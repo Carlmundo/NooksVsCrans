@@ -1,0 +1,248 @@
+;---------------------------------------------------------------------------
+; Override common states (use same number to override) :
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+; Stand
+[Statedef 0]
+type = S
+physics = S
+sprpriority = 0
+velset = 0,0
+ctrl = 1
+;facep2 = 1
+
+[State 0, 1]
+type = ChangeAnim
+triggerall = anim != 200 && animtime != 0
+triggerall = anim != 195
+trigger1 = Anim != 0 ;&& Anim != 5 ;&& anim != 200
+value = 0
+
+[State 300, Turn]
+type = Turn
+trigger1 = p2dist x <= 10
+
+[State 0, PA]
+type = PosAdd
+trigger1 = time = 0
+X = 180-screenpos x
+y = 0
+
+[State 0, No scroll]
+type = ScreenBound
+trigger1 = p2dist x <= 10
+value = 0
+movecamera = 0,0
+
+[State 0, 4]
+type = ChangeState
+trigger1 = time = 100 && roundstate = 2
+value = 211
+
+[State 0, 4] ;Are you dead?
+type = ChangeState
+trigger1 = !alive
+value = 5050
+
+;---------------------------------------------------------------------------
+; Pos
+[Statedef 211]
+type = S
+ctrl = 1
+anim = 0
+velset = 0,0
+movetype = I
+physics = N
+sprpriority = 2
+
+[State 300, Turn]
+type = Turn
+trigger1 = p2dist x <= 10
+
+[State 0, No scroll]
+type = ScreenBound
+trigger1 = p2dist x <= 10
+value = 0
+movecamera = 0,0
+
+[State 0, PA]
+type = PosAdd
+trigger1 = p2dist x <= 10
+X = 180-screenpos x
+y = 0
+
+[State 211, 2]
+type = ChangeState
+trigger1 = Time = 100
+value = 0
+ctrl = 1
+
+;---------------------------------
+
+
+;---------------------------------------------------------------------------
+; Jump Land
+[Statedef 52]
+type    = S
+physics = S
+ctrl = 0
+;anim = 0
+
+[State 52, 4]
+type = ChangeState
+trigger1 = 1
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Walk
+[Statedef 20]
+type    = S
+physics = S
+sprpriority = 0
+anim = 0
+
+[State 20, 1]
+type = VelSet
+trigger1 = command = "holdfwd"
+x = const(velocity.walk.fwd.x)
+
+[State 20, 2]
+type = VelSet
+trigger1 = command = "holdback"
+x = const(velocity.walk.back.x)
+
+;---------------------------------------------------------------------------
+; Jump Start
+[Statedef 40]
+type    = S
+physics = S
+ctrl = 0
+sprpriority = 1
+
+[State 40, 6]
+type = ChangeState
+trigger1 = 1
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouching
+[Statedef 10]
+type    = C
+physics = C
+sprpriority = 0
+
+[State 11, 1]
+type = ChangeState
+trigger1 = 1
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouching
+[Statedef 11]
+type    = C
+physics = C
+sprpriority = 0
+
+[State 11, 1]
+type = ChangeState
+trigger1 = 1
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouching
+[Statedef 12]
+type    = C
+physics = C
+sprpriority = 0
+
+[State 11, 1]
+type = ChangeState
+trigger1 = 1
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; HITA_FALL (knocked up, falling)
+[Statedef 5050]
+type    = A
+movetype= H
+physics = N
+anim = 0
+
+[State 5050, 6]
+type = ChangeState
+trigger1 = 1
+value = 5100
+
+;---------------------------------------------------------------------------
+; HIT_BOUNCE (hit ground)
+[Statedef 5100]
+type    = L
+movetype= H
+physics = N
+
+[State 5100, 7]
+type = ChangeState
+triggerall = alive
+trigger1 = 1
+value = 0 
+
+[State 5100, 7]
+type = ChangeState
+triggerall = !alive
+trigger1 = 1
+value = 5110 
+
+;---------------------------------------------------------------------------
+; HIT_LIEDOWN
+[Statedef 5110]
+type    = L
+movetype= H
+physics = N
+
+[State 5110, 11]
+type = ChangeState
+trigger1 = 1
+value = 5150
+
+;---------------------------------------------------------------------------
+; HIT_LIEDEAD (Explod)
+[Statedef 5150]
+type    = L
+movetype= H
+physics = N
+sprpriority = 1
+velset = 0,0
+anim = 0 ;Anim During Explosion
+
+[State 5150, 8]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+
+;---------------------------------------
+
+;[State 5150, 1] ;Change Anim Again
+;type = ChangeAnim
+;trigger1 = Time = 80
+;value = 210
+
+;----------------------------------------
+
+[State 5150, No Shadows]
+type = AssertSpecial
+trigger1 = 1
+flag = NoShadow
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = time = [0,500]
+flag = roundnotover
+
+;--------------------------------------------

@@ -1,0 +1,3605 @@
+;Scorpion
+;Created by: Gary Fisher ("ermac" on mugenguild.com, mugen-fantry.net)
+
+
+;--------------------------------------------------------------------------
+;wakeup, parry, breakers, etc
+;--------------------------------------------------------------------------
+;dodge bitch
+[Statedef 6168]
+type = C
+physics = C
+movetype = I
+anim = 6168
+velset = ifelse(prevstateno=100,vel x,0),0
+ctrl = 0
+sprpriority = -1
+
+[State ]
+type = NotHitBy
+trigger1 = Time = 0
+value = , NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 17
+
+
+[State 6168, snd]
+type = playsnd
+trigger1 = animelem=1
+value = 3,7
+channel = 0
+
+[State 6168, snd]
+type = playsnd
+trigger1 = animelem=1&&random<500
+value = 11,2
+
+
+
+
+[State 6168, vel]
+type = velset
+trigger1 = animelemtime(2)>=0&&animelemtime(6)<0
+x = 10
+
+[State 6168, push]
+type = playerpush
+trigger1 = 1
+value = 0
+
+[State 6168, hb]
+type = hitby
+trigger1 = animelemtime(7)<0
+value = SCA,AT
+time = 1
+
+[State 6168, end]
+type = changestate
+trigger1 = !animtime
+value = 11
+ctrl = 1
+
+
+
+
+;--------------------------------------------------------------
+;wakeup bitch
+[Statedef 6169]
+type = C
+physics = C
+movetype = I
+anim = 6169
+;velset = ifelse(prevstateno=100,vel x,0),0
+ctrl = 0
+sprpriority = -1
+
+
+[State 6169, push]
+type = playerpush
+trigger1 = 1
+value = 1
+
+[State 6169, hb]
+type = hitby
+trigger1 = time = 1
+value = SCA,AT
+time = 15
+
+
+
+
+;----------------
+;attacks from wakeup
+
+[State 6169, cs]
+type = ChangeState
+trigger1 = Command = "holdback"  ;roll left
+value = 6170
+
+[State 6169, cs]
+type = ChangeState
+trigger1 = Command = "holdfwd"  ;roll right
+value = 5220
+
+
+[State 6169, cs]
+type = ChangeState
+trigger1 = Command = "y"  ;uppercut
+value = 416
+
+[State 6169, cs]
+type = ChangeState
+trigger1 = Command = "b"  ;low punch push
+value = 1401
+
+[State 6169, cs]
+type = ChangeState
+trigger1 = Command = "a"  ;sweep trip
+value = 6171
+
+[State 6169, cs]
+type = ChangeState
+trigger1 = Command = "x"  ;sweep trip
+value = 6171
+
+
+
+
+[state ]
+type = changestate
+trigger1 = life = 0
+value = 5150
+ctrl = 1
+
+
+[State 6169, cs]
+type = changestate
+trigger1 = !animtime
+value = 5120
+ctrl = 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+;--------------------------------------------------------------
+;wakeup roll backwards
+[Statedef 6170]
+type = C
+physics = C
+movetype = I
+anim = 6170
+ctrl = 0
+sprpriority = -1
+
+[State 6170, vel]
+type = velset
+trigger1 = animelemtime(2)>=0&&animelemtime(6)<0
+x = -9
+
+[State 6170, push]
+type = playerpush
+trigger1 = 1
+value = 0
+
+
+
+[State ]
+type = NotHitBy
+trigger1 = Time = 0
+value = , NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 17
+
+;[State 6170, cs]
+;type = changestate
+;trigger1 = !animtime
+;value = 0
+;ctrl = 1
+
+[State 6170, cs]
+type = changestate
+trigger1 = !animtime
+value = 12
+ctrl = 1
+
+
+
+;------------------------------------------------------------------------
+;wakeup sweep
+[Statedef 6171]
+type    = S
+movetype= A
+physics = c
+juggle  = 0
+ctrl = 0
+velset = 0,0
+;poweradd= 100
+anim = 6172
+sprpriority = -1
+
+[State 6171, woosh]
+type = Playsnd
+trigger1 = Time = 2
+value = s1,2  
+
+[State 6173, turn]
+type = turn
+trigger1 = p2bodydist x != [0,400]
+trigger1 = time = 0
+triggerall = p2statetype !=A
+triggerall = p2stateno !=52
+
+
+
+
+[State 6171, def]
+type = HitDef
+trigger1 = !movecontact;time = 3
+attr = S, NA
+animtype  = Back
+damage    = 45, 0
+guardflag = L
+hitflag = LDHMFA
+pausetime = 0, 0
+sparkno = -1
+guard.sparkno = -1
+hitsound   = s0,3
+guardsound = s0,0
+ground.type = Trip
+ground.slidetime = 0
+ground.hittime  = 20
+ground.velocity = 0
+guard.velocity = -3
+air.velocity = -3.4,-4.2
+air.hittime = 16  
+fall = 1
+fall.recover = 0
+
+[state ]
+type = nothitby
+trigger1 = 1
+value = SCA
+
+
+[State 6171, sp]
+type = SprPriority
+trigger1 = AnimElem = 5
+value = 2
+
+[State 6171, cs]
+type = changestate
+trigger1 = !animtime
+value = 5120
+ctrl = 1
+
+
+;------------------------------------------------------------------------
+;wakeup sword attack  (currently not used because it looks gay)
+[Statedef 6172]
+type    = S
+movetype= A
+physics = c
+juggle  = 0
+ctrl = 0
+velset = 0,0
+;poweradd= 100
+anim = 6171
+sprpriority = -1
+
+[State 6172, snd]
+type = playsnd
+trigger1 = time = 1
+value = s11,2
+
+[State 6172, woosh]
+type = Playsnd
+trigger1 = Time = 2
+value = s1,2  
+
+[State 6172, def]
+type = HitDef
+trigger1 = time = 13
+attr = S, NA
+animtype  = Hard
+damage    = 50, 0
+guardflag = L
+hitflag = LDHMFA
+pausetime = 0, 5
+sparkno = -1
+guard.sparkno = -1
+hitsound   = s22,1
+guardsound = s0,0
+ground.type = Low
+ground.slidetime = 15
+ground.hittime  = 20
+ground.velocity = -10
+guard.velocity = -3
+air.velocity = -3.4,-4.2
+air.hittime = 16  
+fall = 0
+fall.recover = 0
+
+
+[State 6172,sp]
+type = SprPriority
+trigger1 = AnimElem = 5
+value = 2
+
+[State 6172, cs]
+type = changestate
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+
+;-------------------------------------------------------------------------
+;wakeup tele kick part1
+[statedef 6173]
+type = U
+movetype = I
+physics = U
+;poweradd= 50
+ctrl = 0
+velset = 0,0
+anim = 6270
+sprpriority = 2
+
+[State 6173, sound]
+type = PlaySnd
+trigger1 = !time
+value = s1, 10
+
+
+
+
+
+
+
+[State 6173,ps] 
+type = posset
+trigger1 = time = 210;trigger1 = !time
+x = ifelse(facing = 1,enemynear,pos x + 60,enemynear,pos x - 60)
+;y = -100
+
+[State 6173, turn] 
+type = turn
+trigger1 = time = 210 && !(enemynear,backedgedist <= 0)
+;trigger1 = !time &&
+
+
+
+[State ]
+type = Helper
+trigger1 = time = 10
+helpertype = Normal
+ID = 14412
+name = "fire vanish"
+postype = p1
+pos = 0,0;40, -200
+;offset = 100, 0
+velocity = 1,-1
+stateno = 14412
+ownpal = 1
+sprpriority = 9999
+ontop = 1
+shadow = -1,0,0
+
+[State 6173,nhb]
+type = nothitby
+trigger1 = !time
+time = 210
+value = SCA
+
+[State 6173, cs]
+type = changestate
+trigger1 = time = 210
+value = 6119
+ctrl = 1
+
+;--------------------------------------------------------------
+;part 2
+[Statedef 6119]
+type    = S
+movetype= A
+physics = S
+juggle  = 3
+ctrl = 0
+velset = 0,0,0
+anim = 1993
+;poweradd = 100
+
+[State ]
+type = Helper
+trigger1 = time = 0
+helpertype = Normal
+ID = 14412
+name = "fire vanish"
+postype = p1
+pos = 0,0;40, -200
+;offset = 100, 0
+velocity = 1,-1
+stateno = 14412
+ownpal = 0
+sprpriority = 9999
+ontop = 1
+shadow = -1,0,0
+
+[State 6173, sound]
+type = PlaySnd
+trigger1 = time = 0
+value = s1, 10
+
+[State 6119,ps] 
+type = posset
+trigger1 = time = 100;trigger1 = !time
+x = ifelse(facing = 1,enemynear,pos x + 60,enemynear,pos x - 60)
+
+[State 6173, turn]
+type = turn
+trigger1 = p2bodydist x != [0,400]
+
+
+
+
+
+[State 6119, turn] 
+type = turn
+trigger1 = time = 100 && !(enemynear,backedgedist <= 0)
+
+
+[State 6119, snd]
+type = Playsnd
+trigger1 = Time = 2
+value = s1,0
+
+[State 6119, def]
+type = HitDef
+numhits = 1
+trigger1 = AnimElem = 4
+attr = S, NA
+animtype  = Back
+damage    = 35, 0
+getpower = 95,5
+guardflag = MH
+hitflag = MAFAD
+pausetime = 3, 0
+sparkno = s9974
+sparkxy = -20,-100                 
+guard.sparkno = -1                   
+hitsound   = s5,0
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -5,-5    
+ground.cornerpush.veloff = -15        
+air.velocity = -4.4,-5.2
+air.hittime = 17  
+fall = 1
+fall.recover = 0
+guard.velocity = -10
+
+[State 6119,nhb]
+type = nothitby
+trigger1 = !time
+time = 25
+value = SCA
+
+[State 6119, cs]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+
+;-------------------------------------------------------------------------
+;wakeup tele-spear
+[statedef 4118]
+type = U
+movetype = I
+physics = U
+;poweradd= 50
+ctrl = 0
+velset = 0,0
+anim = 6270
+sprpriority = 2
+
+[State 6173, sound]
+type = PlaySnd
+trigger1 = !time
+value = s1, 10
+
+
+
+
+[State 6173,ps] 
+type = posset
+trigger1 = time = 210;trigger1 = !time
+x = ifelse(facing = 1,enemynear,pos x + 220,enemynear,pos x - 220)
+;y = -100
+
+
+[State 6173, turn] 
+type = turn
+trigger1 = time = 210 && !(enemynear,backedgedist <= 0)
+;trigger1 = !time &&
+
+
+
+
+[State ]
+type = Helper
+trigger1 = time = 10
+helpertype = Normal
+ID = 14412
+name = "fire vanish"
+postype = p1
+pos = 0,0;40, -200
+;offset = 100, 0
+velocity = 1,-1
+stateno = 14412
+ownpal = 1
+sprpriority = 9999
+ontop = 1
+shadow = -1,0,0
+
+
+
+[State 6173,nhb]
+type = nothitby
+trigger1 = !time
+time = 210
+value = SCA
+
+
+[State 6173, cs]
+type = changestate
+trigger1 = time = 210
+value = 1200
+ctrl = 1
+
+
+;-------------------------------------------------------------------------
+;wakeup spear throw
+[statedef 4119]
+type = U
+movetype = I
+physics = U
+;poweradd= 50
+ctrl = 0
+velset = 0,0
+anim = 6270
+sprpriority = 2
+
+
+[State 6173, sound]
+type = PlaySnd
+trigger1 = !time
+value = s1, 10
+
+
+
+
+[State 6173,ps] 
+type = posset
+trigger1 = time = 210;trigger1 = !time
+x = ifelse(facing = 1,enemynear,pos x + 10,enemynear,pos x - 10)
+;y = -100
+
+
+[State 6173, turn] 
+type = turn
+trigger1 = time = 210 && !(enemynear,backedgedist <= 0)
+;trigger1 = !time &&
+
+
+
+[State ]
+type = Helper
+trigger1 = time = 10
+helpertype = Normal
+ID = 14412
+name = "fire vanish"
+postype = p1
+pos = 0,0;40, -200
+;offset = 100, 0
+velocity = 1,-1
+stateno = 14412
+ownpal = 1
+sprpriority = 9999
+ontop = 1
+shadow = -1,0,0
+
+[State 6173,nhb]
+type = nothitby
+trigger1 = !time
+time = 210
+value = SCA
+
+
+
+
+;spear throw if standing
+[State 6173, cs]
+type = changestate
+trigger1 = time = 210
+trigger1 = frontedgedist >= 40
+trigger1 = p2statetype = S
+value = 6250
+ctrl = 1
+
+
+;change to state 0 of p2 not near
+[State 6173, cs]
+type = changestate
+trigger1 = time = 210
+trigger1 = frontedgedist <= 40
+value = 0
+ctrl = 1
+
+
+[State 6173, cs]
+type = changestate
+trigger1 = time = 210
+trigger1 = frontedgedist >= 40
+trigger1 = p2statetype = A
+value = 6168
+ctrl = 1
+
+[State 6173, cs]
+type = changestate
+trigger1 = time = 210
+trigger1 = frontedgedist >= 40
+trigger1 = p2stateno=6168
+value = 6250
+ctrl = 1
+
+
+  ;error escape??
+[State 6173, cs]
+type = changestate
+trigger1 = time = 250
+value = 6170
+ctrl = 1
+
+
+
+;------------------------------------
+;recovery roll
+[Statedef 5220]
+type = C
+physics = C
+movetype = I
+anim = 5220
+ctrl = 0
+sprpriority = -1
+
+[State 6170, vel]
+type = velset
+trigger1 = animelemtime(2)>=0&&animelemtime(6)<0
+x = 9
+
+[State 6170, push]
+type = playerpush
+trigger1 = 1
+value = 0
+
+
+
+[State ]
+type = NotHitBy
+trigger1 = Time = 0
+value = , NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 17
+
+;[State 6170, cs]
+;type = changestate
+;trigger1 = !animtime
+;value = 0
+;ctrl = 1
+
+[State 6170, cs]
+type = changestate
+trigger1 = !animtime
+value = 12
+ctrl = 1
+
+
+
+;------------------------------------------------------------------------------
+;wakeup low punch push
+
+[Statedef 1401]
+type    = C
+movetype= A
+physics = C
+juggle  = 1
+;poweradd= 60
+ctrl = 0
+anim = 400
+
+[State 6173, turn]
+type = turn
+trigger1 = p2bodydist x != [0,400]
+trigger1 = time = 0
+triggerall = p2statetype !=A
+triggerall = p2stateno !=52
+
+
+[State 400, woosh]
+type = Playsnd
+trigger1 = Time = 2
+value = s1,5 
+
+
+
+[State 400, def]
+type = HitDef
+trigger1 = AnimElem = 2
+attr = C, NA
+damage    = 10, 0
+animtype  = Light
+sparkno = -1
+guard.sparkno = -1
+hitflag = MLAFD
+guardflag = L
+pausetime = 2,2
+hitsound   = s5,5
+guardsound = s0,0
+ground.type = Low
+ground.slidetime = 15
+ground.hittime  = 15
+ground.velocity = -10
+air.velocity = -1.3,-3
+down.velocity = -4,0
+down.hittime = 19
+air.fall=1
+fall.recover = 0
+fall.xvelocity = 0
+fall.yvelocity = 0
+
+[State 400, ctrl]
+type = CtrlSet
+trigger1 = animtime = 0
+value = 1
+
+[state ]
+type = nothitby
+trigger1 = 1
+value = SCA
+
+
+[State 400, cs]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+cttrl = 1
+
+
+
+
+
+
+
+
+;---------------------------------------------------------------------------
+;Parry
+
+[Statedef 7005]
+type = U
+movetype = I
+physics = U
+anim = 7000
+velset = 0,0
+ctrl = 0
+;poweradd = 0
+juggle = 0
+facep2 = 1
+hitdefpersist = 0
+movehitpersist = 0
+hitcountpersist = 0
+sprpriority = 2
+
+
+[State 7005, asserts]
+type = assertspecial
+trigger1 = 1
+flag = nowalk
+flag2 = nostandguard
+flag3 = nocrouchguard
+
+[State 7005, def]
+type = reversaldef
+trigger1 = !movecontact;time = 1
+reversal.attr = S,HA,NA,NT
+animtype  = light
+damage    = 0, 0
+guardflag = 
+hitflag = HM
+pausetime = 0, 0
+sparkno = -1;s10010
+;sparkxy = 1,-115 
+hitsound   = s2,7
+guardsound = s0,0
+ground.type = high
+ground.slidetime = 0
+ground.hittime  = 20
+ground.velocity = 0
+guard.velocity = -0
+air.velocity = 0,0  
+fall.recover = 0
+p2stateno = 14417;4666
+
+[State ]
+type = envcolor
+trigger1 = movehit = 1
+time = 2
+value = 255,255,255
+
+
+[State 7005,nhb]
+type = NotHitBy
+trigger1 = !time
+value = SCA
+time = 2
+
+[State 7005, parry left]
+type = Explod
+trigger1 = movehit = 1
+trigger1 = facing = 1 ;facing right
+anim = 92
+id = 92
+pos = -50,-100
+postype   = p1
+facing = 1
+vfacing = 1
+bindtime = 1
+vel = 0,0
+accel = 0,0
+random = 0,0
+;removetime = 70
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+scale = 1,1
+sprpriority = 3
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+[State 7005, parry right]
+type = Explod
+trigger1 = movehit = 1
+trigger1 = facing = -1 ;facing left
+anim = 93
+id = 93
+pos = 50,-100
+postype = p1
+facing = -1
+vfacing = 1
+bindtime = 1
+vel = 0,0
+accel = 0,0
+random = 0,0
+;removetime = 70
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+scale = 1,1
+sprpriority = 3
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+[State ]
+type = Explod
+trigger1 = time = 0
+anim = 1344
+name = "no spam"
+id = 1349
+pos = 0,0
+postype = left
+facing = 1
+sprpriority = -1
+ownpal = 0
+removetime = 65
+
+
+[State 7005,cs]
+type = ChangeState
+trigger1 = !AnimTime
+value = 0
+ctrl = 1
+
+[state ]
+type=changestate
+trigger1=movecontact=1
+value= 7405
+ctrl=1
+
+
+
+;if parry hits
+[Statedef 7405]
+type = U
+movetype = I
+physics = U
+anim = 7001
+velset = 0,0
+ctrl = 0
+;poweradd = 0
+juggle = 0
+facep2 = 1
+hitdefpersist = 0
+movehitpersist = 0
+hitcountpersist = 0
+sprpriority = 2
+
+[State 7005, asserts]
+type = assertspecial
+trigger1 = 1
+flag = nowalk
+flag2 = nostandguard
+flag3 = nocrouchguard
+
+[state ]
+type = changestate
+trigger1=animtime=0
+value=0
+ctrl=1
+
+
+
+;-------------------------------------------------------------------------------
+;stunned
+[Statedef 4666]
+type    = S
+movetype= H
+physics = N
+velset = 0,0
+ctrl = 0
+
+[State ]
+type = VarSet
+trigger1 = (!Time)
+sysvar(0) = 4
+
+[State 5300: VarAdd]
+type = VarAdd
+trigger1 = (Command = "a") || (Command = "b") || (Command = "c") 
+trigger2 = (Command = "x") || (Command = "y") || (Command = "z")
+sysvar(0) = -1
+
+[state ]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[State 4666, ca]
+type = Changeanim
+trigger1 = animexist(5300)
+trigger1 = anim != 5300
+value = 5300
+
+[State 4666, 2]
+type = Changeanim2
+trigger1 = !animexist(5300)
+trigger1 = anim != 5010
+value = 5010
+
+[State 4666, ss]
+type = Selfstate
+trigger1 = time = 70
+value = 0
+ctrl = 1
+
+;--------------------------------------------------------
+;noob-smoke becomes visible
+;--------------------------------------------------------
+[State ]
+type = VarSet
+trigger1 = time = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+v = 0
+value = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+trigger1 = var(54) = 1
+helpertype = Normal
+ID = 55527
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55527
+ownpal = 1
+;facing = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+trigger1 = var(54) = 2
+helpertype = Normal
+ID = 55528
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55528
+ownpal = 1
+;facing = 0
+
+
+;--------------------------------------------------------
+;reptile becomes visible
+;--------------------------------------------------------
+[State ]
+type = VarSet
+trigger1 = time = 1
+trigger1 = name = "Reptile by Gary Fisher"
+v = 0
+value = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Reptile by Gary Fisher"
+helpertype = Normal
+ID = 55527
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55527
+ownpal = 1
+
+
+
+[state ]
+type = selfstate
+trigger1 = sysvar(0)=0
+triggerall = name != "Scorpion by Gary Fisher"
+triggerall = name != "Sub-Zero by Gary Fisher"
+triggerall = name != "Noob-Smoke by Gary Fisher"
+triggerall = name != "Reptile by Gary Fisher"
+triggerall = name != "Liu Kang by Gary Fisher"
+triggerall = name != "Mimik by Gary Fisher"
+triggerall = name != "Tremor by Gary Fisher"
+value = 0
+ctrl=1
+
+
+
+;-------------------------------------------------------------
+;my characters escape to dodge roll
+
+[State 4666, ss]
+type = Selfstate
+;trigger1 = time = 70
+trigger1 = sysvar(0)=0
+trigger1 = name = "Scorpion by Gary Fisher"
+value = 6168
+ctrl = 1
+
+[State 4666, ss]
+type = Selfstate
+;trigger1 = time = 70
+trigger1 = sysvar(0)=0
+trigger1 = name = "Sub-zero by Gary Fisher"
+value = 6168
+ctrl = 1
+
+[State 4666, ss]
+type = Selfstate
+;trigger1 = time = 70
+trigger1 = sysvar(0)=0
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+value = 6168
+ctrl = 1
+
+[State 4666, ss]
+type = Selfstate
+;trigger1 = time = 70
+trigger1 = sysvar(0)=0
+trigger1 = name = "Reptile by Gary Fisher"
+value = 6168
+ctrl = 1
+
+[State 4666, ss]
+type = Selfstate
+;trigger1 = time = 70
+trigger1 = sysvar(0)=0
+trigger1 = name = "Liu Kang by Gary Fisher"
+value = 6168
+ctrl = 1
+
+[State 4666, ss]
+type = Selfstate
+;trigger1 = time = 70
+trigger1 = sysvar(0)=0
+trigger1 = name = "Mimik by Gary Fisher"
+value = 6168
+ctrl = 1
+
+[State 4666, ss]
+type = Selfstate
+;trigger1 = time = 70
+trigger1 = sysvar(0)=0
+trigger1 = name = "Tremor by Gary Fisher"
+value = 6168
+ctrl = 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;------------------------------------------------------------------------------
+;special spear 2, breaker
+
+[Statedef 1121]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+ctrl = 0
+velset = 0,0,0
+anim = 2019
+;poweradd = 65
+
+
+[State ]
+type = lifeadd
+trigger1 = movecontact = 1
+value = -35
+
+
+
+[State 1121, woosh]
+type = Playsnd
+trigger1 = Time = 0
+value = s1,4
+
+[State 1121, woosh]
+type = Playsnd
+trigger1 = Time = 20
+value = s1,4
+
+[State 1121, woosh]
+type = Playsnd
+trigger1 = Time = 40
+value = s1,4
+
+[State 1121, woosh]
+type = Playsnd
+trigger1 = Time = 60
+value = s1,4
+
+[State 1121, woosh]
+type = Playsnd
+trigger1 = Time = 31
+value = s1,0
+
+
+[State 1121, 2]
+type = HitDef
+trigger1 = time = 1
+attr = S, NA
+animtype  = Back
+damage    = 35, 0
+getpower = 95,5
+guardflag = MA
+hitflag = HAMFLD
+pausetime = 0, 0
+sparkno = -1                   
+guard.sparkno = -1                   
+hitsound   = s5,0
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -5,-5    
+ground.cornerpush.veloff = -15        
+air.velocity = -4.4,-5.2
+air.hittime = 17  
+fall = 1
+fall.recover = 0
+
+[State 1121, 2]
+type = HitDef
+trigger1 = AnimElem = 1
+attr = S, NA
+animtype  = Back
+damage    = 35, 0
+getpower = 95,5
+guardflag = MA
+hitflag = HAMFLD
+pausetime = 0, 0
+sparkno = -1                   
+guard.sparkno = -1                   
+hitsound   = s5,0
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -5,-5    
+ground.cornerpush.veloff = -15        
+air.velocity = -4.4,-5.2
+air.hittime = 17  
+fall = 1
+fall.recover = 0
+
+[State 1121, 2]
+type = HitDef
+trigger1 = AnimElem = 5
+attr = S, NA
+animtype  = Back
+damage    = 35, 0
+getpower = 95,5
+guardflag = MA
+hitflag = HAMFLD
+pausetime = 0, 0
+sparkno = -1                   
+guard.sparkno = -1                   
+hitsound   = s5,0
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -5,-5    
+ground.cornerpush.veloff = -15        
+air.velocity = -4.4,-5.2
+air.hittime = 17  
+fall = 1
+fall.recover = 0
+
+[State 1121, 2]
+type = HitDef
+trigger1 = AnimElem = 7
+attr = S, NA
+animtype  = Back
+damage    = 35, 0
+getpower = 95,5
+guardflag = MA
+hitflag = HAMFLD
+pausetime = 0, 0
+sparkno = -1                   
+guard.sparkno = -1                   
+hitsound   = s5,0
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -5,-5    
+ground.cornerpush.veloff = -15        
+air.velocity = -4.4,-5.2
+air.hittime = 17  
+fall = 1
+fall.recover = 0
+
+[State 1121, 2]
+type = HitDef
+trigger1 = AnimElem = 9
+attr = S, NA
+animtype  = Back
+damage    = 35, 0
+getpower = 95,5
+guardflag = MA
+hitflag = HAMFLD
+pausetime = 0, 0
+sparkno = -1                   
+guard.sparkno = -1                   
+hitsound   = s5,0
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -5,-5    
+ground.cornerpush.veloff = -15        
+air.velocity = -4.4,-5.2
+air.hittime = 17  
+fall = 1
+fall.recover = 0
+
+[State 1121, 2]
+type = HitDef
+trigger1 = AnimElem = 13
+attr = S, NA
+animtype  = Back
+damage    = 35, 0
+getpower = 95,5
+guardflag = MA
+hitflag = HAMFLD
+pausetime = 0, 0
+sparkno = -1                   
+guard.sparkno = -1                   
+hitsound   = s5,0
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -5,-5    
+ground.cornerpush.veloff = -15        
+air.velocity = -4.4,-5.2
+air.hittime = 17  
+fall = 1
+fall.recover = 0
+
+
+[State 1121, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+
+
+;------------------------------------------------------------------------------
+;special Jump flip breaker
+;KANO STYLE BITCH!
+
+[Statedef 1122]
+type    = A
+movetype= A
+physics = A
+juggle  = 0
+;poweradd= 125
+ctrl = 0
+anim = 1122
+;anim = ifelse(!(vel x),641,640)
+sprpriority = 2
+
+
+
+
+
+
+
+[State ]
+type = lifeadd
+trigger1 = time = 0
+value = -35
+
+[State 1122, woosh]
+type = PlaySnd
+trigger1 = Time = 2
+value = 1, 3
+
+[State 1122, 3]
+type = HitDef
+trigger1 = time = 1
+attr = S, NA
+animtype  = Back
+damage    = 35, 0
+getpower = 95,5
+guardflag = MA
+hitflag = HAMFD
+pausetime = 0, 0
+sparkno = -1                   
+guard.sparkno = -1                   
+hitsound   = s5,0
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -5,-5    
+ground.cornerpush.veloff = -15        
+air.velocity = -4.4,-5.2
+air.hittime = 17  
+fall = 1
+fall.recover = 0
+
+
+[State 1122, turn]
+type = turn
+triggerall = p2bodydist x <= -12 && (enemynear,backedgedist != 0)
+trigger1 = !time
+
+[State 1051, 2]
+type = ChangeState
+trigger1 = Command = "a" && movecontact
+value = 3000 
+
+
+
+;------------------------------------------------------------------------------
+;mortal kombat deception/armageddon breaker hit 1
+
+[Statedef 9146]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+ctrl = 0
+velset = 0,0,0
+anim = 775
+;poweradd = 65
+p2facing = 1
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = !time
+attr = S,NA,SA,HA,NT,ST,HT
+slot = 1
+stateno = -1
+time = 5
+forceair = 0
+ignorehitpause =1
+;persistent =
+
+
+
+[state ];disable
+type = varset
+trigger1 = movehit = 1
+var (43) = 1
+
+
+
+[State 1121, woosh]
+type = Playsnd
+trigger1 = Time = 0
+value = s1,4
+
+[State 1121, woosh]
+type = Playsnd
+trigger1 = movehit = 1
+value = s2,7
+channel = 1
+
+[State ]
+type = envcolor
+trigger1 = movehit = 1
+time = 2
+value = 255,255,255
+
+[State ]
+type = Helper
+trigger1 = movehit = 1
+trigger1 = facing = 1
+helpertype = Normal
+ID = 1336
+name = "Breaker"
+pos = -50,-100
+postype   = p1
+stateno = 1663
+ownpal = 1
+size.xscale =1
+size.yscale= 1
+facing = 1
+
+[State ]
+type = Helper
+trigger1 = movehit = 1
+trigger1 = facing = -1
+helpertype = Normal
+ID = 1336
+name = "Breaker"
+pos = 50,-100
+postype = p1
+stateno = 1664
+ownpal = 1
+size.xscale =1
+size.yscale= 1
+facing = -1
+
+
+
+
+
+[State 1121, 2]
+type = HitDef
+trigger1 = time = 1
+trigger1 = frontedgedist >= 90
+attr = S, NA,SA,HA,NT,ST,HT
+animtype  = Back
+damage    = 0, 0
+guardflag =
+hitflag = HAML
+pausetime = 0, 0
+sparkno = -1
+guard.sparkno = -1
+hitsound   = s7,77
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -4.5,0
+ground.cornerpush.veloff = -40
+air.velocity = -10,0
+air.hittime = 17
+fall = 1
+fall.recover = 0
+p2stateno = 1337
+
+[State 1121, 2]
+type = HitDef
+trigger1 = time = 1
+trigger1 = frontedgedist <= 90
+attr = S, NA,SA,HA,NT,ST,HT
+animtype  = Back
+damage    = 0, 0
+guardflag =
+hitflag = HAML
+pausetime = 0, 0
+sparkno = -1
+guard.sparkno = -1
+hitsound   = s7,77
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -4.5,0
+ground.cornerpush.veloff = -40
+air.velocity = -10,0
+air.hittime = 17
+fall = 1
+fall.recover = 0
+p2stateno = 1338
+
+
+[State ]
+type = NotHitBy
+trigger1 = !time
+value = SCA,NA,SA,HA,SP,HP,NT,ST,HT
+time = 40
+
+[State ]
+type = HitBy
+trigger1 = !time
+value = SCA,NP
+time = 40
+
+[state ]
+type = playsnd
+trigger1 = time = 23
+trigger1 = p2stateno = 1337
+value = s0,1
+
+[state ]
+type = playsnd
+trigger1 = time = 25
+trigger1 = p2stateno = 1337
+value = s0,5
+
+;[state ]
+;type = playsnd
+;trigger1 = time = 23
+;trigger1 = p2stateno = 1338
+;value = s0,1
+
+
+
+[State 1121, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+
+
+
+
+;------------------------------------------------------------------------------
+;mortal kombat deception/armageddon breaker hit 2
+
+[Statedef 1334]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+ctrl = 0
+velset = 0,0,0
+anim = 775
+;poweradd = 65
+p2facing = 1
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = !time
+attr = S,NA,SA,HA,NT,ST,HT
+slot = 1
+stateno = -1
+time = 5
+forceair = 0
+ignorehitpause =1
+;persistent =
+
+[state ];disable
+type = varset
+trigger1 = movehit = 1
+var (44) = 1
+
+
+[State 1121, woosh]
+type = Playsnd
+trigger1 = Time = 0
+value = s1,4
+
+[State 1121, woosh]
+type = Playsnd
+trigger1 = movehit = 1
+value = s2,7
+channel = 1
+
+[State ]
+type = envcolor
+trigger1 = movehit = 1
+time = 2
+value = 255,255,255
+
+
+[State ]
+type = Helper
+trigger1 = movehit = 1
+trigger1 = facing = 1
+helpertype = Normal
+ID = 1336
+name = "Breaker"
+pos = -50,-100
+postype   = p1
+stateno = 1663
+ownpal = 1
+size.xscale =1
+size.yscale= 1
+facing = 1
+
+[State ]
+type = Helper
+trigger1 = movehit = 1
+trigger1 = facing = -1
+helpertype = Normal
+ID = 1336
+name = "Breaker"
+pos = 50,-100
+postype = p1
+stateno = 1664
+ownpal = 1
+size.xscale =1
+size.yscale= 1
+facing = -1
+
+
+
+[State 1121, 2]
+type = HitDef
+trigger1 = time = 1
+trigger1 = frontedgedist >= 90
+attr = S, NA,SA,HA,NT,ST,HT
+animtype  = Back
+damage    = 0, 0
+guardflag =
+hitflag = HAML
+pausetime = 0, 0
+sparkno = -1
+guard.sparkno = -1
+hitsound   = s7,77
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -4.5,0
+ground.cornerpush.veloff = -40
+air.velocity = -10,0
+air.hittime = 17
+fall = 1
+fall.recover = 0
+p2stateno = 1337
+
+[State 1121, 2]
+type = HitDef
+trigger1 = time = 1
+trigger1 = frontedgedist <= 90
+attr = S, NA,SA,HA,NT,ST,HT
+animtype  = Back
+damage    = 0, 0
+guardflag =
+hitflag = HAML
+pausetime = 0, 0
+sparkno = -1
+guard.sparkno = -1
+hitsound   = s7,77
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -4.5,0
+ground.cornerpush.veloff = -40
+air.velocity = -10,0
+air.hittime = 17
+fall = 1
+fall.recover = 0
+p2stateno = 1338
+
+
+[State ]
+type = NotHitBy
+trigger1 = !time
+value = SCA,NA,SA,HA,SP,HP,NT,ST,HT
+time = 40
+
+[State ]
+type = HitBy
+trigger1 = !time
+value = SCA,NP
+time = 40
+
+[state ]
+type = playsnd
+trigger1 = time = 23
+trigger1 = p2stateno = 1337
+value = s0,1
+
+[state ]
+type = playsnd
+trigger1 = time = 25
+trigger1 = p2stateno = 1337
+value = s0,5
+
+;[state ]
+;type = playsnd
+;trigger1 = time = 23
+;trigger1 = p2stateno = 1338
+;value = s0,1
+
+
+[State 1121, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+
+;------------------------------------------------------------------------------
+;mortal kombat deception/armageddon breaker hit 3
+
+[Statedef 1335]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+ctrl = 0
+velset = 0,0,0
+anim = 775
+;poweradd = 65
+p2facing = 1
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = !time
+attr = S,NA,SA,HA,NT,ST,HT
+slot = 1
+stateno = -1
+time = 5
+forceair = 0
+ignorehitpause =1
+;persistent =
+
+[state ];disable
+type = varset
+trigger1 = movehit = 1
+var (45) = 1
+
+
+[State 1121, woosh]
+type = Playsnd
+trigger1 = Time = 0
+value = s1,4
+
+[State 1121, woosh]
+type = Playsnd
+trigger1 = movehit = 1
+value = s2,7
+channel = 1
+
+[State ]
+type = envcolor
+trigger1 = movehit = 1
+time = 2
+value = 255,255,255
+
+
+[State ]
+type = Helper
+trigger1 = movehit = 1
+trigger1 = facing = 1
+helpertype = Normal
+ID = 1336
+name = "Breaker"
+pos = -50,-100
+postype   = p1
+stateno = 1663
+ownpal = 1
+size.xscale =1
+size.yscale= 1
+facing = 1
+
+[State ]
+type = Helper
+trigger1 = movehit = 1
+trigger1 = facing = -1
+helpertype = Normal
+ID = 1336
+name = "Breaker"
+pos = 50,-100
+postype = p1
+stateno = 1664
+ownpal = 1
+size.xscale =1
+size.yscale= 1
+facing = -1
+
+
+
+
+[State 1121, 2]
+type = HitDef
+trigger1 = time = 1
+trigger1 = frontedgedist >= 90
+attr = S, NA,SA,HA,NT,ST,HT
+animtype  = Back
+damage    = 0, 0
+guardflag =
+hitflag = HAML
+pausetime = 0, 0
+sparkno = -1
+guard.sparkno = -1
+hitsound   = s7,77
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -4.5,0
+ground.cornerpush.veloff = -40
+air.velocity = -10,0
+air.hittime = 17
+fall = 1
+fall.recover = 0
+p2stateno = 1337
+
+[State 1121, 2]
+type = HitDef
+trigger1 = time = 1
+trigger1 = frontedgedist <= 90
+attr = S, NA,SA,HA,NT,ST,HT
+animtype  = Back
+damage    = 0, 0
+guardflag =
+hitflag = HAML
+pausetime = 0, 0
+sparkno = -1
+guard.sparkno = -1
+hitsound   = s7,77
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -4.5,0
+ground.cornerpush.veloff = -40
+air.velocity = -10,0
+air.hittime = 17
+fall = 1
+fall.recover = 0
+p2stateno = 1338
+
+
+[State ]
+type = NotHitBy
+trigger1 = !time
+value = SCA,NA,SA,HA,SP,HP,NT,ST,HT
+time = 40
+
+[State ]
+type = HitBy
+trigger1 = !time
+value = SCA,NP
+time = 40
+
+[state ]
+type = playsnd
+trigger1 = time = 23
+trigger1 = p2stateno = 1337
+value = s0,1
+
+[state ]
+type = playsnd
+trigger1 = time = 25
+trigger1 = p2stateno = 1337
+value = s0,5
+
+;[state ]
+;type = playsnd
+;trigger1 = time = 23
+;trigger1 = p2stateno = 1338
+;value = s0,1
+
+
+[State 1121, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+
+;------------------------------------------------------------------------------
+;p2's breaker state
+
+[Statedef 1337]
+type    = L
+movetype= I
+physics = C
+ctrl = 0
+velset = 0,0,0
+
+[state ]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state ]
+type = changeanim2
+trigger1 = time = 0
+value = 11035
+
+
+
+[state ]
+type = velset
+trigger1 = time = [0,22]
+x = -5
+
+[state ]
+type = velset
+trigger1 = time = 23
+x = 0
+
+[state ]
+type = velset
+trigger1 = time = [24,45]
+x = -3.5
+
+[state ]
+type = velset
+trigger1 = time = 46
+x = 0
+
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 =1
+value = 0
+;ignorehitpause =
+;persistent =
+
+
+
+[State ]
+type = NotHitBy
+trigger1 = !time
+value = SCA
+time = 43;120
+
+
+;--------------------------------------------------------
+;noob-smoke becomes visible
+;--------------------------------------------------------
+[State ]
+type = VarSet
+trigger1 = time = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+v = 0
+value = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+trigger1 = var(54) = 1
+helpertype = Normal
+ID = 55527
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55527
+ownpal = 1
+;facing = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+trigger1 = var(54) = 2
+helpertype = Normal
+ID = 55528
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55528
+ownpal = 1
+;facing = 0
+
+
+;--------------------------------------------------------
+;reptile becomes visible
+;--------------------------------------------------------
+[State ]
+type = VarSet
+trigger1 = time = 1
+trigger1 = name = "Reptile by Gary Fisher"
+v = 0
+value = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Reptile by Gary Fisher"
+helpertype = Normal
+ID = 55527
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55527
+ownpal = 1
+
+
+
+
+;-----------------------------
+;scorp buster
+;-----------------------------
+[State ]
+type = selfstate
+trigger1 = command = "a" && time = [1,10]
+triggerall = var(55) = 1
+triggerall = var(59) !=1
+trigger1 = name = "Scorpion by Gary Fisher"
+value = 415
+
+[State ]
+type = selfstate
+trigger1 = time = [1,10]
+triggerall= random >= 250 && random < 299 || random >= 950 && random <= 999
+triggerall = var(55) = 1
+triggerall = var(59) =1
+trigger1 = name = "Scorpion by Gary Fisher"
+value = 415
+
+
+;-----------------------------
+;sub buster
+;-----------------------------
+[State ]
+type = selfstate
+trigger1 = command = "a" && time = [1,10]
+triggerall = var(55) = 1
+triggerall = var(59) !=1
+trigger1 = name = "Sub-Zero by Gary Fisher"
+value = 415
+
+[State ]
+type = selfstate
+trigger1 = time = [1,10]
+triggerall= random >= 250 && random < 299 || random >= 950 && random <= 999
+triggerall = var(55) = 1
+triggerall = var(59) =1
+trigger1 = name = "Sub-Zero by Gary Fisher"
+value = 415
+
+;-----------------------------
+;rep buster
+;-----------------------------
+[State ]
+type = selfstate
+trigger1 = command = "a" && time = [1,10]
+triggerall = var(55) = 1
+triggerall = var(59) !=1
+trigger1 = name = "Reptile by Gary Fisher"
+value = 415
+
+[State ]
+type = selfstate
+trigger1 = time = [1,10]
+triggerall= random >= 250 && random < 299 || random >= 950 && random <= 999
+triggerall = var(55) = 1
+triggerall = var(59) =1
+trigger1 = name = "Reptile by Gary Fisher"
+value = 415
+
+;-----------------------------
+;noob buster
+;-----------------------------
+[State ]
+type = selfstate
+trigger1 = command = "a" && time = [1,10]
+triggerall = var(55) = 1
+triggerall = var(59) !=1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+value = 415
+
+[State ]
+type = selfstate
+trigger1 = time = [1,10]
+triggerall= random >= 250 && random < 299 || random >= 950 && random <= 999
+triggerall = var(55) = 1
+triggerall = var(59) =1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+value = 415
+
+;-----------------------------
+;liu buster
+;-----------------------------
+[State ]
+type = selfstate
+trigger1 = command = "a" && time = [1,10]
+triggerall = var(55) = 1
+triggerall = var(59) !=1
+trigger1 = name = "Liu Kang by Gary Fisher"
+value = 415
+
+[State ]
+type = selfstate
+trigger1 = time = [1,10]
+triggerall= random >= 250 && random < 299 || random >= 950 && random <= 999
+triggerall = var(55) = 1
+triggerall = var(59) =1
+trigger1 = name = "Liu Kang by Gary Fisher"
+value = 415
+
+
+
+
+
+;-----------------------------
+;Mimik buster
+;-----------------------------
+[State ]
+type = selfstate
+trigger1 = command = "a" && time = [1,10]
+triggerall = var(55) = 1
+triggerall = var(59) !=1
+trigger1 = name = "Mimik by Gary Fisher"
+value = 415
+
+[State ]
+type = selfstate
+trigger1 = time = [1,10]
+triggerall= random >= 250 && random < 299 || random >= 950 && random <= 999
+triggerall = var(55) = 1
+triggerall = var(59) =1
+trigger1 = name = "Mimik by Gary Fisher"
+value = 415
+
+
+;-----------------------------
+;Tremor buster
+;-----------------------------
+[State ]
+type = selfstate
+trigger1 = command = "a" && time = [1,10]
+triggerall = var(55) = 1
+triggerall = var(59) !=1
+trigger1 = name = "Tremor by Gary Fisher"
+value = 415
+
+[State ]
+type = selfstate
+trigger1 = time = [1,10]
+triggerall= random >= 250 && random < 299 || random >= 950 && random <= 999
+triggerall = var(55) = 1
+triggerall = var(59) =1
+trigger1 = name = "Tremor by Gary Fisher"
+value = 415
+
+
+
+
+
+
+
+
+
+
+[State 1121, 3]
+type = selfstate
+trigger1 = Time = 100
+value = 5120
+ctrl = 1
+
+;------------------------------------------------------------------------------
+;p2's breaker state close
+
+[Statedef 1338]
+type    = L
+movetype= H
+physics = C
+ctrl = 0
+velset = 0,0,0
+
+[state ]
+type = playsnd
+trigger1 = time = 21
+value = s0,1
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = time = [0,100]
+value = 0
+;ignorehitpause =
+;persistent =
+
+[state ]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state ]
+type = changeanim2
+trigger1 = time = 0
+value = 11035
+
+[state ]
+type = velset
+trigger1 = time = [0,22]
+x = -5
+
+[state ]
+type = velset
+trigger1 = time = 23
+x = 0
+
+[State ]
+type = NotHitBy
+trigger1 = !time
+value = SCA
+time = 50
+
+
+[State ]
+type = VarSet
+trigger1 = time = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+v = 0
+value = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+trigger1 = var(54) = 1
+helpertype = Normal
+ID = 55527
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55527
+ownpal = 1
+;facing = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+trigger1 = var(54) = 2
+helpertype = Normal
+ID = 55528
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55528
+ownpal = 1
+;facing = 0
+
+
+;--------------------------------------------------------
+;reptile becomes visible
+;--------------------------------------------------------
+[State ]
+type = VarSet
+trigger1 = time = 1
+trigger1 = name = "Reptile by Gary Fisher"
+v = 0
+value = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Reptile by Gary Fisher"
+helpertype = Normal
+ID = 55527
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55527
+ownpal = 1
+
+[State 1121, 3]
+type = selfstate
+trigger1 = Time = 50
+value = 5120
+ctrl = 1
+;------------------------------------------------------------------------------
+;wakeup uppercut
+
+[Statedef 416]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+ctrl = 0
+;poweradd= 185
+anim = 410
+sprpriority = 2
+
+[state ]
+type = nothitby
+trigger1 = 1
+value = SCA
+
+[State 6173, turn]
+type = turn
+trigger1 = p2bodydist x != [-40,400]
+trigger1 = time = 0
+;triggerall = p2statetype !=A
+;triggerall = p2stateno !=52
+
+
+[State 410, snd]
+type = Playsnd
+trigger1 = time = 2
+value = s11, 7
+
+
+[State 410,snd]
+type = Playsnd
+trigger1 = Time = 2
+value = s1,3
+
+[State 410, pos]
+type = PosAdd
+trigger1 = AnimElem = 2
+x = 20
+
+[State 410, pos]
+type = PosAdd
+trigger1 = AnimElem = 3
+trigger2 = AnimElem = 13
+x = 10
+
+[State 410, pos]
+type = PosAdd
+trigger1 = AnimElem = 5
+x = 5
+
+[State 410, close]
+type = Hitdef
+trigger1 = !time
+damage = 100,0
+getpower = 50,25
+;pausetime = 20,14
+p1stateno = 411
+attr = C,NA
+guardflag = HMA
+hitflag = HMAFD
+animtype = heavy
+air.animtype = back
+priority = 7, hit
+sparkno = s9973
+sparkxy = -20,-100
+hitsound = s5,1
+guardsound = s0,0
+ground.type = high
+air.type = high
+ground.slidetime = 10
+guard.slidetime = 15
+ground.hittime = 10
+guard.hittime = 15
+ground.velocity = -2, -15
+air.velocity = -2, -13
+guard.velocity = -13
+air.cornerpush.veloff = -29
+ground.cornerpush.veloff = -29
+yaccel = .5
+fall = 1
+fall.recover = 0
+envshake.time = 15
+envshake.ampl = -4
+fall.xvelocity = 0
+fall.yvelocity = 0
+p2facing = 1
+
+
+
+
+[State 410, pos]
+type = PosAdd
+trigger1 = AnimElem = 9
+x = -5
+
+[State 410, cs]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;------------------------
+;wakeup uppercut part 2
+[Statedef 417]
+type    = S
+movetype= I
+physics = S
+juggle  = 1
+ctrl = 0
+anim = 411
+;poweradd = 55
+
+
+[State 411, cs]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+
+
+
+
+
+;------------------------------------------------------------------------------
+;p2's knockdown state
+
+[Statedef 6338]
+type    = L
+movetype= H
+physics = C
+ctrl = 0
+velset = 0,0,0
+
+
+
+
+
+
+
+
+
+
+
+
+
+[state ]
+type = playsnd
+trigger1 = time = 21
+value = s0,1
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = time = [0,100]
+value = 0
+;ignorehitpause =
+;persistent =
+
+[state ]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state ]
+type = changeanim2
+trigger1 = time = 0
+value = 11035
+
+[state ]
+type = velset
+trigger1 = time = [0,22]
+x = -5
+
+[state ]
+type = velset
+trigger1 = time = 23
+x = 0
+
+[State ]
+type = NotHitBy
+trigger1 = !time
+value = SCA
+time = 50
+
+
+[State ]
+type = VarSet
+trigger1 = time = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+v = 0
+value = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+trigger1 = var(54) = 1
+helpertype = Normal
+ID = 55527
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55527
+ownpal = 1
+;facing = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+trigger1 = var(54) = 2
+helpertype = Normal
+ID = 55528
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55528
+ownpal = 1
+;facing = 0
+
+
+[state ]
+type = selfstate
+trigger1 = time = 0
+triggerall = gethitvar(damage) >= life
+;trigger1 = statetype !=A
+TRIGGER1 = name != "scorpion by gary fisher"
+triggerall = var(49)=1
+value = 5394
+ctrl = 1
+
+[state ]
+type = selfstate
+trigger1 = time = 0
+triggerall = gethitvar(damage) >= life
+;trigger1 = statetype !=A
+TRIGGER1 = name ="scorpion by gary fisher"
+trigger1 = var(48) = 1
+trigger1 = var(47)!=1
+value = 6394
+ctrl = 1
+
+[state ]
+type = selfstate
+trigger1 = time = 0
+triggerall = gethitvar(damage) >= life
+;trigger1 = statetype !=A
+TRIGGER1 = name ="scorpion by gary fisher"
+trigger1 = var(49) = 0
+trigger1 = var(47) = 1
+value = 5394
+ctrl = 1
+
+
+
+
+
+
+
+
+
+
+
+
+[State 1121, 3]
+type = selfstate
+trigger1 = Time = 50
+value = 6169
+ctrl = 1
+
+[State 1121, 3]
+type = selfstate
+trigger1 = life = 0
+trigger1 = time = 50
+value = 5150
+ctrl = 1
+
+
+;--------------------------------------------------------
+;reptile becomes visible
+;--------------------------------------------------------
+[State ]
+type = VarSet
+trigger1 = time = 1
+trigger1 = name = "Reptile by Gary Fisher"
+v = 0
+value = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Reptile by Gary Fisher"
+helpertype = Normal
+ID = 55527
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55527
+ownpal = 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;-----------------------------------------------------------------
+;firevanish its self
+[Statedef 14412]
+type = S
+movetype = A
+physics = S
+anim = 14455
+sprpriority = 9999
+ctrl = 0
+shadow = -1,0,0
+
+[state ]
+type = assertspecial
+trigger1 = 1
+flag = noshadow
+
+
+[state ]
+type = destroyself
+trigger1 = time = 22
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;----------------------------------------------------------
+;----------------------------------------------------------
+;---------------------------------------------------------------------------
+;breaker buster
+[Statedef 415]
+type = A
+movetype = I
+physics = N
+;poweradd = 100
+velset = 0,0
+Anim = 7757
+ctrl = 0
+sprpriority = 0
+
+
+
+
+[State ]
+type = playsnd
+trigger1 = time = 0
+value = s11,2
+
+[State ]
+type = VelSet
+trigger1 = time = 8
+x = -4
+
+[State ]
+type = VelSet
+trigger1 = time = 29
+x = 0
+
+[State ]
+type = PosSet
+trigger1 = time = 10
+y = -17
+
+[State ]
+type = PosSet
+trigger1 = time = 14
+y = -19
+
+[State ]
+type = PosSet
+trigger1 = time = 23
+y = -14
+
+[State ]
+type = PosSet
+trigger1 = time = 29
+y = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+helpertype = Normal
+ID = 1336
+name = "make lightning"
+Postype = p2
+pos = 0,0
+stateno = 1336
+ownpal = 1
+
+[state ]
+type = varset
+trigger1 = time = 0
+trigger1 = var(55) = 1
+v = 55
+value = 0
+
+[State ]
+type = ChangeState
+trigger1 = Time = 32
+ctrl = 1
+value = 52
+
+
+
+
+
+
+;------------------------------------------------------------------------------
+;breaker buster lightning helper
+
+[Statedef 1336]
+type    = S
+movetype= A
+physics = S
+ctrl = 0
+velset = 0,0
+anim = 4409
+sprpriority = 3
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = time = [0,33]
+value = 1
+movecamera = 0,0
+ignorehitpause =  1
+persistent = 1
+
+[state ]
+type = playsnd
+trigger1 = time = 26
+value = s2,24
+
+[state ]
+type = playsnd
+trigger1 = time = 5
+value = s32,25
+
+
+
+[state 668]
+type = HitDef
+trigger1 = !movecontact
+attr = A, NP
+animtype  = diagup;Back
+damage    = 75, 0
+guardflag =
+hitflag = HMLDF
+pausetime = 0, 0
+sparkno = -1
+guard.sparkno = -1
+;hitsound   = s5,0
+;guardsound = s0,0
+ground.type = High
+ground.slidetime = 0
+ground.hittime  = 0
+ground.velocity = 5,-3.2
+ground.cornerpush.veloff = 0
+air.velocity = 0,0
+air.hittime = 0
+fall = 1
+fall.recover = 0
+p2facing = 0
+palfx.time = 10
+palfx.add = 100,100,100
+palfx.mul = 256,256,256
+palfx.sinadd = -80,-80,-80,10
+palfx.invertall = 0
+palfx.color = 0
+
+[State ]
+type = Explod
+trigger1 = time = 5;movehit = 1
+anim = 4413
+name = "sparkel"
+id = 10017
+pos = -150,-50
+postype = p2
+facing = 1
+sprpriority = 5
+ownpal = 0
+;removetime = 150
+ontop = 1
+
+[State ]
+type = Explod
+trigger1 = movehit = 1
+anim = 4413
+name = "sparkel"
+id = 10017
+Postype = p2
+pos = -150,-150
+facing = 1
+sprpriority = 5
+ownpal = 0
+;removetime = 150
+ontop = 1
+
+[State ]
+type = Explod
+trigger1 =time=8
+anim = 4414
+name = "sparkel"
+id = 4414
+Postype = p2
+pos = 20,15
+facing = 1
+sprpriority = 15
+ownpal = 0
+;removetime = 150
+ontop = 1
+
+[State ]
+type = assertspecial
+trigger1 = 1
+flag = noshadow
+
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 1
+movecamera = 0,0
+
+[State ]
+type = destroyself
+trigger1 = animtime = 0
+trigger2 = p2life = 0
+
+
+
+
+
+;--------------------------------------------------------------
+;breaker explodes right
+
+[Statedef 1663]
+type    = S
+movetype= A
+physics = S
+ctrl = 0
+velset = 0,0
+anim = 783
+sprpriority = 3
+
+[state ]
+type = assertspecial
+trigger1 = 1
+flag = noshadow
+
+[state ]
+type = velset
+trigger1 = 1
+x = -1
+y = -1
+
+[State ]
+type = Helper
+trigger1 = p2stateno = 415
+triggerall = time = 20
+triggerall = root, stateno = 5050
+helpertype = Normal
+ID = 4415
+name = "broken"
+Postype = p1
+pos = 0,0
+stateno = 1665
+ownpal = 1
+
+
+
+[state ]
+type = destroyself
+trigger1 = time = 51
+trigger2 = numhelper(4415)=1
+
+
+;--------------------------------------------------------------
+;breaker explodes left
+
+[Statedef 1664]
+type    = S
+movetype= A
+physics = S
+ctrl = 0
+velset = 0,0
+anim = 783
+sprpriority = 3
+
+[state ]
+type = assertspecial
+trigger1 = 1
+flag = noshadow
+
+[state ]
+type = velset
+trigger1 = 1
+x = 1
+y = -1
+
+[State ]
+type = Helper
+trigger1 = p2stateno = 415
+triggerall = time = 20
+triggerall = root, stateno = 5050
+helpertype = Normal
+ID = 4415
+name = "broken"
+Postype = p1
+pos = 0,0
+stateno = 1665
+ownpal = 1
+
+
+[state ]
+type = destroyself
+trigger1 = time = 51
+trigger2 = numhelper(4415)=1
+
+
+;--------------------------------------------------------------
+;breaker is broken
+
+[Statedef 1665]
+type    = S
+movetype= A
+physics = S
+ctrl = 0
+velset = 0,0
+anim = 4415
+sprpriority = 3
+
+[state ]
+type = playsnd
+trigger1 = time = 0
+value = s32, 26
+
+[state ]
+type = assertspecial
+trigger1 = 1
+flag = noshadow
+
+
+[state ]
+type = destroyself
+trigger1 = animtime = 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;---------------------------------------------------------------------------
+;guard push
+
+[Statedef 4225]
+type = U
+movetype = A
+physics = U
+anim = 4225
+velset = 0,0
+sprpriority = 2
+
+[state ]
+type = varset
+trigger1 = var(57) >= 5
+trigger1 = movehit = 1
+var(57) = 0
+
+[State ]
+type = envcolor
+trigger1 = movehit = 1
+time = 2
+value = 255,255,255
+
+[state ]
+type = velset
+trigger1 = movehit = 1
+x=0
+
+[State 200, 2]
+type = HitDef
+trigger1 = !time
+attr = S, SA
+animtype  = hard
+damage    = 55, 0
+guardflag =
+hitflag = HMLAFD
+pausetime = 0, 0
+sparkno = -1
+sparkxy = -20,-100
+guard.sparkno = -1
+hitsound   = s5,2
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 25
+ground.hittime  = 18
+ground.velocity = -25
+air.velocity = -3.2,-4.2
+p2facing = 1
+airguard.velocity = -1.9
+air.fall = 1
+fall.recover = 0
+
+
+[State 7005,nhb]
+type = NotHitBy
+trigger1 = !time
+value = SCA
+time = 30
+
+;[State 4667, parry spark]
+;type = Explod
+;trigger1 = movehit = 1;(AnimElem = 2)
+;anim = 10010
+;id = 10010
+;pos = 5,(IfElse(StateType = S,-105,-80))
+;postype	= p1
+;facing = 1
+;vfacing = 1
+;bindtime = 1
+;vel = 0,0
+;accel = 0,0
+;random = 0,0
+;removetime = -2
+;supermove = 0
+;supermovetime = 0
+;pausemovetime = 12
+;scale = 1,1
+;sprpriority = 3
+;ontop = 0
+;shadow = 0,0,0
+;ownpal = 1
+;removeongethit = 0
+
+[State ]
+type = Helper
+trigger1 = movehit = 1
+helpertype = Normal
+ID = 4415
+name = "guard spark"
+Postype = p1
+pos = 5,(IfElse(StateType = S,-105,-80))
+stateno = 4226
+ownpal = 1
+
+[State 7005,cs]
+type = ChangeState
+trigger1 = time = 20
+value = 0
+ctrl = 1
+
+;--------------------------------------------------------------
+;spark helper
+
+[Statedef 4226]
+type    = S
+movetype= A
+physics = S
+ctrl = 0
+velset = 0,0
+anim = 10010
+sprpriority = 3
+
+
+
+[state ]
+type = assertspecial
+trigger1 = 1
+flag = noshadow
+
+
+[state ]
+type = destroyself
+trigger1 = animtime = 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;p2 hit state 4 -----escape tremor throw
+[Statedef 19227]
+type    = A
+movetype= A
+physics = A
+juggle  = 1
+;poweradd= 125
+velset = 1,0
+ctrl = 1
+anim = ifelse(!(vel x),641,10015)
+sprpriority = 2
+
+
+[State 641, woosh]
+type = PlaySnd
+trigger1 = Time = 0
+value = S1, 3
+
+[State 641, def]
+type = HitDef
+trigger1 = !movecontact
+trigger1 = time > 0
+trigger1 = p2statetype = S
+trigger1 = p2statetype != A
+attr = A, NA
+damage = ifelse(anim = 640,25,0),ifelse(anim = 641,30,0)
+guardflag = HA
+hitflag = HALMFD
+priority = 4
+pausetime = 7,8
+sparkno = s9972
+sparkxy = -10,-40
+hitsound   = s5,0
+guardsound = s0,0
+animtype = Med
+ground.type = High
+ground.slidetime = 15
+ground.hittime  = 15
+ground.velocity = -3, ifelse(anim = 641,0,-7)
+air.velocity = -3,-4
+air.fall = 1
+air.animtype = back
+fall.recover = 0
+fall.xvelocity = 0
+fall.yvelocity = 0
+p2facing = 1
+air.hittime = 17
+kill = 1
+fall = 1
+p2stateno=6338
+
+[State 641, def]
+type = HitDef
+trigger1 = !movecontact
+trigger1 = time > 0
+trigger1 = p2statetype != S
+trigger1 = p2statetype  = A
+attr = A, NA
+damage = ifelse(anim = 640,25,0),ifelse(anim = 641,30,0)
+guardflag = HA
+hitflag = HALMFD
+priority = 4
+pausetime = 7,8
+sparkno = s9972
+sparkxy = -10,-40
+hitsound   = s5,7
+guardsound = s0,0
+animtype = Med
+ground.type = High
+ground.slidetime = 15
+ground.hittime  = 15
+ground.velocity = -3, ifelse(anim = 641,0,-7)
+air.velocity = -3,-4
+air.fall = 1
+air.animtype = back
+fall.recover = 0
+fall.xvelocity = 0
+fall.yvelocity = 0
+p2facing = 1
+air.hittime = 17
+kill = 1
+fall = 1
+
+
+
+[State 641,turn]
+type = turn
+triggerall = p2bodydist x <= -12 && (enemynear,backedgedist != 0)
+trigger1 = !time
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;---------------------------------------------------------------------------
+;counter
+
+[Statedef 6139]
+type = U
+movetype = A
+physics = U
+anim = 7000
+velset = 0,0
+ctrl = 0
+;poweradd = 0
+juggle = 0
+facep2 = 1
+hitdefpersist = 0
+movehitpersist = 0
+hitcountpersist = 0
+sprpriority = 2
+
+
+[State 7005, asserts]
+type = assertspecial
+trigger1 = 1
+flag = nowalk
+flag2 = nostandguard
+flag3 = nocrouchguard
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = !time
+attr = S,NA,SA,HA,NT,ST,HT
+slot = 1
+stateno = -1
+time = 5
+forceair = 0
+ignorehitpause =1
+;persistent =
+
+[State 7005, def]
+type = hitdef
+trigger1 = time = 1
+attr = S, NA,SA,HA,NT,ST,HT
+animtype  = light
+damage    = 0, 0
+guardflag = 
+hitflag = HML
+pausetime = 0, 0
+sparkno = -1;s10010
+;sparkxy = 1,-115 
+hitsound   = s45,0
+guardsound = s0,0
+ground.type = high
+ground.slidetime = 0
+ground.hittime  = 20
+ground.velocity = 0
+guard.velocity = -0
+air.velocity = 0,0  
+fall.recover = 0
+p2stateno = 6121
+
+[State ]
+type = envcolor
+trigger1 = movehit = 1
+time = 10
+value = 255,255,255
+
+
+[State 7005,nhb]
+type = NotHitBy
+trigger1 = !time
+value = SCA
+time = 2
+
+
+
+[State ]
+type = Explod
+trigger1 = time = 0
+anim = 1344
+name = "no spam"
+id = 1349
+pos = 0,0
+postype = left
+facing = 1
+sprpriority = -1
+ownpal = 0
+removetime = 65
+
+
+[State 7005,cs]
+type = ChangeState
+trigger1 = !AnimTime
+value = 0
+ctrl = 1
+
+[state ]
+type = changestate
+trigger1 = movehit = 1
+value = 6120
+ctrl = 1
+
+
+;-------------------------------------------------------------------------------
+;p2 stunned 
+[Statedef 6121]
+type    = S
+movetype= H
+physics = N
+velset = 0,0
+ctrl = 0
+
+
+[state ]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[State 4666, ca]
+type = Changeanim2
+trigger1 = time = 0
+value = 6121
+
+[state ]
+type = playsnd
+trigger1 = time = 15
+value = s1,2
+
+[state ]
+type = playsnd
+trigger1 = time = 57
+value = s1,0
+
+
+[State 4666, ss]
+type = Selfstate
+trigger1 = time = 200
+value = 0
+ctrl = 1
+
+
+
+;--------------------------------------------------------
+;noob-smoke becomes visible
+;--------------------------------------------------------
+[State ]
+type = VarSet
+trigger1 = time = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+v = 0
+value = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+trigger1 = var(54) = 1
+helpertype = Normal
+ID = 55527
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55527
+ownpal = 1
+;facing = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Noob-Smoke by Gary Fisher"
+trigger1 = var(54) = 2
+helpertype = Normal
+ID = 55528
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55528
+ownpal = 1
+;facing = 0
+
+
+;--------------------------------------------------------
+;reptile becomes visible
+;--------------------------------------------------------
+[State ]
+type = VarSet
+trigger1 = time = 1
+trigger1 = name = "Reptile by Gary Fisher"
+v = 0
+value = 0
+
+[State ]
+type = Helper
+trigger1 = time = 0
+trigger1 = var(0) = 1
+trigger1 = name = "Reptile by Gary Fisher"
+helpertype = Normal
+ID = 55527
+name = "smoke poof"
+postype = p1
+pos = -37,-94
+stateno = 55527
+ownpal = 1
+
+
+
+
+
+
+
+;---------------------------------------------------------------------------
+;counter if success
+
+[Statedef 6120]
+type = U
+movetype = A
+physics = U
+anim = 6120
+velset = 0,0
+ctrl = 0
+poweradd = 0
+juggle = 0
+facep2 = 1
+hitdefpersist = 0
+movehitpersist = 0
+hitcountpersist = 0
+sprpriority = 2
+
+[state ]
+type = varset
+trigger1 = time = 0
+var(51)=1
+
+
+[State 7005, asserts]
+type = assertspecial
+trigger1 = 1
+flag = nowalk
+flag2 = nostandguard
+flag3 = nocrouchguard
+
+[State ]
+type = Explod
+trigger1 = time = 0
+anim = 1344
+name = "no spam"
+id = 1349
+pos = 0,0
+postype = left
+facing = 1
+sprpriority = -1
+ownpal = 0
+removetime = 65
+
+
+[State 239, 2]
+type = HitDef
+trigger1 = !movecontact
+attr = C, NA
+animtype  = Back
+damage    = 88, 0
+guardflag = M
+hitflag = HM
+pausetime = 0, 0
+sparkno = s9972
+sparkxy = -20,-100              
+guard.sparkno = -1                   
+hitsound   = s5,0
+guardsound = s0,0
+ground.type = High
+ground.slidetime = 30
+ground.hittime  = 30
+ground.velocity = -5,-5    
+ground.cornerpush.veloff = -15        
+air.velocity = -4.4,-5.2
+air.hittime = 17  
+fall = 1
+fall.recover = 0
+;p2stateno = 33421
+p2stateno = 6338
+
+
+
+[State 239, snd]
+type = Playsnd
+trigger1 = time = 2
+value = s11, 2
+
+[state ]
+type = playsnd
+trigger1 = time = 40
+value = s7,0
+
+[state ]
+type = playsnd
+trigger1 = time = 60
+value = s0,2
+
+[state ]
+type = playsnd
+trigger1 = time = 65
+value = s11,8
+
+
+
+
+
+
+
+[State 7005,cs]
+type = ChangeState
+trigger1 = !AnimTime
+value = 0
+ctrl = 1
+
+
+
+
+
+
+
+

@@ -1,0 +1,251 @@
+;===========================================================================
+;
+; OH SHETLAND SHEEPDOGS! MINUS STATES!
+;
+;===========================================================================
+
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+
+;Statedef -2
+[Statedef -2]
+
+;Yee, this state summons the Super Armour helper. Helpful for when Yee don't want to be interupted while Yee're singing.
+;ShamelesslYee stolen from ElecbYeete's wikYee, and by extension, SeravYee.
+
+[State -2, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State -2, PosSet]
+type = PosSet
+trigger1 = 1
+x = 0
+
+[State -2, VarSet]
+type = VarSet
+trigger1 = life > 0
+var(3) = 1
+ignorehitpause = 1
+
+[State -2, Turn]
+type = Turn
+trigger1 = facing = 1
+
+[State -2, EnvColor]
+type = EnvColor
+trigger1 = 1
+value = 132,255,152
+time = 1
+under = -1
+ignorehitpause = 1
+
+[State -2, Supes Arms]
+Type = Helper
+Triggerall = NumHelper(11777) = 0 ; Create the superarmor helper if it doesn't exist.
+Trigger1 = life > 0
+Name = "Super Armour"
+PosType = P1
+OwnPal = 1
+Pos = 0, 0
+ID = 11777
+StateNo = 11777
+PauseMoveTime = 999999
+SuperMoveTime = 999999
+
+[State -2, LifeAdd]
+Type = LifeAdd
+Trigger1 = NumHelper(11777) > 0 ; If the superarmor helper exists, subtract taken damage from life.
+Trigger1 = fVar(29) >=1
+Value = -floor(fVar(29))
+ignorehitpause=1
+
+[State -2, VarSet]
+Type = VarAdd
+Trigger1 = 1
+FV = 29
+Value = -floor(fvar(29)) ; Damage already subtracted needs to be removed from the variable
+ignorehitpause=1
+
+[State -2]
+Type= NotHitBy
+Trigger1 = NumHelper(11777) > 0 ; If the superarmor helper is active, the character cannot be hit by anything.
+value = SAC
+
+[State -2]
+Type = NotHitBy
+Trigger1 = NumHelper(11777) > 0 ; If the superarmor helper is active, the character cannot be hit by anything.
+value2 = SAC ; This is for safety, as another Nothitby might override the first one, so better be safe and apply it to both slots.
+
+[State -2, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = nomusic
+flag2 = noautoturn
+flag3 = globalnoshadow
+ignorehitpause = 1
+
+[State -2, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = nobg
+flag2 = nofg
+flag3 = timerfreeze
+ignorehitpause = 1
+
+[State -2, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = nostandguard
+flag2 = nocrouchguard
+flag3 = noairguard
+ignorehitpause = 1
+
+[State -2, AssertSpecial]
+type = AssertSpecial
+trigger1 = var(3) = 1
+trigger1 = enemy,life > 0
+flag = noko
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------
+
+;Statedef -3
+[Statedef -3]
+
+[State -3, Go 2 1337]
+type = ChangeState
+triggerall = life > 0
+trigger1 = !win
+trigger1 = !lose
+trigger1 = roundstate = [1,2]
+trigger1 = stateno != 1337
+value = 1337
+persistent = 0
+
+[State -3, Turn]
+type = Turn
+trigger1 = facing = 1
+
+[State -3, Custom ded]
+type = ChangeState
+trigger1 = life = 0 && stateno != 5148 && stateno != 5149 && stateno != 5150
+value = 5148
+
+[State -3, Stage Thingy]
+type = Explod
+trigger1 = roundstate <= 2 && ctrl = 0
+anim = 7331
+removetime = 2
+postype = back
+pos = 320,-80
+sprpriority = -5
+facing = -1
+ownpal = 1
+scale = .5,.5
+
+[State -3, Stage Thingy]
+type = Explod
+trigger1 = roundstate >= 2 && ctrl = 1 && numexplod(7331) < 1
+anim = 7331
+ID = 7331
+removetime = -1
+postype = back
+pos = 320,-80
+sprpriority = -4
+facing = -1
+ownpal = 1
+scale = .5,.5
+
+[State -3, Border Thingy]
+type = Helper
+trigger1 = numhelper(99997) < 1
+name = "Border Thingy"
+helpertype = normal
+postype = back
+ownpal = 1
+pos = 0,0
+facing = -1
+ID = 99997
+stateno = 99997
+pausemovetime = 999999
+supermovetime = 999999
+
+[State -3, Border Thingy]
+type = Helper
+trigger1 = numhelper(999970) < 1
+name = "Border Thingy"
+helpertype = normal
+postype = front
+ownpal = 1
+pos = 0,0
+facing = 1
+ID = 999970
+stateno = 99997
+pausemovetime = 999999
+supermovetime = 999999
+
+[State -3, Some Thingy]
+type = Helper
+trigger1 = numhelper(99996) < 1
+name = "The Plot"
+helpertype = normal
+postype = front
+ownpal = 1
+pos = 0,0
+facing = 1
+ID = 99996
+stateno = 99996
+pausemovetime = 999999
+supermovetime = 999999
+
+[State -3, Thingy]
+Type = Helper
+trigger1 = numhelper(99998) < 1 && roundstate = 2 && ctrl = 1
+trigger1 = life > 0
+Name = "Thingy"
+PosType = P1
+OwnPal = 1
+Pos = 0,0
+ID = 99998
+StateNo = 99998
+PauseMoveTime = 999999
+SuperMoveTime = 999999
+
+[State -3, Other Thingy]
+Type = Helper
+trigger1 = numhelper(99999) < 1 && roundstate = 2 && ctrl = 1
+trigger1 = life > 0
+Name = "Other Thingy"
+PosType = P1
+OwnPal = 1
+Pos = 0,0
+ID = 99999
+StateNo = ifelse(var(51) = 8,999999,99999)
+PauseMoveTime = 999999
+SuperMoveTime = 999999
+
+[State -3, Helper]
+type = Helper
+trigger1 = var(51) = 8 && roundstate = 2 && ctrl = 1
+trigger1 = life > 0
+helpertype = normal
+name = "Yee"
+stateno = 1350
+ID = 1350
+postype = left
+pos = 0,0
+ownpal = 0
+ignorehitpause = 1
+PauseMoveTime = 999999
+SuperMoveTime = 999999
+
+[State -3, DisplayToClipboard]
+type = DisplayToClipboard
+trigger1 = 1
+text = "var(51) = %d"
+params = var(51)

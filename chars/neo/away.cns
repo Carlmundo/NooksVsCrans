@@ -1,0 +1,133 @@
+;※※※※※※※※※※※※※※※※※※※※前避け
+;理論説明
+;今回は避けなので当たり判定もいらない移動のみのステートです。
+;しかし世の中、前のみではない、「後ろ避け」もあります。
+;というわけで効率化を目指してみよう・・・安易？(-_-;)
+;まずスプライトを分割すると開始、回転、終了になります。
+;なぜ分割するかというと「後ろ避け」を作るから。
+;前のスプライト順を１，２，３とするなら後ろは３，２，１とすればオッケーになるというわけだ。
+;この時点でステート６個、ＡＩＲが３個・・・・効率化成功してる・・・か？（文句は言わないで(-_-;)
+
+;※※※※※※※※※※※※※※※※※※※※前避けの開始
+;Roll Fwd
+[StateDef 110]
+type = S
+physics = N
+movetype = I
+anim = 110
+velset = 0,0
+ctrl = 0
+sprpriority = -1
+
+[State 3100, 5]
+type = PlaySnd
+trigger1 = Time = 0
+value = S171,14
+
+[State 110]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 110]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 110]
+type = AfterImage
+trigger1 = Time = 0
+time = 30
+removetime = 18
+length = 3
+timegap = 6
+framegap = 1
+palbright = 0,0,0
+palcontrast = 255,255,255
+palpostbright = 0,0,0
+paladd = 0,0,0
+palmul = 1,1,1
+trans = Add1
+
+[State 110]
+type = VelSet
+trigger1 = Time = 2
+x = 5
+
+
+[State 110]
+type = StateTypeSet
+trigger1 = AnimElem = 4,10
+value = S
+physics = S
+
+[State 110]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+
+;※※※※※※※※※※※※※※※※※※※※後避けの開始
+;back Roll Fwd
+[StateDef 115]
+type = S
+physics = N
+movetype = I
+anim = 115
+velset = 0,0
+ctrl = 0
+
+[State 3100, 5]
+type = PlaySnd
+trigger1 = Time = 0
+value = S171,14
+
+[State 115]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 115]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 115]
+type = AfterImage
+trigger1 = Time = 0
+time = 30
+removetime = 18
+length = 3
+timegap = 6
+framegap = 1
+palbright = 0,0,0
+palcontrast = 255,255,255
+palpostbright = 0,0,0
+paladd = 0,0,0
+palmul = 1,1,1
+trans = Add1
+
+[State 115]
+type = VelSet
+trigger1 = Time = 2
+x = -5
+
+[State 115]
+type = StateTypeSet
+trigger1 = AnimElem = 4,10
+value = S
+physics = S
+
+[State 115]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+
+
+
+
+
+

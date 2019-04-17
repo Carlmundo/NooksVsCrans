@@ -1,0 +1,3683 @@
+[Data]
+life = 1000
+attack = 100
+defence = 100
+fall.defence_up = 0
+liedown.time = 60
+airjuggle = 10
+sparkno = 2
+guard.sparkno = 40
+KO.echo = 1
+volume = 255
+IntPersistIndex = 59
+FloatPersistIndex = 40
+
+[Size]
+xscale = 0.4           ;Horizontal scaling factor.
+yscale = 0.4           ;Vertical scaling factor.
+ground.back = 10     ;Player width (back, ground)
+ground.front = 10    ;Player width (front, ground)
+air.back = 10        ;Player width (back, air)
+air.front = 10       ;Player width (front, air)
+height = 32      ;Height of player (for opponent to jump over)
+attack.dist = 60    ;Default attack distance
+proj.attack.dist = 60 ;Default attack distance for projectiles
+proj.doscale = 0     ;Set to 1 to scale projectiles too
+head.pos = -5, -30   ;Approximate position of head
+mid.pos = -5, -15    ;Approximate position of midsection
+shadowoffset = 0     ;Number of pixels to vertically offset the shadow
+draw.offset = 0,0    ;Player drawing offset in pixels (x, y)
+
+[Velocity]
+walk.fwd  = 2.8      ;Walk forward
+walk.back = -2.8     ;Walk backward
+run.fwd  = 4.6, 0    ;Run forward (x, y)
+run.back = -4.5,-3.8 ;Hop backward (x, y)
+jump.neu = 0,-10.4    ;Neutral jumping velocity (x, y)
+jump.back = -2.5    ;Jump back Speed (x, y)
+jump.fwd = 2       ;Jump forward Speed (x, y)
+runjump.back = -1.55,-5.1 ;Running jump speeds (opt)
+runjump.fwd = 2,-4.1      ;.
+airjump.neu = 0,-4.1      ;.
+airjump.back = -2.55      ;Air jump speeds (opt)
+airjump.fwd = 2.5         ;.
+
+[Movement]
+airjump.num = 0      ;Number of air jumps allowed (opt)
+airjump.height = 35  ;Minimum distance from ground before you can air jump (opt)
+yaccel = .60         ;Vertical acceleration
+stand.friction = .85  ;Friction coefficient when standing
+crouch.friction = .82 ;Friction coefficient when crouching
+;-------------------------------------------------------------------------
+
+; Win state decider
+[Statedef 180]
+type = S
+
+[State 180, 1]
+type = ChangeState
+trigger1 = Time = 0
+value = 181
+
+; Introduction
+[Statedef 191]
+type = S
+ctrl = 0
+anim = 190
+velset = 0,0
+
+[State 191, 1] ;Freeze animation until PreIntro is over
+type = ChangeAnim
+trigger1 = RoundState = 0
+value = 190
+
+[State 191, 2] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 191, 3] ;Change to stand state when done
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+;Stand Shoot
+[Statedef 200]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+;Commonly-used controllers:
+velset = 0,0
+ctrl = 0
+sprpriority = 2
+
+[State 200, 1]
+type = VelSet
+trigger1 = command = "holdfwd"
+trigger2 = command = "diagup"
+trigger2 = vel x > 0
+trigger3 = command = "diagdown"
+trigger3 = vel x > 0
+x = const(velocity.walk.fwd.x)
+
+[State 200, 3]
+type = AssertSpecial
+trigger1 = command = "holdfwd"
+trigger2 = command = "diagup"
+trigger3 = command = "diagdown"
+flag = noautoturn
+
+[State 200, Anim Walk Fwd]
+type = ChangeAnim
+trigger1 = command = "holdfwd"
+trigger1 = anim != 206
+value = 206
+
+[State 200, Anim Walk Diag Fwd]
+type = ChangeAnim
+trigger1 = command = "diagup"
+trigger1 = anim != 201
+trigger1 = vel x > 0
+value = 201
+
+[State 200, Anim Walk Diag Down Fwd]
+type = ChangeAnim
+trigger1 = command = "diagdown"
+trigger1 = anim != 211
+trigger1 = vel x > 0
+value = 211
+
+[State 200, Anim Shoot Up]
+type = ChangeAnim
+trigger1 = command = "holdup"
+trigger1 = anim != 212
+value = 212
+
+[State 200, Anim Shoot Diag Up]
+type = ChangeAnim
+trigger1 = command = "diagup"
+trigger1 = anim != 200
+trigger1 = vel x = 0
+value = 200
+
+[State 200, Anim Shoot Diag Down]
+type = ChangeAnim
+trigger1 = command = "diagdown"
+trigger1 = anim != 210
+trigger1 = vel x = 0
+value = 210
+
+[State 200, Anim Shoot Normal]
+type = ChangeAnim
+trigger1 = vel x = 0
+trigger1 = command != "holdup"
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+trigger1 = command = "hold_b"
+trigger1 = command != "diagdown"
+trigger1 = command != "diagup"
+trigger1 = anim != 205
+value = 205
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command != "diagup"
+var(0) = 0
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "diagup"
+var(0) = -1
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "diagdown"
+var(0) = 1
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+var(2) = 0
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "diagup"
+var(2) = -14
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "diagdown"
+var(2) = 12
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command != "holdup"
+var(3) = 14
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "holdup"
+var(3) = 3
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "diagdown"
+var(3) = 12
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command = "holdup"
+var(1) = 0
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command != "holdup"
+var(1) = 1
+
+[State 200, 1]
+type = Projectile
+trigger1 = time % 11 = 0
+projanim = 300
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1200
+offset = var(3),-24+var(2)
+velocity = 2.5*var(1),2.5*var(0)
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 2,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,5
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -6, -5*var(6)
+air.velocity = -6.5,-5
+fall = 1*var(6)
+fall.recover = 0
+air.juggle = 2
+ignorehitpause = 1
+
+[state 200, Shoot]
+type = playsnd
+trigger1 = Time = 1
+value = 4, 4
+
+[State 200, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;----------------------------------------------------------------------
+;Stand Machine Gun Shoot
+[Statedef 205]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+sprpriority = 2
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+[State 0, From Hand Effect Y]
+type = VarSet
+trigger1 = time = 0
+var(12) = 25
+
+[State 0, From Hand Effect X]
+type = VarSet
+trigger1 = time = 0
+var(13) = -5
+
+[State 200, 1]
+type = VelSet
+trigger1 = command = "holdfwd" || (var(58) = 020506)
+trigger2 = command = "diagup"
+trigger2 = vel x > 0
+trigger3 = command = "diagdown"
+trigger3 = vel x > 0
+x = const(velocity.walk.fwd.x)
+
+[State 200, Anim Walk Fwd]
+type = ChangeAnim
+trigger1 = command = "holdfwd" || (var(58) = 020506)
+trigger1 = anim != 206
+value = 206
+
+;[State 191, 4]
+;type = Helper
+;trigger1 = time = 0
+;helpertype = normal ;player
+;name = "From Finger Effect"
+;ID = 290
+;stateno = 290
+;pos = 25,-5
+;postype = p1    ;p2,front,back,left,right
+;facing = 1
+;size.xscale=0.5
+;size.yscale=0.5
+
+;can't do it - makai
+;[State 2000, 1]
+;type = StopSnd
+;trigger1 = command = "hold_c"
+;trigger1 = time = 0
+;channel = 10
+
+[State 2000, 1]
+type = PlaySnd
+trigger1 = time = 0
+value = s205,0
+channel = 10
+
+[State 2000, 1]
+type = PlaySnd
+trigger1 = time = 5
+value = s205,1
+channel = 3
+loop = 1
+
+[State 200, 3]
+type = AssertSpecial
+trigger1 = command = "holdfwd"
+trigger2 = command = "diagup"
+trigger3 = command = "diagdown"
+flag = noautoturn
+
+[State 200, Anim Shoot Up]
+type = ChangeAnim
+trigger1 = command = "holdup"
+trigger1 = anim != 212
+value = 212
+
+[State 200, Anim Shoot Diag Up]
+type = ChangeAnim
+trigger1 = command = "diagup"
+trigger1 = anim != 200
+trigger1 = vel x = 0
+value = 200
+
+[State 200, Anim Shoot Normal]
+type = ChangeAnim
+trigger1 = vel x = 0
+trigger1 = command != "holdup"
+trigger1 = command != "holdfwd" || (var(58) != 020506)
+trigger1 = command != "holdback"
+trigger1 = command = "hold_b"
+trigger1 = command != "diagdown"
+trigger1 = command != "diagup"
+trigger1 = anim != 205
+value = 205
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = time % 3 = 0
+var(0) = 0
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "diagup"
+var(0) = -1
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = command = "holdfwd"
+trigger1 = time % 5 = 0
+var(2) = 10
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = command = "holdfwd"
+trigger1 = time % 4 = 0
+var(2) = 17
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = command = "holdfwd"
+trigger1 = time % 7 = 0
+var(2) = 5
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = command != "holdfwd"
+trigger1 = time % 5 = 0
+var(2) = 0
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = command != "holdfwd"
+trigger1 = time % 4 = 0
+var(2) = -5
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = command != "holdfwd"
+trigger1 = time % 7 = 0
+var(2) = 5
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "diagup"
+var(2) = -14
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command != "holdup"
+trigger1 = command != "holdfwd"
+var(3) = 55
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command != "holdup"
+trigger1 = command = "holdfwd"
+var(3) = 50
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "holdup"
+var(3) = 3
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command = "holdup"
+var(1) = 0
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command != "holdup"
+var(1) = 1
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command != "diagup"
+var(5) = 301
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command = "diagup"
+var(5) = 311
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command = "holdup"
+var(5) = 322
+
+[State 200, 1]
+type = Projectile
+trigger1 = time % 15 = 5
+projanim = var(5)
+projhitanim = 350
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1205
+offset = var(3),-30+var(2)
+velocity = 4.5*var(1),4.5*var(0)
+attr = S, SP
+getpower = 3
+givepower = 0
+damage   = 7,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 0
+ground.hittime  = 0
+ground.velocity = -0.1,0*var(6)
+air.velocity = -0.1,0*var(6)
+fall = 0
+fall.recover = 0
+air.juggle = 2
+ignorehitpause = 1
+projscale = 0.5,0.5
+
+[State 2000, 1]
+type = StopSnd
+trigger1 = AnimTime = 0
+trigger1 = command != "hold_b" || (var(58) = 0 && var(59) = 1)
+trigger2 = AnimTime = 0
+trigger2 = command = "hold_a"
+channel = 3
+
+[State 200, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+trigger1 = command != "hold_b" || (var(58) = 0 && var(59) = 1)
+value = 0
+ctrl = 1
+;----------------------------------------------------------------------
+;lock shoot
+[Statedef 206]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+sprpriority = 2
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+[State 0, From Hand Effect Y]
+type = VarSet
+trigger1 = time = 0
+var(12) = 25
+
+[State 0, From Hand Effect X]
+type = VarSet
+trigger1 = time = 0
+var(13) = -5
+
+;[State 191, 4]
+;type = Helper
+;trigger1 = time = 0
+;helpertype = normal ;player
+;name = "From Finger Effect"
+;ID = 290
+;stateno = 290
+;pos = 25,-5
+;postype = p1    ;p2,front,back,left,right
+;facing = 1
+;size.xscale=0.5
+;size.yscale=0.5
+
+;can't do it - makai
+;[State 2000, 1]
+;type = StopSnd
+;trigger1 = command = "hold_c"
+;trigger1 = time = 0
+;channel = 10
+
+[State 2000, 1]
+type = PlaySnd
+trigger1 = time = 0
+value = s205,1
+channel = 3
+loop = 1
+
+[State 200, 3]
+type = AssertSpecial
+trigger1 = command = "holdfwd"
+trigger2 = command = "diagup"
+trigger3 = command = "diagdown"
+flag = noautoturn
+
+[State 200, Anim Shoot Up]
+type = ChangeAnim
+trigger1 = command = "holdup"
+trigger1 = anim != 212
+trigger1 = vel x = 0
+value = 212
+
+[State 200, Anim Shoot Up]
+type = ChangeAnim
+trigger1 = command = "diagdown"
+trigger1 = anim != 210
+trigger1 = vel x = 0
+value = 210
+
+[State 200, Anim Shoot Diag Up]
+type = ChangeAnim
+trigger1 = command = "diagup"
+trigger1 = anim != 200
+trigger1 = vel x = 0
+value = 200
+
+[State 200, Anim Shoot DOWN DOWN DOWN AWAY]
+type = ChangeAnim
+trigger1 = command = "holddown"
+trigger1 = anim != 213
+trigger1 = vel x = 0
+value = 213
+
+
+[State 200, Anim Shoot Normal]
+type = ChangeAnim
+trigger1 = vel x = 0
+trigger1 = command != "holdup"
+trigger1 = command != "holdfwd" || (var(58) != 020506)
+trigger1 = command != "holdback"
+trigger1 = command = "hold_b"
+trigger1 = command != "diagdown"
+trigger1 = command != "holddown"
+trigger1 = command != "diagup"
+trigger1 = anim != 205
+value = 205
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = time % 3 = 0
+var(0) = 0
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "diagup"
+var(0) = -1
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "diagdown"
+trigger2 = command = "holddown"
+var(0) = 1
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = time % 5 = 0
+var(2) = 0
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = time % 4 = 0
+var(2) = -5
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = time % 6 = 0
+var(2) = 5
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "holdup"
+var(2) = -50
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "diagup"
+var(2) = -30
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "diagdown"
+var(2) = 30
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "holddown"
+var(2) = 50
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command != "holdup"
+var(3) = 55
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "holdup"
+var(3) = 9
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "holddown"
+var(3) = 9
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "diagdown"
+var(3) = 40
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "diagup"
+var(3) = 40
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command = "holdup"
+var(1) = 0
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+var(1) = 1
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command = "holddown"
+var(1) = 0
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command != "diagup"
+var(5) = 301
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command = "diagup"
+var(5) = 311
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command = "holdup"
+var(5) = 322
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command = "holddown"
+var(5) = 344
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command = "diagdown"
+var(5) = 333
+
+[State 200, 1]
+type = Projectile
+trigger1 = time % 15 = 5
+projanim = var(5)
+projhitanim = 350
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1205
+offset = var(3),-30+var(2)
+velocity = 4.5*var(1),4.5*var(0)
+attr = S, SP
+getpower = 3
+givepower = 0
+damage   = 7,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 0
+ground.hittime  = 0
+ground.velocity = -0.1,0*var(6)
+air.velocity = -0.1,0*var(6)
+fall = 0
+fall.recover = 0
+air.juggle = 2
+ignorehitpause = 1
+projscale = 0.5,0.5
+
+
+[State 2000, 1]
+type = StopSnd
+trigger1 = AnimTime = 0
+trigger1 = command != "hold_a" || (var(58) = 0 && var(59) = 1)
+channel = 3
+
+[State 200, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+trigger2 = command != "hold_b" || (var(58) = 0 && var(59) = 1)
+trigger1 = command != "hold_a" || (var(58) = 0 && var(59) = 1)
+value = 0
+ctrl = 1
+;----------------------------------------------------------------------
+;lock
+[Statedef 207]
+type    = S
+movetype= H
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2055
+sprpriority = 2
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+[State 200, 3]
+type = AssertSpecial
+trigger1 = command = "holdfwd"
+trigger2 = command = "diagup"
+trigger3 = command = "diagdown"
+flag = noautoturn
+
+[State 200, Anim Shoot Up]
+type = ChangeAnim
+trigger1 = command = "holdup"
+trigger1 = anim != 2122
+value = 2122
+
+[State 200, Anim Shoot Up]
+type = ChangeAnim
+trigger1 = command = "diagdown"
+trigger1 = anim != 2100
+value = 2100
+
+[State 200, Anim Shoot Diag Up]
+type = ChangeAnim
+trigger1 = command = "diagup"
+trigger1 = anim != 2000
+value = 2000
+
+[State 200, Anim Shoot DOWN DOWN DOWN AWAY]
+type = ChangeAnim
+trigger1 = command = "holddown"
+trigger1 = anim != 2133
+value = 2133
+
+
+[State 200, Anim Shoot Normal]
+type = ChangeAnim
+trigger1 = vel x = 0
+trigger1 = command != "holdup"
+trigger1 = command != "holdfwd" || (var(58) != 020506)
+trigger1 = command != "holdback"
+trigger1 = command = "hold_b"
+trigger1 = command != "diagdown"
+trigger1 = command != "holddown"
+trigger1 = command != "diagup"
+trigger1 = anim != 205
+value = 205
+
+[State 200, 7]
+type = ChangeState
+trigger1 = command != "hold_a" || (var(58) = 0 && var(59) = 1)
+trigger2 = command = "hold_b" || (var(58) = 0 && var(59) = 1)
+value = 0
+ctrl = 1
+;----------------------------------------------------------------------
+;From Finger Effect
+[Statedef 290]
+type    = S
+movetype= A
+physics = S
+pos = var(12),var(13)
+juggle  = 1
+anim = 290
+ctrl = 0
+sprpriority = 2
+
+[State 0, From Hand Effect Y]
+type = VarSet
+trigger1 = command = "holdup"
+var(12) = 50
+
+[State 0, From Hand Effect X]
+type = VarSet
+trigger1 = command = "holdup"
+var(13) = -5
+
+[State 51, 1]
+type = DestroySelf
+trigger1 = root, command != "hold_c"
+;----------------------------------------------------------------------
+;Stand Spread Gun Shoot
+[Statedef 210]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+;Commonly-used controllers:
+velset = 0,0
+ctrl = 0
+sprpriority = 2
+
+[State 210, 1]
+type = VelSet
+trigger1 = command = "holdfwd"
+trigger2 = command = "diagup"
+trigger2 = vel x > 0
+trigger3 = command = "diagdown"
+trigger3 = vel x > 0
+x = const(velocity.walk.fwd.x)
+
+[State 210, 3]
+type = AssertSpecial
+trigger1 = command = "holdfwd"
+trigger2 = command = "diagup"
+trigger3 = command = "diagdown"
+flag = noautoturn
+
+[State 210, Anim Walk Fwd]
+type = ChangeAnim
+trigger1 = command = "holdfwd"
+trigger1 = anim != 206
+value = 206
+
+[State 210, Anim Walk Diag Fwd]
+type = ChangeAnim
+trigger1 = command = "diagup"
+trigger1 = anim != 201
+trigger1 = vel x > 0
+value = 201
+
+[State 210, Anim Walk Diag Down Fwd]
+type = ChangeAnim
+trigger1 = command = "diagdown"
+trigger1 = anim != 211
+trigger1 = vel x > 0
+value = 211
+
+[State 210, Anim Shoot Up]
+type = ChangeAnim
+trigger1 = command = "holdup"
+trigger1 = anim != 212
+value = 212
+
+[State 210, Anim Shoot Diag Up]
+type = ChangeAnim
+trigger1 = command = "diagup" || (var(58) = 021009)
+trigger1 = anim != 200
+trigger1 = vel x = 0
+value = 200
+
+[State 210, Anim Shoot Diag Down]
+type = ChangeAnim
+trigger1 = command = "diagdown"
+trigger1 = anim != 210
+trigger1 = vel x = 0
+value = 210
+
+[State 210, Anim Shoot Normal]
+type = ChangeAnim
+trigger1 = vel x = 0
+trigger1 = command != "holdup"
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+trigger1 = command = "hold_x"
+trigger1 = command != "diagdown"
+trigger1 = command != "diagup" || (var(58) = 021009)
+trigger1 = anim != 205
+value = 205
+
+[State 210, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = command != "holdup"
+var(0) = 0
+
+[State 210, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "holdup"
+var(0) = -4
+
+[State 210, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "diagup" || (var(58) = 021009)
+var(0) = -2
+
+[State 210, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "diagdown"
+var(0) = 2
+
+[State 210, Var Shoot X vel]
+type = VarSet
+trigger1 = command = "holdup"
+var(1) = 0
+
+[State 210, Var Shoot X vel]
+type = VarSet
+trigger1 = command != "holdup"
+var(1) = 4
+
+[State 210, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+var(2) = 0
+
+[State 210, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "diagup"
+var(2) = -14
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "diagdown"
+var(2) = 12
+
+[State 210, Var Shoot X Offset]
+type = VarSet
+trigger1 = command != "holdup"
+var(3) = 14
+
+[State 210, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "holdup" || (var(58) = 021009)
+var(3) = 3
+
+[State 210, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "diagdown"
+var(3) = 12
+
+[State 210, Spread 1]
+type = Projectile
+trigger1 = time % 18 = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = var(3),-24+var(2)
+velocity = var(1),var(0)
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -2, -5*var(6)
+air.velocity = -2.5,-5
+fall = 1*var(6)
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 210, Spread 2]
+type = Projectile
+trigger1 = time % 18 = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = var(3),-24+var(2)
+velocity = ifelse(var(1) = 0, -0.5, 3.5),var(0)+0.5
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -2, -5*var(6)
+air.velocity = -2.5,-5
+fall = 1*var(6)
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 210, Spread 3]
+type = Projectile
+trigger1 = time % 18 = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = var(3),-24+var(2)
+velocity = ifelse(var(1) = 0, -1, 3),var(0)+1.0
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -2, -5*var(6)
+air.velocity = -2.5,-5
+fall = 1*var(6)
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 210, Spread 4]
+type = Projectile
+trigger1 = time % 18 = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = var(3),-24+var(2)
+velocity = ifelse(var(1)=0, 0.5, 3.5), var(0)-0.5
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -2, -5*var(6)
+air.velocity = -2.5,-5
+fall = 1*var(6)
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 210, Spread 5]
+type = Projectile
+trigger1 = time % 18 = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = var(3),-24+var(2)
+velocity = ifelse(var(1)=0, 1.0, 3.0), var(0)-1.0
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -2, -5*var(6)
+air.velocity = -2.5,-5
+fall = 1*var(6)
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[state 200, Shoot]
+type = playsnd
+trigger1 = Time = 1
+value = 1, 1
+
+[State 200, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;----------------------------------------------------------------------
+;Stand Laser Gun Shoot
+[Statedef 215]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+;Commonly-used controllers:
+velset = 0,0
+ctrl = 0
+sprpriority = 2
+
+[State 200, 1]
+type = VelSet
+trigger1 = command = "holdfwd"
+trigger2 = command = "diagup"
+trigger2 = vel x > 0
+trigger3 = command = "diagdown"
+trigger3 = vel x > 0
+x = const(velocity.walk.fwd.x)
+
+[State 200, 3]
+type = AssertSpecial
+trigger1 = command = "holdfwd"
+trigger2 = command = "diagup"
+trigger3 = command = "diagdown"
+flag = noautoturn
+
+[State 200, Anim Walk Fwd]
+type = ChangeAnim
+trigger1 = command = "holdfwd"
+trigger1 = anim != 206
+value = 206
+
+[State 200, Anim Walk Diag Fwd]
+type = ChangeAnim
+trigger1 = command = "diagup"
+trigger1 = anim != 201
+trigger1 = vel x > 0
+value = 201
+
+[State 200, Anim Walk Diag Down Fwd]
+type = ChangeAnim
+trigger1 = command = "diagdown"
+trigger1 = anim != 211
+trigger1 = vel x > 0
+value = 211
+
+[State 200, Anim Shoot Up]
+type = ChangeAnim
+trigger1 = command = "holdup"
+trigger1 = anim != 212
+value = 212
+
+[State 200, Anim Shoot Diag Up]
+type = ChangeAnim
+trigger1 = command = "diagup"
+trigger1 = anim != 200
+trigger1 = vel x = 0
+value = 200
+
+[State 200, Anim Shoot Diag Down]
+type = ChangeAnim
+trigger1 = command = "diagdown"
+trigger1 = anim != 210
+trigger1 = vel x = 0
+value = 210
+
+[State 200, Anim Shoot Normal]
+type = ChangeAnim
+trigger1 = vel x = 0
+trigger1 = command != "holdup"
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+trigger1 = command = "hold_y"
+trigger1 = command != "diagdown"
+trigger1 = command != "diagup"
+trigger1 = anim != 205
+value = 205
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command != "diagup"
+var(0) = 0
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "diagup"
+var(0) = -1
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "diagdown"
+var(0) = 1
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger2 = command != "holdup"
+var(2) = 0
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "holdup"
+var(2) = -66
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "diagup"
+var(2) = -38
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "diagdown"
+var(2) = 14
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command != "holdup"
+var(3) = 6
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "holdup"
+var(3) = 3
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "diagdown"
+var(3) = 24
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command = "holdup"
+var(1) = 0
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command != "holdup"
+var(1) = 1
+
+[State 200, 1]
+type = Projectile
+trigger1 = numprojid(215) = 0
+projanim = ifelse(var(0) = 0, 302, ifelse(var(1) = 0, 303,Ifelse(Var(0)=1, 305, 304)))
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 215
+projhits = 3
+projremove = 0
+projmisstime = 3
+offset = var(3),-24+var(2)
+velocity = 3*var(1),3*var(0)
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 15,2
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,8
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -4, -5*var(6)
+air.velocity = -4.5,-5
+fall = 1*var(6)
+fall.recover = 0
+air.juggle = 5
+ignorehitpause = 1
+
+[state 200, Shoot]
+type = playsnd
+trigger1 = Time = 1
+value = 2, 2
+
+[State 200, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+trigger1 = command != "hold_y"
+value = 0
+ctrl = 1
+
+;----------------------------------------------------------------------
+;Stand Flame Thrower Shoot
+[Statedef 220]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+;Commonly-used controllers:
+velset = 0,0
+ctrl = 0
+sprpriority = 2
+
+[State 200, 1]
+type = VelSet
+trigger1 = command = "holdfwd"
+trigger2 = command = "diagup"
+trigger2 = vel x > 0
+trigger3 = command = "diagdown"
+trigger3 = vel x > 0
+x = const(velocity.walk.fwd.x)
+
+[State 200, 3]
+type = AssertSpecial
+trigger1 = command = "holdfwd"
+trigger2 = command = "diagup"
+trigger3 = command = "diagdown"
+flag = noautoturn
+
+[State 200, Anim Walk Fwd]
+type = ChangeAnim
+trigger1 = command = "holdfwd"
+trigger1 = anim != 206
+value = 206
+
+[State 200, Anim Walk Diag Fwd]
+type = ChangeAnim
+trigger1 = command = "diagup"
+trigger1 = anim != 201
+trigger1 = vel x > 0
+value = 201
+
+[State 200, Anim Walk Diag Down Fwd]
+type = ChangeAnim
+trigger1 = command = "diagdown"
+trigger1 = anim != 211
+trigger1 = vel x > 0
+value = 211
+
+[State 200, Anim Shoot Up]
+type = ChangeAnim
+trigger1 = command = "holdup"
+trigger1 = anim != 212
+value = 212
+
+[State 200, Anim Shoot Diag Up]
+type = ChangeAnim
+trigger1 = command = "diagup"
+trigger1 = anim != 200
+trigger1 = vel x = 0
+value = 200
+
+[State 200, Anim Shoot Diag Down]
+type = ChangeAnim
+trigger1 = command = "diagdown"
+trigger1 = anim != 210
+trigger1 = vel x = 0
+value = 210
+
+[State 200, Anim Shoot Normal]
+type = ChangeAnim
+trigger1 = vel x = 0
+trigger1 = command != "holdup"
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+trigger1 = command = "hold_z"
+trigger1 = command != "diagdown"
+trigger1 = command != "diagup"
+trigger1 = anim != 205
+value = 205
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command != "diagup"
+var(0) = 0
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "diagup"
+var(0) = -1
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "diagdown"
+var(0) = 1
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger2 = command != "holdup"
+var(2) = 0
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger2 = command != "holdup"
+var(3) = 0
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "holdup"
+var(2) = -40
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "diagup"
+var(2) = -20
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command = "diagdown"
+var(2) = 12
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command != "holdup"
+var(3) = 6
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "holdup"
+var(3) = 3
+
+[State 200, Var Shoot X Offset]
+type = VarSet
+trigger1 = command = "diagdown"
+var(3) = 24
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command = "holdup"
+var(1) = 0
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command != "holdup"
+var(1) = 1
+
+[State 200, 1]
+type = Helper
+trigger1 = numhelper(220) < 4
+trigger1 = time % 17 = 0
+id = 220
+pos = var(3),-24+var(2)
+stateno = 221
+ownpal = 1
+
+[State 200, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+trigger1 = command != "hold_z"
+value = 0
+ctrl = 1
+
+;----------------------------------------------------------------------
+;Stand Flame Thrower Shoot
+[Statedef 221]
+type    = S
+movetype= A
+physics = N
+juggle  = 15
+;Commonly-used controllers:
+ctrl = 0
+anim = 306
+sprpriority = 3
+
+[State 221, FVar(2)] ;FVar is used to make the circle motion of flame shot
+type = varAdd
+trigger1 = 1
+fv = 2
+value = 0.1570796
+
+[State 221, FVar(2)] ;FVar is used to make the circle motion of flame shot
+type = VarSet
+trigger1 = Fvar(2) > 2.0 * Pi
+fv = 2
+value = 0.0
+
+[State 221, Varset 1]
+type = VarSet
+trigger1 = time = 0
+var(1) = 4*parent,var(1)
+
+[State 221, Varset 0]
+type = VarSet
+trigger1 = time = 0
+var(0) = 4*parent,var(0)
+
+[State 221, Velset]
+type = velset
+trigger1 = var(0) = 4
+y = 1.5 + 4*cos(fvar(2));
+
+[State 221, Velset]
+type = velset
+trigger1 = Var(0) = -4
+trigger1 = Var(1) = 0
+y = -1.5 + 4*sin(fvar(2))
+
+[State 221, Velset]
+type = velset
+trigger1 = Var(0) = -4
+trigger1 = Var(1) = 4
+y = -1.5 + 4*cos(fvar(2))
+
+[State 221, VelSet]
+type = VelSet
+trigger1 = var(0) = 0
+y = -4*cos(fvar(2))
+
+[State 221, Velset]
+type = velset
+trigger1 = Var(1) != 0
+x = 1.5+4*sin(fvar(2))
+
+[State 221, Velset]
+type = VelSet
+trigger1 = Var(1) = 0
+x = 4*cos(fvar(2))
+
+[State 221, AfterImage]
+type = AfterImage
+trigger1 = time = 0
+time = 2
+length = 20
+palbright = 90,0,0
+pal.contrast = 150, 10, 10
+paladd = 30,3,3
+palmul = .5,.5,.5
+
+[State 221, AfterImageTime]
+type = AfterImageTime
+trigger1 = time % 2 = 0
+value = 2
+
+[State 221, HitDef]
+type = HitDef
+trigger1 = time = 0
+attr = S, SP
+animtype  = Medium
+damage    = 50
+getpower = 20, 40
+givepower = 60, 120
+HitFlag = MA
+guardflag = MA
+pausetime = 0,8
+sparkno = -1
+sparkxy = -6,-26
+hitsound   = 8,0
+guardsound = 6,0
+ground.type = High
+ground.slidetime = 8
+ground.hittime  = 9
+ground.velocity = -5.5, -4.5 *var(6)
+air.velocity = -2.5,-4
+air.juggle = 15
+air.fall = 1
+palfx.time = 50
+palfx.add = 248,32,32
+palfx.sinadd = -64,16,16,5
+palfx.color = 200
+
+[state 200, Shoot]
+type = playsnd
+trigger1 = Time = 1
+value = 5, 5
+
+[State 221, Timeout]
+type = destroyself
+trigger1 = time > 240
+trigger2 = movecontact
+trigger3 = frontedgedist < -30
+
+;---------------------------------------------------------------------------
+;Crouch Shoot
+[Statedef 300]
+type    = C
+movetype= A
+physics = S
+juggle  = 1
+;Commonly-used controllers:
+velset = 0,0
+ctrl = 1
+sprpriority = 2
+anim = 573
+
+[State 300, Shoot]
+type = Projectile
+trigger1 = time = 0
+projanim = 300
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1200
+offset = 14,-6
+velocity = 2.5,0
+animtype = Back
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 2,0
+animtype = back
+guardflag = D
+hitflag = MAFD
+pausetime = 0,5
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Light
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -6, 0
+air.velocity = -6.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 2
+ignorehitpause = 1
+
+[State 200, 7]
+type = ChangeState
+trigger1 = animtime = 0
+value = 11
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Crouch Machine Gun Shoot
+[Statedef 301]
+type    = C
+movetype= A
+physics = S
+juggle  = 1
+;Commonly-used controllers:
+velset = 0,0
+ctrl = 1
+sprpriority = 2
+anim = 573
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+[State 2000, 1]
+type = PlaySnd
+trigger1 = time = 0
+value = s205,0
+channel = 10
+
+[State 2000, 1]
+type = PlaySnd
+trigger1 = time = 5
+value = s205,1
+channel = 3
+loop = 1
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = time % 5 = 0
+var(2) = -5
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = time % 4 = 0
+var(2) = 0
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = time % 7 = 0
+var(2) = -10
+
+[State 300, Shoot]
+type = Projectile
+trigger1 = time % 15 = 5
+projanim = 301
+projhitanim = 350
+projremovetime = 360
+projshadow = -1
+projheightbound = -240, 240
+projid = 1205
+offset = 60,-6+var(2)
+velocity = 4.5,0
+animtype = Back
+attr = S, SP
+getpower = 3
+givepower = 0
+damage   = 7,0
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 0
+ground.hittime  = 0
+ground.velocity = -0.1,0*var(6)
+air.velocity = -0.1,0*var(6)
+fall = 0
+fall.recover = 0
+air.juggle = 2
+ignorehitpause = 1
+projscale = 0.5,0.5
+
+[State 2000, 1]
+type = StopSnd
+trigger1 = command != "hold_b"
+channel = 3
+
+[State 200, 7]
+type = ChangeState
+trigger1 = command != "hold_b"
+trigger2 = command = "holdfwd"
+trigger2 = command != "holddown"
+value = 11
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Crouch Spread Gun Shoot
+[Statedef 302]
+type    = C
+movetype= A
+physics = S
+juggle  = 1
+;Commonly-used controllers:
+velset = 0,0
+ctrl = 1
+sprpriority = 2
+anim = 11
+
+[State 300, Spread 1]
+type = Projectile
+trigger1 = time = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = 14,-6
+velocity = 4,0
+givepower = 60, 120
+attr = S, SP
+getpower = 30,60
+damage   = 4,0
+animtype = back
+guardflag = D
+hitflag = MAFD
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -6,0
+air.velocity = -6.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 300, Spread 2]
+type = Projectile
+trigger1 = time = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = 14,-6
+velocity = 3.5,0.5
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = D
+hitflag = MAFD
+pausetime = 0,5
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -6, 0
+air.velocity = -6.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 300, Spread 3]
+type = Projectile
+trigger1 = time = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = 14,-6
+velocity = 3,1
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = D
+hitflag = MAFD
+pausetime = 0,5
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -6, -5
+air.velocity = -6.5,-5
+fall = 1
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 300, Spread 4]
+type = Projectile
+trigger1 = time = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = 14,-6
+velocity = 3.5,-0.5
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = D
+hitflag = MAFD
+pausetime = 0,5
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -6, 0
+air.velocity = -6.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 300, Spread 5]
+type = Projectile
+trigger1 = time = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = 14,-6
+velocity = 3,-1
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = D
+hitflag = MAFD
+pausetime = 0,5
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -6, 0
+air.velocity = -6.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 200, 7]
+type = ChangeState
+trigger1 = animtime = 0
+value = 11
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Crouch laser Gun Shoot
+[Statedef 303]
+type    = C
+movetype= A
+physics = S
+juggle  = 1
+;Commonly-used controllers:
+velset = 0,0
+ctrl = 1
+sprpriority = 2
+anim = 11
+
+[State 300, Shoot]
+type = Projectile
+trigger1 = numprojid(215) = 0
+projanim = 302
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 215
+projhits = 3
+projremove = 0
+projmisstime = 3
+offset = 14,-6
+velocity = 3,0
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 15,2
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,8
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -4, 0
+air.velocity = -4.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 5
+ignorehitpause = 1
+
+[State 200, 7]
+type = ChangeState
+trigger1 = command != "hold_x"
+trigger2 = command != "holddown"
+value = 11
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Crouch flame thrower Shoot
+[Statedef 304]
+type    = C
+movetype= A
+physics = S
+juggle  = 1
+;Commonly-used controllers:
+velset = 0,0
+ctrl = 1
+sprpriority = 2
+anim = 11
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = 1
+var(0) = 0
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = 1
+var(1) = 1
+
+[State 200, 1]
+type = Helper
+trigger1 = numhelper(220) < 4
+trigger1 = time % 17 = 0
+id = 220
+pos = 10,-6
+stateno = 221
+ownpal = 1
+
+[State 200, 7]
+type = ChangeState
+trigger1 = command != "hold_z"
+trigger2 = command != "holddown"
+value = 11
+ctrl = 1
+
+;----------------------------------------------------------------------
+;Jump Normal Shoot
+[Statedef 400]
+type    = A
+movetype= A
+physics = U
+juggle  = 1
+;Commonly-used controllers:
+sprpriority = 2
+
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command != "diagup"
+var(0) = 0
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "diagup"
+var(0) = -1
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "diagdown"
+trigger2 = command = "holddown"
+var(0) = 1
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "holddown"
+var(1) = 0
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+var(1) = 1
+
+[State 200, 1]
+type = Projectile
+trigger1 = time % 11 = 0
+projanim = 300
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = 0,0
+velocity = 2.5*var(1),2.5*var(0)
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 2,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,5
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -6, 0
+air.velocity = -6.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 2
+ignorehitpause = 1
+
+[State 420, ChangeState]
+type = ChangeState
+trigger1 = animtime = 0
+value = 41
+
+;Jump Machine Gun Shoot
+[Statedef 405]
+type    = A
+movetype= A
+physics = U
+juggle  = 1
+;Commonly-used controllers:
+sprpriority = 2
+
+[State 2000, 1]
+type = PlaySnd
+trigger1 = time = 0
+value = s205,0
+channel = 10
+
+[State 2000, 1]
+type = PlaySnd
+trigger1 = time = 5
+value = s205,1
+channel = 3
+loop = 1
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command != "diagup"
+var(0) = 0
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "diagup"
+var(0) = -1
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "diagdown"
+trigger2 = command = "holddown"
+var(0) = 1
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "holddown"
+var(1) = 0
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+var(1) = 1
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = time % 5 = 0
+var(2) = 0
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = time % 4 = 0
+var(2) = -5
+
+[State 200, Var Shoot Y Offset]
+type = VarSet
+trigger1 = command != "diagup"
+trigger1 = time % 6 = 0
+var(2) = 5
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command != "diagup"
+var(5) = 301
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command = "diagup"
+var(5) = 311
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command = "holdup"
+var(5) = 322
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command = "diagdown"
+var(5) = 333
+
+[State 200, Projectile Anim]
+type = VarSet
+trigger1 = command = "holddown"
+var(5) = 344
+
+[State 200, 1]
+type = Projectile
+trigger1 = time % 15 = 5
+projanim = var(5)
+projhitanim = 350
+projremovetime = 360
+projshadow = -1
+projheightbound = -240, 240
+projid = 1205
+offset = 0,0+var(2)
+velocity = 4.5*var(1),4.5*var(0)
+animtype = Back
+attr = S, SP
+getpower = 3
+givepower = 0
+damage   = 7,0
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 0
+ground.hittime  = 0
+ground.velocity = -0.1,0*var(6)
+air.velocity = -0.1,0*var(6)
+fall = 0
+fall.recover = 0
+air.juggle = 2
+ignorehitpause = 1
+projscale = 0.5,0.5
+
+[State 2000, 1]
+type = StopSnd
+trigger1 = command != "hold_b" || (var(58) = 0 && var(59) = 1)
+channel = 3
+
+[State 420, ChangeState]
+type = ChangeState
+trigger1 = command != "hold_b"
+value = 41
+
+;----------------------------------------------------------------------
+;Jump Spread Gun Shoot
+[Statedef 410]
+type    = A
+movetype= A
+physics = U
+juggle  = 1
+;Commonly-used controllers:
+sprpriority = 2
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command != "diagup"
+var(0) = 0
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "holdup"
+var(0) = -4
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "diagup"
+var(0) = -2
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "diagdown"
+var(0) = 2
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "holddown"
+var(0) = 4
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "holddown"
+var(1) = 0
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+var(1) = 1
+
+[State 210, Spread 1]
+type = Projectile
+trigger1 = time % 18 = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = 0,0
+velocity = ifelse(var(1)=1, 4, 2),var(0)
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -2, 0
+air.velocity = -2.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 210, Spread 2]
+type = Projectile
+trigger1 = time % 18 = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = 0,0
+velocity = ifelse(var(1) = 0, -0.5, 3.5),var(0)+0.5
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -2, 0
+air.velocity = -2.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 210, Spread 3]
+type = Projectile
+trigger1 = time % 18 = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = 0,0
+velocity = ifelse(var(1) = 0, -1, 3),var(0)+1.0
+attr = S, SP
+getpower = 30,60
+damage   = 4,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -2, 0
+air.velocity = -2.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 210, Spread 4]
+type = Projectile
+trigger1 = time % 18 = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = 0,0
+velocity = ifelse(var(1)=0, 0.5, 3.5), var(0)-0.5
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -2, 0
+air.velocity = -2.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 210, Spread 5]
+type = Projectile
+trigger1 = time % 18 = 0
+projanim = 301
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 1210
+offset = 0,0
+velocity = ifelse(var(1)=0, 1.0, 3.0), var(0)-1.0
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 4,0
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,2
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -2, 0
+air.velocity = -2.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 1
+ignorehitpause = 1
+
+[State 420, ChangeState]
+type = ChangeState
+trigger1 = animtime = 0
+value = 41
+
+;----------------------------------------------------------------------
+;Jump Laser Gun Shoot
+[Statedef 415]
+type    = A
+movetype= A
+physics = U
+juggle  = 5
+;Commonly-used controllers:
+sprpriority = 2
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = 1
+var(0) = 0
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "diagup"
+var(0) = -1
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "diagdown"
+trigger2 = command = "holddown"
+var(0) = 1
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "holddown"
+var(1) = 0
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+var(1) = 1
+
+[State 200, 1]
+type = Projectile
+trigger1 = numprojid(215) = 0
+projanim = ifelse(var(0) = 0, 302, ifelse(var(0) = 1, ifelse(var(1)=1, 305,303), ifelse(var(1)=1,304,303)))
+projremovetime = 360
+projpriority = 1
+projshadow = -1
+projheightbound = -240, 240
+projid = 215
+projhits = 3
+projremove = 0
+projmisstime = 3
+offset = 0,0
+velocity = 3*var(1),3*var(0)
+attr = S, SP
+getpower = 30,60
+givepower = 60, 120
+damage   = 15,2
+animtype = back
+guardflag = MA
+hitflag = MAFD
+pausetime = 0,8
+hitsound   = 8,0
+sparkno = -1
+sparkxy = 10,-9
+guardsound = 6,0
+ground.type = Heavy
+ground.slidetime = 15
+ground.hittime  = 12
+ground.velocity = -4, 0
+air.velocity = -4.5,-5
+air.fall = 1
+fall.recover = 0
+air.juggle = 5
+ignorehitpause = 1
+
+[State 420, ChangeState]
+type = ChangeState
+trigger1 = command != "hold_y"
+value = 41
+
+;Jump Fire Thrower Shoot
+[Statedef 420]
+type    = A
+movetype= A
+physics = U
+juggle  = 5
+;Commonly-used controllers:
+sprpriority = 2
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command != "diagup"
+var(0) = 0
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "holdup"
+trigger2 = command = "diagup"
+var(0) = -1
+
+[State 200, Var Shoot Y Vel]
+type = VarSet
+trigger1 = command = "diagdown"
+trigger2 = command = "holddown"
+var(0) = 1
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command = "holdup"
+var(1) = 0
+
+[State 200, Var Shoot X vel]
+type = VarSet
+trigger1 = command != "holdup"
+var(1) = 1
+
+[State 200, 1]
+type = Helper
+trigger1 = numhelper(220) < 4
+trigger1 = time % 17 = 0
+id = 220
+pos = 0,0
+stateno = 221
+ownpal = 1
+
+[State 420, ChangeState]
+type = ChangeState
+trigger1 = command != "hold_z"
+value = 41
+
+;Super Attack Start
+[Statedef 1000]
+Type = S
+movetype = A
+physics = S
+ctrl = 0
+anim = 580
+
+[State 1000, 2]
+Type = PowerAdd
+trigger1 = time = 0
+value = -500
+
+[State 0, PalFX]
+type = PalFX
+trigger1 = animelem = 5
+time = 10
+add = 256,256,256
+invertall = 0
+color = 256
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 5
+helpertype = normal ;player
+name = "Giant Peashot"
+ID = 1001
+stateno = 1001
+pos = 40,-15
+postype = p1    ;p2,front,back,left,right
+facing = 1
+size.xscale = 0.2
+size.yscale = 0.2
+
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 5
+value = S1000,0
+
+[State 1000, 3]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;LOOK OUT! IT'S THE GIANT PEASHOT!
+[Statedef 1001]
+Type = S
+movetype = A
+physics = N
+anim = 576
+ctrl = 0
+velset = 2,0
+
+[State 0, Explod]
+type = Explod
+trigger1 = MoveContact
+anim = 577
+ID = 577
+pos = 30,0
+postype = p1  ;p2,front,back,left,right
+removetime = -2
+scale = 0.2,0.2
+sprpriority = 10
+
+[state 2102, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 100, 0
+animtype = Medium
+hitflag = MAF
+guardflag = MA
+priority = 3, Hit
+pausetime = 0, 0
+hitsound = s8002,0
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 0
+ground.hittime  = 15
+ground.velocity = 0
+airguard.velocity = 0,0
+air.type = High
+air.velocity = 0,0
+air.hittime = 15
+
+[State 210, 1]
+type = DestroySelf
+trigger1 = MoveContact
+;---------------------------------------------------------------------------
+;Hold Up
+[Statedef 1]
+type    = S
+movetype= I
+physics = S
+juggle  = 1
+;Commonly-used controllers:
+velset = 0,0
+ctrl = 1
+sprpriority = 2
+anim = 212
+
+[State 1, ChangeState]
+type = changestate
+trigger1 = command != "holdup"
+value = 0
+
+;Hold DiagUp
+[Statedef 2]
+type    = S
+movetype= I
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 1
+sprpriority = 2
+anim = 200
+
+[State 1, ChangeState]
+type = changestate
+trigger1 = command != "diagup"
+value = 0
+
+;---------------------------------------------------------------------------
+;Hold Down
+[Statedef 3]
+type    = S
+movetype= I
+physics = S
+juggle  = 1
+;Commonly-used controllers:
+velset = 0,0
+ctrl = 1
+sprpriority = 2
+anim = 210
+
+[State 1, ChangeState]
+type = changestate
+trigger1 = command != "diagdown"
+value = 0
+
+;---------------------------------------------------------------------------
+; RUN_FWD
+[Statedef 100]
+type    = S
+physics = N
+ctrl = 0
+anim = 100
+
+[State 100, Dash]
+type = VelSet
+trigger1 = time = 0
+x = 5
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = time = 25
+value = 0
+ctrl = 1
+;---------------------------------------------------------------------------
+; RUN_BACK
+[Statedef 105]
+type    = S
+physics = N
+ctrl = 0
+anim = 100
+
+[State 100, Dash]
+type = VelSet
+trigger1 = time = 0
+x = -5
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = time = 25
+value = 0
+ctrl = 1
+;---------------------------------------------------------------------------
+; RUN_FWD Air
+[Statedef 101]
+type    = A
+physics = N
+ctrl = 0
+anim = 100
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7001
+time = -1
+
+[State 100, Dash]
+type = VelSet
+trigger1 = time = 25
+x = 0
+
+[State 100, Dash]
+type = VelSet
+trigger1 = time = 0
+x = 5
+
+[State 100, Dash]
+type = VelSet
+trigger1 = timemod = 1, 0
+y = 0
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = time = 25
+value = 50
+ctrl = 1
+;---------------------------------------------------------------------------
+; RUN_BACK Air
+[Statedef 106]
+type    = A
+physics = S
+ctrl = 0
+anim = 100
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7001
+time = -1
+
+[State 100, Dash]
+type = VelSet
+trigger1 = time = 0
+x = -5
+
+[State 100, Dash]
+type = VelSet
+trigger1 = timemod = 1, 0
+y = 0
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = time = 25
+value = 50
+ctrl = 1
+;---------------------------------------------------------------------------
+; Stand
+[Statedef 0]
+type = S
+physics = S
+sprpriority = 0
+
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = time = 0
+channel = 3
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+[State 0, 1]
+type = ChangeAnim
+trigger1 = Anim != 0 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0 ;Turn anim over
+value = 0
+
+[State 0, 2]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 0, 3] ;Stop moving if low velocity or 4 ticks pass
+type = VelSet
+trigger1 = abs(vel x) < Const(movement.stand.friction.threshold)
+trigger2 = Time = 4
+x = 0
+
+[State 0, 4] ;Are you dead?
+type = ChangeState
+trigger1 = !alive
+value = 5050
+ctrl = 0
+;---------------------------------------------------------------------------
+; Walk
+[Statedef 20]
+type    = S
+physics = S
+sprpriority = 0
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+
+[State 20, 1]
+type = PlaySnd
+trigger1 = animelem = 2
+trigger2 = animelem = 4
+value = 100,0
+
+[State 20, 2]
+type = VelSet
+trigger1 = command = "holdfwd"
+x = const(velocity.walk.fwd.x)
+
+[State 20, 3]
+type = VelSet
+trigger1 = command = "holdback"
+x = const(velocity.walk.back.x)
+
+[State 20, 4]
+type = ChangeAnim
+triggerall = vel x > 0
+trigger1 = Anim != 20 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0
+value = 20
+
+[State 20, 5]
+type = ChangeAnim
+triggerall = vel x < 0
+trigger1 = Anim != 21 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0
+value = 21
+;---------------------------------------------------------------------------
+; Stand to Crouch
+[Statedef 10]
+type    = C
+physics = C
+anim = 10
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+[State 10, 1]
+type = VelMul
+trigger1 = Time = 0
+x = .75
+
+[State 10, 2] ;Stop moving if low velocity
+type = VelSet
+trigger1 = abs(vel x) < Const(movement.crouch.friction.threshold)
+x = 0
+
+[State 10, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+
+;---------------------------------------------------------------------------
+; Crouching
+[Statedef 11]
+type    = C
+physics = C
+anim = 11
+sprpriority = 0
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+
+[State 11, 1] ;Change from turning animation
+type = ChangeAnim
+trigger1 = Anim = 6 && AnimTime = 0
+value = 11
+
+[State 11, 2] ;Stop moving if low velocity
+type = VelSet
+trigger1 = abs(vel x) < Const(movement.crouch.friction.threshold)
+x = 0
+
+;---------------------------------------------------------------------------
+; Crouch to Stand
+[Statedef 12]
+type    = S
+physics = S
+anim = 12
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+
+[State 12, 1]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+;---------------------------------------------------------------------------
+; Jump Start
+[Statedef 40]
+type    = S
+physics = S
+anim = 40
+ctrl = 0
+sprpriority = 1
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+[State 40, 1]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 40, 2]
+type = VarSet
+trigger1 = command = "holdfwd" || command = "diagup" || command = "diagdown"
+sysvar(1) = 1
+
+[State 40, 3]
+type = VarSet
+trigger1 = command = "holdback" || command = "bdiagup" || command = "bdiagdown"
+sysvar(1) = -1
+
+[State 40, 4]
+type = VelSet
+trigger1 = AnimTime = 0
+x = ifelse(sysvar(1)=0, const(velocity.jump.neu.x), ifelse(sysvar(1)=1, const(velocity.jump.fwd.x), const(velocity.jump.back.x)))
+y = const(velocity.jump.y)
+
+[State 40, 5]
+type = VelSet
+trigger1 = AnimTime = 0
+trigger1 = prevstateno = 100 ;RUN_FWD
+trigger1 = sysvar(1) = 1
+x = const(velocity.runjump.fwd.x)
+
+[State 40, 6]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 1
+;---------------------------------------------------------------------------
+; AirJump Start
+[Statedef 45]
+type    = A
+physics = N
+ctrl = 0
+velset = 0,0
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7001
+time = -1
+
+[State 45, 1]
+type = ChangeAnim
+trigger1 = SelfAnimExist(44)
+value = 44
+
+[State 45, 2]
+type = ChangeAnim
+trigger1 = !SelfAnimExist(44)
+value = 41
+
+[State 45, 3]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 45, 4]
+type = VarSet
+trigger1 = command = "holdfwd"
+sysvar(1) = 1
+
+[State 45, 5]
+type = VarSet
+trigger1 = command = "holdback"
+sysvar(1) = -1
+
+[State 45, 6]
+type = VelSet
+trigger1 = Time = 2
+x = ifelse(sysvar(1)=0, const(velocity.airjump.neu.x), ifelse(sysvar(1)=1, const(velocity.airjump.fwd.x), const(velocity.airjump.back.x)))
+y = const(velocity.airjump.y)+var(13)*-1
+
+[State 45, 7]
+type = ChangeState
+trigger1 = Time = 2
+value = 50
+ctrl = 1
+;---------------------------------------------------------------------------
+; Jump Up
+[Statedef 50]
+type    = A
+physics = A
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7001
+time = -1
+
+[State 50, 1]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 50, 2]
+type = ChangeAnim
+trigger1 = Time = 0
+value = ifelse((vel x)=0, 41, ifelse((vel x)>0, 42, 43))
+
+[State 50, 3]
+type = ChangeAnim
+trigger1 = Vel y > Const720p(-8)
+trigger1 = SelfAnimExist(anim + 3)
+trigger1 = anim >= 41 && anim <= 43
+persistent = 0
+value = Anim + 3
+;---------------------------------------------------------------------------
+; Parry
+[Statedef 500]
+type    = A
+physics = A
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 501
+time = 15
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 15
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7001
+time = -1
+
+[State 0, PalFX]
+type = PalFX
+trigger1 = time = 0
+time = 15
+add = 255,20,147
+sinadd = 255,20,147,30
+invertall = 0
+color = 256
+
+[State 50, 1]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 50, 2]
+type = ChangeAnim
+trigger1 = Time = 0
+value = ifelse((vel x)=0, 41, ifelse((vel x)>0, 42, 43))
+
+[State 50, 3]
+type = ChangeAnim
+trigger1 = Vel y > Const720p(-8)
+trigger1 = SelfAnimExist(anim + 3)
+trigger1 = anim >= 41 && anim <= 43
+persistent = 0
+value = Anim + 3
+
+[State 45, 7]
+type = ChangeState
+trigger1 = Time = 15
+value = 53
+;---------------------------------------------------------------------------
+; Jump Up [unable to use parry]
+[Statedef 53]
+type    = A
+physics = A
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7001
+time = -1
+
+[State 50, 1]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 50, 2]
+type = ChangeAnim
+trigger1 = Time = 0
+value = ifelse((vel x)=0, 41, ifelse((vel x)>0, 42, 43))
+
+[State 50, 3]
+type = ChangeAnim
+trigger1 = Vel y > Const720p(-8)
+trigger1 = SelfAnimExist(anim + 3)
+trigger1 = anim >= 41 && anim <= 43
+persistent = 0
+value = Anim + 3
+;---------------------------------------------------------------------------
+; Parry Success
+[Statedef 501]
+type    = A
+physics = A
+velset = 0,-10
+ctrl = 0
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7001
+time = -1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S501,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S501,1
+
+[State 0, PowerAdd]
+type = PowerAdd
+trigger1 = time = 0
+value = 200
+
+[State 50, 1]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 50, 2]
+type = ChangeAnim
+trigger1 = Time = 0
+value = ifelse((vel x)=0, 41, ifelse((vel x)>0, 42, 43))
+
+[State 50, 3]
+type = ChangeAnim
+trigger1 = Vel y > Const720p(-8)
+trigger1 = SelfAnimExist(anim + 3)
+trigger1 = anim >= 41 && anim <= 43
+persistent = 0
+value = Anim + 3
+
+[State 45, 7]
+type = ChangeState
+trigger1 = Time = 10
+value = 50
+ctrl = 1
+;---------------------------------------------------------------------------
+; Jump Down (empty state for compatibility)
+[Statedef 51]
+type    = A
+physics = A
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7001
+time = -1
+
+[State 51, 1]
+type = Null
+trigger1 = 1
+
+;---------------------------------------------------------------------------
+; Jump Land
+[Statedef 52]
+type    = S
+physics = S
+ctrl = 0
+anim = 47
+
+[State 0, HitOverride]
+type = HitOverride
+trigger1 = time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 7000
+time = -1
+
+[State 52, 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 52, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 52, 3]
+type = CtrlSet
+trigger1 = Time = 3
+value = 1
+
+[State 52, 4]
+type = VelSet
+trigger1 = abs(vel x) < Const(movement.stand.friction.threshold)
+x = 0
+
+[State 52, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+;---------------------------------------------------------------------------
+;Continue Jump After Shoot
+[Statedef 41]
+type    = A
+physics = A
+ctrl = 1
+sprpriority = 1
+
+[State 41, Null]
+type = Null
+trigger1 = 1
+;---------------------------------------------------------------------------
+; OW MY LEG
+[Statedef 7000]
+type    = S
+movetype= H
+physics = S
+anim = 7000
+
+[State 100, Dash]
+type = VelSet
+trigger1 = timemod = 1, 0
+y = 0
+
+[State 100, Dash]
+type = VelSet
+trigger1 = timemod = 1, 0
+x = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S7000,0
+
+[State 5150, NOW YOU MUST DIE]
+type = lifeadd
+trigger1 = alive
+trigger1 = Var(18) = 3
+value = -10000000
+absolute = 1
+
+[State 0, VarAdd]
+type = VarAdd
+trigger1 = time = 0
+v = 18
+value = 1
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = animtime = 0
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 100
+
+[State 0, PalFX]
+type = PalFX
+trigger1 = animtime = 0
+time = 100
+add = 256,256,256
+sinadd = 256,256,256,30
+invertall = 0
+color = 256
+
+[State 5120, 7]
+type = ChangeState
+trigger1 = alive
+trigger1 = Var(18) = 3
+trigger1 = time = 1
+value = 5150
+ctrl = 1
+
+[State 5120, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+;---------------------------------------------------------------------------
+; MY LEG ALSO HURTS TOO [aka hurt air]
+[Statedef 7001]
+type    = S
+movetype= H
+physics = S
+anim = 7000
+
+[State 100, Dash]
+type = VelSet
+trigger1 = timemod = 1, 0
+y = 0
+
+[State 100, Dash]
+type = VelSet
+trigger1 = timemod = 1, 0
+x = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S7000,0
+
+[State 5150, NOW YOU MUST DIE]
+type = lifeadd
+trigger1 = alive
+trigger1 = Var(18) = 3
+value = -10000000
+absolute = 1
+
+[State 0, VarAdd]
+type = VarAdd
+trigger1 = time = 0
+v = 18
+value = 1
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = animtime = 0
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 100
+
+[State 0, PalFX]
+type = PalFX
+trigger1 = animtime = 0
+time = 100
+add = 256,256,256
+sinadd = 256,256,256,30
+invertall = 0
+color = 256
+
+[State 5120, 7]
+type = ChangeState
+trigger1 = alive
+trigger1 = Var(18) = 3
+trigger1 = time = 1
+value = 5150
+ctrl = 1
+
+[State 5120, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 1
+;---------------------------------------------------------------------------
+; Downed get-hit (lying defeated)
+[Statedef 5150]
+type    = L
+movetype= H
+physics = N
+sprpriority = -3
+ctrl = 0
+anim = 7000
+
+[State 100, Dash]
+type = VelSet
+trigger1 = timemod = 1, 0
+y = 0
+
+[State 100, Dash]
+type = VelSet
+trigger1 = timemod = 1, 0
+x = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S5150,0
+
+[State 5150, 8]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = -1
+;---------------------------------------------------------------------------
+[StateDef -2]
+
+[State -2, AI Activate]
+type = VarSet
+trigger1 = IsHomeTeam
+trigger1 = TeamSide = 2
+trigger2 = matchno > 1
+trigger2 = ishometeam
+trigger3 = command = "ai"
+trigger4 = command = "ai1"
+trigger5 = command = "ai2"
+trigger6 = command = "ai3"
+trigger7 = command = "ai4"
+trigger8 = command = "ai5"
+trigger9 = command = "ai6"
+trigger10= command = "ai7"
+trigger11= command = "ai8"
+trigger12= command = "ai9"
+trigger13= command = "ai10"
+trigger14= command = "ai11"
+trigger15= command = "ai12"
+trigger16= command = "ai13"
+var(59) = 1
+
+[State -2, Make AI stay facing enemy]
+type = Turn
+triggerall = var(59) = 1
+triggerall = ctrl
+trigger1 = P2BodyDist X < 0
+trigger1 = StateType != A
+
+[State -2, Shoot Spread Diag when Enemy Jumping]
+type = varset
+triggerall = var(59) = 1
+triggerall = ctrl
+triggerall = roundstate = 2
+trigger1 = Enemynear(0), StateType = A
+trigger1 = NumProjId(1210) = 0
+trigger1 = StateType = S
+trigger1 = random < 700
+var(58) = 021009
+
+[State -2, Shoot Crouch Machine Gun when Enemy defending stands]
+type = varset
+triggerall = var(59) = 1
+triggerall = ctrl
+triggerall = roundstate = 2
+trigger1 = Enemynear(0), StateType = S
+trigger1 = Enemynear(0), stateno = [120,140]
+trigger1 = StateType = S
+trigger1 = random < 700
+var(58) = 030105
+
+[State -2, Adavance and Shoot Machine Gun When Enemy attack]
+type = varset
+triggerall = var(59) =1
+triggerall = ctrl
+triggerall = roundstate = 2
+trigger1 = Enemynear(0), MoveType = A
+trigger1 = EnemyNear(0), StateType = S
+trigger1 = P2BodyDist X > 15
+trigger1 = random < 700
+var(58) = 020506
+
+[State -2, Use Super Shoot when Able to]
+type = varset
+triggerall = var(59) =1
+triggerall = ctrl
+triggerall = roundstate = 2
+trigger1 = EnemyNear(0), StateType = S
+trigger1 = P2BodyDist X > 15
+trigger1 = power >= 1000
+trigger1 = random < 900
+var(58) = 100005
+
+[State -2, Var(58) Reset]
+type = varset
+trigger1 = gametime % 2 = 0 && stateno != 205
+trigger2 = movetype = H
+trigger3 = stateno = 205 && time > 75
+var(58) = 0
+
+[State -2, Debug]
+type = DisplayToClipBoard
+trigger1 = 1
+text = "var(58) = %d , GameTime = %d , GameTime mod 2 = %d"
+params = var(58), gametime, gametime % 2
+
+[Statedef -3]
+
+[State -3, No Auto Turn]
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+
+[State -3, No Guard]
+type = AssertSpecial
+trigger1 = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard

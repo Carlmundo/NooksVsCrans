@@ -1,0 +1,780 @@
+;-------------------------------------------------------------------------
+;テルミドール
+[Statedef 3000]
+type = S
+movetype = A
+physics = S
+juggle = 0
+velset = 0,0
+anim = 3000
+poweradd = ifelse((prevstateno = [1000,1200]),-2000,-1000)
+ctrl = 0
+velset = 0,0
+sprpriority = 2
+
+[State -2]
+Type = VarAdd
+Trigger1 = Time = 0
+trigger1 = NumHelper(3301) = 1
+IgnoreHitPause = 1
+V = 10
+Value = -1000
+
+[State 3110, 6]
+type = NotHitBy
+trigger1 = Time <= 55
+value = SCA
+time = 1
+
+[State 3110, 6]
+type = NotHitBy
+trigger1 = Time >= 55
+value = SCA, NT, ST, HT
+time = 1
+
+[State 3000, SC]
+type = Explod
+Trigger1 = Time = 13
+trigger1 = prevstateno = [1000,1200]
+trigger1 = NumExplod(2000) = 0
+trigger1 = TeamSide = 1
+anim = 2001
+ID = 2001
+pos = -125,70
+postype = left
+removetime = 30
+supermove = 1
+bindtime = -1
+vel=0,0
+ownpal = 1
+ontop=1
+
+[State 3000, SC]
+type = Explod
+Trigger1 = Time = 13
+trigger1 = prevstateno = [1000,1200]
+trigger1 = NumExplod(2000) = 0
+trigger1 = TeamSide = 2
+anim = 2011
+ID = 2011
+facing = -1
+pos = 75,70
+postype = left
+removetime = 30
+supermove = 1
+bindtime = -1
+vel=0,0
+ownpal = 1
+ontop=1
+
+[State 3000, 1]
+type = SuperPause
+Trigger1 = Time = 14
+time = 27
+movetime = 27
+anim = -1
+pos = -63,-67
+sound = 3099,0
+p2defmul = 1
+
+[State 1000, 1]
+type = PlaySnd
+Trigger1 = Time = 14
+value = 3099, 0
+
+[State -2,];エフェクト
+type = Explod
+Trigger1 = Time = 14
+anim = 3900
+ID = 3900
+IgnoreHitPause = 1
+sprpriority = 1
+postype = p1
+pos = -19,-64
+supermove = 1
+ownpal = 1
+
+[State -2,];エフェクト
+type = Explod
+Trigger1 = Time = 14
+anim = 3901
+ID = 3901
+IgnoreHitPause = 1
+sprpriority = 4
+postype = p1
+pos = -19,-64
+supermove = 1
+ownpal = 1
+
+[State 191, 0] 
+type = AssertSpecial
+trigger1 = Time = [14,40]
+flag = noFG
+time = 1
+
+[State 3000, 0]
+type = EnvColor
+trigger1 = Time = [14,40]
+value = 0,0,0
+under = 1
+time = 1
+
+[State 1000, 1]
+type = PlaySnd
+Trigger1 = Time = 14
+value = 3000, 0
+
+[State 1000, 1]
+type = PlaySnd
+Trigger1 = AnimElem = 15
+value = 3000, 1
+
+[State 1000, 1]
+type = PlaySnd
+Trigger1 = AnimElem = 15
+value = 3000, 2
+
+[State 1011, 4]
+type = Helper
+Trigger1 = AnimElem = 7
+ID = 3001
+pos = 0,0
+postype = p1
+stateno = 3001
+Persistent = 0
+pausemovetime = 18
+supermovetime = 18
+name = "TD1"
+helpertype = normal
+
+[State 1000, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;-------------------------------------------------------------------------
+;テルミドール弾
+[Statedef 3001]
+anim = 3001
+movetype = A
+sprpriority = 5
+juggle = 0
+velset = 0,0
+
+[State 1001, 1]
+type = NotHitBy 
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 200];ヒット数リセット
+Type = ParentVarSet
+Trigger1 = Time =  0
+Persistent = 0
+IgnoreHitPause = 1
+V = 6
+Value = 0
+
+[State -2];補正リセット
+Type = ParentVarSet
+Trigger1 = Time =  0
+V = 5
+Value = 1000
+
+[State 1040, 3]
+type = Projectile
+trigger1 = P2StateNo != 5040
+trigger1 = Time >= 24
+trigger1 = Parent,Var(6) < 10
+trigger1 = (GameTime%3) = 0
+projanim = 3004
+projhitanim = 3005
+projremovetime = 3
+projshadow = -1
+supermovetime = -1
+ProjID = 3003
+offset = 0, 0
+velocity = 0,0
+accel = 0, 0
+attr = A, HP
+damage    = floor(38*Parent,Var(5)/1000)+(10*Parent,Var(12)),4
+getpower = 0
+animtype  = Hard
+guardflag = M
+hitflag = MAF
+pausetime = 0,0
+sparkno = S73
+guard.sparkno = S62
+sparkxy = 60, -60
+hitsound   = -1
+guardsound = -1
+ground.type = High
+air.animtype = High
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = -4.5,-4
+air.velocity = -4.5,-4
+fall = 1
+can.recover=0
+palfx.color = 100
+Palfx.time          = 60
+Palfx.add           = -100,40,-100
+Palfx.sinadd        = 30,30,30,4
+p2stateno = 1204
+
+[State 201, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+trigger2 = parent, StateNo !=3000
+value = 3002
+ctrl = 1
+
+;-------------------------------------------------------------------------
+;テルミドール弾
+[Statedef 3002]
+anim = 3002
+movetype = A
+sprpriority = 5
+juggle = 0
+velset = 3.5,0
+
+[State 1001, 1]
+type = NotHitBy 
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 1040, 3]
+type = Projectile
+trigger1 = P2StateNo != 5040
+trigger1 = p2statetype != A
+trigger1 = Parent,Var(6) < 10
+trigger1 = (GameTime%3) = 0
+projanim = 3004
+projhitanim = 3005
+projremovetime = 1
+projshadow = -1
+ProjID = 3003
+offset = 0, 0
+velocity = 3.5,0
+accel = 0, 0
+attr = A, HP
+damage    = floor(38*Parent,Var(5)/1000)+(10*Parent,Var(12)),4
+getpower = 0
+animtype  = Hard
+guardflag = M
+hitflag = MAF
+pausetime = 0,2
+sparkno = S73
+guard.sparkno = S62
+sparkxy = 40, -60
+hitsound   = -1
+guardsound = -1
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = 0
+air.velocity = 0,-6
+air.fall = 1
+can.recover=0
+palfx.color = 100
+Palfx.time          = 60
+Palfx.add           = -100,40,-100
+Palfx.sinadd        = 30,30,30,4
+
+[State 1040, 3]
+type = Projectile
+trigger1 = P2StateNo != 5040
+trigger1 = p2statetype = A
+trigger1 = Parent,Var(6) < 10
+trigger1 = (GameTime%3) = 0
+projanim = 3004
+projhitanim = 3005
+projremovetime = 1
+projshadow = -1
+ProjID = 3003
+offset = 0, 0
+velocity = 3.5,0
+accel = 0, 0
+attr = A, HP
+damage    = floor(38*Parent,Var(5)/1000)+(10*Parent,Var(12)),4
+getpower = 0
+animtype  = Hard
+guardflag = M
+hitflag = MAF
+pausetime = 0,2
+sparkno = S73
+guard.sparkno = S62
+sparkxy = 40, -60
+hitsound   = -1
+guardsound = -1
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = 0
+air.velocity = 0,-7
+air.fall = 1
+can.recover=0
+palfx.color = 100
+Palfx.time          = 60
+Palfx.add           = -100,40,-100
+Palfx.sinadd        = 30,30,30,4
+p2stateno = 1204
+
+[State 1002, 4]
+type = ChangeState
+trigger1 = Parent,Var(6) = 10
+IgnoreHitPause = 1
+value = 3003
+
+[State 1002, 4]
+type = DestroySelf
+trigger1 = FrontEdgeDist <= -20
+
+;-------------------------------------------------------------------------
+; 弾消える
+[Statedef 3003]
+anim = 3003
+sprpriority = 5
+velset = 0,0
+
+[State 1001, 1]
+type = NotHitBy 
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 1040, 3]
+type = Projectile
+trigger1 = P2StateNo != 5040
+Trigger1 = Time =  0
+projanim = 3004
+projhitanim = 3005
+projshadow = -1
+ProjID = 3003
+offset = 0, 0
+velocity = 0,0
+accel = 0, 0
+attr = A, HP
+damage    = floor(38*Parent,Var(5)/1000)+(10*Parent,Var(12)),4
+getpower = 0
+animtype  = Hard
+guardflag = M
+hitflag = MAF
+pausetime = 0,2
+sparkno = S73
+guard.sparkno = S62
+sparkxy = 40, -60
+hitsound   = -1
+guardsound = -1
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = -4,-6
+air.velocity = -4,-5
+fall = 1
+can.recover=0
+palfx.color = 100
+Palfx.time          = 60
+Palfx.add           = -100,40,-100
+Palfx.sinadd        = 30,30,30,4
+p2stateno = 1204
+
+[State 1002, 4]
+type = DestroySelf
+trigger1 = AnimTime = 0
+trigger2 = FrontEdgeDist <= -20
+
+;-------------------------------------------------------------------------
+;テルミドール2
+[Statedef 3010]
+type = S
+movetype = A
+physics = S
+juggle = 0
+velset = 0,0
+anim = 3000
+poweradd = ifelse((prevstateno = [1000,1200]),-2000,-1000)
+ctrl = 0
+velset = 0,0
+sprpriority = 2
+
+[State -2, Z0]
+type = RemoveExplod
+Trigger1 = Time = 0
+IgnoreHitPause = 1
+ID = 2999
+
+[State -2]
+Type = VarAdd
+Trigger1 = Time = 0
+trigger1 = NumHelper(3311) = 1
+IgnoreHitPause = 1
+V = 10
+Value = -1000
+
+[State 3110, 6]
+type = NotHitBy
+trigger1 = Time <= 55
+value = SCA
+time = 1
+
+[State 3110, 6]
+type = NotHitBy
+trigger1 = Time >= 55
+value = SCA, NT, ST, HT
+time = 1
+
+[State 3000, SC]
+type = Explod
+Trigger1 = Time = 13
+trigger1 = prevstateno = [1000,1200]
+trigger1 = TeamSide = 1
+anim = 2001
+ID = 2001
+pos = -125,70
+postype = left
+removetime = 30
+supermove = 1
+bindtime = -1
+vel=0,0
+ownpal = 1
+ontop=1
+
+[State 3000, SC]
+type = Explod
+Trigger1 = Time = 13
+trigger1 = prevstateno = [1000,1200]
+trigger1 = TeamSide = 2
+anim = 2011
+ID = 2011
+facing = -1
+pos = 75,70
+postype = left
+removetime = 30
+supermove = 1
+bindtime = -1
+vel=0,0
+ownpal = 1
+ontop=1
+
+[State 3000, 1]
+type = SuperPause
+Trigger1 = Time = 14
+time = 27
+movetime = 27
+anim = -1
+pos = -63,-67
+sound = 3099,0
+p2defmul = 1
+
+[State 1000, 1]
+type = PlaySnd
+Trigger1 = Time = 14
+value = 3099, 0
+
+[State -2,];エフェクト
+type = Explod
+Trigger1 = Time = 14
+anim = 3900
+ID = 3900
+IgnoreHitPause = 1
+sprpriority = 1
+postype = p1
+pos = -19,-64
+supermove = 1
+ownpal = 1
+
+[State -2,];エフェクト
+type = Explod
+Trigger1 = Time = 14
+anim = 3901
+ID = 3901
+IgnoreHitPause = 1
+sprpriority = 4
+postype = p1
+pos = -19,-64
+supermove = 1
+ownpal = 1
+
+[State 191, 0] 
+type = AssertSpecial
+trigger1 = Time = [14,40]
+flag = noFG
+time = 1
+
+[State 3000, 0]
+type = EnvColor
+trigger1 = Time = [14,40]
+value = 0,0,0
+under = 1
+time = 1
+
+[State 1000, 1]
+type = PlaySnd
+Trigger1 = Time = 14
+value = 3000, 0
+
+[State 1000, 1]
+type = PlaySnd
+Trigger1 = AnimElem = 15
+value = 3000, 1
+
+[State 1000, 1]
+type = PlaySnd
+Trigger1 = AnimElem = 15
+value = 3000, 2
+
+[State 1011, 4]
+type = Helper
+Trigger1 = AnimElem = 7
+ID = 3011
+pos = 0,0
+postype = p1
+stateno = 3011
+Persistent = 0
+pausemovetime = 18
+supermovetime = 18
+name = "TD2"
+helpertype = normal
+
+[State 1000, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;-------------------------------------------------------------------------
+;テルミドール弾
+[Statedef 3011]
+anim = 3001
+movetype = A
+sprpriority = 5
+juggle = 0
+velset = 0,0
+
+[State 1001, 1]
+type = NotHitBy 
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 200];ヒット数リセット
+Type = ParentVarSet
+Trigger1 = Time =  0
+Persistent = 0
+IgnoreHitPause = 1
+V = 16
+Value = 0
+
+[State -2];補正リセット
+Type = ParentVarSet
+Trigger1 = Time =  0
+V = 15
+Value = 1000
+
+[State 1040, 3]
+type = Projectile
+trigger1 = P2StateNo != 5040
+trigger1 = Time >= 24
+trigger1 = Parent,Var(16) < 10
+trigger1 = (GameTime%3) = 0
+projanim = 3004
+projhitanim = 3005
+projremovetime = 3
+projshadow = -1
+supermovetime = -1
+ProjID = 3013
+offset = 0, 0
+velocity = 0,0
+accel = 0, 0
+attr = A, HP
+damage    = floor(38*Parent,Var(15)/1000)+(10*Parent,Var(12)),4
+getpower = 0
+animtype  = Hard
+guardflag = M
+hitflag = MAF
+pausetime = 0,0
+sparkno = S73
+guard.sparkno = S62
+sparkxy = 60, -60
+hitsound   = -1
+guardsound = -1
+ground.type = High
+air.animtype = High
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = -4.5,-4
+air.velocity = -4.5,-4
+fall = 1
+can.recover=0
+palfx.color = 100
+Palfx.time          = 60
+Palfx.add           = -100,40,-100
+Palfx.sinadd        = 30,30,30,4
+p2stateno = 1204
+
+[State 201, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+trigger2 = parent, StateNo !=3010
+value = 3012
+ctrl = 1
+
+;-------------------------------------------------------------------------
+;テルミドール弾
+[Statedef 3012]
+anim = 3002
+movetype = A
+sprpriority = 5
+juggle = 0
+velset = 3.5,0
+
+[State 1001, 1]
+type = NotHitBy 
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 1040, 3]
+type = Projectile
+trigger1 = P2StateNo != 5040
+trigger1 = p2statetype != A
+trigger1 = Parent,Var(16) < 10
+trigger1 = (GameTime%3) = 0
+projanim = 3004
+projhitanim = 3005
+projremovetime = 1
+projshadow = -1
+ProjID = 3013
+offset = 0, 0
+velocity = 3.5,0
+accel = 0, 0
+attr = A, HP
+damage    = floor(38*Parent,Var(15)/1000)+(10*Parent,Var(12)),4
+getpower = 0
+animtype  = Hard
+guardflag = M
+hitflag = MAF
+pausetime = 0,2
+sparkno = S73
+guard.sparkno = S62
+sparkxy = 40, -60
+hitsound   = -1
+guardsound = -1
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = 0
+air.velocity = 0,-6
+air.fall = 1
+can.recover=0
+palfx.color = 100
+Palfx.time          = 60
+Palfx.add           = -100,40,-100
+Palfx.sinadd        = 30,30,30,4
+
+[State 1040, 3]
+type = Projectile
+trigger1 = P2StateNo != 5040
+trigger1 = p2statetype = A
+trigger1 = Parent,Var(16) < 10
+trigger1 = (GameTime%3) = 0
+projanim = 3004
+projhitanim = 3005
+projremovetime = 1
+projshadow = -1
+ProjID = 3013
+offset = 0, 0
+velocity = 3.5,0
+accel = 0, 0
+attr = A, HP
+damage    = floor(38*Parent,Var(15)/1000)+(10*Parent,Var(12)),4
+getpower = 0
+animtype  = Hard
+guardflag = M
+hitflag = MAF
+pausetime = 0,2
+sparkno = S73
+guard.sparkno = S62
+sparkxy = 40, -60
+hitsound   = -1
+guardsound = -1
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = 0
+air.velocity = 0,-7
+air.fall = 1
+can.recover=0
+palfx.color = 100
+Palfx.time          = 60
+Palfx.add           = -100,40,-100
+Palfx.sinadd        = 30,30,30,4
+p2stateno = 1204
+
+[State 1002, 4]
+type = ChangeState
+trigger1 = Parent,Var(16) = 10
+IgnoreHitPause = 1
+value = 3013
+
+[State 1002, 4]
+type = DestroySelf
+trigger1 = FrontEdgeDist <= -20
+
+;-------------------------------------------------------------------------
+; 弾消える
+[Statedef 3013]
+anim = 3003
+sprpriority = 5
+velset = 0,0
+
+[State 1001, 1]
+type = NotHitBy 
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 1040, 3]
+type = Projectile
+trigger1 = P2StateNo != 5040
+Trigger1 = Time =  0
+projanim = 3004
+projhitanim = 3005
+projshadow = -1
+ProjID = 3013
+offset = 0, 0
+velocity = 0,0
+accel = 0, 0
+attr = A, HP
+damage    = floor(38*Parent,Var(15)/1000)+(10*Parent,Var(12)),4
+getpower = 0
+animtype  = Hard
+guardflag = M
+hitflag = MAF
+pausetime = 0,2
+sparkno = S73
+guard.sparkno = S62
+sparkxy = 40, -60
+hitsound   = -1
+guardsound = -1
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = -4,-6
+air.velocity = -4,-5
+fall = 1
+can.recover=0
+palfx.color = 100
+Palfx.time          = 60
+Palfx.add           = -100,40,-100
+Palfx.sinadd        = 30,30,30,4
+p2stateno = 1204
+
+[State 1002, 4]
+type = DestroySelf
+trigger1 = AnimTime = 0
+trigger2 = FrontEdgeDist <= -20
+

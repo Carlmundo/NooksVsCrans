@@ -1,0 +1,159 @@
+;---------------------------------------------------------------------------
+; RUN_FWD
+[Statedef 100]
+type    = S
+physics = S
+anim = 100
+sprpriority = 1
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = AnimElem = 4
+trigger2 = AnimElem = 7
+value = S0, 100
+
+[State 100, 1]
+type = VelSet
+trigger1 = 1
+x = const(velocity.run.fwd.x)
+
+[State 100, 2] ;Prevent run from canceling into walk
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+[State 100, 3] ;Prevent from turning
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 100, 4]
+type = ChangeState
+trigger1 = anim = 101 && animtime = 0
+value = 0
+
+[state 100, 5]
+type = changeanim 
+trigger1 = var(59) = 0
+trigger1 = command!="holdfwd"&&anim=100
+trigger2 = (var(59) = 1) && (p2bodydist X < 40) && (anim = 100)
+value=101 
+ctrl = 1
+
+[State 100, 0];こんな感じの追加して
+type = CtrlSet
+;trigger1 = 1
+trigger1 = var(59) = 1
+value = 0
+
+;---------------------------------------------------------------------------
+; RUN_back
+[Statedef 105]
+type    = S
+physics = S
+anim = 105
+sprpriority = 1
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = AnimElem = 4
+trigger2 = AnimElem = 7
+value = S0, 100
+
+[State 105, 1]
+type = VelSet
+trigger1 = 1
+x = const(velocity.run.back.x)
+
+[State 105, 2] ;Prevent run from canceling into walk
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+[State 105, 3] ;Prevent from turning
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 105, 4]
+type = ChangeState
+trigger1 = anim = 102 && animtime = 0
+value = 0
+
+[state 105, 5]
+type = changeanim 
+trigger1 = command!="holdback"&&anim=105 
+value=102 
+
+
+
+;---------------------------------------------------------------------------
+;※※※※※※※※※※※※※※※※※※※※空中ダッシュ
+;空中なのでtypeとphysicsがＡ、つまり空中です。
+;phisicsをＡにすると地上についた瞬間強制的に立ち状態に戻ります。
+;それとctrl = 1にすることで空中ダッシュ中はいつでも攻撃ができるようにしてます。
+
+[Statedef 2300]
+type    = a
+movetype= A
+physics = a
+juggle  = 0
+poweradd= 0
+ctrl = 1
+velset = 8,-2
+anim = 910;←避けの回転スプライトを利用
+sprpriority = 2
+
+[State 2300, 1];←成功したときの残像
+type = AfterImage
+trigger1 = Time = 0
+time = 30
+removetime = 18
+length = 3
+timegap = 6
+framegap = 1
+palbright = 50,90,50
+palcontrast = 255,255,255
+palpostbright = 0,0,0
+paladd = 0,0,0
+palmul = 1,1,1
+trans = Add1
+
+[State 821, 1];←とりあえず重力の役目
+type = VelAdd
+Trigger1 = 1
+y = .1
+x = 0.5
+
+[Statedef 2301]
+type    = a
+movetype= A
+physics = a
+juggle  = 0
+poweradd= 0
+ctrl = 1
+velset = -8,-2
+anim = 911;←避けの回転スプライトを利用
+sprpriority = 2
+
+[State 2301, 1];←成功したときの残像
+type = AfterImage
+trigger1 = Time = 0
+time = 30
+removetime = 18
+length = 3
+timegap = 6
+framegap = 1
+palbright = 50,90,50
+palcontrast = 255,255,255
+palpostbright = 0,0,0
+paladd = 0,0,0
+palmul = 1,1,1
+trans = Add1
+
+[State 821, 1];←とりあえず重力の役目
+type = VelAdd
+Trigger1 = 1
+y = .1
+x = -0.5
+

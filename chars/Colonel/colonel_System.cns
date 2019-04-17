@@ -1,0 +1,233 @@
+;---------------------------------------------------------------------------
+; システム
+;---------------------------------------------------------------------------
+
+[Statedef -2]
+
+[State -2, クリップボード]
+type = DisplayToClipboard
+trigger1 = 1
+text = "AI=%d, AIACT=%d, AITIME=%d\n"
+params = var(0),var(1),var(2)
+
+[State -2, クリップボード]
+type = DisplayToClipboard
+trigger1 = 1
+text = "vx=%f, px=%f,frd=%d\n"
+params = Vel X,Pos X,FrontEdgeDist
+
+[State -2, クリップボード]
+type = DisplayToClipboard
+trigger1 = NumHelper(7000)
+text = "pp0x=%f, pp1x=%f"
+params = (Helper(7000),Pos X), (Helper(7001),Pos X)
+
+[State -2, 画面端判定発射]
+type = Helper
+trigger1 = RoundState = 2
+trigger1 = !NumHelper(7000)
+stateno = 7000
+ID = 7000
+
+[State -2, 画面端判定発射]
+type = Helper
+trigger1 = RoundState = 2
+trigger1 = !NumHelper(7001)
+stateno = 7000
+ID = 7001
+
+;---------------------------------------------------------------------------
+; 汎用処理
+;---------------------------------------------------------------------------
+
+[State -2, AI行動時間消費]
+type = VarAdd
+trigger1 = (Var(2) > 0)
+v = 2
+value = -1
+
+[State -2, AI行動変数リセット]
+type = VarSet
+trigger1 = Var(2) = 0
+v = 1
+value = 0
+
+[State -2, 無敵]
+type = NotHitBy
+trigger1 = (RoundState != 2);（※）
+value = SCA
+time = 10
+supermovetime = 99999999
+pausemovetime = 99999999
+IgnoreHitPause = 1
+
+[State -2, スクロール];負けて倒れたらカメラワークを相手に移す処理
+type = ScreenBound
+triggerall = (Life <= 0) || (!Alive) || (Lose)
+trigger1 = (StateNo = 5150) && (RoundState = 4);（※）
+value = 0
+MoveCamera = 0,0
+IgnoreHitPause = 1
+
+[State -2, 残像表示時間];攻撃食らったら残像を強制的に消す処理
+type = AfterImageTime
+trigger1 = (StateNo = [800,899]) && (MoveType = H)
+trigger2 = (PrevStateNo = [1000,4999]) && (StateNo = [5000,5899]) && (MoveType = H)
+trigger3 = (PrevStateNo = [6000,10999]) && (StateNo = [5000,5899]) && (MoveType = H)
+trigger5 = (RoundState > 3)
+time = 0
+IgnoreHitPause = 1
+
+;---------------------------------------------------------------------------
+; 画面一時退場演出
+;---------------------------------------------------------------------------
+[State -2, ステート変更]
+type = Changestate
+triggerall = (NumEnemy) && (RoundState = [2,3])
+trigger1 = (StateNo = 1006) && (BackEdgeDist < 0) && (EnemyNear,MoveType = H)
+value = 10005
+
+;---------------------------------------------------------------------------
+;大ジャンプ用処理
+;---------------------------------------------------------------------------
+
+[State -2]
+type = VarRangeSet
+trigger1 = (MoveType = H)
+first = 35
+last = 36
+value = 0
+IgnoreHitPause = 1
+
+[State -2]
+type = VarSet
+trigger1 = (command = "holdfwd") && (Var(0) = 0)
+v = 36
+value = 1
+IgnoreHitPause = 1
+
+[State -2]
+type = VarSet
+trigger1 = (command = "holdback") && (Var(0) = 0)
+v = 36
+value = -1
+IgnoreHitPause = 1
+
+[State -2]
+type = VarSet
+trigger1 = (command != "holdfwd") && (command != "holdback") && (Var(0) = 0)
+v = 36
+value = 0
+IgnoreHitPause = 1
+
+[State -2]
+type = VelAdd
+triggerall = (var(35) = 1) && (var(36) != 0)
+trigger1 = (StateType = A) && (Time > 0)
+trigger1 = Vel X = [-3,3]
+x = var(36)*0.8
+IgnoreHitPause = 1
+
+[State -2]
+type = AssertSpecial
+trigger1 = (var(35) = 1)
+flag = nojugglecheck
+
+[State -2]
+type = Turn
+triggerall = (var(35) = 1)
+trigger1 = (StateNo = 50) && (P2Dist X < 0)
+
+;---------------------------------------------------------------------------
+; 崩れＫＯ用処理
+;---------------------------------------------------------------------------
+
+[State -2, 崩れＫＯ]
+type = ChangeState
+trigger1 = (PrevStateNo = [120,131]) || (PrevStateNo = [150,153])
+trigger1 = (StateNo = 5000) || (StateNo = 5010)
+trigger1 = (!Alive) || (Life <= 0) || (Lose)
+value = 10004
+IgnoreHitPause = 1
+
+;---------------------------------------------------------------------------
+; 変数の値の特定範囲をランダムで処理
+;---------------------------------------------------------------------------
+
+[State -2, 汎用ランダム]
+type = VarRandom
+trigger1 = 1
+v = 28
+range = 1,120
+IgnoreHitPause = 1
+
+;ヒットスパーク
+[State -2, 弱]
+type = VarRandom
+trigger1 = 1
+v = 43
+range = 4206,4211
+IgnoreHitPause = 1
+
+[State -2, 強]
+type = VarRandom
+trigger1 = 1
+v = 44
+range = 4200,4205
+IgnoreHitPause = 1
+
+[State -2, 斬る]
+type = VarRandom
+trigger1 = 1
+v = 45
+range = 4400,4405
+IgnoreHitPause = 1
+
+[State -2, スーパーアーツ]
+type = VarRandom
+trigger1 = 1
+v = 46
+range = 4200,4205
+IgnoreHitPause = 1
+
+;---------------------------------------------------------------------------
+;大ジャンプ用処理
+;---------------------------------------------------------------------------
+
+[State -2, フラグリセット]
+type = VarSet
+trigger1 = (StateNo != 50) && (StateNo != 10003)
+v = 54
+value = 0
+IgnoreHitPause = 1
+
+[State -2, フラグリセット]
+type = VarSet
+trigger1 = (StateNo != 50)
+trigger2 = (StateNo = 50) && (command != "holdfwd" || command != "holdback")
+v = 55
+value = 0
+IgnoreHitPause = 1
+
+[State -2, キーを前方か後方に]
+type = VarSet
+trigger1 = (var(54) = 1) && (StateNo = 50)
+v = 55
+value = (command="holdfwd")-(command="holdback")
+IgnoreHitPause = 1
+
+;---------------------------------------------------------------------------
+; 崩れＫＯ用処理
+;---------------------------------------------------------------------------
+
+[State -2, 「立ち」か「しゃがみ」を判断]
+type = VarSet
+triggerall = (RoundState > 1)
+trigger1 = (StateNo = [120,131])
+trigger2 = (StateNo = [150,153])
+v = 37
+value = ifelse((StateType=C),1,0)
+IgnoreHitPause = 1
+
+;---------------------------------------------------------------------------
+

@@ -1,0 +1,698 @@
+
+;---------------------------------------------------------------------------
+; イントロ分岐
+;入場
+
+[Statedef 190]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 801, 入場切り替え]
+type = VarSet
+trigger1 = TeamMode = simul
+var(5) = 1
+
+[State 190, 入場 1p側 先]
+type = ChangeState
+trigger1 = Facing = 1
+trigger1 = var(5) = 0
+value = 20000
+
+[State 190, 入場 2p側 後]
+type = ChangeState
+trigger1 = P2Stateno = 20000
+trigger1 = Facing = -1
+trigger1 = var(5) = 0
+value = 20020
+
+[State 190, 入場 2p側 先]
+type = ChangeState
+trigger1 = Facing = -1
+trigger1 = var(5) = 0
+value = 20000
+
+[State 190, 通常イントロ]
+type = ChangeState
+trigger1 = var(5) = 1
+trigger2 =TeamMode = simul
+trigger3 =TeamMode = turns
+value = 20030
+
+;---------------------------------------------------------------------------
+;入場 1p側
+
+[Statedef 20000]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 3000,00]
+type = BGPalfx
+trigger1 = time = 140
+add =  -200,-200,-200
+sinadd = -60, -60, -60,60
+time = 1400
+
+[State 192, ヘルパーを出す]
+type = Helper
+triggerall = NumHelper(20002) = 0
+trigger1 = time = 0
+name = "(^o^)"
+stateno = 20002
+ID = 20002
+pos = 160, 0
+postype = left
+ownpal = 1
+
+[State 1000,***]
+type = AssertSpecial
+trigger1 = 1
+flag = nobardisplay
+
+[State 801, 入場切り替え]
+type = Varadd
+trigger1 = time = 0
+var(5) = 1
+
+[State 111, 入場切り替え]
+type = VarSet
+triggerall = NumHelper(20001)
+trigger1 = Helper(20001),Var(1) = 1
+var(5) = 0
+
+[State 192, 透明化]
+type = AssertSpecial
+trigger1 = var(5) = 1
+flag = Invisible
+
+[State 192, イントロ用フラグ]
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+flag2 =nomusic
+
+[State 1000,BGM停止]
+type = AssertSpecial
+trigger1 = 1
+flag = nomusic
+
+[State -2, 入場曲]
+type = PlaySnd
+trigger1 = PrevStateno = 190
+trigger1 = time = 180
+trigger2 = PrevStateno = 20020
+trigger2 = time = 0
+value = 2000, 0
+channel = 5
+
+[State -2, 歓声]
+type = PlaySnd
+trigger1 = PrevStateno = 190
+trigger1 = time = 180
+trigger2 = PrevStateno = 20020
+trigger2 = time = 0
+value = 3000, 5
+channel = 6
+loop = 1
+volume = 500
+
+[State -2, 歓声]
+type = PlaySnd
+trigger1 = PrevStateno = 190
+trigger1 = time = 182
+trigger2 = PrevStateno = 20020
+trigger2 = time = 2
+value = 3000, 5
+channel = 7
+loop = 1
+volume = 500
+
+[State -2, 曲停止]
+type = StopSnd
+trigger1 = time = 1400
+channel = 5
+
+[State -2, 歓声停止]
+type = StopSnd
+trigger1 = var(5) = 0
+channel = 6
+
+[State -2, 歓声停止]
+type = StopSnd
+trigger1 = var(5) = 0
+channel = 7
+
+[State 192, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 192, ヘルパーを出す]
+type = Helper
+triggerall = NumHelper(20001) = 0
+trigger1 = PrevStateno = 190
+trigger1 = time >= 480
+trigger2 = PrevStateno = 20020
+trigger2 = time >= 160
+name = "(^o^)"
+stateno = 20001
+ID = 20001
+pos = -200, 0
+
+;====================入場演出=============================
+
+[State -2, 入場曲]
+type = PlaySnd
+trigger1 = var(5) = 0
+value = 800, 0
+Persistent = 0
+
+[State -2,ダウンエフェクト]
+type = Explod
+trigger1 = var(5) = 0
+anim = 30044
+id = 30044
+pos = ceil(0*const(size.xscale)),ceil(0*const(size.yscale))
+postype = P1
+sprpriority = 8
+bindtime = 1
+ownpal = 1
+Facing = -1
+scale = 1,1
+Persistent = 0
+
+[State 5,ヒットスパーク後ろ]
+type = Explod
+trigger1 = var(5) = 0
+anim = 30004
+id = 30004
+pos = 0,0
+accel = 0,0
+postype = p1
+facing = 1
+sprpriority = -3
+bindtime = -1
+ownpal = 1
+scale = 1,1
+Facing = 1
+ignorehitpause = 1
+Persistent = 0
+
+[State 5,ヒットスパーク後ろ]
+type = Explod
+trigger1 = var(5) = 0
+anim = 30004
+id = 30004
+pos = 0,0
+accel = 0,0
+postype = p1
+facing = -1
+sprpriority = -3
+bindtime = -1
+ownpal = 1
+scale = 1,1
+ignorehitpause = 1
+Persistent = 0
+
+
+;====================入場演出=============================
+
+[State 191, スモーク1]
+type = Explod
+trigger1 = NumHelper(20001)
+trigger1 = Helper(20001),time = 1
+anim = 20040
+postype = P1
+pos = -90, -10
+scale = 0.3,1
+sprpriority = -5
+id = 20000
+removetime = 9999999
+
+[State 191, スモーク2]
+type = Explod
+trigger1 = NumHelper(20001)
+trigger1 = Helper(20001),time = 1
+anim = 20040
+postype = P1
+pos = -70, 10
+scale = 0.3,1
+sprpriority = 4
+id = 20000
+removetime = 9999999
+
+[State 191, スモーク3]
+type = Explod
+trigger1 = NumHelper(20001)
+trigger1 = Helper(20001),time = 10
+anim = 20040
+postype = P1
+pos = -50, -10
+scale = 0.3,0.8
+sprpriority = -5
+id = 20000
+removetime = 9999999
+
+[State 191, スモーク4]
+type = Explod
+trigger1 = NumHelper(20001)
+trigger1 = Helper(20001),time = 10
+anim = 20040
+postype = P1
+pos = -30, 10
+scale = 0.3,0.8
+sprpriority = 4
+id = 20000
+removetime = 9999999
+
+[State 191, スモーク5]
+type = Explod
+trigger1 = NumHelper(20001)
+trigger1 = Helper(20001),time = 20
+anim = 20040
+postype = P1
+pos = -20, -10
+scale = 0.3,0.6
+sprpriority = -5
+id = 20000
+removetime = 9999999
+
+[State 191, スモーク6]
+type = Explod
+trigger1 = NumHelper(20001)
+trigger1 = Helper(20001),time = 20
+anim = 20040
+postype = P1
+pos = 0, 10
+scale = 0.3,0.6
+sprpriority = 4
+id = 20000
+removetime = 9999999
+
+[State 192, ステート変更]
+type = ChangeState
+trigger1 = var(5) = 0
+value = 20030
+
+;================================================================================
+;--------------------------------------------------------------------------
+;入場ヘルパー
+[Statedef 20001]
+type = S
+ctrl = 0
+anim = 190
+velset = 1,0
+
+[State 193, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 801, 入場切り替え]
+type = VarSet
+trigger1 = ParentDist X = 2
+var(1) = 1
+
+[State 801, 入場切り替え]
+type = VarSet
+trigger1 = 1
+var(2) = 1
+
+[State 192, 透明化]
+type = AssertSpecial
+trigger1 = ParentDist X < 0
+flag = Invisible
+
+[State 193, 消滅]
+type = DestroySelf
+trigger1 = parent,stateno = 0
+
+;--------------------------------------------------------------------------
+;リングアナ
+[Statedef 20002]
+type = S
+ctrl = 0
+anim = 20030
+velset = 0,0
+sprpriority = -1
+
+[State -2,クロ]
+type = Explod
+trigger1 = time = 2
+anim = 20012
+id = 20012
+pos= 110,120
+postype = left
+sprpriority = 15
+bindtime = -1
+ontop = 1
+removetime = 180
+scale = 2,2
+
+[State 3000,00]
+type = Palfx
+trigger1 = time = 1
+add = -255, -255, -255
+sinadd = 190, 190, 190,400
+time = 180
+
+[State 5110, 7]
+type = Envcolor
+trigger1 = time <= 180
+value = 0,0,0
+time = 1
+under = 0
+
+[State 192, 透明化]
+type = AssertSpecial
+trigger1 = time <= 180
+flag = Invisible
+
+[state 2906,本体の向きに追従]
+type=turn
+trigger1=facing!=root,facing
+ignorehitpause=1
+
+[State 5120, メインイベント]
+type = PlaySnd
+triggerall = parent,PrevStateno = 190
+trigger1 = time = 0
+value = 3030, 0
+
+[State 5120, オフィシャルマッチ]
+type = PlaySnd
+trigger1 = parent,PrevStateno = 190
+trigger1 = time = 180
+value = 3030, 1
+Persistent = 0
+
+[State 5120, 赤コーナーP1]
+type = PlaySnd
+trigger1 = TeamSide = 1
+trigger1 = NumHelper(20001)
+value = 3030, 2
+Persistent = 0
+
+[State 5120, 青コーナーP2]
+type = PlaySnd
+trigger1 = TeamSide = 2
+trigger1 = NumHelper(20001)
+value = 3030, 3
+Persistent = 0
+
+[State 5120, 体重]
+type = PlaySnd
+trigger1 = parent,stateno = 20030
+value = 3030, 4
+Persistent = 0
+
+[State 5120, 名前]
+type = PlaySnd
+trigger1 = NumHelper(20010)
+value = 3030, 5
+Persistent = 0
+
+[State 193, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 192, ステート変更]
+type = Changeanim
+trigger1 = anim = 20030
+trigger1 = parent,stateno = 20030
+value = 20031
+
+[State 193, 消滅]
+type = DestroySelf
+trigger1 = !NumHelper(20010)
+trigger1 = parent,stateno = 0
+;--------------------------------------------------------------------------
+;プロフ
+[Statedef 20010]
+type = S
+ctrl = 0
+anim = 99999
+velset = 0,0
+sprpriority = 20
+
+[State -2,背景]
+type = Explod
+trigger1 = time = 0
+anim = 20001
+id = 20000
+pos= 0,0
+postype = left
+sprpriority = 14
+ontop = 1
+bindtime = -1
+removetime = 99999
+scale = 1.1,1.1
+
+[State -2,バック]
+type = Explod
+trigger1 = time = 0
+anim = ifelse(TeamSide = 1,20000,20100)
+id = 20000
+pos= 0,0
+postype = left
+sprpriority = 15
+ontop = 1
+bindtime = -1
+removetime = 99999
+scale = 1.1,1.1
+
+[State -2,ポーズ]
+type = Explod
+trigger1 = time = 0
+anim = 191
+id = 20000
+pos= ifelse(TeamSide = 1,240,80),180
+postype = left
+sprpriority = 15
+ontop = 1
+bindtime = -1
+removetime = 99999
+scale = 1,1
+
+[State -2,所属]
+type = Explod
+trigger1 = time = 0
+anim = ifelse(TeamSide = 1,20002,20102)
+id = 20000
+pos= 0,0
+postype = left
+sprpriority = 15
+ontop = 1
+bindtime = -1
+removetime = 99999
+scale = 1.1,1.1
+
+[State -2,チャレンジャー]
+type = Explod
+trigger1 = time = 0
+anim = ifelse(TeamSide = 1,20003,20103)
+id = 20000
+pos= 0,0
+postype = left
+sprpriority = 15
+ontop = 1
+bindtime = -1
+removetime = 99999
+scale = 1.1,1.1
+
+[State -2,名前]
+type = Explod
+trigger1 = time = 0
+anim = ifelse(TeamSide = 1,20004,20104)
+id = 20000
+pos= 0,0
+postype = left
+sprpriority = 15
+ontop = 1
+bindtime = -1
+removetime = 99999
+scale = 1.1,1.1
+
+[State -2,体重]
+type = Explod
+trigger1 = time = 0
+anim = ifelse(TeamSide = 1,20005,20105)
+id = 20000
+pos= 0,0
+postype = left
+sprpriority = 15
+ontop = 1
+bindtime = -1
+removetime = 99999
+scale = 1.1,1.1
+
+[State -2,身長]
+type = Explod
+trigger1 = time = 0
+anim = ifelse(TeamSide = 1,20006,20106)
+id = 20000
+pos= 0,0
+postype = left
+sprpriority = 15
+ontop = 1
+bindtime = -1
+removetime = 99999
+scale = 1.1,1.1
+
+[State -2,出身]
+type = Explod
+trigger1 = time = 0
+anim = ifelse(TeamSide = 1,20007,20107)
+id = 20000
+pos= 0,0
+postype = left
+sprpriority = 15
+ontop = 1
+bindtime = -1
+removetime = 99999
+scale = 1.1,1.1
+
+[State 5110, 7]
+type = Envcolor
+trigger1 = 1
+value = 0,0,0
+time = 1
+under = 0
+
+[State -2,***]
+type = AssertSpecial
+trigger1 = 1
+flag = globalnoshadow
+flag2 = noFG
+IgnoreHitPause = 1 
+Persistent = 1
+
+[State 1000,BGM停止]
+type = AssertSpecial
+trigger1 = 1
+flag = nomusic
+
+[State 192, イントロ用フラグ]
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 193, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 700,***]
+type = RemoveExplod
+trigger1 = time >= 250
+id = 20000
+
+[State 193, 消滅]
+type = DestroySelf
+trigger1 = time >= 250
+;---------------------------------------------------------------------------
+;相手 入場中待機
+
+[Statedef 20020]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 1000,***]
+type = AssertSpecial
+trigger1 = 1
+flag = invisible
+
+[State 192, ステート変更]
+type = ChangeState
+trigger1 = P2Stateno = 0
+trigger1 = P2Stateno != 20000
+value = 20000
+
+;---------------------------------------------------------------------------
+;通常イントロ
+[Statedef 20030]
+type = S
+ctrl = 0
+anim = 192
+velset = 0,0
+
+[State 192, ヘルパーを出す]
+type = Helper
+trigger1 = var(5) = 0
+trigger1 = time >= 180
+name = "P"
+stateno = 20010
+ID = 20010
+pos = 160, -100
+postype = left
+ownpal = 1
+Persistent = 0
+
+[State 3000,00]
+type = BGPalfx
+triggerall = Helper(10011+id),var(1) = 20000
+trigger1 = time = 0
+time = 0
+
+[State 700,***]
+type = RemoveExplod
+trigger1 = time = 0
+id = 20000
+
+[State 700,***]
+type = RemoveExplod
+trigger1 = animtime = 0
+id = 20001
+
+[State 1000,BGM停止]
+type = AssertSpecial
+trigger1 = var(5) = 0
+flag = nomusic
+
+[State 192, イントロ用フラグ]
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 192, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 5120, 4]
+type = PlaySnd
+trigger1 = Animelem = 5
+value = 0, 4
+
+[State 1, 歓声B]
+type = PlaySnd
+Trigger1 = AnimElem = 5
+value = 3000,2
+
+[State 600,***]
+type = Explod
+trigger1 = Animelem = 5
+anim = 193
+id = 193
+pos = ceil(0*const(size.xscale)),ceil(-90*const(size.yscale))
+postype = p1
+sprpriority = -3
+bindtime = 1
+vel = -5,-8
+accel = 0,0.45
+scale = const(size.xscale),const(size.yscale)
+
+[State 192, ステート変更]
+type = ChangeState
+trigger1 = var(5)
+trigger1 = time >= 120
+trigger2 = var(5) = 0
+trigger2 = time >= 200
+trigger2 = !NumHelper(20010)
+value = 0

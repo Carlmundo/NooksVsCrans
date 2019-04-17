@@ -1,0 +1,288 @@
+;---------------------------------------------------------------------------
+;AI Crouching Strong Punch
+[Statedef 6420]
+type    = C
+movetype= A
+physics = C
+juggle  = 5
+ctrl = 0
+velset = 0,0
+poweradd = 60
+anim = 420
+
+[State 6420, PlaySnd]
+type = PlaySnd
+trigger1 = Animelem = 6
+value = S1200,0
+
+[State 6420, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 6
+value = S1,2
+
+[State 6420, Explod]
+type = Explod
+trigger1 = animelem = 6
+id = 221
+anim = 421
+pos = -8,-120
+postype = p1
+bindtime = -1
+scale = 3.5,3.5
+sprpriority = 4
+removeongethit = 1
+
+[State 1200, HitDef]
+type = HitDef
+trigger1 = animelem = 5
+attr = C, NA
+damage = 10, 0
+animtype = hard
+guardflag = MA
+hitflag = MAF
+pausetime = 3, 3
+sparkno = s10002
+guard.sparkno = s10004
+sparkxy = -20, -35
+hitsound  = S20,2
+guardsound = S8500, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 22
+ground.velocity = 7,-5
+ground.cornerpush.veloff = 0
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = 2,-5
+air.hittime = 22
+yaccel = .4
+
+[State 6420, HitDef]
+type = HitDef
+trigger1 = animelem = 6
+attr = C, NA
+damage = 55, 0
+animtype = hard
+guardflag = MA
+hitflag = MAF
+pausetime = 5, 5
+sparkno = s10002
+guard.sparkno = s10004
+sparkxy = 20, -95
+hitsound  = S20,2
+guardsound = S8500, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 22
+ground.velocity = 1,-8
+ground.cornerpush.veloff = 0
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = 1,-10
+air.hittime = 22
+yaccel = .5
+
+[State 6420, end]
+type = ChangeState
+trigger1 = time = 23
+value = 7500
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;AI Jump Strong Punch
+[Statedef 6620]
+type    = A
+movetype= A
+physics = A
+juggle  = 5
+poweradd= 60
+ctrl = 0
+anim = 620
+
+[State 6620, PalFX]
+type = PalFX
+trigger1 = AnimElem = 1
+trigger2 = AnimElem = 3
+time = 5
+add = 255,255,255
+mul = 255,255,255
+invertall = 0
+color = 256
+
+[State 6620, 1]
+type = Explod
+trigger1 = AnimElem = 1
+trigger2 = AnimElem = 3
+trigger3 = pos y >= 0 && vel y >= 0
+anim = 1001
+postype = p1
+sprpriority = -4
+pos = 0, -24
+ownpal = 1
+scale = 4.5,4.5
+
+[State 6620, Angle Draw]
+type = Angledraw
+trigger1 = time < 25
+ignorehitpause = 1
+
+[State 6620, Angle Add]
+type = AngleAdd
+trigger1 = time < 25
+value = 61
+ignorehitpause = 1
+
+[State 6620, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S620,0
+
+[State 6620, 1]
+type = HitDef
+trigger1 = time > 5
+trigger1 = Time%5 = 0
+attr = A, NA
+damage = 15, 0
+animtype = hard
+guardflag = HA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 5, 5
+sparkno = s10002
+guard.sparkno = s10004
+sparkxy = -15, -30
+hitsound = S20,2
+guardsound = S8500, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 22
+ground.velocity = -4
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = -1.4,-0.5
+air.hittime = 22
+
+[State 6620, AngleSet]
+type = AngleSet
+trigger1 = MoveType = H
+trigger2 = animelem = 3
+trigger3 = pos y >= 0 && vel y >= 0
+trigger4 = stateno = 650
+value = 0
+
+[State 6620, 1]
+type = ChangeState
+trigger1 = time = 18
+value = 650
+
+;---------------------------------------------------------------------------------------------
+;Beginning of the super jump for AI Launcher
+[Statedef 7500]
+type = S
+physics = S
+anim = 40
+ctrl = 0
+sprpriority = 1
+
+[State 7000]
+type = Explod
+trigger1 = animelem = 1
+anim = 1502
+postype = p1
+pos = 0,0
+removeongethit = 1
+scale = 3.5,3.5
+
+[State 7000, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = s1500,0
+
+[State 7500, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+time = 30
+timegap = 1
+framegap = 3
+length = 15
+palcontrast = 220,220,220
+paladd = 10,10,10
+palmul = .65,.65,.65
+trans = add1
+
+[State 7500, AfterImageTime]
+type = AfterImageTime
+trigger1 = 1
+time = 2
+
+[State 7500, PlaySnd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 7000,0
+
+[State 7500, ChangeState]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 7501
+
+;---------------------------------------------------------------------------------------------
+;Super Jump for AI Launcher
+[Statedef 7501]
+type = A
+physics = A
+ctrl = 0
+anim = 41
+velset = 4,-12
+
+[State 7501, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+time = 30
+timegap = 1
+framegap = 3
+length = 15
+palcontrast = 220,220,220
+paladd = 10,10,10
+palmul = .65,.65,.65
+trans = add1
+
+[State 7501, AfterImageTime]
+type = AfterImageTime
+trigger1 = 1
+time = 2
+
+[State 7501, ChangeState]
+type = ChangeState
+trigger1 = pos y <= -20
+value = 600
+
+;---------------------------------------------------------------------------------------------
+;Super Jump for AI Launcher
+[Statedef 7502]
+type    = A
+physics = A
+ctrl = 1
+
+[State 7502, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+time = 30
+timegap = 1
+framegap = 3
+length = 15
+palcontrast = 220,220,220
+paladd = 10,10,10
+palmul = .65,.65,.65
+trans = add1
+
+[State 7502, AfterImageTime]
+type = AfterImageTime
+trigger1 = 1
+time = 2
+
+[State 2505, Vel]
+type = VelAdd
+triggerall = Vel X <= 2.5
+trigger1 = command = "holdfwd"
+trigger1 = Anim != 42
+x = 0.25

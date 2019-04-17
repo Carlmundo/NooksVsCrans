@@ -1,0 +1,227 @@
+;-------------------------------------------------------------------------
+; サン・キュロット
+[Statedef 3300]
+type = S
+movetype = A
+physics = S
+juggle = 0
+velset = 0,0
+anim = 3300
+poweradd = ifelse((prevstateno = [1000,1200]),-3000,-2000)
+ctrl = 0
+velset = 0,0
+sprpriority = 2
+
+[State -2, Z0]
+type = RemoveExplod
+Trigger1 = Time = 0
+IgnoreHitPause = 1
+ID = 2999
+
+[State 3000, SC]
+type = Explod
+Trigger1 = Time = 0
+trigger1 = prevstateno = [1000,1200]
+trigger1 = NumExplod(2000) = 0
+trigger1 = TeamSide = 1
+anim = 2001
+ID = 2001
+pos = -125,70
+postype = left
+removetime = 30
+supermove = 1
+bindtime = -1
+vel=0,0
+ownpal = 1
+ontop=1
+
+[State 3000, SC]
+type = Explod
+Trigger1 = Time = 0
+trigger1 = prevstateno = [1000,1200]
+trigger1 = NumExplod(2000) = 0
+trigger1 = TeamSide = 2
+anim = 2011
+ID = 2011
+facing = -1
+pos = 75,70
+postype = left
+removetime = 30
+supermove = 1
+bindtime = -1
+vel=0,0
+ownpal = 1
+ontop=1
+
+[State 200, 1]
+type = Turn
+trigger1 = Time = 0
+trigger1 = P2Dist X < 0
+
+[State 3110, 6]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 1300, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 3320
+
+;-------------------------------------------------------------------------
+; サン・キュロット
+[Statedef 3320]
+type = S
+movetype = A
+physics = S
+juggle = 0
+velset = 0,0
+anim = 3320
+poweradd = ifelse((prevstateno = 3320),-2000,0)
+ctrl = 0
+velset = 0,0
+sprpriority = 2
+
+[State -2,]
+Type = VarSet
+trigger1 = Time = 0
+IgnoreHitPause = 1
+V = 10
+Value = power
+
+[State 3110, 6]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 3000, 1]
+type = SuperPause
+Trigger1 = Time = 0
+time = 28
+movetime = 28
+anim = -1
+pos = -63,-67
+sound = 3099,1
+p2defmul = 1
+
+[State 1300, 3]
+type = PlaySnd
+trigger1 = Time = 0
+value = 3099,1
+
+[State 1300, 3]
+type = PlaySnd
+trigger1 = Time = 0
+value = 3300,0
+
+[State -2,];エフェクト
+type = Explod
+Trigger1 = Time = 0
+anim = 3910
+ID = 3910
+IgnoreHitPause = 1
+sprpriority = 1
+postype = p1
+pos = 11,-97
+supermove = 1
+ownpal = 1
+
+[State -2,];エフェクト
+type = Explod
+Trigger1 = Time = 0
+anim = 3911
+ID = 3911
+IgnoreHitPause = 1
+sprpriority = 4
+postype = p1
+pos = 11,-97
+supermove = 1
+ownpal = 1
+
+[State 191, 0] 
+type = AssertSpecial
+trigger1 = Time = [0,29]
+flag = noFG
+time = 1
+
+[State 3000, 0]
+type = EnvColor
+trigger1 = Time = [0,29]
+value = 0,0,0
+under = 1
+time = 1
+
+[State 1300, 3]
+type = PlaySnd
+trigger1 = Time = 30
+value = 3300,1
+
+[State 1040, 3]
+type = Projectile
+Trigger1 = Time = 30
+projanim = 3301
+projhitanim = 3301
+projshadow = -1
+projremovetime = 42
+ProjID = 3001
+offset = 0, 0
+velocity = 0,0
+accel = 0, 0
+attr = S, HP
+damage    = floor(80*Var(9)/1000),8
+getpower  = 0
+guardflag = M
+hitflag = MAF
+pausetime = 0,0
+sparkno = S73
+guard.sparkno = S62
+sparkxy = 60, -60
+hitsound   = S1000,2
+guardsound = S6,1
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = -3,-5
+airguard.velocity = -7
+air.velocity = -3,-5
+ground.cornerpush.veloff = -10
+air.cornerpush.veloff = 0
+fall = 1
+air.recover = 0
+fall.recover = 0
+palfx.color = 100
+Palfx.time          = 60
+Palfx.add           = -100,40,-100
+Palfx.sinadd        = 30,30,30,4
+
+[State -2,];炎後
+type = Explod
+Trigger1 = Time = 30
+anim = 3302
+Persistent = 0
+IgnoreHitPause = 1
+sprpriority = 1
+postype = p1
+pos = 0,0
+bindtime = -1
+ownpal = 1
+
+[State 1000, 1]
+type = Helper
+trigger1 = AnimTime = 0
+ID = 3301
+pos = 0,0
+postype = left
+stateno = 3301
+name = "sc"
+helpertype = normal
+supermovetime = 100
+pausemovetime = 100
+
+[State 1300, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1

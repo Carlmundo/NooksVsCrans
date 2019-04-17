@@ -1,0 +1,240 @@
+;---------------------------------------------------------------------------
+; Lose by Time Over
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0
+
+[State 170, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S170,0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win Pose Decider
+[Statedef 180]
+type = S
+
+[State 0, VarRandom]
+type = VarRandom
+trigger1 = 1
+v = 0
+range = 0,1
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = var(0) = 0
+value = 181
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = var(0) = 1
+value = 182
+
+;---------------------------------------------------------------------------
+; Win Pose 1
+[Statedef 181]
+type = S
+ctrl = 0
+anim = 181
+velset = 0,0
+
+[State 181, Voice]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = 182, 0
+
+[State 181, AssertSpecial]
+type = AssertSpecial
+trigger1 = time = [0, 200]
+flag = roundnotover
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win Pose 2
+[Statedef 182]
+type = S
+ctrl = 0
+anim = 182
+velset = 0,0
+
+[State 183, Helper]
+type = Helper
+trigger1 = time = 5
+helpertype = normal ;player
+name = "Cliff Richard"
+ID = 189
+stateno = 189
+pos = 30,0
+postype = p1
+facing = 1
+keyctrl = 0
+
+[State 183, BGPalFX]
+type = BGPalFX
+trigger1 = time = 5
+time = -1
+add = -104,-104,7
+mul = 256,256,256
+sinadd = 56,56,0,1
+invertall = 0
+color = 0
+
+[State 183, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 183, 2] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = time = [0,280]
+flag = nomusic
+flag2 = roundnotover
+
+;---------------------------------------------------------------------------
+; Cliff Richard
+[Statedef 189]
+type = S
+ctrl = 0
+anim = 189
+
+[State 184, VarRandom]
+type = VarRandom
+trigger1 = Time = 0
+v = 3
+range = 0,5
+
+[State 184, PlaySnd]
+type = PlaySnd
+trigger1 = time = 5
+value = S181, var(3)
+
+;================================================================================
+;Intros
+;================================================================================
+
+;---------------------------------------------------------------------------
+;Intro Decider
+[Statedef 190]
+type = S
+
+[State 0, VarRandom]
+type = VarRandom
+trigger1 = 1
+v = 1
+range = 0,1
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = var(1) = 0
+value = 191
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = var(1) = 1
+value = 192
+
+;---------------------------------------------------------------------------
+; Intro 1
+[Statedef 191]
+type = S
+ctrl = 0
+anim = 191
+velset = 0,0
+
+[State 191, 1] ;Freeze animation until PreIntro is over
+type = ChangeAnim
+trigger1 = RoundState = 0
+value = 191
+
+[State 191, 1]
+type = PlaySnd
+trigger1 = Time = 0
+value = S190,0
+
+[State 191, 2] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 191, 3] ;Change to stand state when done
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+;---------------------------------------------------------------------------
+; Intro 2
+[Statedef 192]
+type = S
+ctrl = 0
+anim = 192
+velset = 0,0
+
+[State 191, 1] ;Freeze animation until PreIntro is over
+type = ChangeAnim
+trigger1 = RoundState = 0
+value = 192
+
+[State 192, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S191,0
+
+[State 192, Fadeout]
+type = AllPalFX
+triggerall = AnimElem = 2
+trigger1 = time = 50
+time = 40
+sinadd = 255,255,255,255
+
+[State 192, EnvColor]
+type = EnvColor
+trigger1 = AnimElem = 2
+value = 255,255,255
+time = 50
+
+[State 191, 2] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 191, 3] ;Change to stand state when done
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+;---------------------------------------------------------------------------
+; Taunt
+; CNS difficulty: easy
+[Statedef 195]
+type = S
+ctrl = 0
+anim = 195
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State 195, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S195,0
+
+[State 195, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1

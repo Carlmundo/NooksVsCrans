@@ -1,0 +1,77 @@
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+[Statedef -2]
+
+[State -2]
+type = DisplayToClipboard
+trigger1 = 1
+text = "Var(59)-Button=%d,Pos X=%d,Y=%d"
+params = var(59),floor(Pos X),floor(Pos Y)
+
+[State -2, Debug Info]
+type = DisplayToClipboard
+trigger1 = roundstate > 0
+text = "AI = %d, Super Jump = %d, SJ Direction = %d, Dampener = %f"
+params = var(59), var(12), var(13), fVar(10)
+
+[State -2, StopSnd]
+type = StopSnd
+trigger1 = stateno != [3000,3999]
+trigger2 = MoveType = H
+ignorehitpause = 1
+channel = 2
+
+[State -2, jump]
+type = PlaySnd
+triggerall = time = 1
+trigger1 = Stateno = 50
+value = 41,0
+volume = 200
+
+[State -2, LifeAdd]
+type = LifeAdd
+trigger1 = numhelper(1901) = 1
+trigger1 = helper(1901), var(25) = 1
+value = 10
+;absolute = 1
+
+[State -2, run]
+type = PlaySnd
+triggerall = time = 1
+trigger1 = Stateno = 100
+value = 100,0
+volume = 200
+
+;Damage Dampener ==================================================
+;The damage dampener exists for public release of a character. In general
+;since the MvC style characters can chain more attacks together it's
+;easier to defeat other "normal" mugen characters. This damage dampener
+;esists to help mitigate this issue. This dampener will be disabled for the
+;1.0 full release of SMvC - EoH.
+
+[State -2, Damage based on hits]
+type=varset
+trigger1= numenemy
+fvar(12)= enemynear,gethitvar(hitcount)
+ignorehitpause=1
+
+[State -2, Reset var when the opponent recovers]
+type=varset
+trigger1= numenemy
+trigger1= (enemynear,movetype!=H)
+trigger2= !numenemy
+fvar(12)=0
+
+[State -2, Dampener]
+type=varset
+trigger1=1
+fvar(10)= ifelse(fvar(12)<9,ifelse(fvar(12)=0, 1, ifelse(fvar(12)=1, .9, .86**fvar(12))),.25)
+ignorehitpause=1
+
+[State -2, Dampener itself]
+type=attackmulset
+trigger1= 1
+value= fvar(10)
+ignorehitpause=1
+

@@ -1,0 +1,421 @@
+; States
+;---------------------------------------------------------------------------
+; Start
+[Statedef 0]
+type = S
+movetype = I
+physics = S
+sprpriority = 4
+
+[State 0, NoTurn]
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 0, AngleSet]
+type = AngleSet
+trigger1 = 1
+value = 0
+
+[State 0, 0]
+type = ChangeAnim
+trigger1 = Anim != 0
+value = 0
+
+[State 0, 1]
+type = VelSet
+trigger1 = Vel X != 0
+x = 0
+
+[State 0, 2]
+type = VelSet
+trigger1 = Vel Y != 0
+y = 0
+
+;---------------------------------------------------------------------------
+; Crouch
+[Statedef 10]
+
+[State 10, 0]
+type = ChangeState
+trigger1 = 1
+value = 30
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Walk
+[Statedef 20]
+
+[State 20, 0]
+type = ChangeState
+trigger1 = 1
+value = 30
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Idle
+[Statedef 30]
+type = A
+movetype = I
+physics = N
+sprpriority = 4
+ctrl = 1
+
+[State 30, AngleSet]
+type = AngleSet
+trigger1 = 1
+value = 0
+
+[State 30, Anim]
+type = ChangeAnim
+trigger1 = Anim != 0
+value = 0
+
+[State 30, Turn]
+type = Turn
+trigger1 = Vel X = 0
+trigger1 = P2Dist X < 0
+
+[State 30, 1]
+type = VelSet
+trigger1 = command = "holdfwd"
+x = const(velocity.walk.fwd.x)
+
+[State 30, 2]
+type = VelSet
+trigger1 = command = "holdback"
+x = const(velocity.walk.back.x)
+
+[State 30, 3]
+type = VelSet
+trigger1 = command = "holdup"
+y = const(velocity.walk.back.x)
+
+[State 30, 4]
+type = VelSet
+trigger1 = command = "holddown"
+y = const(velocity.walk.fwd.x)
+
+[State 30, 5]
+type = VelSet
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+x = 0
+
+[State 30, 5]
+type = VelSet
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+y = 0
+
+[State 30, 6]
+type = PosSet
+trigger1 = Pos Y > 0
+y = 0
+
+[State 30, 6]
+type = PosSet
+trigger1 = Pos Y < -200
+y = -200
+
+;---------------------------------------------------------------------------
+; Hit
+[Statedef 35]
+movetype = H
+ctrl = 0
+
+[State 35, Hit]
+type = HitOverride
+trigger1 = 1
+slot = 0
+stateno = 35
+attr = SCA, AA, AP, AT
+time = 1
+
+[State 35, Anim]
+type = ChangeAnim
+trigger1 = 1
+value = Var(11)
+elem = Var(12)
+
+[State 35, 0]
+type = PalFX
+trigger1 = Time = 0
+time = 2
+add = 250,250,250
+
+[State 35, PosFreeze]
+type = PosFreeze
+trigger1 = !HitShakeOver
+x = 1
+y = 1
+
+[State 35, 1]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 30	;Var(10)
+ctrl = 1 	;Var(13)
+
+[State 35, 2]
+type = ChangeState
+trigger1 = Life = 0
+value = 5151
+
+;---------------------------------------------------------------------------
+; Jump
+[Statedef 40]
+
+[State 40, 0]
+type = ChangeState
+trigger1 = 1
+value = 30
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Lose by Time Over
+[Statedef 170]
+ctrl = 0
+velset = 0,0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win State
+[Statedef 180]
+velset = 0,0
+ctrl = 0
+
+[State 180, Anim]
+type = ChangeAnim
+trigger1 = Anim != 180
+value = 180
+
+[State 180, 0]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Intro
+[Statedef 190]
+velset = 0,0
+ctrl = 0
+
+[State 190, 0]
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 190, Anim]
+type = ChangeAnim
+trigger1 = Anim != 0
+value = 0
+
+[State 190, 5]
+type = ChangeState
+trigger1 = Time > 0
+value = 0
+
+;---------------------------------------------------------------------------
+; Dead
+[Statedef 5150]
+type    = L
+movetype= H
+physics = N
+velset = 0,0
+sprpriority = -5
+ctrl = 0
+
+[State 5150, Anim]
+type = ChangeAnim
+trigger1 = Anim != 5150
+value = 5150
+
+[State 5150, PosSet]
+type = PosSet
+trigger1 = 1
+y = 0
+
+[State 5150, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0,0
+
+[State 5150, 0]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5150, VarSet]
+type = VarSet
+trigger1 = Time <= 0
+var(50) = 1
+
+;---------------------------------------------------------------------------
+; Death
+[Statedef 5151]
+type    = A
+movetype= H
+physics = N
+velset = 0,0
+sprpriority = -5
+ctrl = 0
+
+[State 5150, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0,0
+
+[State 5150, 0]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5150, PosFreeze]
+type = PosFreeze
+trigger1 = Time < 5
+x = 1
+y = 1
+
+[State 5150, Pause]
+type = Pause
+trigger1 = Time = 1
+time = 50
+
+[State 5150, Explod]
+type = Explod
+triggerall = NumExplod(5150) = 0
+trigger1 = Time <= 0
+sprpriority = -5
+removetime = 150
+bindtime = -1
+pos = 0, 0
+postype = p1
+anim = 5151
+id = 5150
+
+[State 5150, Explod]
+type = ModifyExplod
+triggerall = NumExplod(5150) > 0
+trigger1 = Time > 0
+scale = 1-((Var(10))*.01), 1-((Var(10))*.01)
+id = 5150
+
+[State 5150, PlaySnd]
+type = PlaySnd
+triggerall = Time > 0
+trigger1 = TimeMod = 5,0
+value = 3, 0
+channel = 1
+
+[State 5150, Explod]
+type = Explod
+triggerall = Time > 0
+trigger1 = TimeMod = 5,0
+sprpriority = 10
+random = 50,50
+pos = -20, 0
+postype = p1
+anim = F0
+
+[State 5150, Explod]
+type = Explod
+triggerall = Time > 0
+trigger1 = TimeMod = 5,0
+sprpriority = 10
+random = 50,50
+pos = -20, 0
+postype = p1
+anim = F1
+
+[State 5150, Explod]
+type = Explod
+triggerall = Time > 0
+trigger1 = TimeMod = 5,0
+sprpriority = 10
+random = 50,50
+pos = -20, 0
+postype = p1
+anim = F2
+
+[State 5150, Explod]
+type = Explod
+triggerall = Time > 0
+trigger1 = TimeMod = 5,0
+sprpriority = 10
+random = 50,50
+pos = -20, 0
+postype = p1
+anim = F3
+
+[State 5150, PosAdd]
+type = PosAdd
+triggerall = Time > 0
+trigger1 = TimeMod = 6,0
+x = 10
+
+[State 5150, PosAdd]
+type = PosAdd
+triggerall = Time > 0
+trigger1 = TimeMod = 3,0
+x = -5
+
+[State 5150, PosAdd]
+type = PosAdd
+triggerall = Time > 0
+trigger1 = TimeMod = 4,0
+y = 8
+
+[State 5150, PosAdd]
+type = PosAdd
+triggerall = Time > 0
+trigger1 = TimeMod = 2,0
+y = -4
+
+[State 5150, AssertSpecial]
+type = AssertSpecial
+trigger1 = Time > 50
+trigger1 = TimeMod = 2,0
+flag = Invisible
+
+[State 5150, State]
+type = ChangeState
+trigger1 = Time >= 100
+value = 5150
+
+;---------------------------------------------------------------------------
+; Initialize (at the start of the round)
+[Statedef 5900]
+type = S
+sprpriority = 4
+
+[State 5900, 1] ;Clear all int variables
+type = VarRangeSet
+trigger1 = RoundNo = 1
+value = 0
+
+[State 5900, 2] ;Clear all float variables
+type = VarRangeSet
+trigger1 = RoundNo = 1
+fvalue = 0
+
+[State 5900, 3] ;Intro
+type = ChangeState
+trigger1 = RoundNo = 1
+value = 190
+
+[state 5900, 4] ;Turns Mode Intro
+type = ChangeState
+trigger1 = RoundsExisted = 0 && TeamMode = Turns && Roundno > 1
+value = 190
+
+;---------------------------------------------------------------------------

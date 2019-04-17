@@ -1,0 +1,173 @@
+;---------------------------------------------------------------------------
+; Override common states (use same number to override) :
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+[Statedef -2]
+
+;===== Armor Code =====
+;----- State Set -----
+[State -2, VarSet]
+type = VarSet
+trigger1 = MoveType != H
+var(10) = StateNo
+;--------------------
+
+;----- Ctrl Set -----
+[State -2, VarSet]
+type = VarSet
+trigger1 = MoveType = I
+var(11) = 1
+
+[State -2, VarSet]
+type = VarSet
+trigger1 = MoveType = A
+var(11) = 0
+;--------------------
+
+;----- AnimElemNo -----
+[State -2, VarSet]
+type = VarSet
+trigger1 = MoveType = I
+trigger1 = Ctrl = 1
+var(15) = 0
+
+[State -2, VarSet]
+type = VarSet
+trigger1 = MoveType = H
+var(15) = AnimElemNo(0)
+;--------------------
+
+;----- Time Add -----
+[State -2, VarSet]
+type = VarSet
+trigger1 = MoveType != A
+trigger1 = MoveType != H
+var(20) = 0
+
+[State -2, VarAdd]
+type = VarAdd
+trigger1 = MoveType = A
+var(20) = 1
+;--------------------
+;====================
+
+[State -2, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+
+[State -2,Display]
+type = DisplayToClipboard
+trigger1 = 1
+text = "AnimElemTime = %d   AnimElemTime(AnimElemNo) = %d\nVel X = %f   Vel Y = %f"
+params = AnimElemTime(1), AnimElemTime(AnimElemNo(0)), Vel X, Vel Y
+ignorehitpause = 1
+
+[State -2, Power]
+type = PowerSet
+trigger1 = 1
+ignorehitpause = 1
+value = 0
+
+[State -2, RemoveExplod]
+type = RemoveExplod
+trigger1 = StateNo != 290
+trigger1 = StateNo != 291
+trigger2 = Anim != 290
+id = 290
+
+[State -2, RemoveExplod]
+type = RemoveExplod
+trigger1 = StateNo != 5150
+trigger1 = StateNo != 5151
+id = 5150
+
+[State -2, Hit]
+type = HitOverride
+trigger1 = 1
+slot = 0
+stateno = 35
+attr = SCA, AA, AP, AT
+ignorehitpause = 1
+time = 1
+
+[State -2, Push]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State -2, PosSet] 
+type = PosSet
+triggerall = Win = 0
+triggerall = Alive = 1
+triggerall = !DrawGame
+triggerall = LoseTime = 0
+triggerall = StateNo != 190
+trigger1 = StateNo = 5900
+trigger2 = StateNo = 0
+y = -50
+
+[State -2, State]
+type = ChangeState
+triggerall = StateNo < 150
+triggerall = Life > 0
+trigger1 = Lose
+trigger2 = Ctrl
+trigger2 = DrawGame
+trigger3 = Ctrl
+trigger3 = Win
+trigger4 = MoveType = A
+trigger4 = NumTarget = 0
+trigger4 = Pos Y < -100
+trigger4 = Win
+value = 0
+ctrl = 1
+
+[State -2, State]
+type = ChangeState
+triggerall = Ctrl
+triggerall = Alive
+triggerall = !Lose
+trigger1 = StateNo = 0
+trigger2 = StateNo > 50
+trigger2 = StateNo < 100
+trigger3 = StateNo > 1000
+trigger3 = StateNo < 5900
+value = 30
+ctrl = 1
+
+[State -2, State]
+type = ChangeState
+triggerall = StateNo != 5150
+triggerall = StateNo != 5151
+trigger1 = !DrawGame
+trigger1 = Life = 0
+trigger1 = Lose
+value = 5151
+
+[State -2, Special]
+type = AssertSpecial
+trigger1 = StateNo = 5150 || StateNo = 5151
+trigger1 = !DrawGame
+trigger1 = Life = 0
+trigger1 = Lose
+flag = NoBarDisplay
+
+[State -2, NoGuard]
+type = AssertSpecial
+trigger1 = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State -2, NoTurn]
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------

@@ -1,0 +1,120 @@
+; I took Kung Fu Man's files and changed them to make this one, that's why most of the comments are the same.
+; Once again there is no actual "code" here.  We are just setting lots and lots and lots of numbers that are useful.
+; (And yes, I took that comment from Insanius's own commentation of his Kanae)
+
+[Data]
+life = 1000			;Amount of life to start with
+attack = 100		;attack power (more is stronger)
+defence = 100		;defensive power (more is stronger)
+fall.defence_up = 50	;Percentage to increase defense everytime player is knocked down
+liedown.time = 6		;Time which player lies down for, before getting up
+airjuggle = 15		;Number of points for juggling
+sparkno = 2			;Default hit spark number for HitDefs
+guard.sparkno = 40	;Default guard spark number
+KO.echo = 0			;1 to enable echo on KO
+volume = 60			;Volume offset (negative for softer)
+IntPersistIndex = 58;This one is important because winane's code needs var 59 to stay enabled.
+FloatPersistIndex = 40  ;reset to 0 between rounds or matches. There are 60 int variables,
+  				;indexed from 0 to 59, and 40 float variables, indexed from 0 to 39.
+  				;If omitted, then it defaults to 60 and 40 for integer and float
+  				;variables repectively, meaning that none are persistent, i.e. all
+  				;are reset. If you want your variables to persist between matches,
+  				;you need to override state 5900 from common1.cns.
+
+; Being a character converted from a SNES game thus having small sprites, his sprites are rescaled in the engine itself
+[Size]
+xscale = 1.75			;Horizontal scaling factor.
+yscale = 1.75			;Vertical scaling factor.
+ground.back = 19		;Player width (back, ground)
+ground.front = 21	;Player width (front, ground)
+air.back = 17		;Player width (back, air)
+air.front = 17		;Player width (front, air)
+height = 55			;Height of player (for opponent to jump over)
+attack.dist = 160		;Default attack distance
+proj.attack.dist = 90	;Default attack distance for projectiles
+proj.doscale = 0		;Set to 1 to scale projectiles too   
+head.pos = -5, -105	;Approximate position of head
+mid.pos = -5, -61		;Approximate position of midsection
+shadowoffset = 0		;Number of pixels to vertically offset the shadow
+draw.offset = 0,0		;Player drawing offset in pixels (x, y)
+
+; Now remember, mugen is supposed to run at 60 fps, so velocity always means pixels per frame.  Multiply it by 60 and that's how many pixels it is per second.
+; His jumps are that high velocity-wise to accomodate the heavy gravity (yaccel) I gave this character so his jumps aren't floaty and even have some sense of weight
+[Velocity]
+walk.fwd  = 2.9		;Walk forward
+walk.back = -2.9		;Walk backward
+run.fwd  = 5.1, 0		;Run forward (x, y)
+run.back = -4.0,-3.8	;Hop backward (x, y)
+jump.neu = 0,-13		;Neutral jumping velocity (x, y)
+jump.back = -3.1		;Jump back Speed (x, y)
+jump.fwd = 3.7		;Jump forward Speed (x, y)
+runjump.back = -4.5,-13;Running jump speeds (opt)
+runjump.fwd = 5.5,-13	;.
+airjump.neu = 0,-10	;.
+airjump.back = -4	;Air jump speeds (opt)
+airjump.fwd = 4		;.
+air.gethit.groundrecover = -.15,-3.5  ;Velocity for ground recovery state (x, y) **MUGEN 1.0**
+air.gethit.airrecover.mul = .5,.2     ;Multiplier for air recovery velocity (x, y) **MUGEN 1.0**
+air.gethit.airrecover.add = 0,-4.5    ;Velocity offset for air recovery (x, y) **MUGEN 1.0**
+air.gethit.airrecover.back = -1       ;Extra x-velocity for holding back during air recovery **MUGEN 1.0**
+air.gethit.airrecover.fwd = 0         ;Extra x-velocity for holding forward during air recovery **MUGEN 1.0**
+air.gethit.airrecover.up = -2         ;Extra y-velocity for holding up during air recovery **MUGEN 1.0**
+air.gethit.airrecover.down = 1.5      ;Extra y-velocity for holding down during air recovery **MUGEN 1.0**
+
+[Movement]
+airjump.num = 1		;Number of air jumps allowed (opt)
+airjump.height = 35	;Minimum distance from ground before you can air jump (opt)
+yaccel = .84		;Vertical acceleration.
+stand.friction = .85	;Friction coefficient when standing
+crouch.friction = .82	;Friction coefficient when crouching
+stand.friction.threshold = 2          ;If player's speed drops below this threshold while standing, stop his movement **MUGEN 1.0**
+crouch.friction.threshold = .05       ;If player's speed drops below this threshold while crouching, stop his movement **MUGEN 1.0**
+air.gethit.groundlevel = 25           ;Y-position at which a falling player is considered to hit the ground **MUGEN 1.0**
+air.gethit.groundrecover.ground.threshold = -20 ;Y-position below which falling player can use the recovery command **MUGEN 1.0**
+air.gethit.groundrecover.groundlevel = 10   ;Y-position at which player in the ground recovery state touches the ground **MUGEN 1.0**
+air.gethit.airrecover.threshold = -1  ;Y-velocity above which player may use the air recovery command **MUGEN 1.0**
+air.gethit.airrecover.yaccel = .35    ;Vertical acceleration for player in the air recovery state **MUGEN 1.0**
+air.gethit.trip.groundlevel = 15      ;Y-position at which player in the tripped state touches the ground **MUGEN 1.0**
+down.bounce.offset = 0, 20            ;Offset for player bouncing off the ground (x, y) **MUGEN 1.0**
+down.bounce.yaccel = .4               ;Vertical acceleration for player bouncing off the ground **MUGEN 1.0**
+down.bounce.groundlevel = 12          ;Y-position at which player bouncing off the ground touches the ground again **MUGEN 1.0**
+down.friction.threshold = .05         ;If the player's speed drops below this threshold while lying down, stop his movement **MUGEN 1.0**
+
+;Default language victory quotes (optional).  **MUGEN 1.0**
+;If this section is included, the default language victory quotes must be in English.
+[Quotes]
+; Up to 100 victory quotes can be specified per language (victory0 - victory99)
+victory0 = "Take your sorry act home!"
+victory1 = "I didn't need sticks or stones to break your bones, fool."
+victory2 = "Sorry, I didn't mean to hurt you."
+victory3 = "I'll let you fight my grandpa next time."
+victory4 = "Go home... I'll beat you one-on-one every time."
+victory5 = "I AM KAZAAM!!! BOW DOWN TO MY ENCHANTED RAP SKILLZ!!!"
+victory6 = "You need 200% less Yao Ming to stand a chance."
+victory7 = "I just gobbled you up like a Shaq Pack."
+victory8 = "Consider yourself dunked."
+victory9 = "Man of Steel. That says all you need to know."
+victory10 = "You make Shaq Fu look good..."
+victory11 = "Aaron Carter was more of a challenge."
+victory12 = "Feliz Navidad."
+victory13 = "Nothing fills me up like a Good Burger."
+victory14 = "What were you thinking? I've been dribbling since I was born!"
+victory15 = "You wanna fight? Come fight me. I'll hit ya with the WAH-PSH-PSH-PSH! See! See?"
+victory16 = "I know I got skills man, I know I got skills man."
+victory17 = "I told you to go to the damn principal's office!"
+victory18 = "You could've air-blocked that."
+victory19 = "I warned you about the SHAQ ATTACK."
+victory20 = "Your hypnotic style won't work with me. I'm cross-eyed."
+victory21 = "Whaddya mean you need a refund? Kazaam came out 16 years ago!"
+victory22 = "Consider yourself Chaos Dunked."
+victory23 = "See ya, wouldn't want to be ya!"
+victory24 = "Your wrap is whack, bra!"
+victory25 = "I always recycle plastic!"
+victory26 = "Welcome to earth."
+victory27 = "I have a feeling that I would best you even in free throws!"
+victory28 = "Your cat-like quickness is slow."
+victory29 = "Cats can't live in this dog world."
+victory30 = "If I gave you enough trouble, I'm not quite sure how you'd fare against this one wonderlander from my coast."
+
+
+

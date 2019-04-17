@@ -1,0 +1,119 @@
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+[Statedef -2]
+
+[State -2]
+type = DisplayToClipboard
+trigger1 = 1
+text = "Var(59)-Button=%d,Pos X=%d,Y=%d"
+params = var(59),floor(Pos X),floor(Pos Y)
+
+[State -2, Debug Info]
+type = DisplayToClipboard
+trigger1 = roundstate > 0
+text = "AI = %d, Super Jump = %d, SJ Direction = %d, Dampener = %f"
+params = var(59), var(12), var(13), fVar(10)
+
+[State -2, AngleDraw]
+type = AngleDraw
+triggerall = anim = 17210
+trigger1 = 1
+scale = .4,.4
+
+[State -2, AngleDraw]
+type = AngleDraw
+triggerall = anim = 17211
+trigger1 = 1
+scale = .4,.4
+
+[State 1011, Helper]
+type = Helper
+triggerall = (WinKO) && (NumHelper(8420) = 0) && (MoveHit)
+trigger1 = stateno = [1000,1999]
+helpertype = Normal
+name = "Super WinKO"
+id = 8420
+pos = 0,0
+postype = p1
+facing = 0
+stateno = 8420
+keyctrl = 0
+ownpal = 1
+supermovetime = 1000
+pausemovetime = 1000
+ignorehitpause = 1
+
+[State -2, jump]
+type = PlaySnd
+triggerall = time = 1
+trigger1 = Stateno = 50
+value = 41,0
+volume = 200
+
+[State -2]
+type = PlaySnd
+triggerall = Time = 1
+triggerall = Life
+trigger1 = stateno = 5000
+trigger2 = stateno = 5010
+trigger3 = stateno = 5020
+value = 5000,random%7
+channel = 5
+
+[State -2, StopSnd]
+type = StopSnd
+trigger1 = stateno != 3500
+trigger2 = MoveType = H
+ignorehitpause = 1
+channel = 2
+
+[State 7000, ModifyExplod]
+type = ModifyExplod
+trigger1 = stateno = [1000,9999]
+ID = 221
+bindtime = 0
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno = [0,1399]
+trigger2 = stateno = 1490
+id = 1400
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno = [0,2399]
+trigger2 = stateno = 2409
+id = 2400
+
+;Damage Dampener ==================================================
+;The damage dampener exists for public release of a character. In general
+;since the MvC style characters can chain more attacks together it's
+;easier to defeat other "normal" mugen characters. This damage dampener
+;esists to help mitigate this issue. This dampener will be disabled for the
+;1.0 full release of SMvC - EoH.
+
+[State -2, Damage based on hits]
+type=varset
+trigger1= numenemy
+fvar(12)= enemynear,gethitvar(hitcount)
+ignorehitpause=1
+
+[State -2, Reset var when the opponent recovers]
+type=varset
+trigger1= numenemy
+trigger1= (enemynear,movetype!=H)
+trigger2= !numenemy
+fvar(12)=0
+
+[State -2, Dampener]
+type=varset
+trigger1=1
+fvar(10)= ifelse(fvar(12)<9,ifelse(fvar(12)=0, 1, ifelse(fvar(12)=1, .9, .86**fvar(12))),.25)
+ignorehitpause=1
+
+[State -2, Dampener itself]
+type=attackmulset
+trigger1= 1
+value= fvar(10)
+ignorehitpause=1

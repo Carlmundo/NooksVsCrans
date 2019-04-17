@@ -1,0 +1,210 @@
+
+;===========================================================================
+; これは、ジャンプのファイルです。
+;===========================================================================
+
+;---------------------------------------------------------------------------
+; ハイジャンプ　開始
+;---------------------------------------------------------------------------
+[Statedef 40]
+type    = S
+physics = S
+anim = 40
+ctrl = 0
+sprpriority = 1
+
+[State 40,01]
+type = PlaySnd
+trigger1 = Time = 0
+value = 50, 0
+
+[State 40,02]
+type = Explod
+trigger1 = Time = 0
+anim = 7001
+pos = 0,0
+postype = P1
+scale = .5,.5
+sprpriority = 5
+ownpal = 1
+
+[State 40,03]
+type = Explod
+trigger1 = Time = 0 || Time = 2 || Time = 6
+anim = 7005
+pos = 0,0
+postype = P1
+scale = .5,.5
+sprpriority = 5
+ownpal = 1
+
+[State 40,04]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 40,05]
+type = VarSet
+trigger1 = Time = 0
+sysvar(2) = 0
+
+[State 40,06]
+type = VarSet
+trigger1 = Time = 0
+sysvar(3) = 0
+
+[State 40,07]
+type = VarSet
+trigger1 = command = "holdfwd"
+sysvar(1) = 1
+
+[State 40,08]
+type = VarSet
+trigger1 = command = "holdback"
+sysvar(1) = -1
+
+[State 40,09]
+type = VarSet
+trigger1 = command != "holdup"
+sysvar(2) = 1
+
+[State 40,10]
+type = VarSet
+trigger1 = prevstateno = 100 ;RUN_FWD
+trigger2 = command = "jump"
+sysvar(3) = 1
+
+[State 40,11]
+type = VelSet
+trigger1 = sysvar(3) = 0
+trigger1 = AnimTime = 0
+x = ifelse(sysvar(1)=0, const(velocity.jump.neu.x), ifelse(sysvar(1)=1, const(velocity.jump.fwd.x), const(velocity.jump.back.x)))
+y = ifelse(sysvar(2)=0, const(velocity.jump.y), -6.3)
+
+[State 40,12]
+type = VelSet
+trigger1 = sysvar(3) = 1
+trigger1 = AnimTime = 0
+x = ifelse(sysvar(1)=0, 0, ifelse(sysvar(1)=1, const(velocity.runjump.fwd.x), const(velocity.runjump.back.x)))
+y = ifelse(sysvar(2)=0, const(velocity.runjump.y), -10.8)
+
+[State 40,13]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; ハイジャンプ　上昇
+;---------------------------------------------------------------------------
+[Statedef 50]
+type    = A
+physics = A
+
+[State 50,01]
+type = PlaySnd
+triggerall = Time = 0
+trigger1 = sysvar(3) = 1
+value = 40, 1
+
+[State 50,02]
+type = turn
+trigger1 = time = 0
+trigger1 = p2dist x < 0
+
+[State 50,03]
+type = AfterImage
+trigger1 = Time = 0
+trigger1 = sysvar(3) = 1
+time = 20
+PalBright = 1,1,1
+PalContrast = 156,128,172
+PalAdd = 0,0,0
+PalMul = 1,1,1
+length = 9
+trans = add1
+FrameGap = 3
+
+[State 50,04]
+type = ChangeAnim
+trigger1 = Time = 0
+value = ifelse((vel x)=0, 41, ifelse((vel x)>0, 42, 43))
+
+[State 50,05]
+type = ChangeAnim
+trigger1 = Time = 0 
+trigger1 = sysvar(2) = 1
+persistent = 0
+value = Anim + 10
+
+[State 50,06]
+type = VarSet
+trigger1 = Time = 0
+sysvar(3) = 0
+
+[State 50,07]
+type = VarSet
+trigger1 = Time = 0
+sysvar(2) = 0
+
+[State 50,08]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 50,09]
+type = ChangeAnim
+trigger1 = Vel y > -2
+trigger1 = SelfAnimExist(anim + 3)
+persistent = 0
+value = Anim + 3
+
+;---------------------------------------------------------------------------
+; ハイジャンプ　着地
+;---------------------------------------------------------------------------
+[Statedef 52]
+type    = S
+physics = S
+ctrl = 0
+Velset = 0,0
+anim = 47
+
+[State 52,01]
+type = PlaySnd
+trigger1 = Time = 0
+value = 40, 0
+
+[State 52,02]
+type = Explod
+trigger1 = Time = 0
+Anim = 7010
+pos = 0, 0
+postype = p1
+ownpal = 1
+bindtime = 1
+pausemovetime = -1
+supermove = 1
+ignorehitpause = 1
+scale = .5,.5
+
+[State 52,03]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 52,04]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 52,05]
+type = CtrlSet
+trigger1 = Time = 3
+value = 1
+
+[State 52,06]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+

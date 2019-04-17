@@ -1,0 +1,499 @@
+; var2   = Item Release Timer
+; var3   = Item Randomizer
+; var4   = Item Placement Value - X
+; var5   = Life gain from Chicken
+;
+; var10   = Determines Placement of Heart Meter
+; var11   = Weapon Change Var setting
+; var12   = Heart Counter
+; var13   = Heart Counter - Checking previous value
+;
+; var20   = Dracula X Mode
+;
+; NumHelper(420) = D, U motion timer
+; NumHelper(221) = Axe
+; NumHelper(222) = Cross
+
+[Data]
+life = 1000          
+attack = 105     
+defence = 89    
+fall.defence_up = 50 
+liedown.time = 60 
+airjuggle = 15
+sparkno = 0,7  
+guard.sparkno = 0,20
+KO.echo = 0 
+volume = 0 
+IntPersistIndex = 8 
+FloatPersistindex = 8
+
+[Size]
+xscale = 1  
+yscale = 1  
+ground.back = 9   
+ground.front = 7 
+air.back = 10   
+air.front = 8 
+z.width = 3   
+height = 30	
+attack.width = 4,4  
+attack.dist = 160
+proj.attack.dist = 90 
+proj.doscale = 1  
+head.pos =  -15, 28
+mid.pos = -15, 15
+shadowoffset = -1
+draw.offset = 0, 0
+
+[Velocity]
+walk.fwd  = 1.6   
+walk.back = -1.6   
+run.fwd  = 5.3, 0 
+run.back = -1.7,-3.5
+jump.neu = 0,-6
+jump.back = -1.5 
+jump.fwd = 1.5    
+runjump.back = -2.55,-5 
+runjump.fwd = 3.6,-5 
+airjump.neu = 0,-5      
+airjump.back = -2.55,-5 
+airjump.fwd = 2.5,-5   
+
+[Movement]
+airjump.num = 0      
+airjump.height = 35 
+yaccel = .3
+stand.friction = .85 
+crouch.friction = .82 
+
+;---------------------------------------------------------------------------
+; Format:
+; [Statedef STATENO]
+; type = ?      S/C/A/L  stand/crouch/air/liedown
+; movetype = ?  I/A/H    idle/attack/gethit
+; physics = ?   S/C/A/N  stand/crouch/air/none
+; juggle = ?             air juggle points move requires
+;
+; [State STATENO, ?]     ? - any number you choose
+; type = ?
+; ...
+
+;---------------------------------------------------------------------------
+; LOSE (Time over)
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0,0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = Time >= 0
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; WIN
+[Statedef 180]
+type = S
+
+[State 180, 1]
+type = ChangeState
+trigger1 = Time = 0
+value = 181
+
+;---------------------------------------------------------------------------
+; WIN1
+[Statedef 181]
+type = A
+ctrl = 0
+anim = 180
+velset = 0,0,0
+
+[State 190, 1]
+type = AssertSpecial
+trigger1 = Time = [0, 380]
+flag = RoundNotOver
+
+[State -2, 1]
+type = AssertSpecial
+trigger1 = Time >= 6
+flag  = NoMusic
+
+[State 190, 1]
+type = ChangeAnim
+trigger1 = Anim = 180 && AnimTime = 0
+value = 181
+
+[State 200, 0] 
+type = PlaySnd
+trigger1 = Time = 8
+value = 180, 0
+volume = 150
+persistent = 0
+
+[State -1, 1]
+type = Helper
+trigger1 = Time = 0
+helpertype = normal
+name = "Sonic Got"
+ID = 182
+pos = -160, -110
+postype = left
+stateno = 182
+keyctrl = 0
+ownpal = 1
+persistent = 0
+[State -1, 1]
+type = Helper
+trigger1 = Time = 10
+helpertype = normal
+name = "Sonic Got"
+ID = 183
+pos = 300, -90
+postype = left
+stateno = 183
+keyctrl = 0
+ownpal = 1
+persistent = 0
+[State -1, 1]
+type = Helper
+trigger1 = Time = 10
+trigger1 = MatchOver = 0
+helpertype = normal
+name = "Sonic Got"
+ID = 184
+pos = 300, -105
+postype = left
+stateno = 184
+keyctrl = 0
+ownpal = 1
+persistent = 0
+[State -1, 1]
+type = Helper
+trigger1 = Time = 10
+trigger1 = MatchOver = 1
+helpertype = normal
+name = "Sonic Got"
+ID = 185
+pos = 300, -105
+postype = left
+stateno = 185
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+[State 181, 2]
+type = NotHitBy
+trigger1 = Time >= 0
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; INTRO
+[Statedef 190]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0,0
+
+[State 190, 1]
+type = AssertSpecial
+trigger1 = Time = [0, 90]
+flag = intro
+
+[State 190, 7]
+type = ChangeState
+trigger1 = Time = 100
+value = 0
+
+;--------------------------------------------------------------------
+
+;Taunt
+[Statedef 195]
+type = S
+movetype = I
+physics = S
+ctrl = 0
+anim = 195
+poweradd = 30
+velset = 0
+
+[State 2000, 2]
+type = PlaySnd
+trigger1 = AnimElem = 12
+trigger2 = AnimElem = 14
+trigger3 = AnimElem = 16
+volume = 150
+value = S195, 0
+
+[State 2000, 2]
+type = PowerAdd
+trigger1 = AnimElem = 12
+trigger2 = AnimElem = 14
+trigger3 = AnimElem = 16
+value = 50
+
+[State 195, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Override common states (use same number to override) :
+;---------------------------------------------------------------------------
+[Statedef -2]
+
+[State -2, 2]
+type = StopSnd
+trigger1 = Movetype = H
+channel = 3
+
+[State -2, 1]
+type = PlaySnd
+trigger1 = StateNo = 40 
+trigger1 = Time = 1
+value = S40,0
+volume = 150
+
+[State -2, 1]
+type = AssertSpecial
+trigger1 = Time = [0, 999999]
+flag  = NoCrouchGuard
+flag2 = NoStandGuard
+flag3 = NoAirGuard
+
+[State -2, 1]
+type = AssertSpecial
+trigger1 = Time = [0, 999999]
+flag  = NoAutoTurn
+
+[State -2, 1]
+type = AssertSpecial
+triggerall = TimeMod = 2, 0
+trigger1 = Stateno != 5602
+trigger1 = MoveType = H
+trigger2 = NumHelper(5600) = 1
+flag  = Invisible
+
+;----------------------------------
+;    Heart Counter
+;----------------------------------
+
+; Player1-2 Determining Var
+[State -2, 1]
+type = VarSet
+trigger1 = var(10) = 0
+var(10) = 1 + (Pos X >= 0)
+
+; Heart Counter - Double digit - Player 1
+[State -2, 1]
+type = Explod
+trigger1 = Var(10) = 1
+ID = 320
+anim = 300 + (floor(var(12) *.1))*(Var(12)<255) + ((Var(12)>=255)*11)
+pos = 57,55+ (p3name = "Sonic" || p3name = "Richter")*28
+postype = left
+removetime = 1
+sprpriority = 4
+bindtime = 1
+ownpal = 1
+; Heart Counter - Single digit - Player 1
+[State -2, 1]
+type = Explod
+trigger1 = Var(10) = 1
+trigger1 = Var(12) <= 255
+ID = 300
+anim = (300 + (IfElse(Var(12)>=10, Var(12)%10, Var(12))))
+pos = 65,55+ (p3name = "Sonic" || p3name = "Richter")*28
+postype = left
+removetime = 1
+sprpriority = 4
+bindtime = 1
+ownpal = 1
+
+;------------------------------------------------------
+
+; Heart Counter - Double digit - Player 2
+[State -2, 1]
+type = Explod
+trigger1 = Var(10) = 2
+ID = 321
+anim = 300 + (floor(var(12) *.1))*(Var(12)<255) + ((Var(12)>=255)*11)
+pos = -20,55+ (p3name = "Sonic" || p3name = "Richter")*28
+postype = right
+removetime = 1
+sprpriority = 4
+bindtime = 1
+ownpal = 1
+; Heart Counter - Single digit - Player 2
+[State -2, 1]
+type = Explod
+trigger1 = Var(10) = 2
+trigger1 = Var(12) < 255
+ID = 301
+anim = (300 + (IfElse(Var(12)>=10, Var(12)%10, Var(12))))
+pos = -12,55 + (p3name = "Sonic" || p3name = "Richter")*28
+postype = right
+removetime = 1
+sprpriority = 4
+bindtime = 1
+ownpal = 1
+
+; Heart Limiter - Max 99
+[State -2, 1]
+type = VarSet
+trigger1 = Var(12) >= 100
+trigger1 = Var(12) < 255
+var(12) = 99
+; Heart Limiter - Min 00
+[State -2, 1]
+type = VarSet
+trigger1 = Var(12) <= -1
+var(12) = 0
+; Heart Limiter - ?????
+[State -2, 1]
+type = VarSet
+trigger1 = Var(12) >= 255
+var(12) = 300
+
+;--------------------------------------
+
+[State -2, 0]
+type = NotHitBy
+triggerall = Time >= 0
+trigger1 = NumHelper(5600) = 1
+trigger2 = NumHelper(510) = 1
+trigger3 = NumHelper(520) = 1
+value = SCA, AA, AP, AT, NA, NP, NT, SA, SP, ST, HA, HP, HT
+ignorehitpause = 1
+
+[State -2, 1]
+type = ChangeState
+trigger1 = stateno = [5000, 5100)
+value = 5600
+persistent = 0
+
+; Player 1 random items
+[State -1, 1]
+type = Helper
+trigger1 = Var(10) = 1
+trigger1 = NumHelper(351) <=1
+trigger1 = Var(2) = [500, 502]
+helpertype = normal
+name = "Random Item"
+ID = 351
+pos = 60+(Time%3+1)*20, -90
+postype = left
+stateno = 351
+keyctrl = 0
+ownpal = 1
+; Player 1 random items
+[State -1, 1]
+type = Helper
+trigger1 = Var(10) = 1
+trigger1 = NumHelper(351) <=1
+trigger1 = Var(2) = [1000, 1002]
+helpertype = normal
+name = "Random Item"
+ID = 351
+pos = 120+(Time%3+1)*20, -5
+postype = left
+stateno = 351
+keyctrl = 0
+ownpal = 1
+; Player 1 random items
+[State -1, 1]
+type = Helper
+trigger1 = Var(10) = 1
+trigger1 = NumHelper(351) <=1
+trigger1 = Var(2) = [1500, 1502]
+helpertype = normal
+name = "Random Item"
+ID = 351
+pos = 260+(Time%3+1)*20, -110
+postype = left
+stateno = 351
+keyctrl = 0
+ownpal = 1
+; Player 2 random items
+[State -1, 1]
+type = Helper
+trigger1 = Var(10) = 2
+trigger1 = NumHelper(351) <= 1
+trigger1 = Var(2) = [200, 202]
+helpertype = normal
+name = "Random Item"
+ID = 351
+pos = 60+(Time%3+1)*20, -90
+postype = left
+stateno = 351
+keyctrl = 0
+ownpal = 1
+; Player 2 random items
+[State -1, 1]
+type = Helper
+trigger1 = Var(10) = 2
+trigger1 = NumHelper(351) <= 1
+trigger1 = Var(2) = [1700, 1702]
+helpertype = normal
+name = "Random Item"
+ID = 351
+pos = 200+(Time%3+1)*20, -5
+postype = left
+stateno = 351
+keyctrl = 0
+ownpal = 1
+; Player 2 random items
+[State -1, 1]
+type = Helper
+trigger1 = Var(10) = 2
+trigger1 = NumHelper(351) <= 1
+trigger1 = Var(2) = [1200, 1202]
+helpertype = normal
+name = "Random Item"
+ID = 351
+pos = 130+(Time%3+1)*20, -110
+postype = left
+stateno = 351
+keyctrl = 0
+ownpal = 1
+
+; Timer Var
+[State -2, 1]
+type = VarAdd
+trigger1 = Var(2) <= 2000
+var(2) = 1 - ((Var(2) = 2000)*1999)
+
+; Random Item release
+[State -2, 1]
+type = VarRandom
+trigger1 = 1
+v = 3
+range = 200
+; Random Item placement
+[State -2, 1]
+type = VarRandom
+trigger1 = 1
+v = 4
+range = 240
+; Random Item placement
+[State -2, 1]
+type = LifeSet
+trigger1 = 1
+value = 1500
+
+[State -2, 1]
+type = VarSet
+trigger1 = RoundState = 0
+var(12) = 5
+
+;--------------------------------------------
+
+[State 351,2]
+type = VarSet
+trigger1 = Stateno != [410, 420)
+fv = 1
+value = 0

@@ -1,0 +1,2515 @@
+; Jailbot by altoiddealer
+;---------------------------------------------------------------------------
+;SPECIAL ATTACKS
+;---------------------------------------------------------------------------
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;MINIGUN
+[Statedef 1000]
+type = S
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+poweradd = 10
+anim = 1000
+ctrl = 0
+sprpriority = -4
+
+[State 1000, Gun out anim]
+type = Explod
+trigger1 = anim = 1000
+anim = 1001
+id = 1001
+sprpriority = 4
+persistent = 0
+removeTime = -1
+removeongethit = 1
+bindTime = -1
+
+[state 1000, Gun Out Sound]
+type = Playsnd
+trigger1 = !Time
+value = 1000,0
+
+[State 1000, Increment Timer]
+type = varadd
+triggerall = anim = 1000
+trigger1 = AnimElem = 5, > 0
+var(4) = 1
+
+[State 1000, Get jiggy]
+type = velset
+triggerall = anim = 1000
+trigger1 = AnimElem = 5, > 0
+x = -0.5
+
+[State 1000, Get jiggy]
+type = offset
+triggerall = anim = 1000
+trigger1 = AnimElem = 5, > 0
+x = -2+random%5
+
+[state 1000, Gun Loop Sound]
+type = Playsnd
+triggerall = anim = 1000
+trigger1 = AnimElem = 5 ;guarantees play on first shot
+trigger2 = AnimElem = 5, > 0
+trigger2 = Time%18 = 0
+value = 1000,1
+channel = 0
+
+[State 250, Increase Power]
+type = PowerAdd
+trigger1 = anim = 1000 && var(4) < 110
+trigger1 = animelem = 5, >= 0
+trigger1 = Time%8 = 0
+value = 2
+
+[State 1000, Bullets]
+type = projectile
+trigger1 = anim = 1000 && var(4) < 110
+trigger1 = animelem = 4, >= 8
+trigger1 = Time%4 = 0
+;trigger1 = Time%8 = 0
+guardflag = MA
+animtype = medium
+air.animtype = back
+ground.type = low
+ground.hitTime = 9
+air.velocity = -2,1
+projanim = 1007
+projremoveTime = 30
+projpriority = 3
+offset = 80,14*random/1000 - 50
+attr = S,SP
+damage = 3,Time%48 = 0
+ground.hitTime = 5
+velocity = 22,0
+ground.velocity = -5
+sparkno = s8000
+;sparkno = 1;s8000
+sparkxy = 20+random%20,-15+random%30
+hitsound = S8000,3
+guard.sparkno = s8000
+guardsound = -1
+getpower = 0,0
+envshake.Time = 4
+envshake.ampl = 3
+envshake.freq = 40
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 1000, Bursts]
+type = Explod
+trigger1 = anim = 1000 && AnimElem = 5
+anim = 1004
+id = 1001
+sprpriority = 5
+persistent = 0
+removeTime = -1
+removeongethit = 1
+bindTime = -1
+
+[State 1000, Shells]
+type = Helper
+trigger1 = anim = 1000 && AnimElem = 5
+persistent = 0
+stateno = 1005
+id = 1005
+
+[State 1000, End anim]
+type = Changeanim
+trigger1 = var(4) > 90
+trigger1 = anim = 1000 && !animtime
+value = 1002
+
+[state 1000, Gun Away Sound]
+type = Playsnd
+trigger1 = anim = 1002
+value = 1000,0
+persistent = 0
+
+[State 1000, Gun away anim]
+type = RemoveExplod
+trigger1 = anim = 1002
+id = 1001
+persistent = 0
+
+[State 1000, Gun away anim]
+type = Explod
+trigger1 = anim = 1002
+anim = 1003
+sprpriority = 4
+persistent = 0
+removeongethit = 1
+bindTime = -1
+
+[State 1000, Change to Stand]
+type = Changestate
+trigger1 = anim = 1002 && !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;MINIGUN SHELLS
+[StateDef 1005]
+type = S
+anim = 9999
+
+[State 1005, BindToParent]
+type = BindToParent
+trigger1 = 1
+
+[State 1005, Shells]
+type = Explod
+triggerall = parent,anim = 1000
+trigger1 = parent,AnimElem = 5, >= 0
+trigger1 = Time%3 = 0
+facing = parent,facing
+anim = 1005+random%2
+pos = 26,-50
+vel = -4+(random%2/1.5),-4+(random%2/1.5)
+accel = 0,.125
+sprpriority = -5
+removeTime = 80
+
+[State 160, Shells]
+type = Explod
+triggerall = parent,anim = 160
+trigger1 = Time%3 = 0
+facing = parent,facing
+anim = 1005+random%2
+pos = -39,-69
+vel = -4+(random%3/1.5),-1+(random%3/1.5)
+accel = 0,.125
+sprpriority = -5
+removeTime = 80
+
+[State 1005, DestroySelf]
+type = Destroyself
+trigger1 = parent,anim = 1002 && !parent,animTime
+trigger2 = parent,anim = 161
+trigger3 = parent,stateno = 0
+trigger4 = parent,movetype = H
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;MINIGUN FAKE-OUT
+[Statedef 1010]
+type = S
+movetype = A
+physics = S
+velset = 0,0
+poweradd = 0
+anim = 1010
+ctrl = 0
+sprpriority = -4
+
+[State 1000, Hold button check]
+type = VarSet
+trigger1 = !Time
+var(4) = 0
+
+[State 1000, Hold button check]
+type = VarSet
+triggerall = time
+trigger1 = command != "holds"
+var(4) = Time
+persistent = 0
+
+[State 1000, Gun out anim]
+type = Explod
+trigger1 = !Time
+anim = 1012
+id = 1001
+sprpriority = 4
+removeongethit = 1
+bindTime = -1
+
+[State 1000, Bang anim 1]
+type = Explod
+trigger1 = !Time
+anim = Cond(facing = 1,1014,1016)
+pos = 87,-64
+id = 1001
+sprpriority = 5
+removeongethit = 1
+bindTime = -1
+
+[state 1000, Gun Out Sound]
+type = Playsnd
+trigger1 = !Time
+value = 1000,0
+
+[state 1000, Wink Sound]
+type = Playsnd
+trigger1 = anim = 1010
+trigger1 = animelem = 5 || !animtime
+value = 1000,3
+
+[state 1000, Gun Away Sound]
+type = Playsnd
+trigger1 = !AILevel
+trigger1 = Time > 28
+trigger1 = var(4)
+trigger2 = AILevel
+trigger2 = Time > 26
+value = 1000,2
+persistent = 0
+
+[State 1000, Change to Stand]
+type = Changeanim
+trigger1 = !AILevel
+trigger1 = Time > 28
+trigger1 = var(4)
+trigger1 = Time > (var(4) + 2)
+trigger2 = AILevel
+trigger2 = Time > 28
+value = 1011
+persistent = 0
+
+[State 1000, Bang away anim]
+type = Explod
+trigger1 = !AILevel
+trigger1 = Time > 26
+trigger1 = var(4)
+trigger1 = Time > var(4)
+trigger2 = AILevel
+trigger2 = Time > 26
+anim = Cond(facing = 1,1015,1017)
+pos = 87,-64
+id = 1001
+sprpriority = 5
+removeongethit = 1
+bindTime = -1
+persistent = 0
+
+[State 1000, Gun away anim]
+type = Explod
+trigger1 = !AILevel
+trigger1 = Time > 28
+trigger1 = var(4)
+trigger1 = Time > (var(4) + 2)
+trigger2 = AILevel
+trigger2 = Time > 28
+anim = 1013
+id = 1001
+sprpriority = 4
+removeongethit = 1
+bindTime = -1
+persistent = 0
+
+[State 1000, Change to Stand]
+type = Changestate
+trigger1 = anim = 1011 && !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;COME HERE
+[StateDef 1100]
+type = S
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 1100
+poweradd = 20
+sprpriority = -4
+
+[State 1100, Spear out anim]
+type = Explod
+trigger1 = anim = 1100
+anim = 1101
+id = 1001
+sprpriority = 5
+persistent = 0
+removeTime = -1
+removeongethit = 1
+bindTime = -1
+
+[State 1100, Remove Spear Arm]
+type = RemoveExplod
+trigger1 = anim != 1100
+id = 1001
+
+[State 1100, Arm out sound]
+type = PlaySnd
+trigger1 = !time
+value = 2,0
+
+[State 1100, Arm out sound]
+type = PlaySnd
+trigger1 = anim = 1102
+value = 2,1+random%2 ;add a little variety
+persistent = 0
+
+[State 1100, Shoot sound]
+type = PlaySnd
+trigger1 = AnimElem = 6
+value = 1100,1
+persistent = 0
+channel = 0
+
+[State 1100, Spear Helper]
+type = Helper
+trigger1 = AnimElem = 7
+name = "Spear"
+size.ground.front = 0
+size.ground.back = 0
+size.height = 0
+ID = 1101
+StateNo = 1101
+pos = 32,-72
+persistent = 0
+
+[State 1100, Spear claw Helper (target lock)]
+type = Helper
+trigger1 = !NumHelper(1103) ;no duplicates!
+trigger1 = PlayerIdExist(var(58)) ;Enemy exists
+trigger1 = PlayerId(var(58)),StateNo = 1105 ;Enemy is in custom hit state
+name = "Claw"
+size.ground.front = 0
+size.ground.back = 0
+size.height = 0
+ID = 1103
+StateNo = 1103
+pos = Abs(Floor(PlayerId(var(58)),pos X - pos X)),-72
+persistent = 0
+ignorehitpause = 1
+
+[State 1100, Spear claw Helper (fallback code)]
+type = Helper
+trigger1 = !NumHelper(1103) ;no duplicates!
+trigger1 = !PlayerIdExist(var(58)) ;fallback code
+trigger1 = p2StateNo = 1105 ;fallback code
+name = "Claw"
+size.ground.front = 0
+size.ground.back = 0
+size.height = 0
+ID = 1103
+StateNo = 1103
+postype = p2
+pos = 0,-72
+facing = -1
+persistent = 0
+ignorehitpause = 1
+
+[State 1100, Gain power]
+type = PowerAdd
+trigger1 = PlayerIdExist(var(58)) ;Enemy exists
+trigger1 = PlayerId(var(58)),StateNo = 1105 ;Enemy is in custom hit state
+trigger2 = !PlayerIdExist(var(58)) ;fallback code
+trigger2 = p2StateNo = 1105 ;fallback code
+value = 20
+persistent = 0
+ignorehitpause = 1
+
+[State 1100, Spear sinks in sound]
+type = PlaySnd
+trigger1 = PlayerIdExist(var(58)) ;Enemy exists
+trigger1 = PlayerId(var(58)),StateNo = 1105 ;Enemy is in custom hit state
+trigger2 = !PlayerIdExist(var(58)) ;fallback code
+trigger2 = p2StateNo = 1105 ;fallback code
+value = 1100,3
+persistent = 0
+ignorehitpause = 1
+
+[State 1100, Spear opens sound]
+type = PlaySnd
+trigger1 = PlayerIdExist(var(58)) ;Enemy exists
+trigger1 = PlayerId(var(58)),StateNo = 1105 ;Enemy is in custom hit state
+trigger2 = !PlayerIdExist(var(58)) ;fallback code
+trigger2 = p2StateNo = 1105 ;fallback code
+value = 1100,5
+persistent = 0
+ignorehitpause = 1
+
+[State 1100, Rope Helper]
+type = Helper
+triggerall = !NumHelper(1104) ;no duplicates!
+trigger1 = PlayerIdExist(var(58)) ;Enemy exists
+trigger1 = PlayerId(var(58)),StateNo = 1105 ;Enemy is in custom hit state
+trigger2 = !PlayerIdExist(var(58)) ;fallback code
+trigger2 = p2StateNo = 1105 ;fallback code
+trigger3 = NumHelper(1101)
+trigger3 = Helper(1101),moveguarded ;if spear was guarded
+name = "Rope"
+size.ground.front = 0
+size.ground.back = 0
+size.height = 0
+ID = 1104
+StateNo = 1104
+pos = 32,-72
+persistent = 0
+ignorehitpause = 1
+
+[State 1100, Reel in sound]
+type = PlaySnd
+trigger1 = NumHelper(1103)
+trigger1 = Helper(1103),Time = 30
+value = 1100,4
+channel = 2
+
+[State 1100, Blood fade anim (target lock)]
+type = Explod
+triggerall = var(2) < 10
+trigger1 = !numexplod(1113) ;no duplicates!
+trigger1 = PlayerIdExist(var(58)) ;Enemy exists
+trigger1 = PlayerId(var(58)),StateNo = 1106 ;Only when Enemy is in custom dizzy state
+trigger1 = PlayerId(var(58)),life > 0 ;Don't display if enemy dies
+anim = 1113
+id = 1113
+sprpriority = 1
+pos = Cond(NumHelper(1103),Floor(-(Helper(1103),ParentDist X)),Abs(Floor(PlayerId(var(58)),pos X - pos X))),-72
+;pos = Abs(Floor(PlayerId(var(58)),pos X - pos X)),-72
+persistent = 0
+bindTime = -1
+
+[State 1100, Blood fade anim (fallback code)]
+type = Explod
+triggerall = var(2) < 10
+trigger1 = !numexplod(1113) ;no duplicates!
+trigger1 = !PlayerIdExist(var(58)) ;fallback code
+trigger1 = p2StateNo = 1106 ;fallback code
+trigger1 = P2life > 0 ;fallback code
+anim = 1113
+id = 1113
+sprpriority = 1
+postype = p2
+pos = 1,-72
+facing = -1
+persistent = 0
+bindTime = -1
+
+[State 1100, Slicy sound]
+type = PlaySnd
+trigger1 = numexplod(1113)
+value = 1100,5
+persistent = 0
+
+[State 1100, Retract spear gun]
+type = Changeanim
+trigger1 = NumHelper(1101)
+trigger1 = Helper(1101),anim = 1105 && !Helper(1101),animtime ;if spear misses
+trigger2 = NumHelper(1103)
+trigger2 = Helper(1103),anim = 1111 && !Helper(1103),animtime ;After success
+trigger3 = NumHelper(1101)
+trigger3 = Helper(1101),StateNo = 1102 ;if spear was destroyed
+trigger4 = AnimElem = 7, >= 0
+trigger4 = !NumHelper(1101) && !NumHelper(1103);Helpers are simply MIA
+trigger5 = NumHelper(1101)
+trigger5 = Helper(1101),moveguarded
+trigger5 = Abs(Helper(1101),pos x - pos X) = 32
+value = 1102
+persistent = 0
+
+[State 1100, Stop reeling sound]
+type = StopSnd
+trigger1 = anim = 1102
+channel = 2
+
+[State 1100, Spear away anim]
+type = Explod
+trigger1 = anim = 1102
+anim = 1103
+sprpriority = 5
+persistent = 0
+removeongethit = 1
+bindTime = -1
+
+[State 1100, Change to Stand]
+type = ChangeState
+trigger1 = anim = 1102 & !animtime ;after retract spear anim
+value = 0
+ctrl = 1
+
+;-----------------------
+;SPEAR HELPER
+[StateDef 1101]
+type = S
+movetype = A
+physics = N
+juggle = 1
+anim = 1104
+sprpriority = 5
+
+[State 1101, Enemy can't destroy spear with normal attacks]
+type = NotHitBy
+trigger1 = 1
+;value = ,SA,HA,NT,ST,HT ;test version
+value = ,NA,SA,HA,NT,ST,HT
+
+[State 1101, Enemy may destroy spear with projectiles]
+type = HitOverride
+trigger1 = 1
+attr = SCA,NP,SP,HP
+;attr = SCA,NA,NP,SP,HP ;test version
+StateNo = 1102
+ignorehitpause = 1
+
+[State 1101, HitDef]
+type = HitDef
+trigger1 = 1
+attr = S,SP
+damage = 20,1
+animtype = Hard
+guardflag = M
+hitflag = M-
+priority = 3,Hit
+pauseTime = 0,10
+guard.pauseTime = 0,8
+sparkno = s8001
+;sparkno = 2;s8001
+sparkxy = -10,0
+guardsound = s6,0
+ground.type = High
+ground.slideTime = 5
+ground.hitTime  = 12
+ground.velocity = -4
+hitonce = 1
+p2facing = 1
+id = 1105
+fall.envshake.freq = parent,TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = parent,ID ;provide Jailbot's PlayerID
+fall.envshake.phase = parent,var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 1101, Enemy Gets Speared]
+type = TargetState
+trigger1 = numtarget(1105) && movehit
+value = 1105
+persistent = 0
+ignorehitpause = 1
+
+[State 1101, Log the current target's ID]
+type = ParentvarSet
+trigger1 = numtarget(1105)
+var(58) = target(1105),ID
+persistent = 0
+ignorehitpause = 1
+
+[State 1101, Prevent disconnection from Jailbot]
+type = BindToParent
+trigger1 = parent,StateNo = 1100
+trigger1 = !movehit
+trigger1 = !moveguarded
+trigger1 = Time < 20
+pos = 42+(Time*10),-72
+ignorehitpause = 1
+
+[State 1101, Start Timer]
+type = varset
+trigger1 = !time
+var(4) = 0
+ignorehitpause = 1
+
+[State 1101, Increment timer] ;Spear flying
+type = varadd
+trigger1 = anim = 1104 && AnimElem = 14, <= 0
+var(4) = 1
+
+[State 1101, Rope whipping sound]
+type = PlaySnd
+trigger1 = anim = 1104
+value = 1100,2
+loop = 1
+channel = 0
+persistent = 0
+
+[State 1101, Pan rope whipping sound]
+type = SndPan
+trigger1 = 1
+abspan = Floor(Pos X)
+channel = 0
+
+[State 1101, Stop Rope whipping sound]
+type = StopSnd
+trigger1 = anim = 1105 && animelem = 5 ;after spear misses
+trigger2 = movehit ;if succeeds
+trigger3 = (pos x > (GameWidth/2)+150) || (pos x < (-GameWidth/2)-150) ;Left the screen
+trigger4 = moveguarded
+trigger4 = Abs(ParentDist X) <= 32  ;when close to Jailbot
+channel = 0
+persistent = 0
+
+[State 1101, Increment timer] ;Spear retracting
+type = varadd
+triggerall = anim = 1105
+trigger1 = AnimElem = 6, < 0
+trigger2 = AnimElem = 6
+trigger3 = AnimElem = 7, >= 0 && AnimElem = 16, <= 0
+var(4) = 1
+
+[State 1101, Spear max length] ;Jailbot not hit yet, and spear not destroyed or guarded yet
+type = Changeanim
+trigger1 = !movehit
+trigger1 = !moveguarded
+trigger1 = parent,StateNo = 1100 ;Jailbot is still in the Spear Attack state (did not get hit)
+trigger1 = anim = 1104 && AnimElemno(0) = 15
+value = 1105
+
+[State 1101, Change to Destroyed] ;Jailbot hit, and spear is already being pulled back
+type = ChangeState
+trigger1 = !movehit
+trigger1 = parent,StateNo != 1100 ;Jailbot has left the attack state (probably hit)
+trigger1 = anim = 1105
+trigger1 = AnimElem = 8, >= 0 ;If spear is already coming back, when Jailbot gets hit... destroy it!
+value = 1102
+persistent = 0
+ignorehitpause = 1
+
+[State 1101, Spear keeps flying anim] ;Jailbot hit, but spear is still being shot out
+type = Changeanim
+trigger1 = !movehit
+trigger1 = !moveguarded
+trigger1 = parent,StateNo != 1100 ;Jailbot has left the attack state (probably hit)
+value = 1104
+elem = 13
+persistent = 0
+ignorehitpause = 1
+
+[State 1101, Spear keeps flying] ;Jailbot hit
+type = VelSet
+trigger1 = parent,StateNo != 1100
+x = 10
+persistent = 0
+ignorehitpause = 1
+
+[State 1101, Spear idle]
+type = StateTypeSet
+trigger1 = anim = 1105 && AnimElemno(4) = 7
+movetype = I
+persistent = 0
+
+[State 1101, Sprite priority] ;Unsure why, but the Rope Helper (with sprpriority = 2) becomes layered in front of the spear if the spear is guarded.
+type = SprPriority
+trigger1 = moveguarded
+value = 5
+
+[State 1101, Move to Jailbot]
+type = VelSet
+trigger1 = parent,StateNo = 1100
+trigger1 = anim = 1105 && AnimElem = 8 ;if spear missed
+trigger2 = moveguarded ;if blocked
+x = -20
+persistent = 0
+
+[State 1101, Freeze spear tip] ;Spear was guarded
+type = Changeanim
+trigger1 = moveguarded
+value = 1104
+elem = 1 ;freeze anim
+
+[State 1101, Add Pos x]
+type = posAdd
+trigger1 = moveguarded
+trigger1 = ParentDist X >= -52 ;when close to Jailbot
+x = Floor(-ParentDist X - 32)
+persistent = 0
+
+[State 1101, Destroy Self]
+type = destroyself
+trigger1 = anim = 1105 && !animtime ;after spear misses
+trigger2 = movehit ;if succeeds
+trigger3 = (pos x > (GameWidth/2)+150) || (pos x < (-GameWidth/2)-150) ;Left the screen
+trigger4 = moveguarded
+trigger4 = Abs(ParentDist X) <= 32 ;when close to Jailbot
+
+;-----------------------
+;SPEAR DESTROYED
+[StateDef 1102]
+type = S
+movetype = H
+physics = N
+ctrl = 0
+velset = 0,0
+sprpriority = 5
+
+[State 1102, Freeze on correct AnimElem]
+type = Changeanim
+trigger1 = 1
+value = Cond(var(4) <= 13,1104,1105)
+elem = Cond(var(4) <= 13,var(4),var(4)-13)
+
+[State 1102, Fade effect]
+type = Trans
+trigger1 = Time%2 = 0
+trans = add1
+alpha = 0,256
+
+[State 1102, Destroy Self]
+type = destroyself
+trigger1 = Time = 10
+
+;-----------------------
+;CLAW HELPER
+[StateDef 1103]
+type = S
+movetype = I
+physics = N
+anim = 1107
+sprpriority = -5
+velset = 0,0
+
+[State 1103, Spear blood anim]
+type = Explod
+triggerall = parent,var(2) < 10
+trigger1 = 1
+anim = 1112
+sprpriority = 5
+ignorehitpause = 1
+
+[State 1103, Blood spray anim]
+type = Explod
+triggerall = parent,var(2) < 10
+trigger1 = !time
+anim = 9102
+sprpriority = -2
+ignorehitpause = 1
+
+[State 1103, Add Pos X]
+type = posAdd
+trigger1 = PlayerIdExist(parent,var(58)) ;Enemy exists
+trigger1 = PlayerId(parent,var(58)),anim = 1108 ;Enemy is in speared anim
+trigger1 = PlayerId(parent,var(58)),AnimElem = 1, >= 0 && PlayerId(parent,var(58)),AnimElem = 3, < 0 ;Enemy anim has reached get pulled AnimElem
+trigger1 = Abs(Floor(parent,FrontEdgeDist - (GameWidth - PlayerID(parent,var(58)),FrontEdgeDist))) <= 45 ;Enemy is too close to Jailbot
+trigger2 = !PlayerIdExist(parent,var(58)) ;fallback code
+trigger2 = Time < 34 ;fallback code
+trigger2 = EnemyNear,p2bodydist x <= 45 ;fallback code
+x = 4
+
+[State 1103, Move to Jailbot]
+type = VelSet
+trigger1 = PlayerIdExist(parent,var(58)) ;Enemy exists
+trigger1 = PlayerId(parent,var(58)),anim = 1108 ;Enemy is in speared anim
+trigger1 = PlayerId(parent,var(58)),AnimElem = 3 ;Enemy anim has reached get pulled AnimElem
+trigger2 = !PlayerIdExist(parent,var(58)) ;fallback code
+trigger2 = Time = 34 ;fallback code
+x = -20
+persistent = 0
+
+[State 1103, Stop at Jailbot]
+type = VelSet
+trigger1 = PlayerIdExist(parent,var(58)) ;Enemy exists
+trigger1 = PlayerId(parent,var(58)),StateNo = 1106 ;Enemy is in custom dizzy state
+trigger2 = !PlayerIdExist(parent,var(58)) ;fallback code
+trigger2 = p2StateNo = 1106 ;fallback code
+x = 0
+persistent = 0
+
+[State 1103, Close spear claw anim]
+type = Changeanim
+trigger1 = PlayerIdExist(parent,var(58)) ;Enemy exists
+trigger1 = PlayerId(parent,var(58)),StateNo = 1106 ;Enemy is in custom dizzy state
+trigger2 = !PlayerIdExist(parent,var(58)) ;fallback code
+trigger2 = p2StateNo = 1106 ;fallback code
+value = 1110
+persistent = 0
+
+[State 1103, Max sprite priority on phase 2]
+type = Sprpriority
+trigger1 = anim = 1110 && !animtime
+value = 5
+persistent = 0
+
+[State 1103, Remove spear anim]
+type = Changeanim
+trigger1 = anim = 1110 && !animtime
+value = 1111
+persistent = 0
+
+[State 1103, Destroy Self]
+type = destroyself
+trigger1 = parent,anim != [1100,1104] ;if Jailbot is not in shoot anim
+trigger2 = anim = 1111 && !animtime ;after spear is removed
+
+;-----------------------
+;ROPE HELPER
+[StateDef 1104]
+type = S
+movetype = I
+physics = N
+anim = 1106
+sprpriority = 5
+velset = 0,0
+
+[State 1104, 1]
+type = BindToParent
+trigger1 = 1
+pos = 32,-72
+
+[State 1104, Stretch 1px anim across to claw Helper]
+type = AngleDraw
+trigger1 = NumHelper(1103)
+scale = -(Helper(1103),ParentDist X)-32,1
+
+[State 1104, Stretch 1px anim across to spear Helper that was guarded]
+type = AngleDraw
+trigger1 = NumHelper(1101)
+trigger1 = Helper(1101),moveguarded
+scale = -(Helper(1101),ParentDist X)-32,1
+
+[State 1104, Destroy Self]
+type = destroyself
+trigger1 = parent,anim != [1100,1104] ;Jailbot is MIA
+trigger2 = !NumHelper(1103) && !NumHelper(1101) ;If move was guarded, or Helpers are simply MIA
+
+;---------------------------
+;ENEMY SPEARED
+[Statedef 1105]
+type = A
+movetype = H
+physics = N
+velset = 0,0
+sprpriority = -1
+
+[State 1105, 1]
+type = Screenbound
+trigger1 = 1
+movecamera = 1,0
+
+[State 1105, Guess offset position]
+type = OffSet
+trigger1 = 1
+y = Floor(Const(size.mid.pos.y))
+x = Floor(Const(size.mid.pos.x))
+ignorehitpause = 1
+
+[State 1105, Gets hit anim]
+type = Changeanim2
+Trigger1 = !time
+value = 1108
+
+[State 1105, Add x position]
+type = posAdd
+triggerall = AnimElem = 1, >= 0 && AnimElem = 3, < 0
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = Abs(Floor(PlayerId(GetHitvar(fall.envshake.ampl)),FrontEdgeDist - (GameWidth - FrontEdgeDist))) <= 45
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = p2bodydist x <= 45 ;fallback code
+x = -4
+
+[State 1105, Move to Jailbot]
+type = VelSet
+trigger1 = anim = 1108 && AnimElem = 3
+x = 20
+persistent = 0
+
+[State 1105, Stop at Jailbot]
+type = VelSet
+triggerall = anim = 1108 && AnimElem = 3, >= 0
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = Abs(Floor(PlayerId(GetHitvar(fall.envshake.ampl)),FrontEdgeDist - (GameWidth - FrontEdgeDist))) <= 45
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = p2bodydist x <= 45 ;fallback code
+x = 0
+
+[State 1105, Selfstate]
+type = SelfState
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),StateNo != 1100
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = p2StateNo != 1100 ;fallback code
+value = 5050
+
+[State 1105, Get Dizzy]
+type = ChangeState
+triggerall = anim = 1108 && AnimElem = 3, >= 0
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = Abs(Floor(PlayerId(GetHitvar(fall.envshake.ampl)),FrontEdgeDist - (GameWidth - FrontEdgeDist))) <= 45
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = p2bodydist x <= 45 ;fallback code
+value = 1106
+ctrl = 0
+
+;---------------------------
+;ENEMY DIZZY
+[StateDef 1106]
+type = S
+movetype = H
+physics = S
+velset = 0,0
+ctrl = 0
+sprpriority = 0
+
+[State 1106, Released anim]
+type = Changeanim2
+trigger1 = !time
+value = 1109
+
+[State 1106, Offset position for axis change]
+type = OffSet
+trigger1 = anim = 1109
+y = Floor(Const(size.mid.pos.y))
+x = Floor(Const(size.mid.pos.x))
+ignorehitpause = 1
+
+[State 1106, Reset offset]
+type = OffSet
+trigger1 = life <= 1
+trigger1 = anim = 1109 && !animtime
+trigger1 = gethitvar(fall.envshake.phase) = 2 ;If custom winpose selected
+y = 0
+x = 0
+
+;[State 1106, Change to dead] ;If custom winpose selected and enemy is dying
+;;type = ChangeState
+;type = LifeSet
+;trigger1 = life <= 1
+;trigger1 = anim = 1109 && !animtime
+;trigger1 = gethitvar(fall.envshake.phase) = 2 ;If custom winpose selected
+;value = 0
+
+[State 1106, Reset offset]
+type = OffSet
+trigger1 = anim = 1109 && !animtime
+trigger2 = Time = 2
+trigger2 = life <= 0
+y = 0
+x = 0
+
+[State 1106, Dizzy anim]
+type = Changeanim
+trigger1 = anim = 1109 && !animtime
+value = 5300
+
+[State 1106, Release dead enemy]
+type = SelfState
+trigger1 = Time = 2 ;Just fall down if dead
+trigger1 = life <= 0 ;Just fall down if dead
+value = 5110
+;value = 5050
+
+[State 1106, Release enemy]
+type = SelfState
+trigger1 = Time = 80
+trigger1 = life > 0
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;LONG PUNCH
+[Statedef 1200]
+type = S
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+poweradd = 0
+anim = var(10)
+ctrl = 0
+sprpriority = 1
+
+[State 1200, Attack sound]
+type = PlaySnd
+trigger1 = !time
+value = 1200,0
+channel = 0
+
+[State 1200, Stop attack sound]
+type = StopSnd
+trigger1 = movecontact
+channel = 0
+
+[State 1200, HitDef]
+type = HitDef
+trigger1 = !movecontact
+attr = S,SA
+damage = 35,1
+animtype = Hard
+guardflag = MA
+hitflag = MAF
+priority = 4, Hit
+pauseTime = 6,10
+guard.pauseTime = 10,10
+sparkno = s8001
+;sparkno = 2;s8001
+sparkxy = -10,-58
+guard.sparkno = s6767
+hitsound = S200,260 ;5,3
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 13
+ground.hitTime = 13
+ground.velocity = -8,0
+air.type = Low
+air.hitTime = 5
+air.velocity = -7,0
+id = 1200
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 1200, Set Counter]
+type = varset
+trigger1 = !time
+var(4) = 7
+
+[State 1200, Decrease Counter]
+type = varadd
+trigger1 = AnimElem = 1
+trigger2 = AnimElem = 2
+trigger3 = AnimElem = 3
+trigger4 = AnimElem = 4
+trigger5 = AnimElem = 5
+trigger6 = AnimElem = 6
+var(4) = -1
+
+[State 1200, Change to arm retract anim]
+type = Changeanim
+trigger1 = anim = var(10)
+trigger1 = movecontact || !animtime
+value = var(10)+1
+elem = var(4)
+persistent = 0
+
+[State 1200, Change to Stand]
+type = ChangeState
+trigger1 = anim = var(10)+1
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;AIR SPIN SPECIAL
+[Statedef 1500]
+type = A
+movetype = A
+physics = A
+juggle = 1
+ctrl = 0
+anim = 640
+poweradd = 0
+sprpriority = 2
+
+[State 640, Jumping straight up attack]
+type = Changeanim
+trigger1 = vel x = 0
+value = 641
+persistent = 0
+ignorehitpause = 1
+
+[State 640, Attack sound]
+type = PlaySnd
+trigger1 = !time
+value = 640,0
+
+[State 640, HitDef]
+type = HitDef
+triggerall = moveguarded < 1
+trigger1 = animelem = 3 || animelem = 4 || animelem = 5 || animelem = 6 || animelem = 7 || animelem = 8 || animelem = 9
+;trigger1 = hitcount < 5
+attr = A,NA
+damage = 5,1
+animtype = Medium
+guardflag = HA
+priority = 4, Hit
+pauseTime = 4,4
+guard.pauseTime = 2,2
+sparkno = s8001
+;sparkno = 2;s8001
+sparkxy = -10,-22
+guard.sparkno = -1
+hitsound = S200,250 ;5,1
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 2
+ground.hitTime = 15
+ground.velocity = -8
+air.fall = 0
+air.velocity = -3.2, -7.5
+air.hitTime = 25
+id = 640
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 640, Change to Safe Fall]
+type = ChangeState
+trigger1 = !animtime
+value = 948
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;B&T ATTEMPT
+[StateDef 2000] ;BASH N' TOSS
+type = S
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 2000
+sprpriority = 1
+
+[State 2000, Change to Medium or Heavy Version Attempt]
+type = ChangeAnim
+trigger1 = !Time
+trigger1 = var(4) > 1 ;Med or Heavy version
+value = Cond(var(4) = 2,2100,2200)
+persistent = 0
+
+[State 2000, Grab sound]
+type = PlaySnd
+trigger1 = anim != 2200 ;light/medium version
+trigger2 = anim = 2200 && animelem = 6 ;heavy version
+value = 1,0
+persistent = 0
+
+[State 2000, Lunge Medium]
+type = VelSet
+trigger1 = anim = 2100
+x = 5
+persistent = 0
+
+[State 186, BG Fade]
+type = BGPalFX
+trigger1 = anim = 2200 && animelem = 6, < 0
+time = 1
+mul = 200,200,200
+color = Floor(256-(Time*8))
+
+[State 2000, Lose Power Heavy]
+type = PowerAdd
+trigger1 = anim = 2200
+value = -1000
+persistent = 0
+
+[State 251, Angry Sound Heavy]
+type = PlaySnd
+trigger1 = anim = 2200
+value = 2200,0
+channel = 0
+persistent = 0
+
+[State 2000, Angry Shake Heavy]
+type = Offset
+trigger1 = anim = 2200 && animelem = 6, < 0
+x = random%3
+y = random%3
+
+[State 2000, Lunge Heavy]
+type = VelSet
+trigger1 = anim = 2200 && animelem = 6
+x = 14
+
+[State 100, Dash Dust Heavy]
+type = Explod
+trigger1 = anim = 2200 && animelem = 6
+anim = 8102
+pos = -20,0
+sprpriority = -5
+scale = .2,.2
+ownpal = 1
+
+[State 2000, No Auto Turn]
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+
+[State 2000, HitDef - Light Version]
+type = HitDef
+triggerall = var(4) = 1 ;Light version
+trigger1 = !movecontact
+attr = S,ST
+damage = 0,0
+hitflag = M-          ;Affect only ground people who are not being hit
+priority = 1, Miss    ;Throw has low priority, must be miss or dodge type.
+guard.dist = 0
+sparkno = -1
+;sparkxy = -10, -65
+hitsound = 3200,5
+guardsound = S200,340 ;6,0
+forcestand = 1
+fall.recover = 0
+p2facing = 1
+p1StateNo = 2001
+;p2StateNo = 2002
+p1sprpriority = 1
+fall = 1
+id = 2000
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 3200, HitDef - Medium Version]
+type = HitDef
+triggerall = var(4) = 2 ;Medium version
+trigger1 = !movecontact
+attr = S,ST
+damage = 0,0
+hitflag = M-          ;Affect only ground people who are not being hit
+priority = 1, Miss    ;Throw has low priority, must be miss or dodge type.
+guard.dist = 0
+sparkno = -1
+;sparkxy = -10, -65
+hitsound = 3200,5
+forcestand = 1
+fall.recover = 0
+p2facing = 1
+p1StateNo = 2100
+;p2StateNo = 2101
+p1sprpriority = 1
+fall = 1
+id = 2100
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 3200, HitDef - Heavy Version]
+type = HitDef
+triggerall = var(4) = 3 ;Hard version
+trigger1 = !movecontact
+attr = S,ST
+damage = 0,0
+hitflag = M-          ;Affect only ground people who are not being hit
+priority = 1, Miss    ;Throw has low priority, must be miss or dodge type.
+guardflag = MA
+guard.pauseTime = 8,8
+guard.dist = 0
+sparkno = -1
+;sparkxy = -10, -65
+guard.sparkno = -1
+hitsound = 3200,5
+guardsound = S200,340 ;6,0
+forcestand = 1
+fall.recover = 0
+p2facing = 1
+p1StateNo = 2200
+;p2StateNo = 2201
+p1sprpriority = 1
+fall = 1
+id = 2200
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 2000, Change to Stand]
+type = ChangeAnim
+trigger1 = moveguarded
+value = 2002
+persistent = 0
+
+[State 2000, Change to Stand]
+type = Changestate
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;---------------------------
+;B&T LIGHT
+[Statedef 2001]
+type = S
+movetype = A
+physics = N
+poweradd = 0
+
+[State 2001, Targetstate]
+type = TargetState
+trigger1 = !Time
+value = 2002
+
+[State 2000, 1]
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+
+[State 2000, Camera follow Enemy]
+type = Screenbound
+trigger1 = numtarget(2000)
+trigger1 = target(2000),anim = 2004
+trigger1 = target(2000),animelem = 11, < 0
+value = 1
+
+[State 2000, Grab sound]
+type = PlaySnd
+trigger1 = anim = 2001
+trigger1 = AnimElem = 1 || AnimElem = 6
+value = 1,0
+
+[State 2000, Hurt Enemy - Enemy hits Floor]
+type = TargetlifeAdd
+triggerall = anim = 2001
+triggerall = numtarget(2000)
+trigger1 = AnimElem = 5
+value = -35
+id = 2000
+kill = 0 ;don't kill Enemy during Floor bashing
+
+[State 2000, Grab the Enemy 1]
+type = TargetBind
+trigger1 = numtarget(2000)
+trigger1 = anim = 2000
+trigger1 = AnimElem = 2, >= 0 && AnimElem = 3, < 0
+id = 2000
+pos = 72,-77
+
+[State 2000, Grab the Enemy 2]
+type = TargetBind
+trigger1 = numtarget(2000)
+trigger1 = anim = 2000
+trigger1 = AnimElem = 3, >= 0 && AnimElem = 4, < 0
+id = 2000
+pos = 95,-80
+
+[State 2000, Grab and hold the Enemy up 3]
+type = TargetBind
+trigger1 = numtarget(2000)
+trigger1 = anim = 2000
+trigger1 = AnimElem = 4, >= 0
+id = 2000
+pos = 95,-80
+
+[State 2000, Bash n' Toss anim]
+type = Changeanim
+trigger1 = numtarget(2000)
+trigger1 = anim = 2000 && AnimElem = 5, >= 0
+value = 2001
+persistent = 0
+ignorehitpause = 1
+
+[State 2000, 3]
+type = TargetBind
+trigger1 = anim = 2001
+trigger1 = numtarget(2000)
+trigger1 = AnimElem = 1, >= 0 && AnimElem = 2, < 0
+id = 2000
+pos = 59,-101
+
+[State 2000, 3]
+type = TargetBind
+trigger1 = anim = 2001
+trigger1 = numtarget(2000)
+trigger1 = AnimElem = 2, >= 0 && AnimElem = 3, < 0
+id = 2000
+pos = 4,-128
+
+[State 2000, 3]
+type = TargetBind
+trigger1 = anim = 2001
+trigger1 = numtarget(2000)
+trigger1 = AnimElem = 3, >= 0 && AnimElem = 4, < 0
+id = 2000
+pos = -43,-72
+
+[State 2000, 3] ;Enemy hits Floor
+type = TargetBind
+trigger1 = anim = 2001
+trigger1 = numtarget(2000)
+trigger1 = AnimElem = 4, >= 0 && AnimElem = 7, < 0
+id = 2000
+pos = -50,-6
+
+[State 2000, Enemy hits Floor sound]
+type = PlaySnd
+triggerall = anim = 2001
+trigger1 = AnimElem = 4
+value = 200,240
+
+[State 2000, 3]
+type = TargetBind
+trigger1 = anim = 2001
+trigger1 = numtarget(2000)
+trigger1 = AnimElem = 7, >= 0 && AnimElem = 8, < 0
+id = 2000
+pos = -42,-46
+
+[State 2000, 3]
+type = TargetBind
+trigger1 = anim = 2001
+trigger1 = numtarget(2000)
+trigger1 = AnimElem = 8, >= 0 && AnimElem = 9, < 0
+id = 2000
+pos = -32,-59
+
+[State 2000, 3]
+type = TargetBind
+trigger1 = anim = 2001
+trigger1 = numtarget(2000)
+trigger1 = AnimElem = 9, >= 0 && AnimElem = 10, < 0
+id = 2000
+pos = 38,-143
+
+[State 2000, Throw sound]
+type = PlaySnd
+trigger1 = anim = 2001 && AnimElem = 10
+value = 40,0
+
+[State 2000, 3]
+type = TargetBind
+trigger1 = anim = 2001
+trigger1 = numtarget(2000)
+trigger1 = AnimElem = 10, >= 0 && AnimElem = 11, < 0
+id = 2000
+pos = 120,-136
+
+[State 2000, Enemy hits wall sound]
+type = PlaySnd
+triggerall = numtarget(2000)
+trigger1 = target(2000),anim = 2005
+value = 200,360
+persistent = 0
+
+[State 2000, Hurt Enemy - Enemy hits wall]
+type = TargetlifeAdd
+triggerall = numtarget(2000)
+trigger1 = target(2000),anim = 2005
+value = -10
+id = 2000
+persistent = 0
+
+[State 2000, Enemy hits wall effect]
+type = Explod
+triggerall = numtarget(2000)
+trigger1 = target(2000),anim = 2005
+sprpriority = 2
+facing = -1
+postype = front
+bindtime = -1
+pos = 0,Floor(target(2000),Screenpos Y+target(2000),Const(size.mid.pos.y))
+anim = 8003
+;anim = F70
+persistent = 0
+
+[State 2000, Dyanamic face]
+type = Explod
+trigger1 = anim = 2001 && AnimElem = 13, >= 0
+sprpriority = 2
+anim = var(7)+10000
+
+[State 2000, Change to Stand]
+type = Changestate
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;---------------------------
+;ENEMY B&T LIGHT
+[Statedef 2002] ;BASH'D N' TOSS'D
+type = A
+movetype = H
+physics = N
+velset = 0,0
+sprpriority = 0
+
+[State 3200,1]
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+
+[State 2001,1]
+type = SprPriority
+trigger1 = anim = 2004
+value = 2
+persistent = 0
+
+[State 3201, 2] ;Normal grabbed anim
+type = Changeanim2
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),anim = 2000
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = EnemyNear,anim = 2000
+value = 2003
+persistent = 0
+
+[State 3201, 2] ;Bashed n' Tossed anim
+type = Changeanim2
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),anim = 2001
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = EnemyNear,anim = 2001
+value = 2004
+persistent = 0
+
+[State 0, 6] ;Hit Floor effect
+type = Explod
+trigger1 = anim = 2004
+trigger1 = AnimElem = 5
+sprpriority = -5
+anim = F60
+pos = Floor(Const(size.head.pos.y)/3),0
+
+[State 3200, 3] ;Get tossed
+type = VelSet
+trigger1 = anim = 2004 && AnimElem = 12, >= 0
+x = 12
+y = -6
+persistent = 0
+
+[State 2001,1]
+type = Turn
+triggerall = anim = 2004 && AnimElem = 12, < 0
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),facing != facing
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = EnemyNear,facing != facing
+
+[State 3201, 2] ;Change to Air Physics
+type = StateTypeSet
+trigger1 = anim = 2004 && AnimElem = 12, >= 0
+StateType = A
+Physics = A
+persistent = 0
+
+[State 810, 1]
+type = AfterImage
+trigger1 = anim = 2004 && AnimElem = 12
+Time = 30
+length = 16
+framegap = 4
+palcontrast = 48,48,48
+palpostbright = -32,0,0
+palbright = 0,0,0
+paladd = 0,0,0
+palmul = 1.0,1.0,1.0
+trans = add
+persistent = 0
+
+[State 3201, 2] ;Change to Air Physics
+type = AfterImageTime
+trigger1 = anim = 2005
+Time = 30
+persistent = 0
+
+[State 3201, 1] ;Hit Wall
+type = Changeanim2
+triggerall = anim = 2004 && AnimElem = 12, >= 0
+trigger1 = BackEdgeDist <= 12
+trigger2 = FrontEdgeDist <= 12
+value = 2005
+persistent = 0
+ignorehitpause = 1
+
+[State 3304, 4] ;Guessed offset position
+type = posAdd
+trigger1 = anim = 2005
+y = Floor(-Const(size.mid.pos.y))
+x = Floor(BackEdgeDist)
+persistent = 0
+ignorehitpause = 1
+
+[State 3201, 1] ;Hit Wall
+type = posFreeze
+trigger1 = anim = 2005
+ignorehitpause = 1
+
+[State 3201, 1] ;Hit Wall
+type = VelSet
+trigger1 = anim = 2005 && !animtime
+x = (-Vel X)*0.2
+persistent = 0
+ignorehitpause = 1
+
+[State 3201, 1] ;Hit Wall
+type = Turn
+trigger1 = anim = 2005 && !animtime
+ignorehitpause = 1
+
+[State 3201, 2]
+type = SelfState
+triggerall = Time > 20
+trigger1 = anim = 2004 && AnimElem = 12, < 0
+trigger1 = !gethitvar(isbound)
+value = 5050
+
+[State 3201, 2]
+type = SelfState
+triggerall = Time > 20
+trigger1 = anim = 2005 && !animtime
+value = 5035
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;B&T MED
+[StateDef 2100] ;BASH N' TOSS
+type = S
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+sprpriority = 1
+
+[State 2001, Targetstate]
+type = TargetState
+trigger1 = !Time
+value = 2101
+
+[State 2000, 1]
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+
+[State 2000, Camera follow Enemy]
+type = Screenbound
+trigger1 = numtarget(2100)
+trigger1 = target(2100),anim = 2104
+trigger1 = target(2100),animelem = 26, < 0
+value = 1
+
+[State 2000,0] ;Grab sound
+type = PlaySnd
+trigger1 = anim = 2101
+trigger1 = AnimElem = 1 || AnimElem = 6 || AnimElem = 12 || AnimElem = 18
+value = 1,0
+
+[State 3200, 3] ;Enemy hits Floor
+type = TargetlifeAdd
+triggerall = anim = 2101
+triggerall = numtarget(2100)
+trigger1 = AnimElem = 5
+trigger2 = AnimElem = 11
+trigger3 = AnimElem = 17
+value = -25
+id = 2100
+kill = 0 ;don't kill Enemy during Floor bashing
+
+[State 0, 6] ;Hit Floor effect front
+type = Explod
+triggerall = numtarget(2100)
+trigger1 = target,anim = 2104
+trigger1 = target,AnimElem = 5 || target,AnimElem = 13 || target,AnimElem = 21
+sprpriority = 3
+anim = 8004
+postype = p2
+pos = Cond((target(2100),animelem = 13),-Floor(target(2100),Const(size.head.pos.y)/3),Floor(target(2100),Const(size.head.pos.y)/3)),0
+
+[State 0, 6] ;Hit Floor effect back
+type = Explod
+triggerall = numtarget(2100)
+trigger1 = target,anim = 2104
+trigger1 = target,AnimElem = 5 || target,AnimElem = 13 || target,AnimElem = 21
+sprpriority = -3
+anim = 8005
+postype = p2
+pos = Cond((target(2100),animelem = 13),-Floor(target(2100),Const(size.head.pos.y)/3),Floor(target(2100),Const(size.head.pos.y)/3)),0
+
+[State 3200, 3] ;Grab and hold the Enemy up
+type = TargetBind
+trigger1 = numtarget(2100)
+trigger1 = anim = 2100
+trigger1 = AnimElem = 2, >= 0 && AnimElem = 3, < 0
+id = 2100
+pos = 52,-77
+
+[State 3200, 3] ;Grab and hold the Enemy up
+type = TargetBind
+trigger1 = numtarget(2100)
+trigger1 = anim = 2100
+trigger1 = AnimElem = 3, >= 0 && AnimElem = 4, < 0
+id = 2100
+pos = 77,-91
+
+[State 3200, 3] ;Grab and hold the Enemy up
+type = TargetBind
+trigger1 = numtarget(2100)
+trigger1 = anim = 2100
+trigger1 = AnimElem = 4, >= 0
+id = 2100
+pos = 73,-90
+
+[State 3200, 3] ;Bash n' Toss anim
+type = Changeanim
+trigger1 = numtarget(2100)
+trigger1 = anim = 2100 && AnimElem = 5, >= 0
+value = 2101
+persistent = 0
+ignorehitpause = 1
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 1, >= 0 && AnimElem = 2, < 0
+id = 2100
+pos = 59,-101
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 2, >= 0 && AnimElem = 3, < 0
+id = 2100
+pos = 4,-128
+
+[State 3200, 3]
+type = TargetBind
+triggerall = anim = 2101
+triggerall = numtarget(2100)
+trigger1 = AnimElem = 3, >= 0 && AnimElem = 4, < 0
+trigger2 = AnimElem = 15, >= 0 && AnimElem = 16, < 0
+id = 2100
+pos = -43,-72
+
+[State 3200, 3] ;Enemy hits Floor
+type = TargetBind
+triggerall = anim = 2101
+triggerall = numtarget(2100)
+trigger1 = AnimElem = 4, >= 0 && AnimElem = 7, < 0
+trigger2 = AnimElem = 16, >= 0 && AnimElem = 19, < 0
+id = 2100
+pos = -50,-6
+
+[State 2100,0] ;Enemy hits Floor sound
+type = PlaySnd
+trigger1 = anim = 2101 && (AnimElem = 4 || AnimElem = 10 || AnimElem = 16)
+value = 200,240
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 7, >= 0 && AnimElem = 8, < 0
+id = 2100
+pos = -42,-44
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 8, >= 0 && AnimElem = 9, < 0
+id = 2100
+pos = 13,-140
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 9, >= 0 && AnimElem = 10, < 0
+id = 2100
+pos = 92,-124
+
+[State 3200, 3] ;Enemy hits ground
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 10, >= 0 && AnimElem = 13, < 0
+id = 2100
+pos = 135,-6
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 13, >= 0 && AnimElem = 14, < 0
+id = 2100
+pos = 132,-44
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 14, >= 0 && AnimElem = 15, < 0
+id = 2100
+pos = 63,-148
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 19, >= 0 && AnimElem = 20, < 0
+id = 2100
+pos = -42,-46
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 20, >= 0 && AnimElem = 21, < 0
+id = 2100
+pos = -32,-59
+
+[State 2100,0] ;Twirl sound
+type = PlaySnd
+trigger1 = anim = 2101 && AnimElem = 21
+value = 800,0
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 21, >= 0 && AnimElem = 22, < 0
+id = 2100
+pos = 38,-143
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 22, >= 0 && AnimElem = 37, < 0
+id = 2100
+pos = 40,-144
+
+[State 2100,0] ;Throw sound
+type = PlaySnd
+trigger1 = anim = 2101 && AnimElem = 37
+value = 40,0
+
+[State 3200, 3] ;Whirlwind front
+type = Explod
+trigger1 = anim = 2101 && AnimElem = 22
+trigger1 = numtarget(2100)
+anim = 2106
+id = 2106
+pos = 40,-144
+sprpriority = 2
+scale = ((target(2100),Const(size.head.pos.y)*-2.5)/285.0)*target(2100),Const(size.yscale),((target(2100),Const(size.head.pos.y)*-2.5)/285.0)*target(2100),Const(size.yscale) ;try not to look ridiculous vs. abnormally sized enemies
+
+[State 3200, 3] ;Whirlwind back
+type = Explod
+trigger1 = anim = 2101 && AnimElem = 22
+trigger1 = numtarget(2100)
+anim = 2107
+id = 2106
+pos = 40,-144
+sprpriority = -2
+scale = ((target(2100),Const(size.head.pos.y)*-2.5)/285.0)*target(2100),Const(size.yscale),((target(2100),Const(size.head.pos.y)*-2.5)/285.0)*target(2100),Const(size.yscale) ;try not to look ridiculous vs. abnormally sized enemies
+
+[State 3200, 3] ;Turn before tossing Enemy, turn if screen is close in front
+type = Turn
+triggerall = FrontEdgeDist < 120
+trigger1 = anim = 2101
+trigger1 = AnimElem = 36, >= 1 && AnimElem = 37, < 0
+persistent = 0
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2101
+trigger1 = numtarget(2100)
+trigger1 = AnimElem = 37, >= 0 && AnimElem = 38, < 0
+id = 2100
+pos = 120,-136
+
+[State 2100,0] ;Enemy hits wall sound
+type = PlaySnd
+triggerall = numtarget(2100)
+trigger1 = target(2100),anim = 2005
+value = 200,360
+persistent = 0
+
+[State 3200, 3] ;Enemy hits wall
+type = TargetlifeAdd
+triggerall = numtarget(2100)
+trigger1 = target(2100),anim = 2005
+value = -10
+id = 2100
+persistent = 0
+
+[State 0, 6] ;Enemy hits wall effect
+type = Explod
+triggerall = numtarget(2100)
+trigger1 = target(2100),anim = 2005
+sprpriority = 2
+facing = -1
+postype = front
+bindtime = -1
+pos = 0,Floor(target(2100),Screenpos Y+target(2100),Const(size.mid.pos.y))
+anim = 8003
+;anim = F70
+persistent = 0
+
+[State 0, 6] ;Dyanamic face
+type = Explod
+trigger1 = anim = 2101 && AnimElem = 40, >= 0
+sprpriority = 2
+anim = var(7)+10000
+
+[State 3200, 17] ;Change to Stand
+type = Changestate
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;---------------------------
+;ENEMY B&T MED
+[Statedef 2101] ;BASH'D N' TOSS'D
+type = A
+movetype = H
+physics = N
+velset = 0,0
+sprpriority = 0
+
+[State 3200,1]
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+
+[State 2101,1]
+type = SprPriority
+trigger1 = anim = 2104
+value = 2
+persistent = 0
+
+[State 3201, 2] ;Grabbed by neck anim
+type = Changeanim
+triggerall = SelfanimExist(7591)
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),anim = 2100
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = EnemyNear,anim = 2100
+value = 7591
+persistent = 0
+
+[State 3201, 2] ;Grabbed by mid anim
+type = Changeanim2
+triggerall = !SelfanimExist(7591)
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),anim = 2100
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = EnemyNear,anim = 2100
+value = 2003
+persistent = 0
+
+[State 3201, 2] ;Bashed n' Tossed anim
+type = Changeanim2
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),anim = 2101
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = EnemyNear,anim = 2101
+value = 2104
+persistent = 0
+
+;[State 0, 6] ;Hit Floor effect
+;type = Explod
+;triggerall = anim = 2101
+;trigger1 = AnimElem = 5 || AnimElem = 13 || AnimElem = 21
+;sprpriority = -5
+;anim = F60
+;pos = Cond((animelem = 13),-Floor(Const(size.head.pos.y)/3),Floor(Const(size.head.pos.y)/3)),0
+
+[State 3200, 3] ;Get tossed
+type = VelSet
+trigger1 = anim = 2104 && AnimElem = 43, >= 0
+x = 12
+y = -6
+persistent = 0
+
+[State 2101,1]
+type = Turn
+triggerall = anim = 2104 && AnimElem = 43, < 0
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),facing != facing
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = EnemyNear,facing != facing
+
+[State 3201, 2] ;Change to Air Physics
+type = StateTypeSet
+trigger1 = anim = 2104 && AnimElem = 43, >= 0
+StateType = A
+Physics = A
+persistent = 0
+
+[State 810, 1]
+type = AfterImage
+trigger1 = anim = 2104 && AnimElem = 43
+Time = 30
+length = 16
+framegap = 4
+palcontrast = 48,48,48
+;palcontrast = 257,256,256
+palpostbright = -32,0,0
+palbright = 0,0,0
+paladd = 0,0,0
+palmul = 1.0,1.0,1.0
+trans = add
+persistent = 0
+
+[State 3201, 2] ;Change to Air Physics
+type = AfterImageTime
+trigger1 = anim = 2005
+Time = 30
+persistent = 0
+
+[State 3201, 1] ;Hit Wall
+type = Changeanim2
+triggerall = anim = 2104 && AnimElem = 43, >= 0
+trigger1 = BackEdgeDist <= 12
+trigger2 = FrontEdgeDist <= 12
+value = 2005
+persistent = 0
+ignorehitpause = 1
+
+[State 3304, 4] ;Guessed offset position
+type = posAdd
+trigger1 = anim = 2005
+y = Floor(-Const(size.mid.pos.y))
+x = Floor(BackEdgeDist)
+persistent = 0
+ignorehitpause = 1
+
+[State 3201, 1] ;Hit Wall
+type = posFreeze
+trigger1 = anim = 2005
+ignorehitpause = 1
+
+[State 3201, 1] ;Hit Wall
+type = VelSet
+trigger1 = anim = 2005 && !animtime
+x = (-Vel X)*0.2
+persistent = 0
+ignorehitpause = 1
+
+[State 3201, 1] ;Hit Wall
+type = Turn
+trigger1 = anim = 2005 && !animtime
+ignorehitpause = 1
+
+[State 3201, 2]
+type = SelfState
+triggerall = Time > 20
+trigger1 = anim = 2104 && AnimElem = 43, < 0
+trigger1 = !gethitvar(isbound)
+value = 5050
+
+[State 3201, 2]
+type = SelfState
+triggerall = Time > 20
+trigger1 = anim = 2005 && !animtime
+value = 5035
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;B&T HEAVY
+[StateDef 2200] ;BASH N' TOSS
+type = S
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+sprpriority = 1
+
+[State 2001, Targetstate]
+type = TargetState
+trigger1 = !Time
+value = 2201
+
+[State 3200,1]
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+
+[State 3200, Camera follow Enemy]
+type = Screenbound
+trigger1 = numtarget(2200)
+trigger1 = target(2200),anim = 2204
+trigger1 = target(2200),animelem = 42, < 0
+
+[State 2000,0] ;Grab sound
+type = PlaySnd
+trigger1 = anim = 2201
+trigger1 = AnimElem = 1 || AnimElem = 6 || AnimElem = 12 || AnimElem = 18 || AnimElem = 24 || AnimElem = 30
+value = 1,0
+
+[State 3200, 3] ;Enemy hits Floor
+type = TargetlifeAdd
+triggerall = anim = 2201
+triggerall = numtarget(2200)
+trigger1 = AnimElem = 5 || AnimElem = 11 || AnimElem = 17 || AnimElem = 23 || AnimElem = 29
+value = -25
+id = 2200
+kill = 0 ;don't kill Enemy during Floor bashing
+
+[State 0, 6] ;Hit Floor effect front
+type = Explod
+triggerall = numtarget(2200)
+trigger1 = target(2200),anim = 2204
+trigger1 = target(2200),AnimElem = 5 || target(2200),AnimElem = 13 || target(2200),AnimElem = 21 || target(2200),AnimElem = 29 || target(2200),AnimElem = 37
+sprpriority = 3
+postype = p2
+anim = 8004
+pos = Cond((target(2200),animelem = 13),-Floor(target(2200),Const(size.head.pos.y)/3),Floor(target(2200),Const(size.head.pos.y)/3)),0
+
+[State 0, 6] ;Hit Floor effect back
+type = Explod
+triggerall = numtarget(2200)
+trigger1 = target(2200),anim = 2204
+trigger1 = target(2200),AnimElem = 5 || target(2200),AnimElem = 13 || target(2200),AnimElem = 21 || target(2200),AnimElem = 29 || target(2200),AnimElem = 37
+sprpriority = -3
+postype = p2
+anim = 8005
+pos = Cond((target(2200),animelem = 13),-Floor(target(2200),Const(size.head.pos.y)/3),Floor(target(2200),Const(size.head.pos.y)/3)),0
+
+[State 3200, 3] ;Grab and hold the Enemy up
+type = TargetBind
+trigger1 = numtarget(2200)
+trigger1 = anim = 2200
+trigger1 = AnimElem = 8, >= 0 && AnimElem = 9, < 0
+id = 2200
+pos = 77,-91
+
+[State 3200, 3] ;Grab and hold the Enemy up
+type = TargetBind
+trigger1 = numtarget(2200)
+trigger1 = anim = 2200
+trigger1 = AnimElem = 9, >= 0
+id = 2200
+pos = 73,-90
+
+[State 3200, 3] ;Bash n' Toss anim
+type = Changeanim
+trigger1 = numtarget(2200)
+trigger1 = anim = 2200 && AnimElem = 5, >= 0
+value = 2201
+persistent = 0
+ignorehitpause = 1
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2201
+trigger1 = numtarget(2200)
+trigger1 = AnimElem = 1, >= 0 && AnimElem = 2, < 0
+id = 2200
+pos = 59,-101
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2201
+trigger1 = numtarget(2200)
+trigger1 = AnimElem = 2, >= 0 && AnimElem = 3, < 0
+id = 2200
+pos = 4,-128
+
+[State 3200, 3]
+type = TargetBind
+triggerall = anim = 2201
+triggerall = numtarget(2200)
+trigger1 = AnimElem = 3, >= 0 && AnimElem = 4, < 0
+trigger2 = AnimElem = 15, >= 0 && AnimElem = 16, < 0
+trigger3 = AnimElem = 27, >= 0 && AnimElem = 28, < 0
+id = 2200
+pos = -43,-72
+
+[State 3200, 3] ;Enemy hits Floor
+type = TargetBind
+triggerall = anim = 2201
+triggerall = numtarget(2200)
+trigger1 = AnimElem = 4, >= 0 && AnimElem = 7, < 0
+trigger2 = AnimElem = 16, >= 0 && AnimElem = 19, < 0
+trigger3 = AnimElem = 28, >= 0 && AnimElem = 31, < 0
+id = 2200
+pos = -50,-6
+
+[State 2200,0] ;Enemy hits Floor sound
+type = PlaySnd
+trigger1 = anim = 2201
+trigger1 = AnimElem = 4 || AnimElem = 10 || AnimElem = 16 || AnimElem = 22 || AnimElem = 28
+value = 200,240
+
+[State 3200, 3]
+type = TargetBind
+triggerall = anim = 2201
+triggerall = numtarget(2200)
+trigger1 = AnimElem = 7, >= 0 && AnimElem = 8, < 0
+trigger2 = AnimElem = 19, >= 0 && AnimElem = 20, < 0
+id = 2200
+pos = -42,-44
+
+[State 3200, 3]
+type = TargetBind
+triggerall = anim = 2201
+triggerall = numtarget(2200)
+trigger1 = AnimElem = 8, >= 0 && AnimElem = 9, < 0
+trigger2 = AnimElem = 20, >= 0 && AnimElem = 21, < 0
+id = 2200
+pos = 13,-140
+
+[State 3200, 3]
+type = TargetBind
+triggerall = anim = 2201
+triggerall = numtarget(2200)
+trigger1 = AnimElem = 9, >= 0 && AnimElem = 10, < 0
+trigger2 = AnimElem = 21, >= 0 && AnimElem = 22, < 0
+id = 2200
+pos = 92,-124
+
+[State 3200, 3] ;Enemy hits ground
+type = TargetBind
+triggerall = anim = 2201
+triggerall = numtarget(2200)
+trigger1 = AnimElem = 10, >= 0 && AnimElem = 13, < 0
+trigger2 = AnimElem = 22, >= 0 && AnimElem = 25, < 0
+id = 2200
+pos = 135,-6
+
+[State 3200, 3]
+type = TargetBind
+triggerall = anim = 2201
+triggerall = numtarget(2200)
+trigger1 = AnimElem = 13, >= 0 && AnimElem = 14, < 0
+trigger2 = AnimElem = 25, >= 0 && AnimElem = 26, < 0
+id = 2200
+pos = 132,-44
+
+[State 3200, 3]
+type = TargetBind
+triggerall = anim = 2201
+triggerall = numtarget(2200)
+trigger1 = AnimElem = 14, >= 0 && AnimElem = 15, < 0
+trigger2 = AnimElem = 26, >= 0 && AnimElem = 27, < 0
+id = 2200
+pos = 63,-148
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2201
+trigger1 = numtarget(2200)
+trigger1 = AnimElem = 31, >= 0 && AnimElem = 32, < 0
+id = 2200
+pos = -42,-46
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2201
+trigger1 = numtarget(2200)
+trigger1 = AnimElem = 32, >= 0 && AnimElem = 33, < 0
+id = 2200
+pos = -32,-59
+
+[State 2200,0] ;Twirl sound
+type = PlaySnd
+trigger1 = anim = 2201 && AnimElem = 33
+value = 800,0
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2201
+trigger1 = numtarget(2200)
+trigger1 = AnimElem = 33, >= 0 && AnimElem = 34, < 0
+id = 2200
+pos = 38,-143
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2201
+trigger1 = numtarget(2200)
+trigger1 = AnimElem = 34, >= 0 && AnimElem = 49, < 0
+id = 2200
+pos = 40,-144
+
+[State 2200,0] ;Throw sound
+type = PlaySnd
+trigger1 = anim = 2201 && AnimElem = 49
+value = 40,0
+
+[State 3200, 3] ;Whirlwind front
+type = Explod
+trigger1 = anim = 2201 && AnimElem = 34
+trigger1 = numtarget(2200)
+anim = 2106
+id = 2106
+pos = 40,-144
+sprpriority = 2
+scale = ((target(2200),Const(size.head.pos.y)*-2.5)/285.0)*target(2200),Const(size.yscale),((target(2200),Const(size.head.pos.y)*-2.5)/285.0)*target(2200),Const(size.yscale) ;try not to look ridiculous vs. abnormally sized enemies
+
+[State 3200, 3] ;Whirlwind back
+type = Explod
+trigger1 = anim = 2201 && AnimElem = 34
+trigger1 = numtarget(2200)
+anim = 2107
+id = 2106
+pos = 40,-144
+sprpriority = -2
+scale = ((target(2200),Const(size.head.pos.y)*-2.5)/285.0)*target(2200),Const(size.yscale),((target(2200),Const(size.head.pos.y)*-2.5)/285.0)*target(2200),Const(size.yscale) ;try not to look ridiculous vs. abnormally sized enemies
+
+[State 3200, 3] ;Turn before tossing Enemy, turn if screen is close in front
+type = Turn
+triggerall = FrontEdgeDist < 120
+trigger1 = anim = 2201
+trigger1 = AnimElem = 48, >= 1 && AnimElem = 49, < 0
+persistent = 0
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = anim = 2201
+trigger1 = numtarget(2200)
+trigger1 = AnimElem = 49, >= 0 && AnimElem = 50, < 0
+id = 2200
+pos = 120,-136
+
+[State 2200,0] ;Enemy hits wall sound
+type = PlaySnd
+triggerall = numtarget(2200)
+trigger1 = target(2200),anim = 2005
+value = 200,360
+persistent = 0
+
+[State 3200, 3] ;Enemy hits wall
+type = TargetlifeAdd
+triggerall = numtarget(2200)
+trigger1 = target(2200),anim = 2005
+value = -10
+id = 2200
+persistent = 0
+
+[State 0, 6] ;Enemy hits wall effect
+type = Explod
+triggerall = numtarget(2200)
+trigger1 = target(2200),anim = 2005
+sprpriority = 2
+facing = -1
+postype = front
+bindtime = -1
+pos = 0,Floor(target(2200),Screenpos Y+target(2200),Const(size.mid.pos.y))
+anim = 8003
+;anim = F70
+persistent = 0
+
+[State 0, 6] ;Dyanamic face
+type = Explod
+trigger1 = anim = 2201 && AnimElem = 52, >= 0
+sprpriority = 2
+anim = var(7)+10000
+
+[State 3200, 17] ;Change to Stand
+type = Changestate
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;---------------------------
+;ENEMY B&T HEAVY
+[Statedef 2201] ;BASH'D N' TOSS'D
+type = A
+movetype = H
+physics = N
+velset = 0,0
+sprpriority = 0
+
+[State 3200,1]
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+
+[State 2201,1]
+type = SprPriority
+trigger1 = anim = 2204
+value = 2
+persistent = 0
+
+[State 3201, 2] ;Grabbed by neck anim
+type = Changeanim
+triggerall = SelfanimExist(7591)
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),anim = 2200
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = EnemyNear,anim = 2200
+value = 7591
+persistent = 0
+
+[State 3201, 2] ;Grabbed by mid anim
+type = Changeanim2
+triggerall = !SelfanimExist(7591)
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),anim = 2200
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = EnemyNear,anim = 2200
+value = 2003
+persistent = 0
+
+[State 3201, 2] ;Bashed n' Tossed anim
+type = Changeanim2
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),anim = 2201
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = EnemyNear,anim = 2201
+value = 2204
+persistent = 0
+
+;[State 0, 6] ;Hit Floor effect
+;type = Explod
+;triggerall = anim = 2204
+;trigger1 = AnimElem = 5 || AnimElem = 13 || AnimElem = 21 || AnimElem = 29 || AnimElem = 37
+;sprpriority = -5
+;anim = F60
+;pos = Cond((animelem = 13),-Floor(Const(size.head.pos.y)/3),Floor(Const(size.head.pos.y)/3)),0
+
+[State 3200, 3] ;Get tossed
+type = VelSet
+trigger1 = anim = 2204 && AnimElem = 59, >= 0
+x = 12
+y = -6
+persistent = 0
+
+[State 2201,1]
+type = Turn
+triggerall = anim = 2204 && AnimElem = 59, < 0
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),facing != facing
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = EnemyNear,facing != facing
+
+[State 3201, 2] ;Change to Air Physics
+type = StateTypeSet
+trigger1 = anim = 2204 && AnimElem = 59, >= 0
+StateType = A
+Physics = A
+persistent = 0
+
+[State 810, 1]
+type = AfterImage
+trigger1 = anim = 2204 && AnimElem = 59
+Time = 30
+length = 16
+framegap = 4
+palcontrast = 48,48,48
+;palcontrast = 257,256,256
+palpostbright = -32,0,0
+palbright = 0,0,0
+paladd = 0,0,0
+palmul = 1.0,1.0,1.0
+trans = add
+persistent = 0
+
+[State 3201, 2] ;Change to Air Physics
+type = AfterImageTime
+trigger1 = anim = 2005
+Time = 30
+persistent = 0
+
+[State 3201, 1] ;Hit Wall
+type = Changeanim2
+triggerall = anim = 2204 && AnimElem = 59, >= 0
+trigger1 = BackEdgeDist <= 12
+trigger2 = FrontEdgeDist <= 12
+value = 2005
+persistent = 0
+ignorehitpause = 1
+
+[State 3304, 4] ;Guessed offset position
+type = posAdd
+trigger1 = anim = 2005
+y = Floor(-Const(size.mid.pos.y))
+x = Floor(BackEdgeDist)
+persistent = 0
+ignorehitpause = 1
+
+[State 3201, 1] ;Hit Wall
+type = posFreeze
+trigger1 = anim = 2005
+ignorehitpause = 1
+
+[State 3201, 1] ;Hit Wall
+type = VelSet
+trigger1 = anim = 2005 && !animtime
+x = (-Vel X)*0.2
+persistent = 0
+ignorehitpause = 1
+
+[State 3201, 1] ;Hit Wall
+type = Turn
+trigger1 = anim = 2005 && !animtime
+ignorehitpause = 1
+
+[State 3201, 2]
+type = SelfState
+triggerall = Time > 20
+trigger1 = anim = 2204 && AnimElem = 59, < 0
+trigger1 = !gethitvar(isbound)
+value = 5050
+
+[State 3201, 2]
+type = SelfState
+triggerall = Time > 20
+trigger1 = anim = 2005 && !animtime
+value = 5035

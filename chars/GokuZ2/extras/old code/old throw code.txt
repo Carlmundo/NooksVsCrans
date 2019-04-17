@@ -1,0 +1,569 @@
+;----------------------------
+;Goku's State - OLD CODE
+[Statedef 80100000]
+type = S
+movetype = A
+physics = S
+anim = 801
+ctrl = 0
+sprpriority = 1
+
+[State 1000]
+type = width
+trigger1 = anim = 801
+value = 45,30
+
+[State Throw]
+type = targetstate
+trigger1 = !time
+value = 802
+
+[State 182, 1]
+type = screenbound
+trigger1 = 1
+movecamera = 1,0
+value = 1
+
+[State 810, Bind 1]
+type = TargetBind
+trigger1 = AnimElemTime(2) < 0
+pos = 35, 0
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(2) >= 0 && AnimElemTime(3) < 0
+pos = -40, -40
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(3) >= 0 && AnimElemTime(4) < 0
+pos = 0, -40
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+pos = -50, -30
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(5) >= 0 && AnimElemTime(6) < 0
+pos = 50,-65
+
+[State 810, Turn Target]
+type = TargetFacing
+trigger1 = animelemtime(2)=0
+value = 1
+
+[State 811, Turn]
+type = turn
+trigger1 = animelemtime(4)=0
+
+[State 1000]
+type = PosAdd
+trigger1 = animelemtime(4)=0
+x = 10
+
+[State 810, Turn Target]
+type = TargetFacing
+trigger1 = animelemtime(4)=0
+value = 1
+
+[State 810, Throw 11]
+type = TargetState
+trigger1 = AnimElem = 6
+value = 803
+
+[State 200, throw sound]
+type = PlaySnd
+trigger1 = animelem = 5
+value = 20,2
+volume = 150
+
+[State 810, Hurt 11]
+type = TargetLifeAdd
+trigger1 = AnimElem = 6
+value = -ceil(50*fvar(15))
+
+[State 810, hurt]
+type = poweradd
+trigger1 = animelem = 6
+value = 180
+
+[State 801, end]
+type = changestate
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;----------------------------
+;Enemy Thrown State - OLD CODE
+[Statedef 802000000]
+type = S
+movetype = H
+physics = N
+velset = 0,0
+sprpriority = 0
+
+[State 182, 1]
+type = screenbound
+trigger1 = 1
+movecamera = 1,0
+value = 1
+
+[State 802, anim]
+type = changeanim2
+trigger1 = !time
+value = 802
+
+[State 820, 2]
+type = SelfState
+trigger1 = !gethitvar(isbound)
+value = 5050
+
+[State 801, end]
+type = selfstate
+trigger1 = !animtime
+value = 5100
+ctrl = 0
+
+;---------------------------------------------------------------------------
+; Double Knee + Kick Throw
+
+[Statedef 810]
+type = S
+movetype = A
+physics = S
+juggle = 15
+velset = 0,0
+ctrl = 0
+anim = 800
+sprpriority = 1
+facep2 = 1
+poweradd = 20
+
+[State 800, Don't Guard]
+type = attackdist
+trigger1 = 1
+value = 0
+
+[State 800, hit]
+type = hitdef
+trigger1 = animelem=4
+attr = S,NT
+hitflag = M- 
+priority = 1,Miss 
+sparkno = -1
+p1facing = 1
+p2facing = 1
+p1stateno = 811
+guard.dist = 0
+fall = 1
+fall.recover = 0
+hitsound = s800,1
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = animelem = 5
+value = 0, 1
+[State 200, 1]
+type = PlaySnd
+trigger1 = animelem = 5
+value = 5000,0
+channel = 0
+
+[State Idle]
+type = statetypeset
+trigger1 = animelemtime(5)>=0
+movetype = I
+
+[State 800, end]
+type = changestate
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;----------------------------
+;Goku's State (kick throw)
+[Statedef 811]
+type = S
+movetype = A
+physics = S
+anim = 810
+ctrl = 0
+sprpriority = 1
+
+[State 200, Haria voice]
+type = PlaySnd
+trigger1 = !time
+value = 3,12
+
+[State 1000]
+type = width
+trigger1 = anim = 810
+value = 45,0
+
+[State Throw]
+type = targetstate
+trigger1 = !time
+value = 812
+
+[State 182, 1]
+type = screenbound
+trigger1 = 1
+movecamera = 1,0
+value = 1
+
+[State 810, Bind 1]
+type = TargetBind
+trigger1 = AnimElemTime(2) < 0
+pos = 45, 0
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(2) >= 0 && AnimElemTime(3) < 0
+pos = 45, 0
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(3) >= 0 && AnimElemTime(4) < 0
+pos = 55, -60
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+pos = 50, 0
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(5) >= 0 && AnimElemTime(6) < 0
+pos = 50,0
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(6) >= 0 && AnimElemTime(7) < 0
+pos = 50,0
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(7) >= 0 && AnimElemTime(8) < 0
+pos = 50,0
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(8) >= 0 && AnimElemTime(9) < 0
+pos = 32,0
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(9) >= 0 && AnimElemTime(10) < 0
+pos = 45,-60
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(10) >= 0 && AnimElemTime(11) < 0
+pos = 45,-60
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(11) >= 0 && AnimElemTime(12) < 0
+pos = 50,-60
+[State 810, Bind 2-4]
+type = TargetBind
+trigger1 = AnimElemTime(12) >= 0 && AnimElemTime(12) < 2
+pos = 60,-20
+
+[State Idle]
+type = statetypeset
+trigger1 = animelemtime(8)=0
+statetype = A
+physics = A
+
+[State Idle]
+type = velset
+trigger1 = animelemtime(8)=0
+x = 3
+y = -5
+
+[State Idle]
+type = PosAdd
+trigger1 = animelemtime(8)=0
+x = 30
+
+[State 650, 2]
+type = Explod
+trigger1 = animelemtime(3)=0
+anim = 7020
+pos = 40,-65
+postype = p1
+ignorehitpause = 1
+persistent = 0
+sprpriority = 5
+ownpal = 1
+[State 650, 2]
+type = Explod
+trigger1 = animelemtime(8)=0
+anim = 7020
+pos = 35,-65
+postype = p1
+ignorehitpause = 1
+persistent = 0
+sprpriority = 5
+ownpal = 1
+[State 650, 2]
+type = Explod
+trigger1 = animelemtime(11)=0
+anim = 7030
+pos = 50,-65
+postype = p1
+ignorehitpause = 1
+persistent = 0
+sprpriority = 5
+ownpal = 1
+
+[State 650, 2]
+type = PlaySnd
+trigger1 = animelemtime(3)=0
+value = 5, 3
+[State 650, 2]
+type = PlaySnd
+trigger1 = animelemtime(8)=0
+value = 5, 3
+[State 650, 2]
+type = PlaySnd
+trigger1 = animelemtime(11)=0
+value = 5, 2
+
+[State 810, hurt]
+type = targetlifeadd
+trigger1 = animelem = 3
+trigger2 = animelem = 8
+trigger3 = animelem = 11
+value = ceil(-23*fvar(15))
+
+[State 810, hurt]
+type = poweradd
+trigger1 = animelem = 3
+trigger2 = animelem = 8
+trigger3 = animelem = 11
+value = 60
+
+[State 810, hurt]
+type = hitadd
+trigger1 = animelem = 8
+trigger2 = animelem = 11
+value = 1
+
+[State 810, Throw 2]
+type = TargetState
+trigger1 = AnimElemtime(12)=2
+value = 813
+
+[State 801, end]
+type = changestate
+trigger1 = !animtime
+value = 50
+ctrl = 1
+
+;----------------------------
+;Enemy Thrown State (kick throw)
+[Statedef 812]
+type = S
+movetype = H
+physics = N
+velset = 0,0
+sprpriority = 0
+
+[State 802, anim]
+type = changeanim2
+trigger1 = !time
+value = 811
+
+[State 820, 2]
+type = SelfState
+trigger1 = !gethitvar(isbound)
+value = 5050
+
+[State 801, end]
+type = selfstate
+trigger1 = !animtime
+value = 5100
+ctrl = 0
+
+;----------------------------
+;Enemy Thrown State 2 - in air
+[Statedef 813]
+type    = A
+movetype= H
+physics = N
+velset = -5,-7
+poweradd = 40
+
+[State 821, 1] ;Gravity
+type = VelAdd
+Trigger1 = 1
+y = .4
+
+[State 3000, nhb]
+type = nothitby
+trigger1 = 1
+time = 1
+value = SCA
+
+[State 821, 2] ; Recover near ground (use ChangeState)
+type = ChangeState
+triggerall = Vel Y > 0
+triggerall = Pos Y >= -20
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+value = 5200 ;HITFALL_RECOVER
+
+[State 821, 3] ; Recover in mid air (use SelfState)
+type = SelfState
+triggerall = Vel Y > 0
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+value = 5210 ;HITFALL_AIRRECOVER
+
+[State 821, 4] ;Hit ground
+type = SelfState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 5100 ;Hit ground
+
+
+
+
+
+;===========================================================================
+; <<<<< KAMEHAMEHA UPWARDS >>>>>
+; State = 2100
+; Helper : 2101
+;===========================================================================
+
+[Statedef 2100]
+type = S
+physics = S
+movetype = A
+anim = 2100
+ctrl = 0
+velset = 0,0
+sprpriority = 1
+poweradd = -1000
+
+[State 0, Stay in Place]
+type = PosFreeze
+trigger1 = 1
+value = 1
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = time = [0,48]
+flag = noBG
+flag2 = noFG
+
+[State 3000, nhb]
+type = nothitby
+trigger1 = animelemtime(21) < 0
+time = 1
+value = SCA
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = time = 0
+value = 2000,5+random%3
+volume = 355
+channel = 0
+
+[State 200, Kmh charge]
+type = PlaySnd
+trigger1 = time = 10
+trigger2 = time = 30
+value = s2000,10
+volume = 355
+
+[State 3000, superpause]
+type = superpause
+trigger1 = time=5
+time = 40
+p2defmul = 1
+unhittable = 1
+anim = -1
+sound = s2000,0
+darken = 0
+movetime = 40
+
+[State 0, Super FX]
+type = Explod
+trigger1 = time = 5
+anim = 2003
+id = 2003
+pos = -145,52
+postype = p1
+supermovetime = 9999
+pausemovetime = 9999
+supermove = 1
+removetime = 38
+sprpriority = 8
+ownpal = 1
+bindtime = -1
+scale = 1,1
+persistent = 0
+
+[State 0, Charge Ball FX]
+type = Explod
+trigger1 = time = 5
+anim = 2001+10000*(var(2)=0)
+id = 2001
+pos = -31,-57
+postype = p1
+supermovetime = 9999
+pausemovetime = 9999
+supermove = 1
+removetime = 38
+sprpriority = 5
+ownpal = 1
+bindtime = -1
+scale = 1,1
+persistent = 0
+
+[State 0, Ki Gather FX]
+type = Explod
+trigger1 = time = 5
+anim = 2002+10000*(var(2)=0)
+id = 2002
+pos = -31,-57
+postype = p1
+supermovetime = 9999
+pausemovetime = 9999
+supermove = 1
+removetime = 38
+sprpriority = 6
+ownpal = 1
+bindtime = -1
+scale = 1,1
+persistent = 0
+
+[State 2500, bgpalfx1]
+type = bgpalfx
+trigger1 = !time
+time = 43
+color=0
+mul=0,0,0
+
+[state 1215, Smoke FX]
+type = explod
+trigger1 = animelemtime(20)=0
+anim = 1206+(var(2)=0)
+id = 1206
+pos = -25,3
+postype = P1
+sprpriority = 3
+ownpal = 1
+removetime = -2
+persistent = 0
+ignorehitpause = 1
+
+[State 3000, Kamehameha]
+type = helper
+trigger1 = anim=2100 && animelem=20
+helpertype = normal
+stateno = 2101
+ID = 2101
+name = "kameha_up"
+postype = p1
+pos = 40,-67
+ownpal = 1
+
+[State 3000, end]
+type = changestate
+trigger1 = !animtime
+value = 0
+ctrl = 1

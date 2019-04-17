@@ -1,0 +1,1981 @@
+;ウォーリアー召喚
+[Statedef 1100]
+type = S
+movetype = A
+physics = S
+velset = 0,0
+ctrl = 0
+;anim = 1050
+sprpriority = 2
+
+[State 1050, Anim]
+type = ChangeAnim
+trigger1 = PrevStateno != 9000
+trigger1 = time = 0
+value = 1050
+
+[State 1050, flash]
+type = Palfx
+trigger1 = AnimElem = 1
+add = 100,100,200
+mull = 200,200,200
+time = 10
+
+[State 1050, power]
+type = poweradd
+trigger1 = AnimElem = 1
+value = -1000
+
+[State 1100, 0]
+type = Varrandom
+trigger1 = time = 0
+v = 2
+
+[State 1100, 1]
+type = playsnd
+trigger1 = AnimElem = 3
+trigger2 = AnimElem = 9
+value = 6,0
+volume = 255
+
+[State 1100, 2]
+type = helper
+triggerall = numhelper(1100) <= 4
+triggerall = var(2) < 650
+trigger1 = AnimElemTime(3) = 3
+id = 1100
+name = "warrior"
+sprpriority = 4
+pos = -40,-60
+postype = back
+stateno = 1106
+helpertype = player;normal
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+[State 1100, 3]
+type = helper
+triggerall = numhelper(1100) <= 4
+triggerall = var(2) > 650
+trigger1 = AnimElemTime(3) = 3
+id = 1100
+name = "warrior"
+sprpriority = 4
+pos = 80,-600
+postype = p1
+stateno = 1105
+helpertype = player;normal
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+[State 1100, 4]
+type = changestate
+trigger1 = AnimTime = 0
+trigger2 = numhelper(1100) = 5 && AnimElem = 5
+trigger3 = PrevStateNo = 9000
+trigger3 = Anim != 1050
+value = 0
+ctrl = 1
+
+;-----------------------------------------------------------
+;ウォリアー落下出現
+[Statedef 1105]
+type = A
+movetype = I
+physics = N
+velset = 0,0
+anim = 3110
+sprpriority = 3
+
+[State 1105, 0]
+type = destroyself
+triggerall = time = 0
+trigger1 = ishelper(1100) = 1 && numhelper(1100) >= 9
+
+[State 1105, 1]
+type = Gravity
+trigger1 = Time >= 0
+
+[State 1105, 2]
+type = ScreenBound
+trigger1 = Time >= 0
+value = 0
+
+[State 1105, 3]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1220
+
+[State 1105, LifeSet(warrior)]
+type = varset
+trigger1 = time = 0
+v= 3
+value = 250
+
+[State 1105, 4]
+type = assertspecial
+trigger1 = 1
+flag = noshadow
+
+[State 1105, 5]
+type = ChangeState
+trigger1 = pos Y >= 0
+trigger1 = vel Y > 0
+value = 1140
+ctrl = 0
+
+;-----------------------------------------------------------
+;ウォリアー飛び掛り出現
+[Statedef 1106]
+type = A
+movetype = I
+physics = N
+velset = 8,-3
+anim = 1205
+sprpriority = 3
+
+[State 1106, 0]
+type = destroyself
+triggerall = time = 0
+trigger1 = ishelper(1100) = 1 && numhelper(1100) >= 9
+
+[State 1106, 0]
+type = ScreenBound
+trigger1 = Time >= 0
+value = 0
+
+[State 1106, LifeSet(warrior)]
+type = varset
+trigger1 = time = 0
+v= 3
+value = 250
+
+[State 1106, 1]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1220
+
+[State 1106, 2]
+type = Gravity
+trigger1 = Time >= 0
+
+[State 1106, 3]
+type = assertspecial
+trigger1 = 1
+flag = noshadow
+
+[State 1106, 4]
+type = ChangeState
+trigger1 = pos Y >= 0
+trigger1 = vel Y > 0
+value = 1140
+ctrl = 0
+
+;-----------------------------------------------------------
+;ウォリアー通常
+[Statedef 1110]
+type = S
+movetype = I
+physics = N
+velset = 0,0
+anim = 1100
+sprpriority = 3
+
+[State 1110, 0]
+type = Varrandom
+trigger1 = time >= 0
+v = 2
+persistent = 30
+
+[state 1110, 1]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1200
+
+[State 1110, 2]
+type = changestate
+trigger1 = root,life = 0
+value = 1300
+ctrl = 0
+
+[State 1110, 3]
+type = changestate
+trigger1 = p2life > 0
+trigger1 = var(2) < 40
+trigger1 = P2BodyDist X < 30 && p2statetype = S
+value = 1125
+ctrl = 0
+
+[State 1110, 4]
+type = changestate
+trigger1 = var(2) < 40
+trigger1 = p2statetype = A && P2BodyDist X = [0,25]
+value = 1130
+ctrl = 0
+
+[State 1110, 5]
+type = changestate
+triggerall = p2life > 0
+trigger1 = var(2) < 25
+trigger1 = P2BodyDist X = [60,140]
+trigger2 = var(2) < 5
+trigger2 = p2Bodydist X = [0,20]
+value = 1145
+ctrl = 0
+
+[State 1110, 6]
+type = changestate
+trigger1 = var(2) >= 200
+trigger1 = P2BodyDist X >= -70
+value = 1111
+ctrl = 0
+
+[State 1110, 7]
+type = changestate
+trigger1 = P2BodyDist X < -70
+value = 1112
+ctrl = 0
+
+;-----------------------------------------------------------
+;ウォリアー・歩き
+[Statedef 1111]
+type = S
+movetype = I
+physics = N
+velset = 0,0
+anim = 1110
+sprpriority = 3
+
+[State 1111, 0]
+type = Varrandom
+trigger1 = time >= 0
+v = 2
+persistent = 20
+
+[state 1111, 1]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1200
+
+[State 1111, 2]
+type = posadd
+trigger1 = AnimElem = 2
+x = 14
+
+[State 1111, 3]
+type = posadd
+trigger1 = AnimElem = 3
+x = 11
+
+[State 1111, 4]
+type = posadd
+trigger1 = AnimElem = 4
+x = 16
+
+[State 1111, 5]
+type = posadd
+trigger1 = AnimElem = 5
+x = 12
+
+[State 1111, 6]
+type = posadd
+trigger1 = AnimElem = 6
+x = 15
+
+[State 1111, 7]
+type = posadd
+trigger1 = AnimElem = 7
+x = 12
+
+[State 1111, 8]
+type = posadd
+trigger1 = AnimElem = 8
+x = 14
+
+[State 1111, 9]
+type = posadd
+trigger1 = AnimElem = 9
+x = 12
+
+[State 1111, 10]
+type = changestate
+trigger1 = root,life = 0
+value = 1300
+ctrl = 0
+
+[State 1111, 11]
+type = changestate
+trigger1 = var(2) < 30
+trigger1 = p2statetype = A && P2BodyDist X = [0,25]
+value = 1130
+ctrl = 0
+
+[State 1111, 12]
+type = changestate
+trigger1 = var(2) >= 200
+value = 1110
+ctrl = 0
+
+[State 1111, 13]
+type = changestate
+trigger1 = p2life > 0
+trigger1 = var(2) < 50
+trigger1 = P2BodyDist X >= 130 && P2BodyDist X <= 135
+value = 1115
+ctrl = 0
+
+[State 1111, 14]
+type = changestate
+trigger1 = p2life > 0
+trigger1 = var(2) < 50
+trigger1 = P2BodyDist X >= 16 && P2BodyDist X <= 42
+value = 1114
+ctrl = 0
+
+[State 1111, 15]
+type = changestate
+trigger1 = p2life > 0
+trigger1 = var(2) < 60
+trigger1 = P2BodyDist X < 16
+value = 1113
+ctrl = 0
+
+[State 1111, 16]
+type = changestate
+trigger1 = var(2) < 200
+trigger1 = P2BodyDist X < -60
+value = 1112
+ctrl = 0
+
+;-----------------------------------------------------------
+;ウォリアー・ターン
+[Statedef 1112]
+type = S
+movetype = I
+physics = N
+velset = 0,0
+anim = 1105
+sprpriority = 3
+
+[State 1112, 0]
+type = turn
+trigger1 = AnimTime = 0
+
+[state 1112, 1]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1200
+
+[State 1112, 2]
+type = changestate
+trigger1 = root,life = 0
+value = 1300
+ctrl = 0
+
+[State 1112, 3]
+type = changestate
+trigger1 = AnimTime = 0
+value = 1110
+ctrl = 0
+
+;-----------------------------------------------------------
+;ウォリアー・パンチ
+[Statedef 1113]
+type = S
+movetype = A
+physics = N
+velset = 0,0
+anim = 1120
+sprpriority = 3
+
+[state 1113, 1]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1200
+ignorehitpause= 1
+
+[State 1113, 2]
+type = HitDef
+trigger1 = AnimElem = 2
+trigger1 = root,var(53) != 2
+attr = S, NP
+damage = ifelse(root,var(53)=1, 48, 24)
+animtype = Light
+hitflag = MA
+guardflag = MA
+priority = 2, Hit
+pausetime = 12,12
+sparkno = S910
+guard.sparkno = S900
+sparkxy = -10, -48
+hitsound = S2,0
+guardsound = S3,0
+ground.type = High
+ground.slidetime = 10
+ground.hittime  = 10
+ground.velocity = -6
+airguard.velocity = -3,-1
+air.velocity = -4,-2
+air.fall = 1
+
+[State 1113, 3]
+type = HitDef
+trigger1 = AnimElem = 2
+trigger1 = root,var(53) = 2
+attr = S, NP
+damage = (root,var(57)*2)+48
+animtype = Light
+hitflag = MA
+guardflag = MA
+priority = 2, Hit
+pausetime = 12,12
+sparkno = S910
+guard.sparkno = S900
+sparkxy = -10, -48
+hitsound = S2,0
+guardsound = S3,0
+ground.type = High
+ground.slidetime = 10
+ground.hittime  = 10
+ground.velocity = -6
+airguard.velocity = -3,-1
+air.velocity = -4,-2
+air.fall = 1
+
+[State 1113, 4]
+type = changestate
+trigger1 = root,life = 0
+value = 1300
+ctrl = 0
+
+[State 1113, 5]
+type = changestate
+trigger1 = AnimTime = 0
+value = 1110
+
+[State 1113, 6]
+type = changestate
+trigger1 = AnimTime = 0
+trigger1 = P2BodyDist X < 0
+value = 1112
+ctrl = 0
+
+;-----------------------------------------------------------
+;ウォリアー・尻尾攻撃
+[Statedef 1114]
+type = S
+movetype = A
+physics = N
+velset = 0,0
+anim = 1130
+sprpriority = 3
+
+[state 1114, 1]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1200
+ignorehitpause= 1
+
+[State 1114, 2]
+type = HitDef
+trigger1 = AnimElem = 4
+trigger1 = root,var(53) != 2
+attr = S, NP
+damage = ifelse(root,var(53)=1, 64, 32)
+animtype = hard
+hitflag = MA
+guardflag = MA
+priority = 4, Hit
+pausetime = 12,12
+sparkno = S920
+guard.sparkno = S900
+sparkxy = -10, -50
+hitsound = S2,1
+guardsound = S3,0
+ground.type = low
+ground.slidetime = 14
+ground.hittime  = 14
+ground.velocity = -10
+airguard.velocity = -5,-2
+air.velocity = -5,-3
+air.fall = 1
+
+[State 1114, 3]
+type = HitDef
+trigger1 = AnimElem = 4
+trigger1 = root,var(53) = 2
+attr = S, NP
+damage = (root,var(57)*2)+64
+animtype = hard
+hitflag = MA
+guardflag = MA
+priority = 4, Hit
+pausetime = 12,12
+sparkno = S920
+guard.sparkno = S900
+sparkxy = -10, -50
+hitsound = S2,1
+guardsound = S3,0
+ground.type = low
+ground.slidetime = 14
+ground.hittime  = 14
+ground.velocity = -10
+airguard.velocity = -5,-2
+air.velocity = -5,-3
+air.fall = 1
+
+[State 1114, 4]
+type = changestate
+trigger1 = root,life = 0
+value = 1300
+ctrl = 0
+
+[State 1114, 5]
+type = changestate
+trigger1 = AnimTime = 0
+value = 1110
+
+[State 1114, 6]
+type = changestate
+trigger1 = AnimTime = 0
+trigger1 = P2BodyDist X < 0
+value = 1112
+ctrl = 0
+
+;-----------------------------------------------------------
+;ウォリアー・酸吐き
+[Statedef 1115]
+type = S
+movetype = A
+physics = N
+velset = 0,0
+anim = 1140
+sprpriority = 3
+
+[state 1115, 0]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1200
+
+[State 1115, 1]
+type = PlaySnd
+trigger1 = AnimElemTime(2) = 8
+trigger2 = AnimElemTime(2) = 13
+trigger3 = AnimElemTime(2) = 17
+value = 1,3
+volume = 255
+
+[State 1115, 2]
+type = helper
+trigger1 = AnimElemTime(2) = 8
+id = 1005
+name = "Asid"
+sprpriority = 4
+pos = ceil(49*const(size.xscale)), ceil(-55*const(size.yscale))
+postype = p1
+stateno = 1120
+helpertype = normal
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+[State 1115, 3]
+type = helper
+trigger1 = AnimElemTime(2) = 13
+id = 1005
+name = "Asid"
+sprpriority = 4
+pos = ceil(49*const(size.xscale)), ceil(-55*const(size.yscale))
+postype = p1
+stateno = 1121
+helpertype = normal
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+[State 1115, 4]
+type = helper
+trigger1 = AnimElemTime(2) = 17
+id = 1005
+name = "Asid"
+sprpriority = 4
+pos = ceil(49*const(size.xscale)), ceil(-55*const(size.yscale))
+postype = p1
+stateno = 1122
+helpertype = normal
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+[State 1115, 5]
+type = changestate
+trigger1 = root,life = 0
+value = 1300
+
+[State 1115, 6]
+type = changestate
+trigger1 = AnimTime = 0
+value = 1110
+
+[State 1115, 7]
+type = changestate
+trigger1 = AnimTime = 0
+trigger1 = P2BodyDist X < 0
+value = 1112
+ctrl = 0
+
+;------------------------------------------------
+;酸1
+[Statedef 1120]
+type = A
+movetype = A
+physics = N
+velset = 5,-3
+anim = 1005
+sprpriority = 3
+
+[state 1120, 0]
+type = NotHitBy
+trigger1 = time >= 0
+value = ,AA,AT
+ignorehitpause= 1
+
+[State 1120, 1]
+type = veladd
+trigger1 = Time >= 0
+y= .2
+
+[State 1120, 2]
+type = Hitdef
+trigger1 = AnimElemTime(1) >= 1
+attr = A, SP
+animtype  = Hard
+damage    = 12,10
+getpower  = 0
+priority  = 7,Hit
+hitflag = MA
+guardflag = MA
+pausetime = 0,8
+sparkno = -1
+guard.sparkno = -1
+sparkxy = -10,-10
+hitsound   = -1
+guardsound = -1
+ground.type = High
+ground.slidetime = 10
+ground.hittime  = 10
+ground.velocity = -10
+guard.velocity = -8
+air.velocity = -5,-3
+air.fall = 1
+persistent = 0
+
+[State 1120, 3]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA,NP,SP,HP
+slot = 0
+stateno = 1010
+ignorehitpause= 1
+
+[State 1120, 4]
+type = ChangeState
+trigger1 = movecontact
+value = 1010
+ctrl = 0
+
+[State 1120, 5]
+type = ChangeState
+trigger1 = Pos Y >= 0
+trigger1 = Vel Y > 0
+value = 1015
+ctrl = 0
+
+;------------------------------------------------
+;酸2
+[Statedef 1121]
+type = A
+movetype = A
+physics = N
+velset = 4.1,-3
+anim = 1005
+sprpriority = 3
+
+[state 1121, 0]
+type = NotHitBy
+trigger1 = time >= 0
+value = ,AA,AT
+ignorehitpause= 1
+
+[State 1121, 1]
+type = veladd
+trigger1 = Time >= 0
+y= .2
+
+[State 1121, 2]
+type = Hitdef
+trigger1 = AnimElemTime(1) >= 1
+attr = A, SP
+animtype  = Hard
+damage    = 12,10
+getpower  = 0
+priority  = 7,Hit
+hitflag = MA
+guardflag = MA
+pausetime = 0,8
+sparkno = -1
+guard.sparkno = -1
+sparkxy = -10,-10
+hitsound   = -1
+guardsound = -1
+ground.type = High
+ground.slidetime = 10
+ground.hittime  = 10
+ground.velocity = -10
+guard.velocity = -8
+air.velocity = -5,-3
+air.fall = 1
+persistent = 0
+
+[State 1121, 3]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA,NP,SP,HP
+slot = 0
+stateno = 1010
+ignorehitpause= 1
+
+[State 1121, 4]
+type = ChangeState
+trigger1 = movecontact
+value = 1010
+ctrl = 0
+
+[State 1121, 5]
+type = ChangeState
+trigger1 = Pos Y >= 0
+trigger1 = Vel Y > 0
+value = 1015
+ctrl = 0
+
+;------------------------------------------------
+;酸3
+[Statedef 1122]
+type = A
+movetype = A
+physics = N
+velset = 3.2,-3
+anim = 1005
+sprpriority = 3
+
+[state 1122, 0]
+type = NotHitBy
+trigger1 = time >= 0
+value = ,AA,AT
+ignorehitpause= 1
+
+[State 1122, 1]
+type = veladd
+trigger1 = Time >= 0
+y= .2
+
+[State 1122, 2]
+type = Hitdef
+trigger1 = AnimElemTime(1) >= 1
+attr = A, SP
+animtype  = Hard
+damage    = 12,10
+getpower  = 0
+priority  = 7,Hit
+hitflag = MA
+guardflag = MA
+pausetime = 0,8
+sparkno = -1
+guard.sparkno = -1
+sparkxy = -10,-10
+hitsound   = -1
+guardsound = -1
+ground.type = High
+ground.slidetime = 10
+ground.hittime  = 10
+ground.velocity = -10
+guard.velocity = -8
+air.velocity = -5,-3
+air.fall = 1
+persistent = 0
+
+[State 1122, 3]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA,NP,SP,HP
+slot = 0
+stateno = 1010
+ignorehitpause= 1
+
+[State 1122, 4]
+type = ChangeState
+trigger1 = movecontact
+value = 1010
+ctrl = 0
+
+[State 1122, 5]
+type = ChangeState
+trigger1 = Pos Y >= 0
+trigger1 = Vel Y > 0
+value = 1015
+ctrl = 0
+
+;-----------------------------------------------------------
+;ウォリアー・アッパー
+[Statedef 1125]
+type = S
+movetype = A
+physics = N
+velset = 0,0
+anim = 1125
+sprpriority = 3
+
+[state 1125, 1]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1200
+ignorehitpause= 1
+
+[State 1125, 2]
+type = HitDef
+trigger1 = AnimElem = 2
+trigger1 = root,var(53) != 2
+attr = S, NP
+damage = ifelse(root,var(53)=1, 52, 26)
+animtype = hard
+hitflag = MA
+guardflag = MA
+priority = 3, Hit
+pausetime = 14,14
+sparkno = S920
+guard.sparkno = S900
+sparkxy = -10, -58
+hitsound = S2,1
+guardsound = S3,0
+ground.type = Trip
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = -3,-8
+airguard.velocity = -4,-4
+air.velocity = -4,-6
+air.fall = 1
+
+[State 1125, 3]
+type = HitDef
+trigger1 = AnimElem = 2
+trigger1 = root,var(53) = 2
+attr = S, NP
+damage = (root,var(57)*2)+52
+animtype = hard
+hitflag = MA
+guardflag = MA
+priority = 3, Hit
+pausetime = 14,14
+sparkno = S920
+guard.sparkno = S900
+sparkxy = -10, -58
+hitsound = S2,1
+guardsound = S3,0
+ground.type = Trip
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = -3,-8
+airguard.velocity = -4,-4
+air.velocity = -4,-6
+air.fall = 1
+
+[State 1125, 4]
+type = changestate
+trigger1 = root,life = 0
+value = 1300
+ctrl = 0
+
+[State 1125, 5]
+type = changestate
+trigger1 = AnimTime = 0
+value = 1110
+
+[State 1125, 6]
+type = changestate
+trigger1 = AnimTime = 0
+trigger1 = P2BodyDist X < 0
+value = 1112
+ctrl = 0
+
+;-----------------------------------------------------------
+;ウォリアー・サマーソルト
+[Statedef 1130]
+type = A
+movetype = A
+physics = N
+velset = 2,-7
+anim = 3100
+sprpriority = 3
+
+[State 1130, nothit]
+type = NotHitBy
+trigger1 = time = 0
+time = 10
+value = SCA
+
+[state 1130, 0]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1220
+ignorehitpause= 1
+
+[state 1130, 1]
+type = veladd
+trigger1 = Time >= 5
+x= -.02
+y= .5
+
+[State 1130, 2]
+type = HitDef
+trigger1 = 1
+trigger1 = root,var(53) != 2
+attr = A, NP
+damage = ifelse(root,var(53)=1, 72, 36)
+animtype = hard
+hitflag = MA
+guardflag = MA
+priority = 4, Hit
+pausetime = 10,12
+sparkno = S940
+guard.sparkno = S900
+sparkxy = -10, -50
+hitsound = S2,3
+guardsound = S3,0
+ground.type = high
+ground.slidetime = 28
+ground.hittime  = 28
+ground.velocity = -4,-9
+airguard.velocity = -3,-5
+air.velocity = -4,-6
+fall = 1
+air.fall = 1
+persistent = 0
+
+[State 1130, 3]
+type = HitDef
+trigger1 = 1
+trigger1 = root,var(53) = 2
+attr = A, NP
+damage = (root,var(57)*2)+72
+animtype = hard
+hitflag = MA
+guardflag = MA
+priority = 4, Hit
+pausetime = 10,12
+sparkno = S940
+guard.sparkno = S900
+sparkxy = -10, -50
+hitsound = S2,3
+guardsound = S3,0
+ground.type = high
+ground.slidetime = 28
+ground.hittime  = 28
+ground.velocity = -4,-9
+airguard.velocity = -3,-5
+air.velocity = -4,-6
+fall = 1
+air.fall = 1
+persistent = 0
+
+[State 1130, 4]
+type = changeanim
+trigger1 = AnimTime = 0
+value = 3110
+
+[State 1130, 5]
+type = changestate
+trigger1 = pos y >= 0
+trigger1 = vel y > 0
+value = 1140
+ctrl = 0
+
+;-----------------------------------------------------------
+;ウォリアー・サマソ着地
+[Statedef 1140]
+type = S
+movetype = I
+physics = N
+anim = 3120
+velset = 0,0
+sprpriority = 3
+
+[State 1140, 1]
+type = posset
+trigger1 = time = 0
+y= 0
+
+[state 1140, 1]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1200
+
+[State 1140, 2]
+type = changestate
+trigger1 = root,life = 0
+value = 1300
+ctrl = 0
+
+[State 1140, 3]
+type = changestate
+trigger1 = AnimTime = 0
+value = 1110
+ctrl = 0
+
+;-----------------------------------------------------------
+;飛び掛り構え
+[Statedef 1145]
+type = S
+movetype = I
+physics = N
+velset = 0,0
+anim = 1145
+sprpriority = 3
+
+[state 1145, 1]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1200
+ignorehitpause= 1
+
+[State 1145, 2]
+type = changestate
+trigger1 = AnimTime = 0
+value = 1146
+
+;-----------------------------------------------------------
+;飛び掛り
+[Statedef 1146]
+type = A
+movetype = A
+physics = N
+velset = 4,-12
+anim = 1205
+sprpriority = 3
+
+[state 1146, 0]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1220
+ignorehitpause= 1
+
+[state 1146, 1]
+type = gravity
+trigger1 = 1
+
+[State 1146, 2]
+type = HitDef
+trigger1 = 1
+trigger1 = root,var(53) != 2
+attr = A, NP
+damage = ifelse(root,var(53)=1, 60, 30)
+animtype = hard
+hitflag = MA
+guardflag = HA
+priority = 3, Hit
+pausetime = 10,12
+sparkno = S920
+guard.sparkno = S900
+sparkxy = -10, -80
+hitsound = S2,1
+guardsound = S3,0
+ground.type = high
+ground.slidetime = 26
+ground.hittime  = 26
+ground.velocity = -8
+airguard.velocity = -3,-6
+air.velocity = -4,-5
+air.fall = 1
+persistent = 0
+
+[State 1146, 3]
+type = HitDef
+trigger1 = 1
+trigger1 = root,var(53) = 2
+attr = A, NP
+damage = (root,var(57)*2)+60
+animtype = hard
+hitflag = MA
+guardflag = HA
+priority = 3, Hit
+pausetime = 10,12
+sparkno = S920
+guard.sparkno = S900
+sparkxy = -10, -80
+hitsound = S2,1
+guardsound = S3,0
+ground.type = high
+ground.slidetime = 26
+ground.hittime  = 26
+ground.velocity = -8
+airguard.velocity = -3,-6
+air.velocity = -4,-5
+air.fall = 1
+persistent = 0
+
+[State 1146, 4]
+type = changestate
+trigger1 = pos y >= 0
+trigger1 = vel y > 0
+value = 1147
+
+;-----------------------------------------------------------
+;着地
+[Statedef 1147]
+type = S
+movetype = I
+physics = N
+anim = 1146
+velset = 0,0
+sprpriority = 3
+
+[State 1147, 1]
+type = posset
+trigger1 = time = 0
+y= 0
+
+[state 1147, 1]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1200
+
+[State 1147, 2]
+type = changestate
+trigger1 = root,life = 0
+value = 1300
+ctrl = 0
+
+[State 1147, 3]
+type = changestate
+trigger1 = AnimTime = 0
+value = 1110
+ctrl = 0
+
+;------------------------------------------------
+;ウォリアー・地上やられshake
+[Statedef 1200]
+type = S
+movetype = H
+physics = N
+velset = 0,0
+
+[State 1200, 1]
+type = varadd
+trigger1 = time = 0
+v = 3
+value = -(GetHitVar(damage))
+
+[State 1200, 2]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1200
+
+[State 1200, 3]
+type = changeanim
+trigger1 = Time = 0
+value = ifelse(GetHitVar(animtype) = 0, 1150, ifelse(GetHitVar(animtype) = 1, 1155, 1160))
+
+[State 1200, 4] ;State type gets set to aerial if getting hit up
+type = StateTypeSet
+trigger1 = Time = 0
+trigger1 = GetHitVar(yvel) != 0 || GetHitVar(fall)
+trigger2 = Pos Y != 0
+statetype = a
+
+[State 1200, 5]
+type = ChangeState
+trigger1 = HitShakeOver
+trigger1 = GetHitVar(yvel) = 0 && !GetHitVar(fall)
+value = 1210 ;HITG_SLIDE
+
+[State 1200, 6]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 1230
+
+;------------------------------------------------
+;ウォリアー・地上やられslide
+[Statedef 1210]
+type = S
+movetype = H
+physics = S
+
+[State 1210, 1]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1200
+
+[State 1210, 2]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+
+[State 1210, 3]
+type = VelMul
+trigger1 = Time >= GetHitVar(slidetime)
+x = .6
+
+[State 1210, 4]
+type = VelSet
+trigger1 = HitOver
+x = 0
+
+[State 5001, 5]
+type = DefenceMulSet
+trigger1 = HitOver
+value = 1
+
+[State 1210, 5]
+type = changestate
+trigger1 = var(3) <= 0
+trigger2 = root,life = 0
+trigger3 = lose
+value = 1300
+
+[State 1210, 6]
+type = changestate
+trigger1 = HitOver
+trigger1 = var(3) > 0
+value = 1110
+
+;------------------------------------------------
+;ウォリアー・空中やられshake
+[Statedef 1220]
+type = A
+movetype = H
+physics = N
+velset = 0,0
+
+[State 1220, 1]
+type = varadd
+trigger1 = time = 0
+v = 3
+value = -(GetHitVar(damage))
+
+[State 1220, 2]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1220
+
+[State 1220, 3]
+type = changeanim
+trigger1 = Time = 0
+trigger1 = prevstateno != [1220,1272]
+value = 1220
+
+[State 1220, 4]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 1230
+
+;---------------------------------------------------------------------------
+; HITA_UP (initial going up)
+[Statedef 1230]
+type    = A
+movetype= H
+physics = N
+ctrl = 0
+
+[State 1220, 2]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1220
+
+[State 1230, 1]
+type = VelAdd;Gravity
+trigger1 = 1
+y = GetHitVar(yaccel)
+
+[State 1230, 2]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+y = 1
+
+[State 1230, 3]
+type = ChangeState
+trigger1 = HitOver
+trigger2 = Vel Y > 0    ;Hit ground
+trigger2 = Pos Y >= 10  ;.
+value = 1250 ;HITA_FALL
+
+[State 1230, 4]
+type = changestate
+trigger1 = var(3) <= 0
+trigger2 = root,life = 0
+trigger3 = lose
+value = 1310
+
+;----------------------------------------------------------
+; HITA_FALL (knocked up, falling)
+[Statedef 1250]
+type    = A
+movetype= H
+physics = N
+
+[State 1250, 1] ;Change anim when done with transition
+type = VelAdd
+trigger1 = 1
+y = GetHitVar(yaccel)
+
+[State 1220, 2]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1220
+
+[State 1250, 3]
+type = changeanim
+trigger1 = Time = 0
+value = 1250
+
+[State 1250, 6]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 25
+value = 1260 ;HIT_BOUNCE
+
+;-------------------------------------------------------
+; HIT_BOUNCE (hit ground)
+[Statedef 1260]
+type    = L
+movetype= H
+physics = N
+
+[State 1260, 0]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1271
+
+[State 1260, 1]
+type = VelSet
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) = 0
+trigger1 = vel x > 1
+x = 1
+
+[State 1260, EnvShake]
+type = FallEnvShake
+trigger1 = Time = 0
+
+[State 1260, Var] ;Save fall velocity
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = floor(vel y)
+
+[State 1260, 2] ;Hit ground anim (normal)
+type = ChangeAnim
+trigger1 = time = 0
+value = 1260
+
+[State 1260, 4]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 1260, 5]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 1260, 6] ;Reduce speed
+type = VelMul
+trigger1 = Time = 0
+x = 0.75
+
+[State 1260, 7]
+type = ChangeState
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) = 0
+value = 1270 ;HIT_LIEDOWN
+
+[State 126, 8]
+type = PlaySnd
+trigger1 = Time = 1
+value = 4,1
+volume = 255
+
+[State 1260, 11]
+type = PosFreeze
+trigger1 = 1
+
+[State 1260, 12]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 1261
+
+;---------------------------------------------------------------
+; HIT_BOUNCE (bounce into air)
+[Statedef 1261]
+type    = L
+movetype= H
+physics = N
+
+[State 1261, 0]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1271
+
+[State 1261, 1] ;Coming hit ground anim (normal)
+type = ChangeAnim
+trigger1 = time = 0
+value = 1261
+
+[State 1261, 2] ;Coming hit ground anim (for hit up)
+type = HitFallVel
+trigger1 = Time = 0
+
+[State 1261, 4]
+type = PosSet
+trigger1 = Time = 0
+y = 20
+
+[State 1261, 5] ;Acceleration
+type = VelAdd
+trigger1 = 1
+y = .4
+
+[State 1261, 6] ;Hit ground
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 12
+type = ChangeState
+value = 1270
+
+;---------------------------------------------------------
+; HIT_LIEDOWN
+[Statedef 1270]
+type    = L
+movetype= H
+physics = N
+
+[State 1270, 0]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1271
+
+[State 1270, EnvShake]
+type = FallEnvShake
+trigger1 = Time = 0
+
+[State 1270, 1]
+type = ChangeAnim
+trigger1 = time = 0
+value = 1260
+
+[State 1270, 3]
+type = HitFallDamage
+trigger1 = Time = 0
+
+[State 1270, 5]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 1270, Var] ;Get fall velocity
+type = VarSet
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) != 0
+sysvar(1) = floor(vel y)
+
+[State 1270, 6]
+type = PlaySnd
+trigger1 = Time = 0
+trigger1 = !SysVar(0)
+value = 4,2
+volume = 255
+
+[State 1270, 7]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 1270, 9]
+type = ChangeAnim
+persistent = 0
+triggerall = Anim != 1270
+trigger1 = AnimTime = 0
+value = 1270
+
+[State 1270, 11]
+type = VarSet
+trigger1 = SysVar(0)
+trigger1 = Time = 0
+sysvar(0) = 0
+
+[State 1270, 12] ;Friction
+type = VelMul
+trigger1 = 1
+x = 0.85
+
+[State 1270, 13]
+type = ChangeState
+trigger1 = Anim = 1270 && Time >= 60
+value = 1280
+
+;---------------------------------------------------------
+; HITL_SHAKE
+[Statedef 1271]
+type    = L
+movetype= H
+physics = N
+velset = 0,0
+
+[State 1272, 1]
+type = varadd
+trigger1 = time = 0
+v = 3
+value = -(GetHitVar(damage))
+
+[State 1271, 2]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1271
+
+[State 1271, 3] ;Set default anim
+type = ChangeAnim
+trigger1 = 1
+value = ifelse(GetHitVar(yvel) = 0, 1271, 1250)
+
+[State 1271, 4]
+type = ChangeState
+trigger1 = HitShakeOver
+trigger1 = GetHitVar(yvel) = 0
+value = 1272 ;HITL_SLIDE
+
+[State 1271, 5]
+type = ChangeState
+trigger1 = HitShakeOver
+trigger1 = GetHitVar(yvel) != 0
+value = 1230 ;HITA_UP
+
+;--------------------------------------------------------
+; HITL_SLIDE
+[Statedef 1272]
+type    = L
+movetype= H
+physics = C
+
+[State 1272, 1]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1271
+
+[State 1272, 2]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+
+[State 1272, 3]
+type = VelSet
+trigger1 = HitOver
+x = 0
+
+[State 1272, 4] ;Don't show hit ground frame
+type = VarSet
+trigger1 = Time = 0
+sysvar(0) = 1
+
+[State 1272, 5]
+type = changestate
+trigger1 = var(3) <= 0
+value = 1310
+
+[State 1272, 6]
+type = ChangeState
+trigger1 = HitOver
+value = 1270 ;HIT_LIEDOWN
+
+;-----------------------------------------------------
+;起き上がり
+[Statedef 1280]
+type    = L
+movetype= I
+physics = N
+anim = 1280
+
+[State 1280, 2]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+
+[State 1280, 3]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 1280, 4]
+type = HitFallSet
+trigger1 = AnimTime = 0
+value = 1
+
+[State 1280, 5]
+type = HitOverRide
+trigger1 = Time = 0
+time = -1
+attr = SCA, NA, NP, NT, SA, ST, SP, HA, HT, HP
+slot = 0
+stateno = 1271
+
+[State 1280, 6]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 1110
+
+;------------------------------------------------
+;ウォリアー・死亡1
+[Statedef 1300]
+type = S
+movetype = H
+physics = N
+velset = 0,0
+anim = 1170
+sprpriority = 2
+
+[State 1300, varset]
+type = parentvarset
+trigger1 = time = 0 && roundstate <= 2
+v= 52
+value = 1
+
+[State 1300, varadd]
+type = parentvaradd
+trigger1 = time = 0
+v= 57
+value = ifelse(root,var(53)=1, -1, ifelse(root,var(53)=2 && RoundState>2, 0, 1))
+
+[State 1300, screenbound]
+type = ScreenBound
+trigger1 = Time >= 0
+value = 0
+
+[State 1300, 1]
+type = helper
+trigger1 = time = 0
+id = 1100
+name = "warrior"
+sprpriority = 4
+pos = 0,0
+postype = p1
+stateno = 1301
+helpertype = normal
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+[State 1300, varset]
+type = parentvarset
+trigger1 = time = 1
+v= 52
+value = 0
+
+[State 1300, 2]
+type = destroyself
+trigger1 = time = 3
+
+;------------------------------------------------
+;ウォリアー・死亡(normal helper)
+[Statedef 1301]
+type = S
+movetype = H
+physics = N
+velset = 0,0
+anim = 1170
+sprpriority = 2
+
+[State 1301, 1]
+type = playsnd
+trigger1 = AnimElem = 1
+value = 0,3
+volume = 255
+
+[State 1301, 2]
+type = posadd
+trigger1 = time = [10,30]
+x= -3
+
+[State 1301, 3]
+type = destroyself
+trigger1 = time = 210
+
+;-----------------------------------------------------------------
+;吹っ飛び死亡1
+[Statedef 1310]
+type = A
+movetype = H
+physics = N
+anim = 1171
+ctrl = 0
+
+[State 1310, varset]
+type = parentvarset
+trigger1 = time = 0 && roundstate <= 2
+v= 52
+value = 1
+
+[State 1310, nothit]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 1310, varadd]
+type = parentvaradd
+trigger1 = time = 0
+v= 57
+value = ifelse(root,var(53)=1, -1, ifelse(root,var(53)=2 && RoundState>2, 0, 1))
+
+[State 1310, screenbound]
+type = ScreenBound
+trigger1 = Time >= 0
+value = 0
+
+[State 1310, varset]
+type = parentvarset
+trigger1 = time = 1
+v= 52
+value = 0
+
+[State 1310, 2]
+type = changestate
+trigger1 = time = 3
+value = 1311
+
+;------------------------------------------------
+;ふっとび死亡2
+[Statedef 1311]
+type    = A
+movetype= H
+physics = N
+anim = 1171
+ctrl = 0
+
+[State 1311, nothit]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 1310, 1]
+type = VelAdd
+trigger1 = 1
+y = GetHitVar(yaccel)
+
+[State 1310, 2]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+y = 1
+
+[State 1311, 0]
+type = playsnd
+trigger1 = AnimElem = 1
+value = 0,3
+volume = 255
+
+[State 1311, 3]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 1320
+
+;-----------------------------------------------------
+;死亡バウンド
+[Statedef 1320]
+type    = A
+movetype= H
+physics = N
+anim = 1175
+ctrl = 0
+
+[State 1320, screenbound]
+type = ScreenBound
+trigger1 = Time >= 0
+value = 0
+
+[State 1320, 0]
+type = playsnd
+trigger1 = time = 0
+value = 4,1
+
+[State 1320, 1]
+type = posset
+trigger1 = time = 0
+y= 0
+
+[State 1320, 2]
+type = velset
+trigger1 = time = 0
+y= 0
+
+[State 1320, 3]
+type = velset
+trigger1 = AnimElem = 2
+y= -4
+
+[State 1320, 4]
+type = gravity
+trigger1 = AnimElemTime(2) >= 2
+
+[State 1320, 5]
+type = ChangeState
+trigger1 = AnimElemTime(2) >= 2
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 1340
+
+;--------------------------------------------------
+;down
+[Statedef 1340]
+type    = L
+movetype= H
+physics = N
+velset = 0,0
+anim = 1176
+ctrl = 0
+
+[State 1340, screenbound]
+type = ScreenBound
+trigger1 = Time >= 0
+value = 0
+
+[State 1340, 0]
+type = playsnd
+trigger1 = time = 0
+value = 4,2
+
+[State 1340, 1]
+type = posset
+trigger1 = time = 0
+y= 0
+
+[State 1340, 1]
+type = helper
+trigger1 = time = 0
+id = 1100
+name = "warrior"
+sprpriority = 4
+pos = 0,0
+postype = p1
+stateno = 1341
+helpertype = normal
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+[State 1340, 2]
+type = DestroySelf
+trigger1 = Time = 0
+
+;-------------------------------------------------
+;消滅
+[Statedef 1341]
+type    = S
+movetype= H
+physics = N
+velset = 0,0
+anim = 1176
+ctrl = 0
+
+[State 1330, screenbound]
+type = ScreenBound
+trigger1 = Time >= 0
+value = 0
+
+[State 1330, 0]
+type = playsnd
+trigger1 = time = 0
+value = 4,2
+
+[State 1330, 1]
+type = posset
+trigger1 = time = 0
+y= 0
+
+[State 1330, 2]
+type = DestroySelf
+trigger1 = Time = 171
+

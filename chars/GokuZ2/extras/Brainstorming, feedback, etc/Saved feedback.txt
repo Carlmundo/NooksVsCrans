@@ -1,0 +1,35 @@
+-------------------------------------------
+Save some feedback :
+
+- When fixing the errors, a particular problem with Hitvelset may appear.
+Both Mugen docs and Fighter Factory 3 list the Hitvelset as an obsolete code. But although is obsolete, it isn't possible to remove it because the opponent won't recover as expected.
+An example of Hitvelset appears in Goku's state 1115030:
+[State 1115030, Vel]
+type = hitvelset
+trigger1 = !time
+x = 1
+y = 1
+The code makes the exact same effect as the code above without using the Hitvelset. I tested extensively and no side effect appears:
+[State 1115030, 1]
+type = VelSet
+trigger1 = !Time
+x = GetHitVar(xvel) - facing
+y = gethitvar(yvel)
+In the code above, you will notice the "!time". According to DonDrago, codes like "!time" and "!animtime" are faster to process than "time=0" and "animtime=0"
+
+- In FF3 : get rid of this ugly red cross for syntax errors.
+
+- You must be aware of the veladd bug shown by Cyanide and Vans at http://elecbyte.com/forum/index.php?topic=3607.msg24874#msg24874, explained with more details at http://www.vans.trinitymugen.net/home/mugenbug.html .
+The bug affects the states 5030, 5035, 5040, 5050, 5071 and 5200 . Since Goku gets most of these states straight from the common1.cns in Mugen, the veladd bug appears in him.
+
+- Restand bug (see video with Ken):
+	+ In the first situation you can notice Ken returns to the state 5040 20 ticks after the pause time ends. It looks like Mugen uses an air.hittime of 20 by default.
+	+ In the second situation Ken regains control 6 ticks after the hitpause ends as specified.
+	+ I believe that this is the effect that you want. With his current air.velocity of -2,-2 the opponent returns to the floor after mere 4 ticks. Increase a bit more the y value of that air velocity and give an air hittime slightly lower, which ensures that the opponent regains control before reaching the ground.
+-> higher air.vels, lower air.hittime
+
+- Snap Kick still acts weird on parries. On normal version, some characters will have the kick go thru the opponent when a parry is attempted.  On Ex version, either it will go thru the opponent, the opponent will have to be parry it twice, or the parry seems to not activate and they still get hit.
+>>> Most (if not all) of the moves that put the opponent in a custom state do so via a P2StateNo parameter in their HitDef.
+Somehow, it makes the opponent completely immune to said moves whenever they have an active HitOverride with the corresponding attributes.
+For instance, you can parry a fully charged Focus Hammer just fine with Jmorphman's characters (parry via helper with ReversalDef) while Infinite's characters (parry via HitOverride) will walk right through it.
+I'm guessing the correct way to fix it would be to replace all of the P2Stateno parameters with TargetState controllers.

@@ -1,0 +1,4424 @@
+;===========================================================================
+;=====[NEWMOVES' CODE FOR KFM MASTER BY MIKE WEREWOLF]======================
+;===========================================================================
+
+
+;###########################################################################
+;## NOTES ADDITIONNELLES
+;## --------------------
+;##
+;## Afin de rendre plus claire la programmation de certains coups, j'ai
+;## expliqué l'utilisation de certains states avec des blocs de commentaires
+;## décalés d'une tabulation.
+;##
+;## Ces blocs sont placés SOUS le state controller qu'ils détaillent.
+;## J'appelle state controller les blocs ressemblant à ceci :
+;##
+;## [State XXX, Detail]
+;## type = Type_du_Controller
+;## trigger1 = Condition_de_déclenchement
+;## paramètres optionnels propres à chaque state controller
+;##
+;###########################################################################
+
+;###########################################################################
+;## LISTE DES VARIABLES ENTIERES UTILISEES
+;## --------------------------------------
+;##
+;## var(00) = 
+;## var(01) =
+;## var(02) = 
+;## var(03) = 
+;## var(04) = 
+;## var(05) = 
+;## var(06) = 
+;## var(07) = 
+;## var(08) = 
+;## var(09) = 
+;## var(10) = 
+;## var(11) = 
+;## var(12) = 
+;## var(13) = 
+;## var(14) = 
+;## var(15) = 
+;## var(16) = 
+;## var(17) = 
+;## var(18) = 
+;## var(19) = 
+;## var(20) = 
+;## var(21) = 
+;## var(22) = 
+;## var(23) = 
+;## var(24) = 
+;## var(25) = 
+;## var(26) = 
+;## var(27) = 
+;## var(28) = 
+;## var(29) = 
+;## var(30) = 
+;## var(31) = 
+;## var(32) = 
+;## var(33) = 
+;## var(34) = 
+;## var(35) = 
+;## var(36) = 
+;## var(37) = 
+;## var(38) = 
+;## var(39) = 
+;## var(40) = 
+;## var(41) = 
+;## var(42) = 
+;## var(43) = 
+;## var(44) = 
+;## var(45) = 
+;## var(46) = 
+;## var(47) = 
+;## var(48) = 
+;## var(49) = 
+;## var(50) = HelperMoveHit sur WC chain
+;## var(51) = Chain Kung Fu Kicks
+;## var(52) = CommandP2
+;## var(53) = 
+;## var(54) = 
+;## var(55) = Counter Tip
+;## var(56) = Sacrifice Flag
+;## var(57) = Sound Loop On
+;## var(58) = Transversal Moving Vel
+;## var(59) = Test state 220 - Affichage Kung Fu
+;##
+;###########################################################################
+;## LISTE DES VARIABLES FLOTTANTE UTILISEES
+;## ---------------------------------------
+;##
+;## fvar(00) = WC Chain : Target Vel sur rebond
+;## fvar(01) = 
+;## fvar(02) = 
+;## fvar(03) = 
+;## fvar(04) = 
+;## fvar(05) = 
+;## fvar(06) = 
+;## fvar(07) = 
+;## fvar(08) = 
+;## fvar(09) = 
+;## fvar(10) = 
+;## fvar(11) = 
+;## fvar(12) = 
+;## fvar(13) = 
+;## fvar(14) = 
+;## fvar(15) = 
+;## fvar(16) = 
+;## fvar(17) = 
+;## fvar(18) = 
+;## fvar(19) = 
+;## fvar(20) = 
+;## fvar(21) = 
+;## fvar(22) = 
+;## fvar(23) = 
+;## fvar(24) = 
+;## fvar(25) = 
+;## fvar(26) = 
+;## fvar(27) = 
+;## fvar(28) = 
+;## fvar(29) = 
+;## fvar(30) = 
+;## fvar(31) = 
+;## fvar(32) = 
+;## fvar(33) = 
+;## fvar(34) = 
+;## fvar(35) = 
+;## fvar(36) = 
+;## fvar(37) = 
+;## fvar(38) = 
+;## fvar(39) = 
+;##
+;###########################################################################
+
+;===========================================================================
+; TELEPORT / TELEPORTATION
+;===========================================================================
+
+[StateDef 20100]
+type = S
+movetype = I
+physics = N
+anim = 195
+velset = 0,0
+ctrl = 0
+poweradd = 100
+
+;[State 20100, AfterImageEffect]
+;type = AfterImage
+;trigger1 = Time = 0
+;time = 34
+;paladd = 70,70,70
+;palinvert = 1
+;trans = add1
+
+	;--[State Annulé]--[Remplacé par DispEffect]--
+	;--[Explications]--
+	; Crée un effet d'AfterImage : persistence du sprite, décalé dans le
+	; temps, qui crée une traînée.
+	;--[End]--
+
+[State 20100, DispEffect]
+type = Helper
+trigger1 = AnimElem = 6
+name = "Ghost"
+stateno = 20200
+ID = 20100
+postype = p1
+pos = 0,0
+ownpal = 1
+
+	;--[Explications]--
+	; On crée un helper afin d'afficher le "fantôme" de KFM, une image
+	; qui va rester et disparaître petit à petit. A priori, c'est un
+	; effet qu'on ne peut pas recréer avec l'AfterImage.
+	; On a besoin d'un helper pour pouvoir lui appliquer un PalFX, et
+	; pour utiliser une animation utilisant la transparence.
+	;
+	;	-----[Annulé]-----
+	; Vous noterez que le trigger se déclenche sur l'élément n°5 de
+	; l'animation et non sur le n°6. Ceci permet de créer l'helper
+	; à la même position que KFM (postype = p1, pos = 0,0). Sans cela,
+	; on doit placer l'helper après la téléportation, ce qui oblige à
+	; recalculer l'ancienne position X de KFM. Les valeurs Pos étant
+	; relatives à l'écran, et cet écran bougeant lors de la 
+	; téléportation, retrouver la position X initiale de KFM est très
+	; complexe.
+	;	------------------
+	;
+	; Le state a été déplacé avant le state 20100, CancelScreenBound
+	; alors qu'à l'origine, il se trouvait après le state 20100, PosChange.
+	; Ceci créait un petit bug : lorsqu'on faisait le téléport, l'helper
+	; apparaissait alors que KFM n'était pas téléporté, et donc, on
+	; pouvait voir pendant quelques ticks KFM et son helper transparent à
+	; la même position.
+	;
+	; Maintenant, on crée l'helper en même temps qu'on déplace KFM (même
+	; trigger : AnimElem = 6). L'idée de base est toujours la même (créer
+	; l'helper avant que KFM n'ait fait sa téléportation, mais comme ceci
+	; se produit dans le même tick, on ne le constate plus visuellement.
+	;
+	; On renvoit l'helper (qui va de state en state comme un personnage
+	; à part entière) dans un state 20200 où on lui appliquera l'effet
+	; d'estompe.
+	;--[End]--
+
+[State 20100,CancelScreenBound]
+type = ScreenBound
+trigger1 = AnimElem = 6, >=0
+value = 0
+movecamera = 1,1
+
+	;-- [Explications]--
+	; Evite que KFM soit bloqué par les bords de l'écran lors de sa 
+	; téléportation. La caméra suit son mouvement.
+	;--[End]--
+
+[State 20100, Snd]
+type = PlaySnd
+trigger1 = AnimElem = 6
+value = 800,0
+
+	;-- [Explications]--
+	; Joue un son pour le teleport
+	;--[End]--
+
+[State 20100, PosChange]
+type = PosSet
+trigger1 = AnimElem = 6
+X = IfElse((Pos X < (Enemy, Pos X)), (Enemy, Pos X)+140, (Enemy, Pos X)-140)
+
+	;--[Explications]--
+	; Pour le calcul de X, on fait appel à deux variables, qui sont
+	; initialisées dans le CNS d'origine de KFM, dans les states -2.
+	; (newkfm.cns).
+	;
+	; Sachant que ces positions sont celles dans l'écran (et non dans le
+	; le stage), ces valeurs sont forcément comprises entre -160 (bord
+	; gauche) et +160 (bord droit). De là, on en déduit que si Pos X
+	; est inférieur à Pos X de P2, c'est que KFM est sur la gauche, alors
+	; P2 est sur la droite, sinon, c'est l'inverse.
+	;
+	; Il s'agit d'un PosSet, ce qui veut dire qu'on place KFM dans 
+	; l'écran par rapport à l'origine (0,0), qui correspond au centre en
+	; largeur, et au niveau du sol en hauteur. Ici, on ne calcule que X.
+	;
+	; En mettant Enemy, Pos X dans le calcul de X, on revient au même 
+	; niveau que P2. Il n'y a plus ensuite qu'à ajouter une valeur pour 
+	; décaler KFM par rapport à P2.
+	;
+	; La téléportation de KFM doit le faire changer de côté. Pour cela,
+	; on doit connaître le côté occupé par l'adversaire. On a vu que les
+	; deux variables nous permettent de savoir ce paramètres. Dès lors,
+	; on utilise un IfElse pour chacun des deux cas : si KFM est à
+	; gauche, on le fait donc passer à droite en rajoutant 140. Sinon,
+	; c'est qu'il est à droite, et qu'il faut le faire passer à gauche,
+	; en réduisant la valeur X, ce qu'on fait en enlevant 140.
+	;--[End]--
+
+[State 20100, Facing]
+type = Turn
+trigger1 = AnimElem = 6, >= 0
+trigger1 = Facing = Enemy, facing
+
+	;--[Explications]--
+	; Si le facing de KFM est le même que celui de P2, ça veut dire que
+	; les deux personnages regardent dans la même direction. Dans ce
+	; cas, on va retourner KFM pour qu'il fasse face à son adversaire.
+	;
+	; Un second trigger a été rajouté pour corriger un petit bug : si on
+	; lançait le teleport alors que P2 ne faisait pas face à KFM (ex : on
+	; lance le teleport alors que P2 tombe au sol derrière KFM), alors
+	; KFM était retourné dès le début du mouvement, ce qui faisait bizarre.
+	; Désormais, KFM ne peut plus se retourner qu'après le changement de
+	; position.
+	;--[End]--
+
+[State 20100, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+ctrl = 1
+value = 0
+
+	;--[Explications]--
+	; Fin du state, on retourne en stand.
+	;--[End]--
+
+
+[StateDef 20200] ; Effet de persistence qui disparaît
+; Helper Ghost
+type = S
+Movetype = I
+Physics = N
+anim = 20100
+velset = 0,0
+
+[State 20200, Intangible]
+type = PlayerPush
+trigger1 = AnimTime != 0
+value = 0
+
+	;--[Explications]--
+	; On désactive la poussée des joueurs. Normalement, deux personnages
+	; ne peuvent pas se trouver au même endroit (leurs Clsn2 ne peuvent
+	; pas se chevaucher). Avec le PlayerPush, on désactive cette
+	; fonction, pour permettre à l'helper qui est créé de ne pas être
+	; décalé (puisqu'il est créé là où se trouve KFM).
+	;--[End]--
+
+[State 20200, GhostEffect0]
+type = PalFX
+trigger1 = Time = [34,59]
+add = ((33-time)*10),((33-time)*10),((33-time)*10)
+time = 1
+
+	;--[Explications]--
+	; A l'origine, il y avait 27 (oui, 27 !) PalFX afin de créer l'effet
+	; de disparition. Grâce à la formule de calcul du add et un trigger
+	; amélioré, un seul PalFX suffit. Le fonctionnement était strictement
+	; identique. Simplement, le trigger était : time = X (selon le PalFX
+	; à appliquer) et le add comportait des valeurs numériques au lieu
+	; des formules.
+	; 
+	; Les formules permettent d'automatiser le PalFX, et ainsi, de
+	; n'avoir qu'un seul PalFX au lieu des 27. Du coup, le trigger est
+	; appliqué sur l'ensemble des ticks concernés.
+	;
+	; On utilise ici le principe de transparence de Mugen pour faire
+	; disparaître progressivement l'helper. Pour ce faire, on va
+	; simplement annuler l'effet de transparence : ici, l'animation a un
+	; add qui augmente la valeur RVB des pixels ; on va donc utliser
+	; un add négatif pour ramener progressivement la valeur du add de
+	; l'animation à 0.
+	;
+	; Tout d'abord, il faut savoir que l'helper est affiché avec une
+	; animation qui utilise le paramètre de transparence "Add" sur toute
+	; sa durée. Ainsi, à la base, les pixels de l'animations ne sont pas
+	; réellement affichés : comme déjà expliqué dans d'autres tutoriaux,
+	; avec un add, on ajoute les valeurs RVB du sprite aux valeurs RVB
+	; des images situées au-dessous.
+	;
+	; Avec le PalFX, on va additionner des valeurs négatives, si bien
+	; que les valeurs RVB ajoutés aux images situées sous l'animation
+	; (valeurs ajoutées par le 'add' de l'animation, et non par le PalFX)
+	; vont progressivement diminuer, jusqu'à arriver à 0. En effet, si
+	; on ajoute 0 à une valeur RVB, on ne la modifie pas.
+	;
+	; Maintenant, voici le principe :
+	; * L'animation de l'helper dure 60 ticks (donc de 0 à 59), et
+	;   utilise un paramètre de transparence "Add" sur son unique 
+	;   élément.
+	; * On laisse s'écouler 34 ticks (de 0 à 33) en affichant juste
+	;   l'animation normalement.
+	; * A partir du 35ème ticks, et jusqu'à la fin, on va peu à peu
+	;   réduire la transparence du sprite, jusqu'à atteindre un add
+	;   de 0,0,0 (= pas de modification du sprite au-dessous : le sprite
+	;   de l'animation devient invisible.
+	;
+	; Voici comment cela se passe à partir du 35ème tick (time = 34) :
+	; Pour chaque tick où on utilise l'helper, on va ajouter -10 à
+	; chaque composant RVB de l'anim de l'helper (donc au final, enlever
+	; 10 à chaque composant RVB des sprites de l'anim).
+	; 
+	; En réalité on n'applique le PalFX que pendant 1 tick. Pour avoir
+	; un effet continu, on le déclenche à chaque tick, en augmentant
+	; l'intensité du add, grâce à la formule basé sur le time :
+	;
+	; A chaque tick, on ajoute (33-time)*10 à chaque composant. Voici
+	; ce que cela donne quand : 
+	;	time = 34 : (33-34)*10 = -10
+	;	time = 35 : (33-35)*10 = -20
+	;	time = 36 : (33-36)*10 = -30
+	;	...
+	;	time = 59 : (33-59)*10 = -260
+	;
+	; Dans le dernier cas : les composants RVB ont une valeur comprise 
+	; entre 0 et 255, valeur qui ne peut pas sortir de cet intervalle.
+	; Donc la valeur la plus élevée qui soit pour un composant est 255.
+	; En faisant un -260, on obtient donc forcément une valeur négative,
+	; qui sera ramenée à 0. Or un add de 0,0,0 revient à ne rien faire.
+	;
+	; On a alors l'impression que l'animation ne s'affiche plus ; en
+	; fait, elle s'affiche bien, mais elle est invisible !
+	;
+	; Notez que tout ceci n'est possible qu'avec une animation qui 
+	; utilise la transparence. Pour une anim qui aurait utilisé un sub,
+	; on aurait changé la formule en (time-33)*10 pour avoir un add
+	; positif.
+	;--[End]--
+
+[State 20200, DestroySelf]
+type = DestroySelf
+trigger1 = AnimTime = 0
+
+	;--[Explications]--
+	; On est arrivé au bout de l'animation, l'effet de disparition est
+	; arrivé à son terme, on n'a donc plus besoin de l'helper.
+	;
+	; Contrairement au personnage que l'on doit renvoyer continuellement
+	; dans un state, nous allons simplement supprimer l'helper avec
+	; DestroySelf.
+	;--[End]--
+
+;===========================================================================
+; SACRIFICE
+;===========================================================================
+
+[StateDef 21000]
+type = S
+movetype = A
+physics = N
+anim = 0
+velset = 0,0
+ctrl = 0
+
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = numproj = 0
+trigger1 = time > 18
+value = 420
+ctrl = 0
+
+
+[State 21000, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+	;--[Explications]--
+	; Le mode Sacrifice étant activé, et les state -2 se chargeant de
+	; modifier le power et la vie, on n'a plus rien à faire dans ce
+	; state. Une fois l'anim terminée, on revient donc au stand.
+	;--[End]--
+
+
+
+;===========================================================================
+; WOODPROJ
+;===========================================================================
+
+;------------------------------------------------
+
+[StateDef 22000] ; Wood z-button
+type = S
+movetype = A
+physics = N
+anim = 21000
+velset = 0,0
+ctrl = 0
+juggle = 5
+poweradd = 200
+
+[State 22000, SndLaunch]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = 0,4
+
+	;--[Explications]--
+	; Son pour le lancer du projectile.
+	;--[End]--
+
+[State 22000, Proj]
+type = Projectile
+trigger1 = AnimElem = 13
+;-----[Paramètres du Projectile]-----
+ProjID = 22000
+ProjAnim = 650
+ProjHitAnim = 650
+ProjRemAnim = 650
+ProjCancelAnim = 650
+Projscale = 0.7,0.7
+Velocity = 5,0
+RemVelocity = -20,0
+Offset = 65,-40
+;-----[Paramètres du HitDef liés au Proj]-----
+Attr = S, SP
+HitFlag = MAF
+GuardFlag = MA
+AnimType = Hard
+Priority = 5
+Damage = 110, 10
+PauseTime = 15,15
+Guard.PauseTime = 15,15
+SparkNo = 2
+SparkXY = 30,0
+Ground.Type = Low
+Ground.SlideTime = 15
+Guard.SlideTime = 15
+Ground.HitTime = 15
+Guard.HitTime = 15
+Air.HitTime = 15
+Ground.Velocity = -5
+Guard.Velocity = -3
+Air.Velocity = -5,-3
+Air.Juggle = 4
+GetPower = 200,0
+GivePower = 75,10
+hitsound = 5,3
+guardsound = 6,0
+
+	;--[Explications]--
+	; Définition du Projectile et des différents paramètres.
+	;--[End]--
+
+[State 22000, End]
+Type = ChangeState
+Trigger1 = animtime = 0
+Value = 21000
+Ctrl = 0
+
+	;--[Explications]--
+	; Retour en state de stance. On redonne le contrôle.
+	;--[End]--
+
+
+;------------------------------------------------
+
+[StateDef 22100] ; Wood x-button
+type = S
+movetype = A
+physics = N
+anim = 20100
+velset = 0,0
+ctrl = 0
+juggle = 5
+poweradd = 200
+
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S777,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 15
+value = S777,4
+
+
+	;--[Explications]--
+	; Son pour le lancer du projectile.
+	;--[End]--
+
+[State 22100, Proj]
+type = Projectile
+trigger1 = AnimElem = 16
+;-----[Paramètres du Projectile]-----
+ProjID = 22000
+ProjAnim = 20200
+ProjHitAnim = 22150
+ProjRemAnim = 22150
+ProjCancelAnim = 22150
+RemVelocity = 1.5,0
+Projscale = 0.7,0.7
+Velocity = 6,-12
+accel = 0,1
+velmul = 1
+Offset = 65,-57
+;-----[Paramètres du HitDef liés au Proj]-----
+Attr = S, SP
+HitFlag = MAFD
+GuardFlag =
+AnimType = Hard
+Priority = 5
+Damage = 80, 10
+PauseTime = 15,15
+Guard.PauseTime = 15,15
+SparkNo = 2
+SparkXY = 30,0
+Ground.Type = Low
+Ground.SlideTime = 15
+Guard.SlideTime = 15
+Ground.HitTime = 15
+Guard.HitTime = 15
+Air.HitTime = 15
+Ground.Velocity = -5,-7
+Guard.Velocity = -3
+Air.Velocity = -5,-3
+Air.Juggle = 4
+GetPower = 200,0
+GivePower = 75,10
+hitsound = 5,3
+guardsound = 6,0
+fall = 1
+
+
+	;--[Explications]--
+	; Définition du Projectile et des différents paramètres.
+	;--[End]--
+
+[State 22100, End]
+Type = ChangeState
+Trigger1 = AnimTime = 0
+Value = 0
+Ctrl = 1
+
+	;--[Explications]--
+	; Retour en state de stance. On redonne le contrôle.
+	;--[End]--
+
+;------------------------------------------------
+
+[StateDef 22200] ; Wood y-button
+type = S
+movetype = A
+physics = N
+anim = 22200
+velset = 0,0
+ctrl = 0
+juggle = 5
+poweradd = 200
+
+;[State 22200, SndLaunch]
+;type = PlaySnd
+;trigger1 = AnimElem = 3
+;value = 0,4
+
+	;--[Explications]--
+	; Son pour le lancer du projectile.
+	
+	[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 14
+value = S777,3
+	;--[End]--
+
+[State 22200, Proj]
+type = Projectile
+trigger1 = AnimElem = 14
+;-----[Paramètres du Projectile]-----
+ProjID = 22000
+ProjAnim = 22000
+ProjHitAnim = 22100
+ProjRemAnim = 22100
+ProjCancelAnim = 22100
+Projscale = 0.5,0.5
+Velocity = 10,0
+RemVelocity = 1.5,0
+Offset = 65,-57
+;-----[Paramètres du HitDef liés au Proj]-----
+Attr = S, SP
+HitFlag = MAF
+GuardFlag = MA
+AnimType = Hard
+Priority = 5
+Damage = 95, 10
+PauseTime = 15,15
+Guard.PauseTime = 15,15
+SparkNo = 2
+SparkXY = 30,0
+Ground.Type = Low
+Ground.SlideTime = 15
+Guard.SlideTime = 15
+Ground.HitTime = 15
+Guard.HitTime = 15
+Air.HitTime = 15
+Ground.Velocity = -5
+Guard.Velocity = -3
+Air.Velocity = -5,-3
+Air.Juggle = 4
+GetPower = 200,0
+GivePower = 75,10
+hitsound = 5,3
+guardsound = 6,0
+
+
+	;--[Explications]--
+	; Définition du Projectile et des différents paramètres.
+	;--[End]--
+
+[State 22200, End]
+Type = ChangeState
+Trigger1 = AnimTime = 0
+Value = 0
+Ctrl = 1
+
+	;--[Explications]--
+	; Retour en state de stance. On redonne le contrôle.
+	;--[End]--
+
+
+
+;===========================================================================
+; POWER CHARGE
+;===========================================================================
+
+[StateDef 23000]
+type = S
+movetype = I
+physics = N
+anim = 23000
+velset = 0,0
+ctrl = 0
+
+[State 23000, Snd]
+type = PlaySnd
+trigger1 = time = 0
+value = 23000,0
+loop = 1
+channel = 3
+
+	;--[Explications]--
+	; On déclenche le son de charge et on le fait tourner en boucle. On
+	; le stoppera plus tard losrqu'on sortira du state. On attribue un
+	; channel bien spécifique pour être sûr que ce sera ce son qui sera
+	; stoppé et uniquement celui-là.
+	;--[End]--
+
+[State 23000, SndState]
+type = VarSet
+trigger1 = Time = 0
+var(57) = 1
+
+	;--[Explications]
+	; On va utiliser une variable pour savoir qu'un son en loop est joué.
+	; On s'en resservira dans les state -2 : à la fin de ce state, la var
+	; sera remise à 0 (sortie "normale" du state). Si KFM est sorti de ce
+	; state sans que la var soit remise à 0, on activera alors un state -2
+	; qui arrêtera le son.
+	;--[End]
+
+[State 23000, PowerAdd]
+type = PowerAdd
+trigger1 = command = "PCb"
+trigger1 = command = "PCy"
+value = 10
+
+	;--[Explications]--
+	; Tant que la commande PowerCharge est activée, le power augmente
+	; de 10 points par tick (sachant qu'une barre de power vaut 1000 
+	; points).
+	;--[End]--
+
+[State 23000, PalFX]
+type = PalFX
+trigger1 = command = "PCb"
+trigger1 = command = "PCy"
+time = 1
+add = 116,102,10
+invertall = 1
+color = 0
+
+	;--[Explications]--
+	; On applique un effet PalFX à KFM lors de la charge (effet jaune
+	; avec inversion de couleur (négatif). L'effet négatif est appliqué
+	; avant le add.
+	;
+	; On utilise color = 0 afin de rendre KFM en niveau de gris. Cette
+	; opération étant faite avant l'application du add et de l'invertall,
+	; ceci permet de mieux contrôler les couleurs que l'on applique à
+	; notre sprite.
+	;--[End]--
+
+[State 23000, PalFX on end]
+type = PalFX
+trigger1 = Power >= 3000
+add = 255,255,255
+time = 3
+
+	;--[Explications]--
+	; On applique un PalFX lorsque le power est au maximum. Le PalFX rend
+	; KFM tout blanc (grâce à un add maximal) pendant 3 ticks. C'est une
+	; façon de signaler au joueur que le power est au maximum.
+	;--[End]--
+
+[State 23000, EndChargeSnd]
+type = StopSnd
+trigger1 = command != "PCb"
+trigger2 = command != "PCy"
+trigger3 = Power >= 3000
+channel = 3
+
+	;--[Explications]--
+	; On stoppe le son sur le channel utilisé par le son de charge, pour
+	; pouvoir le couper. Les triggers utilisés sont les mêmes que pour la
+	; fin du charge.
+	;--[End]--
+
+[State 23000, EndStateSnd]
+type = VarSet
+trigger1 = command != "PCb"
+trigger2 = command != "PCy"
+trigger3 = Power >= 3000
+var(57) = 0
+
+	;--[Explications]--
+	; Si KFMM sort normalement de ce state (c'est à dire sans être frappé
+	; ou chopé par l'adversaire), on remet la variable "StateSound" à 0,
+	; puisqu'on a arrêté le son avec le controller précédent. Si cette
+	; variable n'est pas remise à 0, alors ce sera un state -2 qui se
+	; chargera de couper le son.
+	;--[End]--
+
+[State 23000, End]
+type = ChangeState
+trigger1 = command != "PCb"
+trigger2 = command != "PCy"
+trigger3 = Power >= 3000
+value = 0
+ctrl = 1
+
+	;--[Explications]--
+	; Fin du state, retour en stance. Il y a ici deux triggers qui 
+	; permettent de sortir du state : soit on lâche la commande
+	; "PowerCharge", soit le power est max.
+	; 
+	; Que se passe-t-il si aucune de ces conditions n'est remplie ?
+	; L'anim 23000 a un loopstart dès le début de l'animation, donc elle
+	; tourne en boucle, ce qui permet de rester dans le state. Du coup,
+	; les autres fonctions (PalFX et PowerAdd) restent actives.
+	;--[End]--
+
+
+;===========================================================================
+; CRUSHING KICKS
+;===========================================================================
+
+[StateDef 24000] ; Low CK
+type = A
+movetype = A
+physics = N
+anim = 24000
+ctrl = 0
+poweradd = 50
+juggle = 4
+
+[State 24000, Snd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,3
+
+	;--[Explications]--
+	; On joue un son pour le mouvement.
+	;--[End]--
+
+[State 24000, VelSet]
+type = VelSet
+trigger1 = Time = 0
+X = 6
+Y = 5
+
+	;--[Explications]--
+	; On donne la vitesse de descente à KFM. Rappel : une vitesse Y
+	; positive signifie que le personnage va vers le bas, et une vitesse
+	; X positive indique que le personnage va vers l'avant.
+	;--[End]--
+
+[State 24000, AfterI]
+type = AfterImage
+trigger1 = Time = 0
+time = 20
+length = 20
+trans = add
+palbright = 0,-30,-30
+paladd = 0,0,0
+palmul = 1,1,1
+
+	;--[Explications]--
+	; On affiche une traînée. On indique paladd = 0,0,0 et palmul = 1,1,1
+	; pour en fait annuler ces paramètres, car leurs valeurs par défaut
+	; modifient l'affichage de base.
+	;--[End]--
+
+[State 24000, HitDef]
+type = HitDef
+trigger1 = AnimElem = 2
+attr = A, NA
+hitflag = MAF
+guardflag = HA
+animtype = medium
+priority = 5, Hit
+damage = 110,10
+pausetime = 15,15
+sparkno = 3
+sparkxy = 0,-37
+ground.type = high
+air.type = low
+ground.slidetime = 15
+ground.hittime = 15
+ground.velocity = -4
+guard.velocity = -3.5
+air.velocity = -3.5,-5
+getpower = 100,20
+givepower = 50,0
+hitsound = 5,2
+guardsound = 6,0
+
+
+	;--[Explications]--
+	; Définition du coup. On utilise le guardflag "HA" afin que le coup
+	; puisse toucher si l'adversaire est accroupi. Le coup ne peut donc
+	; pas être bloqué lorsqu'on est accroupi.
+	;--[End]--
+
+[State 24000, End]
+type = ChangeState
+value = 52
+trigger1 = Pos Y > 20
+ctrl = 1
+
+	;--[Explications]--
+	; Fin du state, mais attention, c'est un state aérien : on ne rend
+	; contrôle que lorsque le personnage atterrit ! Dans le SFF, le
+	; sprite est placé environ 35 pixels au-dessus de l'axe, ce qui fait
+	; que KFM touche le sol quand X = 35. Cependant, on va lui faire
+	; "anticiper" cet atterrissage à X = 20, donc un peu avant que
+	; KFM ne touche le sol réellement.
+	;
+	; On le passe alors en state 52 qui est le state "d'atterrissage"
+	; pour toute action aérienne (saut, coup, airjump...).
+	;--[End]--
+
+;---------------------------------------------------------------------------
+[StateDef 24200] ; Strong CK
+type = A
+movetype = A
+physics = N
+anim = 24000
+ctrl = 0
+poweradd = 50
+juggle = 4
+
+[State 24200, Snd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,3
+
+	;--[Explications]--
+	; On joue un son pour le mouvement.
+	;--[End]--
+
+[State 24200, VelSet]
+type = VelSet
+trigger1 = Time = 0
+X = 6
+Y = 5
+
+	;--[Explications]--
+	; Idem que state 24000.
+	;--[End]--
+
+[State 24200, AfterI]
+type = AfterImage
+trigger1 = Time = 0
+time = 20
+length = 20
+trans = add
+palbright = 0,-30,-30
+paladd = 0,0,0
+palmul = 1,1,1
+
+	;--[Explications]--
+	; Idem que state 24000.
+	;--[End]--
+
+[State 24200, HitDef]
+type = HitDef
+trigger1 = AnimElem = 2
+attr = A, NA
+hitflag = HAF
+guardflag = HA
+animtype = medium
+priority = 5, Hit
+damage = 110,10
+pausetime = 15,15
+sparkno = 3
+sparkxy = 0,-37
+ground.type = high
+air.type = low
+ground.slidetime = 15
+ground.hittime = 15
+ground.velocity = -4
+guard.velocity = -3.5
+air.velocity = -3.5,-5
+getpower = 100,20
+givepower = 50,0
+hitsound = 5,2
+guardsound = 6,0
+
+
+	;--[Explications]--
+	; idem que state 24000.
+	;--[End]--
+
+[State 24200, BackBounce]
+type = ChangeState
+value = 24250
+trigger1 = MoveContact
+
+	;--[Explications]--
+	; La nouveauté du crushing kick strong, c'est qu'il fait
+	; rebondir KFM vers l'arrière. Pour cela,
+	; nous allons renvoyer KFM dans un autre state s'il entre
+	; en contact avec l'adversaire (d'où le trigger MoveContact).
+	;--[End]--
+
+[State 24200, End]
+type = ChangeState
+value = 52
+trigger1 = Pos Y > 20
+ctrl = 1
+
+	;--[Explications]--
+	; Cas où KFM n'entre pas en contact avec l'adversaire : il est
+	; envoyé, comme pour le state 24000, dans le state d'atterrissage,
+	; le 52.
+	;--[End]--
+
+;------------------------------------------------
+
+[StateDef 24250] ; Rebond Arrière
+type = A
+movetype = I
+physics = N
+anim = 24550
+ctrl = 1
+
+[State 24250, BounceVel]
+type = VelSet
+trigger1 = Time = [0,15]
+X = -4
+Y = -4
+
+	;--[Explications]--
+	; KFM a touché l'adversaire : on doit le faire rebondir. Pour cela,
+	; on lui donne une vitesse Y négative qui le fait repartir vers le
+	; haut, et on donne une vitesse X négative pour qu'il reparte vers
+	; l'arrière.
+	;--[End]--
+
+[State 24250, VelVar]
+type = VelAdd
+trigger1 = Time > 18
+Y = IfElse((Vel Y < 7),0.75,0)
+
+	;--[Explications]--
+	; On a donné une vitesse Y négative à KFM pour le faire "rebondir".
+	; Oui, mais avec la gravité, il devrait redescendre au bout d'un 
+	; moment (moment que l'on évalue à 18 ticks, après tests).
+	;
+	; A partir de là, on va progressivement augmenter la vitesse Y.
+	; Celle-ci étant négative, on va la rapprocher de 0, donc en réalité,
+	; on va réduire la vitesse de KFM. Quand la vitesse redevient
+	; positive, KFM commence à descendre. On augmente la vitesse jusqu'à
+	; ce qu'elle soit supérieure à 7, ensuite, on y touche plus (sinon,
+	; KFM redescend trop vite.
+	;--[End]--
+
+[State 24250, End]
+type = ChangeState
+trigger1 = Pos Y > 0
+value = 52
+ctrl = 1
+
+	;--[Explications]--
+	; Fin de state comme pour les states 24000 et 24550 sans rebond.
+	;--[End]--
+
+
+
+;---------------------------------------------------------------------------
+[StateDef 24500] ; Hard CK
+type = A
+movetype = A
+physics = N
+anim = 24000
+ctrl = 0
+poweradd = 50
+juggle = 4
+
+[State 24500, Snd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,3
+
+	;--[Explications]--
+	; On joue un son pour le mouvement.
+	;--[End]--
+
+[State 24500, VelSet]
+type = VelSet
+trigger1 = Time = 0
+X = 6
+Y = 5
+
+	;--[Explications]--
+	; Idem que state 24000.
+	;--[End]--
+
+[State 24500, AfterI]
+type = AfterImage
+trigger1 = Time = 0
+time = 20
+length = 20
+trans = add
+palbright = 0,-30,-30
+paladd = 0,0,0
+palmul = 1,1,1
+
+	;--[Explications]--
+	; Idem que state 24000.
+	;--[End]--
+
+[State 24500, HitDef]
+type = HitDef
+trigger1 = AnimElem = 2
+attr = A, NA
+hitflag = HAF
+guardflag = HA
+animtype = medium
+priority = 5, Hit
+damage = 110,10
+pausetime = 15,15
+sparkno = 3
+sparkxy = 0,-37
+ground.type = high
+air.type = low
+ground.slidetime = 15
+ground.hittime = 15
+ground.velocity = -4
+guard.velocity = -3.5
+air.velocity = -3.5,-5
+getpower = 100,20
+givepower = 50,0
+hitsound = 5,2
+guardsound = 6,0
+
+	;--[Explications]--
+	; idem que state 24000.
+	;--[End]--
+
+[State 24500, FwdBounce]
+type = ChangeState
+value = 24550
+trigger1 = MoveContact
+
+	;--[Explications]--
+	; La nouveauté du crushing kick hard, c'est qu'il fait
+	; rebondir KFM vers l'avant, (comme Evil Ken en middle kick). Pour 
+	; cela, nous allons renvoyer KFM dans un autre state s'il entre
+	; en contact avec l'adversaire (d'où le trigger MoveContact).
+	;--[End]--
+
+[State 24500, End]
+type = ChangeState
+value = 52
+trigger1 = Pos Y > 20
+ctrl = 1
+
+	;--[Explications]--
+	; Cas où KFM n'entre pas en contact avec l'adversaire : il est
+	; envoyé, comme pour le state 24000, dans le state d'atterrissage,
+	; le 52.
+	;--[End]--
+
+
+;------------------------------------------------
+
+[StateDef 24550] ; Rebond Avant
+type = A
+movetype = I
+physics = N
+anim = 24550
+ctrl = 1
+
+[State 24550, BounceVel]
+type = VelSet
+trigger1 = Time = [0,15]
+X = 5
+Y = -4
+
+	;--[Explications]--
+	; KFM a touché l'adversaire : on doit le faire rebondir. Pour cela,
+	; on lui donne une vitesse Y négative qui le fait repartir vers le
+	; haut, et on garde la vitesse X pour qu'il continue vers l'avant.
+	;--[End]--
+
+[State 24550, Turn]
+type = Turn
+trigger1 = Time = 16
+
+	;--[Explications]--
+	; Quand KFM est sur le point de terminer la roulade du rebond, on va
+	; tourner KFM de façon à ce qu'il fasse de nouveau face à son ennemi.
+	;
+	; Grâce aux triggers du CMD, il est alors possible de sortir un
+	; nouveau crushing kick (hard ou low), mais bien sûr, pour cela, il
+	; faut que KFM soit dans le bon sens !
+	;--[End]--
+
+[State 24550, VelVar]
+type = VelAdd
+trigger1 = Time > 18
+Y = IfElse((Vel Y < 7),0.75,0)
+
+	;--[Explications]--
+	; On a donné une vitesse Y négative à KFM pour le faire "rebondir".
+	; Oui, mais avec la gravité, il devrait redescendre au bout d'un 
+	; moment (moment que l'on évalue à 18 ticks, après tests).
+	;
+	; A partir de là, on va progressivement augmenter la vitesse Y.
+	; Celle-ci étant négative, on va la rapprocher de 0, donc en réalité,
+	; on va réduire la vitesse de KFM. Entre -1 et 1, le turn et
+	; l'inversion de vitesse en X s'opèrent. Quand la vitesse redevient
+	; positive, KFM commence à descendre. On augmente la vitesse jusqu'à
+	; ce qu'elle soit supérieure à 7, ensuite, on y touche plus (sinon,
+	; KFM redescend trop vite.
+	;--[End]--
+
+[State 24550, End]
+type = ChangeState
+trigger1 = Pos Y > 0
+value = 52
+ctrl = 1
+
+	;--[Explications]--
+	; Fin de state comme pour les states 24000 et 24550 sans rebond.
+	;--[End]--
+
+
+
+
+
+;===========================================================================
+; KUNG FU KICKS
+;===========================================================================
+
+[StateDef 25000] ; low KFK
+type = S
+movetype = A
+physics = S
+juggle = 4
+anim = 25000
+poweradd = 100
+ctrl = 0
+velset = 6,-6
+
+[State 25000, Snd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,0
+
+	;--[Explications]--
+	; On joue un son pour le mouvement.
+	;--[End]--
+
+[State 25000, Attr]
+type = StateTypeSet
+trigger1 = Pos Y < 0
+statetype = A
+physics = A
+
+	;--[Explications]--
+	; KFM part du sol, donc le state doit début par des attributs de sol
+	; (type = S ; physics = S). Cependant, le coup, lui, est aérien.
+	; Donc dès que KFM va décoller du sol, on va changer le type et le
+	; physics pour qu'ils correspondent à un coup aérien.
+	;--[End]--
+
+[State 25000, Hit]
+type = HitDef
+trigger1 = AnimElem = 2
+attr = A, NA
+hitflag = MAF
+guardflag = MA
+animtype = medium
+priority = 5, Hit
+damage = 100,10
+pausetime = 15,15
+sparkno = 3
+sparkxy = 0,-37
+ground.type = low
+air.type = low
+ground.slidetime = 15
+ground.hittime = 15
+ground.velocity = -8
+guard.velocity = -3.5
+air.velocity = -3.5,-5
+getpower = 100,20
+givepower = 50,0
+hitsound = 5,2
+guardsound = 6,0
+
+
+	;--[Explications]--
+	; Définition du coup. Rien d'exceptionnel.
+	;--[End]--
+
+[State 25000, ChangeAnim]
+type = ChangeAnim
+trigger1 = MoveContact
+value = 25010
+
+	;--[Explications]--
+	; Lorsque le coup touche, on place KFM dans une nouvelle animation,
+	; qui affiche la fin du coup, quand il redescend au sol. Cette anim
+	; ne pouvait pas être dans la même que celle de départ car KFM doit
+	; rester avec le pied en avant tant qu'il ne rencontre rien.
+	;--[End]--
+
+[State 25000, StopVelX]
+type = VelSet
+trigger1 = MoveContact
+X = 3
+
+	;--[Explications]--
+	; L'impact du coup doit ralentir KFM, donc on réduit sa vitesse à 3.
+	;--[End]--
+
+[State 25000, End]
+type = ChangeState
+trigger1 = Time > 20
+trigger1 = Pos Y >= 0
+value = 52
+ctrl = 1
+
+	;--[Explications]--
+	; On renvoit, comme pour le crushing Kick, KFM en state 52 
+	; (atterrissage) quand il touche le sol, ou s'il n'a rien touché au
+	; bout de 20 ticks. On renvoie KFM en state 52 et non en state 0
+	; car on est passé en "mode" aérien avec le StateTypeSet.
+	;--[End]--
+
+;------------------------------------------------
+
+[StateDef 25200] ; Strong KFK
+type = S
+movetype = A
+physics = S
+juggle = 4
+anim = 25500
+poweradd = 100
+ctrl = 0
+velset = 6,-6
+
+[State 25200, Snd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,1
+
+	;--[Explications]--
+	; On joue un son pour le mouvement.
+	;--[End]--
+
+[State 25200, Attr]
+type = StateTypeSet
+trigger1 = Pos Y < 0
+statetype = A
+physics = A
+
+	;--[Explications]--
+	; KFM part du sol, donc le state doit début par des attributs de sol
+	; (type = S ; physics = S). Cependant, le coup, lui, est aérien.
+	; Donc dès que KFM va décoller du sol, on va changer le type et le
+	; physics pour qu'ils correspondent à un coup aérien.
+	;--[End]--
+
+[State 25200, Hit]
+type = HitDef
+trigger1 = AnimElem = 4
+attr = A, NA
+hitflag = MAF
+guardflag = MA
+animtype = medium
+priority = 5, Hit
+damage = 110,10
+pausetime = 15,15
+sparkno = 3
+sparkxy = 0,-37
+ground.type = low
+air.type = low
+ground.slidetime = 15
+ground.hittime = 15
+ground.velocity = -8
+guard.velocity = -3.5
+air.velocity = -3.5,-5
+getpower = 100,20
+givepower = 50,0
+hitsound = 5,3
+guardsound = 6,0
+
+	;--[Explications]--
+	; Définition du coup. Rien d'exceptionnel.
+	;--[End]--
+
+[State 25200, ChangeAnim]
+type = ChangeAnim
+trigger1 = MoveContact
+value = 25510
+
+	;--[Explications]--
+	; Lorsque le coup touche, on place KFM dans une nouvelle animation,
+	; qui affiche la fin du coup, quand il redescend au sol. Cette anim
+	; ne pouvait pas être dans la même que celle de départ car KFM doit
+	; rester avec le pied en avant tant qu'il ne rencontre rien.
+	;--[End]--
+
+[State 25200, StopVelX]
+type = VelSet
+trigger1 = MoveContact
+X = 3
+
+	;--[Explications]--
+	; L'impact du coup doit ralentir KFM, donc on réduit sa vitesse à 3.
+	;--[End]--
+
+[State 25200, End]
+type = ChangeState
+trigger1 = Time >20
+trigger1 = Pos Y >= 0
+value = 52
+ctrl = 1
+
+	;--[Explications]--
+	; On renvoit, comme pour le crushing Kick, KFM en state 52 
+	; (atterrissage) quand il touche le sol, ou s'il n'a rien touché au
+	; bout de 20 ticks. On renvoie KFM en state 52 et non en state 0
+	; car on est passé en "mode" aérien avec le StateTypeSet.
+	;--[End]--
+
+
+;------------------------------------------------
+
+[StateDef 25500] ; hard KFK
+type = S
+movetype = A
+physics = S
+juggle = 4
+anim = 25000
+poweradd = 100
+ctrl = 0
+velset = 6,-6
+
+[State 25500, Snd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,0
+
+	;--[Explications]--
+	; On joue un son pour le mouvement.
+	;--[End]--
+
+[State 25500, Attr]
+type = StateTypeSet
+trigger1 = Pos Y < 0
+statetype = A
+physics = A
+
+	;--[Explications]--
+	; Idem que state 25000.
+	;--[End]--
+
+[State 25500, SetChain]
+type = VarSet
+trigger1 = Time = 0
+var(51) = 1
+
+	;--[Explications]--
+	; On initialise la variable 51 pour noter que le premier coup est
+	; sorti et que l'on peut donc sortir éventuellement le second. Dans
+	; le CMD, un trigger va vérifier la valeur de var(51) ; si var(51) 
+	; vaut 0 (cas lors du premier coup), on utilise le state 25500. Si
+	; var(51) vaut 1 (cas lors du second coup), on utilise le state 
+	; 25600, qui définit le second coup.
+	;
+	; On aura besoin également de réécrire le state 52 pour annuler la
+	; variable si KFM atterrit après le premier coup sans avoir sorti le
+	; second (sinon, la prochaine fois que l'on voudra sortir le coup,
+	; c'est le second coup qui sortira directement). Voir newcommon.cns.
+	;--[End]--
+
+[State 25500, Hit]
+type = HitDef
+trigger1 = AnimElem = 2
+attr = A, NA
+hitflag = MAF
+guardflag = MA
+animtype = medium
+priority = 5, Hit
+damage = 110,10
+pausetime = 15,15
+sparkno = 3
+sparkxy = 0,-37
+ground.type = low
+air.type = low
+ground.slidetime = 20
+ground.hittime = 20
+ground.velocity = -12
+guard.velocity = -3.5
+air.velocity = -3.5,-5
+getpower = 100,20
+givepower = 50,0
+hitsound = 5,2
+guardsound = 6,0
+
+	;--[Explications]--
+	; Idem state 25000.
+	;--[End]--
+
+[State 25500, ChangeAnim]
+type = ChangeAnim
+trigger1 = MoveContact
+value = 25010
+
+	;--[Explications]--
+	; Idem state 25000.
+	;--[End]--
+
+[State 25500, StopVelX]
+type = VelSet
+trigger1 = MoveContact
+X = 3
+
+	;--[Explications]--
+	; Idem State 25000.
+	;--[End]--
+
+[State 25500, End]
+type = ChangeState
+trigger1 = Time > 20
+trigger1 = Pos Y > 0
+value = 52
+ctrl = 1
+
+	;--[Explications]--
+	; Idem State 25000.
+	;--[End]--
+
+;------------------------------------------------
+
+[StateDef 25600] ; Enchaînement Hard KFK
+type = A
+movetype = A
+physics = A
+juggle = 4
+anim = 25500
+poweradd = 100
+ctrl = 0
+vel = 0,0
+
+[State 25600, Snd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,1
+
+	;--[Explications]--
+	; On joue un son pour le mouvement.
+	;--[End]--
+
+[State 25600, VelIni]
+type = VelSet
+trigger1 = Time = 0
+X = 6
+Y = -4
+
+	;--[Explications]--
+	; On initialise une nouvelle vitesse à KFM pour le faire "rebondir"
+	; dans les airs avec ce second coup.
+	;--[End]--
+
+[State 25600, EndChain]
+type = VarSet
+trigger1 = Time = 0
+var(51) = 0
+
+	;--[Explications]--
+	; Le second coup sort : on réinitialise la var(51) pour ne pas
+	; sortir le second coup en premier, la prochaine fois qu'on fera la
+	; commande "kung fu kick".
+	;--[End]--
+
+[State 25600, Hit]
+type = HitDef
+trigger1 = AnimElem = 4
+attr = A, NA
+hitflag = MAF
+guardflag = MA
+animtype = medium
+priority = 5, Hit
+damage = 110,10
+pausetime = 15,15
+sparkno = 3
+sparkxy = 0,-37
+ground.type = low
+air.type = low
+ground.slidetime = 15
+ground.hittime = 15
+ground.velocity = -12
+guard.velocity = -3.5
+air.velocity = -3.5,-5
+getpower = 100,20
+givepower = 50,0
+fall = 1
+hitsound = 5,3
+guardsound = 6,0
+
+	;--[Explications]--
+	; Idem state 25000 sauf qu'on utilise un paramètre "fall = 1" pour
+	; faire tomber l'adversaire sur le second coup.
+	;--[End]--
+
+[State 25600, ChangeAnim]
+type = ChangeAnim
+trigger1 = MoveContact
+value = 25510
+
+	;--[Explications]--
+	; Idem State 25000.
+	;--[End]--
+
+[State 25600, StopVelX]
+type = VelSet
+trigger1 = MoveContact
+X = 3
+
+	;--[Explications]--
+	; Idem State 25000.
+	;--[End]--
+
+[State 25600, End]
+type = ChangeState
+trigger1 = Time > 20
+trigger1 = Pos Y > 0
+value = 52
+ctrl = 1
+
+	;--[Explications]--
+	; Idem state 25000.
+	;--[End]--
+
+
+
+
+;===========================================================================
+; ADDITIONNAL HARD MOVES
+;===========================================================================
+
+;------------------------------------------------
+[StateDef 250] ; Standing Hard Kick
+type = S
+movetype = A
+physics = S
+anim = 250
+juggle = 3
+velset = 0,0
+ctrl = 0
+poweradd = 50
+
+[State 250, Snd]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,2
+
+	;--[Explications]
+	; On joue un son pour le mouvement du coup.
+	;--[End]--
+
+[State 250, Hit]
+type = HitDef
+trigger1 = AnimElem = 4
+attr = S,NA
+hitflag = MAF
+guardflag = MA
+animtype = hard
+priority = 4, Hit
+damage = 85
+pausetime = 12,12
+sparkno = 3
+sparkxy = 0,-94
+ground.type = high
+ground.slidetime = 7
+guard.slidetime = 5
+ground.hittime = 7
+guard.hittime = 5
+ground.velocity = -8
+air.velocity = -4,-3
+hitsound = 5,2
+guardsound = 6,0
+
+	;--[Explications]
+	; On définit un nouveau coup en stand pour KFM. Rien de particulier.
+	;--[End]--
+
+[State 250, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+	;--[Explications]
+	; Fin du coup, on retourne en stand.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 450] ; Crouching Hard Kick
+type = C
+movetype = A
+physics = C
+anim = 440
+juggle = 3
+velset = 0,0
+ctrl = 0
+poweradd = 50
+
+[State 450, Snd]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,2
+
+	;--[Explications]
+	; On joue un son pour le mouvement du coup.
+	;--[End]--
+
+[State 450, Vel]
+type = VelSet
+trigger1 = AnimElem = 3
+X = 15
+
+	;--[Explications]
+	; On donne une vitesse initiale de 15 à KFM au début du troisième
+	; élément de l'animation, pour provoquer une glissade.
+	;--[End]--
+
+[State 450, VelVar]
+type = VelSet
+trigger1 = Vel X > 0
+X = IfElse((Vel X < 0.5),0,(Vel X)*0.9)
+
+	;--[Explications]
+	; La glissade ne fait avancer KFM qu'un tout petit peu, on ne peut
+	; donc pas simplement lui assigner une vitesse initiale, sans quoi,
+	; il va glisser sans s'arrêter.
+	;
+	; Avec ce state, on va réduire progressivement la vitesse de KFM.
+	; Pour cela, on la multiplier par un coefficient inférieur à 1 à
+	; chaque tick. Ce qui donne :
+	; - tick t   : Vel X = 15
+	; - tick t+1 : Vel X = 15*0.9 = 13.5
+	; - tick t+2 : Vel X = 13.5*0.9 = 12.15
+	; - tick t+3 : Vel X = 12.15*0.9 = 10.935
+	; - Etc.
+	;
+	; L'avantage d'utiliser un coefficient (plutôt que de réduire de 1
+	; la vitesse à chaque tick, par exemple) est que comme ce coefficient
+	; s'applique à un chiffre de plus en plus faible, la réduction de
+	; vitesse est de plus en plus faible, ce qui simule assez bien un
+	; freinage.
+	;
+	; L'inconvénient, en revanche, c'est qu'on appliquer ce coefficient
+	; à l'infini, la vitesse ne sera jamais tout à fait égale à 0, et
+	; que les réductions de vitesse étant de plus en plus faibles, elles
+	; sont de moins en moins visibles à l'écran, au point que si on
+	; mettait seulement "X = (Vel X)*0.9", au bout d'un moment, KFM 
+	; donnerait l'impression d'être sur un tapis roulant !
+	;
+	; Pour pallier ce problème, on va poser une condition IfElse : si la
+	; vitesse de KFM devient trop faible (càd ici : inférieure à 0.5),
+	; dans ce cas, on fixe la vitesse à 0, ce qui stoppe complètement
+	; KFM. Et ainsi, la prochaine fois que Mugen arrivera sur ce state,
+	; il ne le déclenchera pas car le trigger utilise le signe 
+	; strictement supérieur à 0.
+	;--[End]--
+
+[State 450, Hit]
+type = HitDef
+trigger1 = AnimElem = 4
+attr = C,NA
+hitflag = MAFD
+guardflag = LA
+animtype = hard
+priority = 4, Hit
+damage = 85
+pausetime = 12,12
+sparkno = 3
+sparkxy = 0,-15
+ground.type = trip
+ground.slidetime = 7
+guard.slidetime = 5
+ground.hittime = 7
+guard.hittime = 5
+ground.velocity = -6
+fall = 1
+down.velocity = -4
+down.hittime = 7
+hitsound = 5,2
+guardsound = 6,0
+
+
+	;--[Explications]
+	; On définit un nouveau coup en crouch pour KFM. Rien de particulier.
+	;--[End]--
+
+[State 450, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+	;--[Explications]
+	; Fin du coup, on retourne en crouch (et non en stand).
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 650] ; Aerial Hard Kick
+type = A
+movetype = A
+physics = A
+anim = 650
+juggle = 3
+ctrl = 0
+poweradd = 50
+
+[State 650, Snd]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,2
+
+	;--[Explications]
+	; On joue un son pour le mouvement du coup.
+	;--[End]--
+
+[State 650, Hit]
+type = HitDef
+trigger1 = AnimElem = 4
+attr = A,NA
+hitflag = MAF
+guardflag = MA
+animtype = hard
+priority = 4, Hit
+damage = 85
+pausetime = 12,12
+sparkno = 3
+sparkxy = 0,0
+ground.type = high
+ground.slidetime = 7
+guard.slidetime = 5
+ground.hittime = 7
+guard.hittime = 5
+ground.velocity = -8
+air.velocity = -4,-3
+hitsound = 5,2
+guardsound = 6,0
+
+
+	;--[Explications]
+	; On définit un nouveau coup en air pour KFM. Rien de particulier.
+	;
+	; Pas de state de fin, puisqu'il s'agit d'un coup aérien normal :
+	; l'anim est infinie (le dernier élément a un temps de -1). On a
+	; précisé un physics = A, ce qui veut dire qu'on utilise les
+	; paramètres aériens, à savoir que KFM est soumis à la gravité,
+	; et que si sa position est > 0 (donc s'il est sous le sol), alors
+	; KFM repasse immédiatement en state 52 (atterrissage).
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 220] ; Standing Hard Punch
+type = S
+movetype = A
+physics = S
+anim = 220
+juggle = 3
+velset = 0,0
+ctrl = 0
+poweradd = 50
+
+
+[State 220, Snd]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,2
+
+[State 220, Snd]
+type = PlaySnd
+trigger1 = time = 1
+value = s777,6
+
+
+	;--[Explications]
+	; On change la largeur de KFM, pour éviter que sur ce mouvement, il
+	; ne rentre "dans" son adversaire ; en changeant le width sur ce 
+	; coup, KFM va pousser son adversaire si ce dernier est trop près de
+	; lui.
+	;
+	; On utilise deux triggers car ce changement de largeur se produit
+	; fois : au début et à la fin du coup.
+	;
+	; En fait, on règle la largeur qui va être ajoutée à celle déjà 
+	; existante (dans [size], paramètre ground.front ; ici, 16). Donc
+	; la nouvelle largeur de KFM sur ces deux triggers sera de 16+24 = 40.
+	;--[End]--
+
+	; Même principe qu'au-dessus, sauf que la largeur ajoutée est
+	; différente. Ce Width s'applique entre les deux triggers du Width
+	; précédent.
+	;--[End]--
+
+[State 220, Hit]
+type = HitDef
+trigger1 = time = 0
+attr = S,NA
+hitflag = MAF
+guardflag = MA
+animtype = hard
+priority = 4, Hit
+damage = 45
+pausetime = 8,8
+sparkno = 3
+sparkxy = 0,-60
+ground.type = low
+ground.slidetime = 7
+guard.slidetime = 5
+ground.hittime = 7
+guard.hittime = 5
+ground.velocity = -8
+air.velocity = -4,-3
+hitsound = 5,2
+guardsound = 6,0
+
+
+	;--[Explications]
+	; On définit un nouveau coup en stand pour KFM. Rien de particulier.
+	;--[End]--
+
+[State 220, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+	;--[Explications]
+	; Fin du coup, on retourne en crouch (et non en stand).
+	;--[End]--
+
+
+;------------------------------------------------
+[StateDef 420] ; Crouching Hard Punch
+type = C
+movetype = A
+physics = C
+anim = 420
+juggle = 3
+velset = 0,0
+ctrl = 0
+poweradd = 50
+
+
+
+
+	;--[Explications]
+	; On définit un nouveau coup en crouch pour KFM. Rien de particulier.
+	;--[End]--
+
+[State 420, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+	;--[Explications]
+	; Fin du coup, on retourne en crouch (et non en stand).
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 620] ; Aerial Hard Punch
+type = A
+movetype = A
+physics = A
+anim = 620
+juggle = 3
+ctrl = 0
+poweradd = 50
+
+[State 620, Snd]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,2
+
+	;--[Explications]
+	; On joue un son pour le mouvement du coup.
+	;--[End]--
+
+[State 620, Hit]
+type = HitDef
+trigger1 = AnimElem = 2
+trigger2 = AnimElem = 4
+attr = A,NA
+hitflag = MAF
+guardflag = MA
+animtype = hard
+priority = 4, Hit
+damage = 60
+pausetime = 3,12
+sparkno = 3
+sparkxy = 0,-55
+ground.type = high
+ground.slidetime = 7
+guard.slidetime = 5
+ground.hittime = 7
+guard.hittime = 5
+ground.velocity = -8
+air.velocity = -4,-3
+hitsound = 5,2
+guardsound = 6,0
+
+
+	;--[Explications]
+	; On définit un nouveau coup en air pour KFM. Rien de particulier.
+	;
+	; Pas de state de fin, puisqu'il s'agit d'un coup aérien normal :
+	; l'anim est infinie (le dernier élément a un temps de -1). On a
+	; précisé un physics = A, ce qui veut dire qu'on utilise les
+	; paramètres aériens, à savoir que KFM est soumis à la gravité,
+	; et que si sa position est > 0 (donc s'il est sous le sol), alors
+	; KFM repasse immédiatement en state 52 (atterrissage).
+	;--[End]--
+
+
+
+
+;===========================================================================
+; ROLL CANCEL
+;===========================================================================
+
+[StateDef 26000] ; Accroupissement
+type = S
+MoveType = I
+Physics = S
+Anim = 10
+VelSet = 0,0
+Ctrl = 0
+
+[State 26000]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 26100
+Ctrl = 0
+
+	;--[Explications]
+	; Dans ce state, on ne fait qu'accroupir KFM. On utilise pour cela
+	; l'animation qui existe déjà, la 10. On ne passe pas par le state
+	; 10 (Stand to crouch) d'une part pour basculer directement en state
+	; 26000 et d'autre part parce que le perso n'a pas le contrôle dans
+	; ce mouvement, contrairement au Stand-to-crouch normal.
+	;
+	; Quand l'anim est finie, on bascule en state 26100, qui sera le
+	; Roll en lui-même. On laisse le Ctrl à 0 puisque le mouvement n'est
+	; pas fini.
+	;--[End]--
+
+[StateDef 26100]
+type = C
+MoveType = I
+Physics = N
+Anim = 26000
+VelSet = 4,0
+Ctrl = 0
+sprpriority = -3
+
+[State 26100, VelSet]
+type = Null ;VelSet
+trigger1 = Time = 0
+
+
+[State 26100, Intangible]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+	;--[Explications]
+	; On désactive la "poussée" des joueurs pour tout le state ; quand
+	; deux joueurs se touchent, normalement, celui qui avance repousse
+	; l'autre ou, si les deux avancent, ils se bloquent mutuellement.
+	; Avec le PlayerPush à 0, on permet à KFM de passer "à travers"
+	; son adversaire pour changer de côté au cours de roll cancel.
+	;
+	; Dans le StateDef, on a spécifié un sprpriority de -3 afin que
+	; le personnage soit affiché derrière la plupart des autres sprites
+	; donnant l'impression qu'il passe à côté d'eux.
+	;
+	; On a également spécifié une vitesse de 4 qui fera avancer KFM.
+	;--[End]--
+
+[State 26100, VelVar]
+type = VelAdd
+trigger1 = Time > 25
+trigger1 = Vel X != 0
+X = IfElse((Vel X)<0.5, 0-(Vel X), -0.5)
+
+	;--[Explications]
+	; On va réduire progressivement la vitesse de KFM à partir du 26ème
+	; tick. Pour cela, si la vitesse X est supérieure à 0.5, on enlèvera
+	; 0.5 à la vitesse, et si la vitesse devient inférieure à 0.5, on
+	; enlèvera toute cette vitesse (qui deviendra alors nulle, et le 
+	; trigger ne se déclenchera plus.
+	;--[End]--
+
+[State 26100, GiveControl]
+type = CtrlSet
+trigger1 = Time = 26
+value = 1
+
+	;--[Explications]
+	; A partir du moment où la vitesse du Roll de KFM va se réduire,
+	; on redonne le contrôle à KFM, ce qui va lui permettre d'annuler
+	; le Roll Cancel pour sortir un autre coup (en crouch).
+	;--[End]--
+
+[State 26100, End]
+type = ChangeState
+trigger1 = Time = 33
+value = 11
+ctrl = 1
+
+	;--[Explications]
+	; Fin du Roll, on renvoie KFM vers le state de Crouch. De là, si le
+	; joueur maintient la direction bas, KFM ne se relèvera pas, alors que
+	; sinon, il ira automatiquement en state 12 (crouch to stand) pour se
+	; relever.
+	;--[End]--
+
+
+;===========================================================================
+; COUNTER
+;===========================================================================
+
+[StateDef 27000]
+type = S
+movetype = A
+physics = N
+anim = 27000
+velset = 0,0
+ctrl = 0
+
+[State 27000, Snd]
+type = PlaySnd
+trigger1 = time = 0
+value = 27000,0
+
+	;--[Explications]
+	; Joue le son du contre.
+	;--[End]--
+
+[State 27000, Var]
+type = VarSet
+trigger1 = time = 0
+var(55) = 1
+
+	;--[Explications]
+	; On initialise une variable 55 qui servira dans les coups auxquels
+	; renvoient le counter. Selon que la variable vaudra 1 ou 0, on saura
+	; ainsi si le coup est sorti normalement ou en contre. Dans le second
+	; cas, on enlèvera pas de power, on fera une petit PalFX, et
+	; s'agissant d'un contre, KFM ne pourra pas être touché.
+	;
+	; A la fin du coup en contre, la var(55) sera remise à 0.
+	;--[End]--
+
+[State 27000, Pause]
+type = SuperPause
+trigger1 = Time = 0
+time = 30
+anim = -1
+darken = 0
+p2defmul = 1
+movetime = 30
+
+	;--[Explications]
+	; On crée une petite pause, pour laisser au joueur le temps de 
+	; réaliser que KFM a fait un contre.
+	;
+	; Avant, cette superpause se déclenchait quand le joueur avait passé
+	; 12 ticks dans le state. Désormais, elle se déclenche dès le début
+	; du state, mais on a rajouté un paramètre "movetime = 30" qui permet
+	; à KFMM de "jouer son anim" pendant que P2 est bloqué.
+	;
+	; Ceci permet d'avoir un counter plus souple, car avant, pendant les
+	; 12 premiers ticks, P2 pouvait bouger et donc se protéger ou se
+	; retirer.
+	;--[End]--
+
+[State 27000, InvincibleInCounter]
+type = NotHitBy
+trigger1 = Time >= 0
+value = SCA
+
+	;--[Explications]
+	; Quand KFM réalise son Counter, il est invincible, de même quand le
+	; coup qui suit le contre.
+	;--[End]--
+
+[State 27000,PseudoCounter]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = IfElse((P2Statetype = A),1120, 1020)
+
+	;--[Explications]
+	; On va changer de state. Selon que l'adversaire est en l'air ou au
+	; sol, on le renverra dans le state du Fast Kung Fu Upper ou du Kung
+	; Fu Palm.
+	;
+	; Le trigger a changé, ici. On changeait de state un tick après la
+	; fin de la Pause, mais désormais, on se base sur la fin de l'anim,
+	; ce qui est plus logique.
+	;--[End]--
+
+
+;===========================================================================
+; DRAIN
+;===========================================================================
+
+[StateDef 28000] ; Tentative de prise de l'adversaire
+type = S
+movetype = A
+physics = S
+anim = 28000
+velset = 0,0
+ctrl = 0
+juggle = 0
+poweradd = -1000
+
+[State 28000, Snd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,0
+
+	;--[Explications]
+	; Joue un son pour le mouvement.
+	;--[End]--
+
+[State 28000, Hyper]
+type = SuperPause
+trigger1 = Time = 0
+time = 30
+sound = 20,0
+pos = 26,-79
+p2defmul = 1
+
+	;--[Explications]
+	; Un petit effet SuperPause au début de l'attaque.
+	;--[End]--
+
+[State 28000, Throw]
+type = HitDef
+trigger1 = AnimElem = 5
+attr = S,HT
+hitflag = M-
+priority = 3,Miss
+sparkno = -1
+sprpriority = 1
+p2facing = 1
+snap = 103,-57
+p1stateno = 28100
+p2stateno = 28200
+guard.dist = 0
+fall = 1
+hitsound = S100,0
+
+	;--[Explications]
+	; HitDef propre au projection. Ici, il va nous servir à placer 
+	; l'adversaire dans un state particulier, où il "subira" le drain.
+	; De même on place notre joueur dans un state 28100 propre au drain.
+	; 
+	; Les joueurs n'iront dans ce state que si le HitDef est effectif,
+	; c'est à dire, si KFM a attrapé son adeversaire.
+	;--[End]--
+
+[State 28000, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+	;--[Explications]
+	; Si on ne touche pas l'adversaire, l'animation se termine 
+	; normalement et on retourne en stand.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 28100] ; KFM place son adversaire
+type = S
+movetype = I
+physics = N
+anim = 28100
+sprpriority = -3
+ctrl = 0
+
+[State 28100, SndGrab]
+type = PlaySnd
+trigger1 = Time = 0
+value = 100,0
+
+	;--[Explications]
+	; Un petit effet SuperPause au début de l'attaque.
+	;--[End]--
+
+[State 28100, BGPal]
+type = BGPalFX
+trigger1 = Time = 0
+time = 46
+add = -150,-150,0
+sinadd = 10,10,10,46
+invertall = 1
+color = 0
+
+	;--[Explications]
+	; Un BGPalFX pour faire changer la couleur du décor, et un sinadd
+	; pour que la couleur ne soit pas fixe.
+	;--[End]--
+
+[State 28100, Place1]
+type = TargetBind
+trigger1 = AnimElem = 1, >= 0
+trigger1 = AnimElem = 2, <0
+pos = 103,-57
+
+	;--[Explications]
+	; C'est peut-être ce qu'il y a de plus chiant avec les projections.
+	; On va devoir, à chaque étape de l'animation, placer l'adversaire
+	; avec un "TargetBind", pour que P2 soit toujours placé correctement
+	; par rapport à notre joueur durant la projection.
+	;
+	; En théorie, il y autant de "TargetBind" que d'éléments dans 
+	; l'animation (9 dans celle-ci). Cependant, si deux éléments 
+	; "placent" l'adversaire au même endroit, on n'utilisera qu'un
+	; TargetBind pour les deux. Et inversement, si on doit placer
+	; deux fois l'adversaire sur un même élément de l'animation, 
+	; on aura deux TargetBind pour un même élément.
+	;--[End]--
+
+[State 28100, Place2]
+type = TargetBind
+trigger1 = (AnimElem = 2, >= 0) && (AnimElem = 3, <0)
+pos = 59,-52
+
+[State 28100, Place3]
+type = TargetBind
+trigger1 = (AnimElem = 3, >= 0) && (AnimElem = 4, <0)
+pos = 50,-57
+
+[State 28100, Place4]
+type = TargetBind
+trigger1 = (AnimElem = 4, >= 0) && (AnimElem = 5, <0)
+pos = 39,-48
+
+[State 28100, SndUp]
+type = PlaySnd
+trigger1 = AnimElem = 5
+value = 0,0
+
+	;--[Explications]
+	; Joue un son quand KFM met P2 au-dessus de lui.
+	;--[End]--
+
+[State 28100, Place5]
+type = TargetBind
+trigger1 = (AnimElem = 5, >= 0) && (AnimElem = 6, <0)
+pos = 42,-56
+
+[State 28100, Place6]
+type = TargetBind
+trigger1 = (AnimElem = 6, >= 0) && (AnimElem = 7, <0)
+pos = 46,-77
+
+[State 28100, Place7]
+type = TargetBind
+trigger1 = (AnimElem = 7, >= 0) && (AnimElem = 8, <0)
+pos = 44,-136
+
+[State 28100, Place1]
+type = TargetBind
+trigger1 = (AnimElem = 8, >= 0) && AnimTime < 0
+pos = 42,-128
+
+	;--[Explications]
+	; On utilise le même TargetBind pour les éléments 8 et 9, et comme
+	; l'élément 9 est le dernier, on ne se réfère plus à l'élément
+	; suivant qui serait théoriquement le 10 ; le n°10 n'existant pas,
+	; on se réfère à l'AnimTime (s'il est inférieur à 0, c'est que
+	; l'animation n'est pas terminée).
+	;--[End]--
+
+[State 28100, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 28150
+
+	;--[Explications]
+	; On arrive à la fin de l'animation : on va envoyer KFM dans un autre
+	; state pour réaliser le drain lui-même. On change de state car on va
+	; mettre le drain en boucle.
+	;
+	; Le coup n'est pas terminé, donc on ne redonne pas le contrôle.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 28150] ; Drain
+type = S
+movetype = I
+physics = N
+anim = 28150
+sprpriority = -3
+ctrl = 0
+
+[State 28150, SndDrain]
+type = PlaySnd
+trigger1 = Time = 0
+value = 28000,0
+channel = 3
+loop = 1
+
+	;--[Explications]
+	; Joue le son du drain en boucle tant qu'on est dans le state.
+	;--[End]--
+
+[State 28150, SndState]
+type = VarSet
+trigger1 = Time = 0
+var(57) = 1
+
+	;--[Explications]
+	; On va utiliser une variable pour savoir qu'un son en loop est joué.
+	; On s'en resservira dans les state -2 : à la fin de ce state, la var
+	; sera remise à 0 (sortie "normale" du state). Si KFM est sorti de ce
+	; state sans que la var soit remise à 0, on activera alors un state -2
+	; qui arrêtera le son.
+	;--[End]
+
+[State 28150, BGPal]
+type = BGPalFX
+trigger1 = (Time % 8) = 0
+time = 8
+add = -150,-150,0
+sinadd = 10,10,10,8
+invertall = 1
+color = 0
+
+	;--[Explications]
+	; Un BGPalFX pour faire changer la couleur du décor, et un sinadd
+	; pour que la couleur ne soit pas fixe.
+	;--[End]--
+
+[State 28150, PalFX]
+type = PalFX
+trigger1 = 1
+time = 1
+add = 116,102,10
+invertall = 1
+color = 0
+
+	;--[Explications]
+	; PalFX jaune (idem que PowerCharge) lors du drain.
+	;--[End]--
+
+[State 28150, TargetAnim]
+type = TargetState
+trigger1 = Time = 0
+value = 28250
+
+	;--[Explications]
+	; On a changé de state, on fait changer de state à la cible.
+	;--[End]--
+
+[State 28150, Place]
+type = TargetBind
+trigger1 = AnimTime < 0
+pos = 42,-128
+
+	;--[Explications]
+	; On place une nouvelle fois l'adversaire, à une position fixe pour
+	; toute la durée du state.
+	;--[End]--
+
+[State 28150, Drain]
+type = TargetLifeAdd
+trigger1 = (Time % 8) = 0
+value = -15
+
+	;--[Explications]
+	; On ajoute une valeur négative à la vie de la "cible" (c'est à dire,
+	; notre adversaire), ce qui a pour conséquence finale de lui retirer
+	; de la vie.
+	; 
+	; On utilise ici un opérateur "Mod" (le signe %) qui retourne le 
+	; reste d'une division. Comme notre state tourne en boucle, on veut 
+	; que la vie soit drainée à chaque fois que l'animation repart. Cette
+	; anim dure 8 ticks, donc à chaque fois que le temps de state divisé
+	; par 8 ne laisse pas de reste (0, 8, 16...), le state se déclenche.
+	;--[End]--
+
+[State 28150, GainLife]
+type = LifeAdd
+trigger1 = (Time % 8) = 0
+value = 15
+
+	;--[Explications]
+	; Deuxième partie du drain : on augmente la vie de notre joueur en
+	; lui rajoutant de la vie.
+	;--[End]--
+
+[State 28150, EndSnd]
+type = StopSnd
+trigger1 = Time = 120
+trigger2 = (Time % 8)
+trigger2 = Life >= Const(data.life)-1
+trigger3 = var(52) >= 15
+channel = 3
+
+	;--[Explications]
+	; Stoppe le son du drain si on sort du state.
+	;--[End]--
+
+[State 28160, EndStateSnd]
+type = VarSet
+trigger1 = command != "PCb"
+trigger2 = command != "PCy"
+trigger3 = Power >= 3000
+var(57) = 0
+
+	;--[Explications]--
+	; Si KFMM sort normalement de ce state (c'est à dire sans être frappé
+	; ou chopé par l'adversaire), on remet la variable "StateSound" à 0,
+	; puisqu'on a arrêté le son avec le controller précédent. Si cette
+	; variable n'est pas remise à 0, alors ce sera un state -2 qui se
+	; chargera de couper le son.
+	;--[End]--
+
+[State 28150, End]
+type = ChangeState
+trigger1 = Time = 120
+trigger2 = (Time % 8)
+trigger2 = Life >= Const(data.life)-1
+trigger3 = var(52) >= 15
+value = 28160
+
+	;--[Explications]
+	; On change de state quand on a passé 120 ticks dans le state, ou si
+	; la vie est remplie au maximum, ou encore si l'adversaire a appuyé
+	; suffisamment de fois sur les touches pour se libérer de la prise.
+	;
+	; Là encore, le coup n'étant pas terminé (puisqu'on doit encore 
+	; lâcher l'adversaire), on ne redonne pas le contrôle.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 28160] ; On rejette l'adversaire.
+type = S
+movetype = I
+physics = N
+anim = 28160
+
+	;--[Explications]
+	; Attention ! Même si on donne un coup dans ce state, le movetype est
+	; de type I, car le coup est illusoire. En effet, on va se servir des
+	; TargetBind pour "simuler" ce coup. De même, il n'y a pas de Clsn1
+	; dans l'animation.
+	;--[End]--
+
+[State 28160, TargetAnim]
+type = TargetState
+trigger1 = Time = 0
+value = 28260
+
+	;--[Explications]
+	; Idem State 28150.
+	;--[End]--
+
+[State 28160, Place1]
+type = TargetBind
+trigger1 = (AnimElem = 1, >= 0) && (AnimElem = 4, < 0)
+pos = 42,-128
+
+	;--[Explications]
+	; On continue de placer notre cible (l'adversaire), qui est toujours
+	; soumise à nos gestes pour l'instant.
+	;--[End]--
+
+[State 28160, Place2]
+type = TargetBind
+trigger1 = (AnimElem = 4, >= 0) && (AnimElem = 6, < 0)
+pos = 42, (-128+(AnimElemTime(4)*3))
+
+	;--[Explications]
+	; Cette fois, on simule une chute de l'adversaire quand KFM enlève
+	; son bras.
+	;--[End]--
+
+[State 28160, Place3]
+type = TargetBind
+trigger1 = AnimElem = 6
+pos = 71,-81
+
+	;--[Explications]
+	; On place l'adversaire sur le coup
+	;--[End]--
+
+[State 28160, Spark]
+type = Explod
+trigger1 = AnimElem = 6
+anim = F3
+sprpriority = 2
+pos = 71,-81
+
+	;--[Explications]
+	; On crée un spark qui simule le choc du coup
+	;--[End]--
+
+[State 28160, HitSound]
+type = PlaySnd
+trigger1 = AnimElem = 6
+value = F5,3
+
+	;--[Explications]
+	; On joue le son de la frappe par un PlaySnd.
+	;--[End]
+
+[State 28160, LostLife]
+type = TargetLifeAdd
+trigger1 = AnimElem = 6
+value = -50
+
+	;--[Explications]
+	; Comme pour le drain, on simule la perte de vie de l'adversaire.
+	;--[End]--
+
+[State 28160, Vel]
+type = TargetVelSet
+trigger1 = AnimElem = 6, = 1
+X = -4
+Y = 1
+
+	;--[Explications]
+	; On donne une vitesse à l'adversaire pour simuler sa chute suite
+	; au coup.
+	;--[End]--
+
+[State 28160, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+	;--[Explications]
+	; A la fin de l'animation, on revient en state de stand.
+	;--[End]--
+
+
+
+;------------------------------------------------
+[StateDef 28200] ; Adversaire soulevé par KFM
+type = A
+movetype = H
+physics = N
+
+[State 28200, ChangeAnim]
+type = ChangeAnim2
+trigger1 = Time = 0
+value = 28200
+
+	;--[Explications]
+	; On utilise le ChangeAnim2 pour que l'adversaire utilise le AIR de
+	; de KFM - mais attention ! Il utilise toujours son propre SFF !
+	; Et on place l'adversaire en anim 28200
+	;--[End]--
+
+
+
+;------------------------------------------------
+[StateDef 28250] ; Adversaire qui subit le drain
+type = A
+movetype = H
+physics = N
+
+[State 28250, PalFX]
+type = PalFX
+trigger1 = 1
+time = 1
+add = 40,-75,-75
+invertall = 1
+color = 0
+
+	;--[Explications]
+	; PalFX rouge sur l'adversaire "drainé".
+	;--[End]--
+
+[State 28250, ChangeAnim]
+type = ChangeAnim2
+trigger1 = Time = 0
+value = 28250
+
+	;--[Explications]
+	; Idem state 28000
+	;--[End]--
+
+
+;------------------------------------------------
+[StateDef 28260] ; Adversaire relâché
+type = A
+movetype = H
+physics = N
+
+[State 28260, ChangeAnim]
+type = ChangeAnim2
+trigger1 = Time = 0
+value = 28260
+
+	;--[Explications]
+	; Idem state 28000
+	;--[End]--
+
+[State 28260, Gravity]
+type = VelAdd
+trigger1 = AnimElem = 4, >= 0
+Y = .3
+
+	;--[Explications]
+	; On augmente la vitesse en Y pour simuler une gravité qui va
+	; ramener l'adversaire au sol après le coup.
+	;
+	; L'idéal serait de pouvoir remettre physics = A, mais on ne peut
+	; pas car sinon, lorsque le perso arrivera au niveau du sol, il
+	; passera automatiquement en state 52 (atterrissage après un saut),
+	; sans rester au sol, et ce, sans même utiliser le state Self.
+	;
+	; De plus, comme on a personnalisé le state 52, l'adversaire 
+	; utilisera celui qui se trouve dans le CNS de KFM-Master, et non
+	; celui du common. Du coup, il restera dans notre CNS.
+	;--[End]--
+
+[State 28260, Self]
+type = SelfState
+trigger1 = Pos Y >= 0
+value = 5100
+
+	;--[Explications]
+	; On renvoit P2 dans son propre CNS, dans un state de Hit, quand P2
+	; touche le sol.
+	;--[End]--
+
+
+;===========================================================================
+; WC CHAIN
+;===========================================================================
+[StateDef 29000] ; Geste de départ, création helper Wood, attente.
+type = S
+movetype = I
+physics = N
+anim = 29000
+poweradd = -2000
+ctrl = 0
+velset = 0,0
+
+[State 29000, ChargeSnd]
+type = PlaySnd
+trigger1 = Time = 0
+value = F20,0
+
+	;--[Explications]
+	; Son de charge, pour indiquer qu'on exécute un hyper
+	;--[End]--
+
+[State 29000, BGHelper]
+type = Helper
+trigger1 = Time = 0
+name = "BGPal"
+ID = 29300
+supermovetime = 60
+pausemovetime = 60
+stateno = 29300
+
+	;--[Explications]
+	; On va se servir de cet helper pour contôler un effet de BGPalFX.
+	; En effet, KFM-Master va passer par plusieurs states au cours de
+	; ce coup, ce qui rend difficile la maîtrise d'un BGPalFX directement
+	; dans les states du perso.
+	;
+	; On crée donc cet Helper BGPal, qui sera un helper "fictif". Sa
+	; seule utilité sera d'effectuer un BGPalFX. On le crée dès le
+	; début du state et on le fera disparaître dès que KFM ne sera plus
+	; dans cet hyper.
+	;
+	; On précise un supermovetime et un pausemovetime afin que le BGPalFX
+	; ne se coupe pas pendant les pauses et les coups portés (hitpauses).
+	;--[End]--
+
+[State 29000, MoveSnd]
+type = PlaySnd
+trigger1 = AnimElem = 8
+value = 0,0
+
+	;--[Explications]
+	; Son pour le mouvement de KFM
+	;--[End]--
+
+[State 29000, WoodHelper]
+type = Helper
+trigger1 = AnimElem = 10
+name = "Wood"
+ID = 29100
+postype = P2
+pos = -(Enemy, Const(size.head.pos.x)), (260-Floor(Enemy, ScreenPos Y))
+stateno = 29100
+
+	;--[Explications]
+	; Lorsqu'on arrive au dixième élément de l'animation de KFM, on crée
+	; l'helper Wood (planche de bois qui remontera du sol). Nous lui
+	; attribuons un ID pour l'identifier, nous le positionnons par 
+	; rapport à P2 (puisqu'il doit surgir sous P2) et nous l'envoyons en
+	; state 29100.
+	;
+	; Petite explication sur la formule : Floor est une fonction 
+	; d'arrondi, et ScreenPos donne la position du joueur dans l'écran.
+	; En effet, s'agissant d'un placement par rapport à la position Y du
+	; joueur, le placement exact d'un objet dépend de la hauteur de la
+	; ligne de sol du stage (zoffset). Comme cette hauteur varie d'un
+	; stage à l'autre, on ne peut pas prendre le trigger Pos Y si on
+	; veut placer l'helper toujours au même endroit (c'est à dire
+	; légèrement hors de l'écran). On prend donc la position Y dans
+	; l'écran, ce qui fait que quelque soit le niveau du sol, l'helper
+	; sera générée au même endroit, 20 pixels sous le bas de l'écran.
+	;
+	; On utilise une redirection de trigger "Enemy" car le postype est
+	; P2 et l'ennemi de P2, c'est P1, c'est à dire KFM. Comme KFM est
+	; au sol quand il réalise son coup, sa position Y dans l'écran nous
+	; donne le niveau de la ligne de sol.
+	;--[End]--
+
+[State 29000, ChangeToWait]
+type = ChangeState
+trigger1 = P2StateNo = 29150
+value = 29500
+
+	;--[Explications]
+	; Si P2 est touché, il est donc en state 29150. Dans ce cas, KFM va
+	; en state 29500 pour préparer le coup suivant.
+	;--[End]--
+
+[State 29000, End]
+type = ChangeState
+trigger1 = AnimElem = 13, >= 0
+trigger1 = Time = 115
+value = 0
+ctrl = 1
+
+	;--[Explications]
+	; Sinon, lorsque l'on est sur le dernier élément de l'animation après
+	; au moins 115 ticks, on revient en stance.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29100]; Helper Wood - Ce state n'est utilisé que par un helper.
+type = A
+movetype = A
+physics = N
+anim = 29100
+sprpriority = 3
+
+[State 29100, Vel]
+type = VelSet
+trigger1 = Time = 0
+Y = -8
+	;--[Explications]
+	; On attribue une vitesse à l'helper Wood, comme on le ferait pour
+	; un joueur normal. La vitesse permet de faire remonter l'helper du
+	; sol.
+	;--[End]--
+
+[State 29100, Hit]
+type = HitDef
+trigger1 = P2StateType = S
+trigger1 = Floor(Helper(29100), Pos Y) <= (Enemy, Const(size.head.pos.y))
+trigger2 = P2StateType = C
+trigger2 = Floor(Helper(29100), Pos Y) <= (Enemy, Const(size.head.pos.y)/2)
+trigger3 = P2StateType = A
+trigger3 = Floor(Helper(29100), Pos Y) <= Floor((Enemy, Pos Y)+(Enemy, Const(size.head.pos.y))+15)
+persistent = 0
+attr = A, HA
+hitflag = MAF
+guardflag = MA
+animtype = Up
+damage = 50,5
+pausetime = 12,12
+guard.pausetime = 5,5
+sparkno = 2
+sparkxy = 0,0
+guard.hittime = 12
+guard.velocity = -4
+airguard.velocity = -4,0
+p1stateno = 29110
+p2stateno = 29150
+hitsound = 5,3
+guardsound = 6,0
+kill = 0
+
+	;--[Explications]
+	; Le HitDef du projectile. Bien que ce ne soit pas visible à l'écran,
+	; on utilise un HitDef similaire à celui d'une projection. On va donc
+	; placer l'adversaire dans un state de NOTRE fichier CNS pour pouvoir
+	; contrôler, à partir de ce moment, sa réaction.
+	;
+	; On utilise également un "p1stateno" pour envoyer l'helper dans un 
+	; autre state (pour simuler "l'impact" de la planche). Enfin, on
+	; précise "kill = 0" pour éviter que le coup ne tue l'adversaire ;
+	; donc même si l'adversaire est censé mourir sur ce coup, ce paramètre
+	; va le "maintenir" en vie (en lui laissant 1 point de vie) pour nous
+	; permettre de continuer l'enchaînement normalement. On réutilisera
+	; ce paramètre dans les autres HitDefs pour aller jusqu'au bout de
+	; l'enchaînement, sauf sur le dernier, naturellement.
+	;
+	; Un petit mot sur les triggers : On utilise 3 triggers différents
+	; pour les 3 positions que peut adopter l'adversaire au moment du
+	; coup : debout, accroupi, en l'air.
+	;
+	; Pour avoir un rendu correct, on veut que la planche touche au 
+	; niveau de la tête. Le problème, c'est que les personnages n'ont
+	; pas tous la même taille, et il est donc impossible de mettre une
+	; valeur fixe, surtout pour les petits personnages.
+	;
+	; Pour contourner le problème, on utilise la trigger "Const" qui
+	; permet de connaître les constantes des joueurs. En l'occurrence,
+	; on va se servir du "size.head.pos.y", qui donne la hauteur de la
+	; tête du joueur et on le redirige sur "Enemy" pour obtenir la 
+	; position de la tête de l'ennemi.
+	;
+	; Lorsque l'ennemi est accroupi, on va diviser cette taille par deux
+	; de façon arbitraire, qui donne un résultat satisfaisant.
+	;
+	; Lorsque l'ennemi est en l'air, on va rajouter sa position Y pour
+	; que l'helper soit à hauteur de l'adveraire, quelle que soit la 
+	; hauteur de P2. Enfin, on "ôte" 15 pixels (en fait, on les rajoute,
+	; mais comme les positions Y ont des valeurs négatives quand les 
+	; persos sont en l'air, ça revient à ôter cette valeur). Ces 15
+	; pixels sont destinés à donner une petite marge d'erreur, car la
+	; position de l'adversaire n'est pas fixe, et il faut éviter que
+	; P2 et l'helper ne se croisent sans se toucher.
+	;--[End]--
+
+[State 29100, EndNoHit]
+type = DestroySelf
+trigger1 = Floor(ScreenPos Y) < -40
+
+	;--[Explications]
+	; Si l'helper ne touche pas l'adversaire (P2 évite le coup ou le
+	; bloque), on le détruit lorsqu'il est 40 pixels au-dessus de 
+	; l'écran.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29110] ; Si Helper Wood touche l'adversaire
+type = A
+movetype = I
+physics = N
+velset = 0,0
+anim = 22100
+sprpriority = 3
+
+[State 29110, VelDown]
+type = VelSet
+trigger1 = Time = 0
+X = 3
+Y = 4
+
+	;--[Explications]
+	; Suite au choc, on va mettre une vitesse négative pour faire 
+	; descendre la planche de bois, en utilisant l'anim de la planche
+	; qui se brise. On utilise aussi une vitesse négative pour simuler
+	; une "déviation" suite à l'impact.
+	;--[End]--
+
+[State 29110, EndHit]
+type = DestroySelf
+trigger1 = AnimTime = 0
+
+	;--[Explications]
+	; On détruit l'helper quand l'animation arrive à son terme. A partir
+	; de ce moment, il n'y a plus d'helper Wood.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29150] ; Adversaire touché sur Wood
+type = A
+movetype = H
+physics = N
+velset = 0,-7
+
+[State 29150]
+type = ChangeAnim2
+trigger1 = Time = 0
+value = 29150
+
+	;--[Explications]
+	; Suite au coup de l'helper Wood, P2 est placé dans un state de Hit
+	; (notez le movetype), dans une animation en boucle grâce à un
+	; ChangeAnim2 (qui permet d'appliquer NOTRE fichier AIR à P2), comme
+	; pour une prise, et on applique à P2 une vitesse négative pour le
+	; faire monter suite au coup (notez le velset du StateDef).
+	;
+	; On ne met pas d'autre bloc de state car on laisse P2 dans ce state
+	; indéfiniment, ce qui l'empêche d'en sortir pour une raison 
+	; quelconque. Il faudra donc une "intervention extérieure" qui
+	; provoquera un changement de state (en l'occurrence, un nouveau 
+	; coup).
+	;
+	; Le state suivant est juste un contrôle pour un cas particulier.
+	;--[End]--
+
+[State 29150, CheckKFM]
+type = ChangeState
+trigger1 = P2StateNo != [29000,29999]
+value = 29350
+
+	;--[Explications]
+	; Ceci vise à prévenir un cas particulier ; si jamais KFM est touché
+	; avant que l'helper ninja soit apparu, KFM va "sortir" du coup, et
+	; ne créera donc pas l'helper ninja.
+	;
+	; Cet helper étant censé bloquer la montée de l'adversaire, celui-ci
+	; va continuer son ascension et resté bloqué indéfiniment dans ce
+	; state.
+	;
+	; Ce state permet de vérifier le state de KFM. Comme on se place du
+	; point de vue de l'adversaire, KFM, c'est P2, d'où le trigger
+	; P2StateNo. Si KFM est sorti du coup, on envoie l'adversaire dans
+	; un state 29350 qui le renverra dans son propre CNS. Le coup est 
+	; alors avorté.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29200] ; Helper Ninja coup 1
+type = A
+movetype = A
+physics = A
+velset = 0,.8
+anim = 29200
+
+	;--[Explications]
+	; NB : Vous vous demandez peut-être d'où sort ce nouvel helper ?
+	; Regardez donc le state 29500. Il faut réussir à "synchroniser" les
+	; actions des différents intervenants : quand l'helper Wood a touché,
+	; KFM est passé en state 29500 (cf. plus loin dans le code), et même
+	; si à l'écran il semble en attente, dans le code, on a prévu la
+	; création de ce nouvel helper, lorsque P2 est suffisamment haut dans
+	; l'écran.
+	;
+	; Ce nouvel helper "Ninja" débute ici, en state 29200.
+	;--[End]--
+
+[State 29200, PosNinja]
+type = PosSet
+trigger1 = Time = 0
+Y = -(Floor(Root, ScreenPos Y))
+
+	;--[Explications]
+	; Dès le début du state, on place le ninja hors de l'écran, selon le
+	; même principe que pour l'helper Wood, à quelques différences près.
+	;
+	; D'une part, la formule est légèrement parce qu'on place le Ninja
+	; au-dessus de l'écran, alors qu'on plaçait le Wood au-dessous.
+	;
+	; D'autre part, puisqu'on se trouve maintenant dans le state de 
+	; l'helper et non plus du joueur, on doit utiliser une redirection de
+	; trigger de façon à récupérer le ScreenPos Y non pas de l'helper, 
+	; mais du joueur. "Root" désigne le joueur principal (ici, 
+	; KFM-Master), quelque soit "l'entité" qui a créé l'helper (soit le 
+	; joueur principal - c'est le cas ici - soit un autre helper du
+	; joueur principal).
+	;
+	; Le placement étant réalisé à Time = 0, et ce state étant le premier
+	; utilisé par l'helper, cela donne l'impression que l'helper est
+	; directement créé à cette position.
+	;--[End]--
+
+[State 29220, PalFX]
+type = PalFX
+trigger1 = IsHelper(29200) 
+add = -255,-255,-255
+time = 1
+
+	;--[Explications]
+	; On utilise en fait une animation normale de KFM (retombe d'un saut
+	; sur place), à laquelle on applique un PalFX. En enlevant 255 à 
+	; chacun des composant RVB des sprites de l'animation, on obtient un
+	; personnage complètement noir (d'où son nom de "ninja", ici :p).
+	;
+	; On n'applique ce PalFX que pour un seul tick, mais il se déclenche
+	; à chaque tick de l'animation, ce qui donne une continuité.
+	;--[End]--
+
+[State 29200, AirHit]
+type = HitDef
+trigger1 = AnimElem = 3
+attr = A, HA
+hitflag = MAF
+damage = 25
+pausetime = 0,0
+sparkno = 2
+sparkxy = 0,0
+p1stateno = 29210
+p2stateno = 29250
+snap = 0,0
+hitsound = 5,2
+kill = 0
+
+	;--[Explications]
+	; On définit le second coup (après celui du Wood). Tout comme le 
+	; premier, on va envoyer P2 dans un state personnalisé (ce qui va
+	; donc le sortir du state 29150 où il se trouve).
+	;
+	; De même, on envoie P1 dans un state 29210. Comme on est certain
+	; que le coup va toucher, on n'a pas besoin d'envisager que le
+	; coup rate.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29210] ; Ninja fall
+type = A
+movetype = I
+physics = N
+velset = 0,0
+anim = 29210
+
+[State 29210, PauseOnHit]
+type = Pause
+trigger1 = Time = 0
+Time = 20
+
+	;--[Explications]
+	; On lance une pause pour simuler l'impact du coup.
+	;--[End]--
+
+[State 29210, PalFX]
+type = PalFX
+trigger1 = IsHelper(29200)
+add = -255,-255,-255
+time = 1
+
+	;--[Explications]
+	; On applique le PalFX, comme pour le précédent state du Ninja.
+	;--[End]--
+
+[State 29210, Vel]
+type = VelSet
+trigger1 = Time = 0
+Y = 10
+
+	;--[Explications]
+	; On lui applique une vitesse pour le faire descendre selon les lois
+	; de la gravité.
+	;--[End]--
+
+[State 29210, Target]
+type = TargetBind
+trigger1 = 1
+pos = 0,7
+
+	;--[Explications]
+	; On lie la "cible" (P2) durant tout le temps de la chute, si bien
+	; que P2 tombe en même temps que P1, et à l'écran, cela donne 
+	; l'impression que P1 entraîne P2 dans sa chute.
+	;--[End]--
+
+[State 29210, GroundHit]
+type = ChangeState
+trigger1 = Pos Y >= -10
+value = 29220
+
+	;--[Explications]
+	; On change de state quand P1 arrive très légèrement sous le sol.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29220] ; Ninja bounce
+type = A
+movetype = I
+physics = N
+anim = 29220
+velset = 0,0
+
+[State 29220, GroundSound]
+type = PlaySnd
+trigger1 = Time = 0
+value = F7,2
+
+	;--[Explications]
+	; Son simulant l'impact au sol.
+	;--[End]--
+
+[State 29220, Bounds]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0,0
+
+	;--[Explications]
+	; On fixe la position de la caméra pour qu'elle ne suive pas KFM
+	; quand on le fera sortir de l'écran.
+	;--[End]--
+
+[State 29220, PalFX]
+type = PalFX
+trigger1 = ScreenPos X = [0,319]
+add = -255,-255,-255
+time = 1
+
+	;--[Explications]
+	; On applique toujours notre PalFX, mais cette fois, le trigger 
+	; change. En effet, il y a un petit souci avec le PalFX, à savoir 
+	; que s'il est toujours actif au moment où l'on supprime l'helper,
+	; la prochaine fois que l'on fera appel à cet helper, le PalFX sera
+	; inactif.
+	;
+	; On contourne ce problème en désactivant le PalFX une fois que le 
+	; Ninja est sorti de l'écran. On supprimera l'helper un peu après,
+	; de sorte que le PalFX sera terminé quand le Ninja sera supprimé.
+	; Ainsi, la prochaine fois que le coup sortira, le PalFX s'appliquera
+	; normalement.
+	;--[End]--
+
+[State 29220, TargetHit]
+type = TargetLifeAdd
+trigger1 = Time = 0
+value = IfElse((Target, Life)<51, (Target, Life)-1, -50)
+
+	;--[Explications]
+	; On enlève de la vie à P2 suite au choc avec le sol.
+	;--[End]--
+
+[State 29220, Spark]
+type = Explod
+trigger1 = Time = 0
+anim = F3
+ownpal = 1
+
+	;--[Explications]
+	; Et on affiche un Explod pour simuler l'impact du coup.
+	;--[End]--
+
+[State 29220, TargetBounceGround]
+type = TargetState
+trigger1 = Time = 0
+value = 29260
+
+	;--[Explications]
+	; On change également P2 de state (pour le faire rebondir du sol).
+	;--[End]--
+
+[State 29220, BounceAway]
+type = VelSet
+trigger1 = AnimElem = 6
+X = 9
+Y = -6
+
+	;--[Explications]
+	; On redonne une vitesse négative au ninja pour le faire rebondir
+	; vers l'un des côtés de l'écran.
+	;--[End]--
+
+[State 29220, TargetVel]
+type = TargetVelSet
+trigger1 = AnimElem = 7
+persistent = 0
+X = Root, fvar(0)
+Y = -3
+
+	;--[Explications]
+	; Ici, on va donner une vitesse à P2, sachant que fvar(0) est la
+	; vitesse théorique pré-calculée pour que P2 revienne à portée de 
+	; coup de KFM en 20 ticks (cf. le state -2 WCVelXP2).
+	;
+	; Pourquoi en 20 ticks ? On détermine que le coup de KFM doit toucher
+	; P2 lorsqu'il est à environ 60 pixels du sol. En attribuant une
+	; vitesse Y de -3, on le fait remonter à 60 pixels en 20 ticks.
+	;
+	; Partant de cette donnée fixe, on calcule la vitesse qu'aura P2 en
+	; X pour revenir à portée du coup. Voir le state -2 pour plus de
+	; détail.
+	;
+	; En appliquant cette vitesse à P2, on ramène la cible à portée de
+	; coup de KFM et ce, quelle que soit la position de KFM et quelle
+	; que soit la distance entre KFM et son adversaire.
+	;--[End]--
+
+[State 29220, GravitySimul]
+type = VelAdd
+trigger1 = AnimElemTime(6) > 0
+Y = .3
+
+	;--[Explications]
+	; On augmente progressivement la vitesse du ninja, de façon à simuler
+	; une gravité qui va réduire sa montée puis la stopper, pour enfin le
+	; faire redescendre, simulant ainsi un saut.
+	;--[End]--
+
+[State 29220, End]
+type = DestroySelf
+trigger1 = Floor(ScreenPos X) != [-10,329]
+
+	;--[Explications]
+	; Lorsque le Ninja est sorti d'au moins 10 pixels à droite ou à
+	; gauche de l'écran, on supprime l'helper Ninja. On attend que le
+	; ninja soit sorti de 10 pixels pour arrêter le PalFX avant que
+	; l'helper ne soit supprimé.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29250] ; Hit sur 1er coup Ninja
+type = A
+movetype = H
+physics = N
+velset = 0,0
+
+[State 29250]
+type = ChangeAnim2
+trigger1 = Time = 0
+value = 29250
+
+	;--[Explications]
+	; Comme pour le state 29150, on place P2 dans un state de façon
+	; indéfini. Cette fois, c'est le rebond sur le sol qui fera
+	; changer P2 de state (tout en restant dans un state personnalisé).
+	;--[End]--
+
+[State 29250, CheckKFM]
+type = ChangeState
+trigger1 = P2StateNo != [29000,29999]
+value = 29350
+
+	;--[Explications]
+	; State de contrôle ; si jamais KFM-Master sort de ce coup (exemple :
+	; il est touché par un autre adversaire, projectile, striker...), on
+	; doit libérer P2 et le renvoyer dans son propre CNS.
+	;
+	; On utilise un paramètre "P2StateNo" car ce state est utilisé par
+	; l'adversaire, et pour lui, P2, c'est KFM-Master.
+	;
+	; cf. aussi State 29150, checkKFM.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29260] ; Hit sur rebond Ninja
+type = A
+movetype = H
+physics = N
+velset = 0,0
+
+[State 29260]
+type = ChangeAnim2
+trigger1 = Time = 0
+value = 29260
+
+	;--[Explications]
+	; Idem state précédent. Cette fois, P2 rebondit après l'impact au sol
+	; et le saut du ninja. Il "subit" la vitesse qui lui a été attribuée
+	; par le ninja lors du rebond, et qui l'amène à portée de coup de
+	; KFM. Là, c'est le Kung Fu Palm qui le sortira de ce state pour le
+	; placer dans un autre.
+	;--[End]--
+
+[State 29260, CheckKFM]
+type = ChangeState
+trigger1 = P2StateNo != [29000,29999]
+value = 29350
+
+	;--[Explications]
+	; cf. State 29150, checkKFM & 29250, checkKFM
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29300] ; Helper BGPal
+type = S
+movetype = I
+physics = N
+anim = 29300
+
+	;--[Explications]
+	; L'anim 29300 est composée d'un unique sprite 0,-1. Ces références
+	; ne correspondent bien sûr à aucun sprite existant, et cette 
+	; animation n'affiche donc rien. Cette anim a une durée de -1 et dure
+	; donc autan de temps que l'on veut.
+	;
+	; Si on n'avait pas précisé "anim = 29300" ou si on avait mis un
+	; numéro d'animation inexistant, Mugen afficherait par défaut l'anim
+	; de stance de KFM. On crée donc une anim "vide" pour éviter cela.
+	;--[End]--
+
+[State 29300, BGEffect]
+type = BGPalFX
+trigger1 = Time%30 = 0
+ignorehitpause = 1
+time = 30
+color = 0
+invertall = 1
+add = -100,-100,0
+sinadd = 20,20,20,30
+
+	;--[Explications]
+	; L'effet BGPalFX. Le trigger déclenche l'effet à chaque fois que
+	; le temps de state est un multiple de 30 (ou plus exactement, à
+	; chaque fois que le reste de (temps de state/30) vaut zéro.
+	; 
+	; Ainsi, le state se déclenchera quand le state-time vaut 0, 30, 60,
+	; etc.
+	;
+	; On précise une durée de 30 ticks pour la durée de ce BGPalFX, ce
+	; qui fait que les BGPalFX s'enchaîneront sans coupure.
+	; Les paramètres de add donnent un effet bleuté au fond et le sinadd
+	; crée un effet changeant. La durée de ce sinadd est de 30 ticks,
+	; qui correspond à la durée du BGPalFX, et renforce l'impression de
+	; continuité de l'effet changeant.
+	;
+	; Vous noterez également le "ignorehitpause". C'est un paramètre 
+	; optionnel universel, c'est à dire qu'on peut l'utiliser dans
+	; n'importe quel state controller. En utilisant ce paramètre, on
+	; permet que le BGPalFX soit déclenché pendant la pause des coups
+	; (paramètre pausetime du HitDef).
+	;
+	; Il faut bien distinguer les conséquences des paramètres 
+	; "supermovetime" et "pausemovetime" de celle du "ignorehitpause".
+	; les "*movetime" permettent à l'HELPER d'agir pendant les pauses,
+	; tandis que le ignorehitpause permet au STATE CONTROLLER d'agir
+	; pendant la pause d'un coup.
+	;
+	; On doit préciser les *movetime pour que les states utilisés par
+	; l'helper soient vérifiés durant la pause (et notamment celles des
+	; coups). Mais on doit aussi préciser le "ignorehitpause = 1" pour
+	; que le state controller du BGPalFX soit déclenché pendant ces
+	; pauses.
+	;
+	; Si on précisait le ignorehitpause sans les *movetime, le BGPalFX
+	; ne serait même pas vérifié, puisque le personnage serait en pause.
+	; Et si on précisait les *movetime sans le ignorehitpause, le BGPalFX
+	; serait vérifié (puisque l'helper peut agir), mais ne serait pas
+	; déclenché à cause de la pause du coup.
+	;--[End]--
+
+[State 29300, End]
+type = DestroySelf
+trigger1 = Root, Stateno != [29000,29999]
+trigger1 = Time%30 = 0
+
+	;--[Explications]
+	; On détruit l'helper (ce qui arrête la "boucle" du BGPalFX) quand
+	; le "Root" (c'est à dire le personnage principal, KFM-Master) n'est
+	; plus dans l'un des states de l'hyper (ex : il retourne en stance ou
+	; il est touché) et quand la boucle en cours est terminée.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29350] ; Sort l'ennemi si KFM touché
+type = A
+movetype = H
+physics = A
+
+[State 29350]
+type = SelfState
+trigger1 = Time = 0
+value = 5050
+
+	;--[Explications]
+	; KFM est touché et ne peut sortir l'helper : on renvoie P2 dans son
+	; propre CNS grâce à un SelfState. Le physics = A permet de faire
+	; retomber l'adversaire pour qu'il ne monte pas indéfiniment (suite
+	; au coup de l'helper Wood).
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29500] ; Prépa second coup KFM
+type = S
+movetype = I
+phyics = N
+anim = 29500
+ctrl = 0
+
+	;--[Explications]
+	; Pour rappel : KFM vient dans ce state dès que l'helper Wood a
+	; touché l'adversaire (attention donc : il faut bien saisir la
+	; chronologie !). On entre donc dans ce state alors même que P2 n'est
+	; pas encore dans le state 29260.
+	;--[End]--
+
+[State 29500, VarChange]
+type = VarSet
+trigger1 = NumHelper(29200) != 0
+trigger1 = Helper(29200), AnimElem = 7
+var(50) = 3
+
+	;--[Explications]
+	; On va utiliser une variable pour faire réagir KFM en fonction de
+	; ce que fait son helper Ninja. KFM est censé rester un certain temps
+	; dans ce state, et plusieurs choses vont se passer pendant qu'il y
+	; sera : P2, touché par le Wood, va monter ; le ninja va être créé et
+	; va toucher P2 en haut de l'écran et le ramener au sol, puis rebondir
+	; et disparaître, et faire rebondir P2 pour le mettre à portée de
+	; coup de KFM. Ce n'est qu'à ce moment qu'on changera de state.
+	;
+	; On va assigner une variable à un instant T (quand le ninja est
+	; présent et qu'il a commencé à rebondir -- l'anim du rebond du ninja
+	; est la seule à avoir 7 éléments parmi les anims utilisées par cet
+	; helper). Ainsi, on pourra faire agir (ou non) KFM selon que l'on se
+	; situe avant ou après cet instant T.
+	;--[End]--
+	
+[State 29500, HitGround]
+type = HitAdd
+trigger1 = P2Stateno = 29260
+persistent = 0
+value = 1
+
+	;--[Explications]
+	; Lorsque P2 touche le sol, on rajoute 1 au compteur de combo.
+	;--[End]--
+
+[State 29500, PalPrep]
+type = PalFX
+trigger1 = P2StateNo = 29260
+time = 1
+add = 5*(Enemy, Time), 5*(Enemy, Time), 0
+
+	;--[Explications]
+	; A partir du moment où P2 rebondit du sol, on va appliquer un effet
+	; lumineux sur KFM, qui va le jaunir progressivement, en fonction
+	; du temps de state de P2.
+	;--[End]--
+
+[State 29500, AnotherHelper]
+type = Helper
+trigger1 = (Floor(Enemy, ScreenPos Y)) < 120
+persistent = 0
+name = "Ninja"
+ID = 29200
+postype = P2
+pos = 0,0 ; -Floor(ScreenPos Y)-20
+stateno = 29200
+ownpal = 1
+
+	;--[Explications]
+	; On se trouve dans le cas où P2 vient d'être touché par le Wood, et
+	; monte. Quand il atteint une certaine hauteur, on va créer l'helper
+	; Ninja et l'envoyer en state 29200.
+	;
+	; Comment être sûr que notre Ninja ne va pas apparaître sur un saut
+	; de l'adversaire ? Parce que KFM se trouve en state 29500, et qu'il
+	; ne peut arriver là que si l'adversaire est touché (= touché par le
+	; Wood).
+	;
+	; On utilise le paramètre "universel" (utilisable avec n'importe quel
+	; state controller) "persistent = 0" afin que ce controller ne se
+	; déclenche qu'une seule fois, pour éviter d'avoir 36 ninjas !
+	;--[End]--
+
+[State 29500, Change]
+type = ChangeState
+trigger1 = var(50) = 3
+trigger1 = Floor(Enemy, Pos Y) <= -60
+trigger1 = Floor(P2Dist X) < 66
+value = 29600
+
+	;--[Explications]
+	; Lorsque l'adversaire est à portée, on va changer de state pour
+	; sortir le KFPalm.
+	;
+	; Voici l'utilité de la var(50) : on ne peut changer de state (c'est
+	; à dire sortir le coup suivant) que si le ninja vient de rebondir,
+	; c'est à dire si P2 a rebondi au sol !
+	;
+	; Pourquoi cette "précaution" ? Eh bien nous devons envisager tous
+	; les cas de figure ; imaginons que lors de l'impact avec le Wood,
+	; P2 soit à 60 pixels de KFM. KFM arrive en state 29500, et on voit
+	; que le 3ème trigger1 est rempli. P2 commence à monter, et bientôt,
+	; il va atteindre ou dépasser une position Y de -60 (-62 par exemple).
+	; Dès lors, le 2ème trigger1 est rempli, et si nous n'avons pas le
+	; premier trigger1, alors toutes les conditions sont remplies et 
+	; KFM déclenche son coup alors même l'helper Ninja n'a pas fait son
+	; apparition.
+	;
+	; Avec la variable, on oblige KFM à attendre que P2 rebondisse du sol,
+	; suite à l'intervention du ninja, pour pouvoir sortir le prochain 
+	; coup.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29600] ; Second coup KFM
+type = S
+movetype = A
+physics = N
+anim = 29600
+ctrl = 0
+
+[State 29600, MoveSnd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,2
+
+	;--[Explications]
+	; Son du mouvement de KFMM quand il donne son coup.
+	;--[End]--
+
+[State 29600, ReinitVar]
+type = VarSet
+trigger1 = Time = 0
+var(50) = 0
+
+	;--[Explications]
+	; On réinitialise la variable 50 pour qu'elle soit de nouveau à 0 la
+	; prochaine fois qu'on lancera ce coup.
+	;--[End]--
+
+[State 29600, StopTarget]
+type = TargetVelSet
+trigger1 = Time = 0
+X = 0
+Y = 0
+
+	;--[Explications]
+	; P2 est à portée de coup, donc on l'immobilise pour ne pas le rater.
+	;--[End]--
+
+[State 29600, Hit]
+type = HitDef
+trigger1 = AnimElem = 2
+attr = S, HA
+hitflag = MAF
+damage = 75
+pausetime = 0,0
+sparkno = 3
+sparkxy = 0,-60
+p1stateno = 29610
+p2stateno = 29650
+snap = 65,-60
+hitsound = 5,3
+kill = 0
+
+	;--[Explications]
+	; Le coup de KFM, toujours avec une petite ressemblance avec les
+	; prises. On change P1 et P2 de states, et comme on n'est pas censé
+	; rater l'adversaire, on ne prévoit rien derrière.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29610] ; Make Target Bounce, waiting
+type = S
+movetype = I
+physics = N
+anim = 29610
+
+[State 29610, PauseOnHit]
+type = Pause
+trigger1 = Time = 0
+time = 15
+
+	;--[Explications]
+	; On utilise une Pause sur simuler l'impact du coup.
+	;--[End]--
+
+[State 29610, TargetVel]
+type = TargetVelSet
+trigger1 = Time = 1
+X = -8
+Y = -4
+
+	;--[Explications]
+	; On applique une vitesse à P2 qui correspond au recul suite au coup.
+	;--[End]--
+
+[State 29610, TargetBounce]
+type = TargetState
+trigger1 = Enemy, BackEdgeDist < 5
+value = 29660
+
+	;--[Explications]
+	; Quand l'ennemi touche le bord de l'écran, on le change de state.
+	;--[End]--
+
+[State 29610, ExplodOnBounce]
+type = Explod
+trigger1 = P2StateNo = 29660
+persistent = 0
+anim = F72
+ID = 29610
+facing = 1
+postype = p2
+pos = 0,0
+
+	;--[Explications]
+	; Quand P2 rebondit sur le bord de l'écran, on affiche un explod pour
+	; simuler l'impact.
+	;--[End]--
+
+[State 29610, BounceSnd]
+type = PlaySnd
+trigger1 = NumExplod(29610) = 1
+persistent = 0
+value = F7,1
+
+	;--[Explications]
+	; Son du rebond sur le mur. On utilise un "persistent = 0" pour que
+	; le son ne se déclenche qu'une seule fois.
+	;--[End]--
+
+[State 29610, TargetVelBounce]
+type = TargetVelSet
+trigger1 = P2StateNo = 29660
+persistent = 0
+X = 8
+
+	;--[Explications]
+	; Quand P2 est dans le state 29660 (donc après le rebond sur le bord
+	; de l'écran, on change sa vitesse pour le faire repartir dans l'autre
+	; sens.
+	;--[End]--
+	
+[State 29610, HitScreenBound]
+type = HitAdd
+trigger1 = P2StateNo = 29660
+persistent = 0
+value = 1
+
+	;--[Explications]
+	; Lorsque P2 touche le bord de l'écran, on rajoute 1 au compteur de
+	; combo.
+	;--[End]--
+
+[State 29610, TargetVelBounce]
+type = TargetVelAdd
+trigger1 = P2StateNo = 29660
+Y = .33
+
+	;--[Explications]
+	; A partir du moment où P2 touche le bord de l'écran, on réduit 
+	; progressivement sa vitesse en y pour simuler la chute.
+	;
+	; A noter que l'utilisation de ces vitesses permet que P2 retombe
+	; à portée de KFM pour le dernier coup, et ce, quelque soit la
+	; position de départ des deux joueurs.
+	;--[End]--
+
+[State 29610, PalPrep]
+type = PalFX
+trigger1 = P2StateNo = 29660
+time = 1
+add = 10*(Enemy, Time), 10*(Enemy, Time), 0
+
+	;--[Explications]
+	; A partir du moment où P2 rebondit contre le bord de l'écran, on va
+	; appliquer un effet lumineux sur KFM, qui va le jaunir 
+	; progressivement, en fonction du temps de state de P2. Idem State
+	; 29500, PalPrep.
+	;--[End]--
+
+[State 29610, ToHit2]
+type = ChangeState
+trigger1 = P2StateNo = 29660
+trigger1 = P2Dist X < 95
+value = 29700
+
+	;--[Explications]
+	; Lorsque P2 est presque à portée de coup, on change de state.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29650] ; Hit sur Second coup KFM
+type = A
+movetype = H
+physics = N
+velset = 0,0
+
+[State 29650, Anim]
+type = ChangeAnim2
+trigger1 = Time = 0
+value = 29650
+
+	;--[Explications]
+	; Comme d'habitude, on place P2 dans un state pendant un temps
+	; indéterminé, jusqu'à ce que le coup suivant le change de state,
+	; le coup suivant étant le rebond contre le mur.
+	;--[End]--
+
+[State 29650, CheckKFM]
+type = ChangeState
+trigger1 = P2StateNo != [29000,29999]
+value = 29350
+
+	;--[Explications]
+	; cf. State 29150, checkKFM & 29250, checkKFM
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29660] ; Hit sur rebond écran
+type = A
+movetype = H
+physics = N
+
+[State 29660, Turn]
+type = Turn
+trigger1 = Time = 0
+
+	;--[Explications]
+	; On change de state quand P2 touche le bord de l'écran. On doit
+	; donc le retourner.
+	;--[End]--
+
+[State 29660, Anim]
+type = ChangeAnim2
+trigger1 = Time = 0
+value = 29660
+
+	;--[Explications]
+	; Changement traditionnel d'animation. P2 reste dans ce state jusqu'au
+	; Smash Upper, dernier coup de l'enchaînement.
+	;--[End]--
+
+[State 29660, CheckKFM]
+type = ChangeState
+trigger1 = P2StateNo != [29000,29999]
+value = 29350
+
+	;--[Explications]
+	; cf. State 29150, checkKFM & 29250, checkKFM
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 29700] ; Troisième coup KFM
+type = S
+movetype = A
+physics = N
+anim = 29700
+
+[State 29700, BounceSnd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,2
+
+	;--[Explications]
+	; Son du mouvement.
+	;--[End]--
+
+[State 29700, Hit]
+type = HitDef
+trigger1 = AnimElem = 7
+attr = S, HA
+hitflag = MAF
+damage = 150
+pausetime = 30,30
+sparkno = 3
+sparkxy = -10,-125
+animtype = Up
+fall = 1
+air.velocity = -3,-25
+p2facing = 1
+fall.recover = 0
+fall.damage = 15
+fall.envshake.time = 30
+fall.envshake.freq = 60
+fall.envshake.ampl = -5
+fall.envshake.phase = 0
+mindist = 50,-50            ;Keep p2 a minimum of 50 pixels away from p1, and no higher than 100 pixels up
+maxdist = 100,-10            ;Keep p2 a maximum of 100 pixels away from p1, and no lower than 10 pixels below
+yaccel = .8
+hitsound = 5,3
+guardsound = 6,0
+kill = 0
+
+	;--[Explications]
+	; C'est le dernier coup de KFM. On le déclenche quand P2 est à portée
+	; (passage du state 29600 au 29700), ce qui nous garantit de pouvoir
+	; toucher l'adversaire. Cette fois, comme il s'agit du dernier coup,
+	; on utilise pas de "kill = 0". Comme P2 est de dos au moment de
+	; l'impact (face au bord de l'écran qu'il vient de toucher), on
+	; utilise le p2facing pour forcer P2 à se remettre face à KFM. On
+	; utilise des paramètres de fall pour faire chuter l'adversaire
+	; au sol, sans lui laisser la possibilité de se rétablir.
+ 	;
+	; La vitesse donnée à P2 le fait partir très haut dans les airs (hors
+	; de l'écran). On n'utilise qu'un air.velocity car on a contrôlé tous
+	; les éléments précédents, si bien que le coup ne peut toucher P2
+	; que lorsqu'il est dans les airs. Et on utilise un fall.damage pour
+	; que P2 perde encore de la vie lorsqu'il s'écrase au sol.
+	; 
+	; Par contre, on ne sait pas très exactement où va se situer P2 au 
+	; moment du coup. On va donc le repositionner en x grâce au snap. 
+	; (mais pas en y, c'est pourquoi il n'y a qu'une valeur).
+	; 
+	; Enfin, on utilise des paramètres envshake pour provoquer un 
+	; tremblement lorsque P2 s'écrase par terre.
+	;
+	; A noter que le HitDef renvoie automatiquement P2 dans son propre
+	; CNS et dans son propre AIR. C'est pourquoi on n'utilise pas de
+	; SelfState, contrairement à une prise traditionnelle.
+	;--[End]--
+
+[State 29700, HitGround]
+type = HitAdd
+trigger1 = P2StateType = L
+value = 1
+
+	;--[Explications]
+	; Lorsque P2 touche le sol, on rajoute 1 au compteur de combo.
+	;
+	; Le trigger est le même que pour le ChangeState, mais comme il
+	; est situé avant, il est déclenché avant que KFM ne change de
+	; state.
+	;--[End]--
+
+[State 29700, End]
+type = ChangeState
+trigger1 = P2StateType = L
+value = 0
+ctrl = 1
+
+	;--[Explications]
+	; On attend que l'adversaire doit au sol pour redonner le contrôle
+	; à P2 et le renvoyer en stand.
+	;--[End]--
+
+;===========================================================================
+; TRANSVERSAL MOVING
+;===========================================================================
+[StateDef 30000] ; Initialisation des données du TM avant low
+type = S
+movetype = I
+physics = N
+anim = 30000
+velset = 0,0
+ctrl = 0
+
+	;--[Explications]
+	; Dans les states 30000 à 30050, on va régler la vitesse du mouvement.
+	; Cette vitesse dépend de deux choses : d'abord la "puissance" des
+	; boutons utilisés (LK+MK = faible ; MK+HK = fort ; LK+HK = moyen),
+	; qui va donner la valeur absolue de la vitesse, et ensuite la
+	; direction du mouvement (avant ou arrière) qui donnera le signe
+	; (+ ou -) appliquée à la vitesse.
+	;
+	; La valeur de cette vitesse différera selon le state -1 qui aura été
+	; activé. Les 6 states auxquels renvoient les state -1 ne font que
+	; paramétrer cette vitesse, avant d'envoyer le perso dans un state
+	; commun pour les 6 mouvements, où seule la valeur de la vitesse
+	; créera une différence.
+	;
+	; Cette "technique" d'avoir des states de paramétrage et un "tronc
+	; commun" pour plusieurs mouvements similaires permet d'avoir un code
+	; plus court, avec les mêmes effets, et d'éviter de recopier plusieurs
+	; fois le même code en ne changeant qu'une valeur.
+	;--[End]--
+
+[State 30000, VelMove]
+type = VarSet
+trigger1 = Time = 0
+var(58) = 4
+
+	;--[Explications]
+	; On règle la vitesse du déplacement : avant, donc + et faible, donc
+	; 4. La valeur de la vitesse du mouvement est stockée dans une 
+	; variable pour être réutilisée dans le state "commun".
+	;
+	; NB 1 : La variable utilisée dans les 6 states de "paramétrage" est
+	; la même à chaque fois, bien sûr.
+	;
+	; NB 2 : Ici, on utilise une variable entière "var()" et non une
+	; variable flottante "fvar()", car la vitesse attribuée est une valeur
+	; entière. Si on voulait donner une vitesse non entière (6.5 par ex.),
+	; on devrait utiliser une variable flottante.
+	;--[End]--
+
+[State 30000, ToMove]
+type = ChangeState
+trigger1 = Time = 1
+value = 30500
+
+	;--[Explications]
+	; On envoie ensuite le perso dans le state "commun".
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 30010] ; Initialisation des données du TM avant medium
+type = S
+movetype = I
+physics = N
+anim = 30000
+velset = 0,0
+ctrl = 0
+
+[State 30010, VelMove]
+type = VarSet
+trigger1 = Time = 0
+var(58) = 7
+
+	;--[Explications]
+	; Idem state 30000 : avant = + ; moyen = 7
+	;--[End]--
+
+[State 30010, ToMove]
+type = ChangeState
+trigger1 = Time = 1
+value = 30500
+
+	;--[Explications]
+	; Idem state 30000
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 30020] ; Initialisation des données du TM avant high
+type = S
+movetype = I
+physics = N
+anim = 30000
+velset = 0,0
+ctrl = 0
+
+[State 30020, VelMove]
+type = VarSet
+trigger1 = Time = 0
+var(58) = 12
+
+	;--[Explications]
+	; Idem state 30000 : avant = + : fort = 7
+	;--[End]--
+
+[State 30020, ToMove]
+type = ChangeState
+trigger1 = Time = 1
+value = 30500
+
+	;--[Explications]
+	; Idem state 30000
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 30030] ; Initialisation des données du TM arrière low
+type = S
+movetype = I
+physics = N
+anim = 30000
+velset = 0,0
+ctrl = 0
+
+[State 30030, VelMove]
+type = VarSet
+trigger1 = Time = 0
+var(58) = -4
+
+	;--[Explications]
+	; Idem state 30000 : arrière = - ; faible = 4
+	;--[End]--
+
+[State 30030, ToMove]
+type = ChangeState
+trigger1 = Time = 1
+value = 30500
+
+	;--[Explications]
+	; Idem state 30000
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 30040] ; Initialisation des données du TM arrière medium
+type = S
+movetype = I
+physics = N
+anim = 30000
+velset = 0,0
+ctrl = 0
+
+[State 30040, VelMove]
+type = VarSet
+trigger1 = Time = 0
+var(58) = -7
+
+	;--[Explications]
+	; Idem state 30000 : arrière = - ; moyen = 7
+	;--[End]--
+
+[State 30040, ToMove]
+type = ChangeState
+trigger1 = Time = 1
+value = 30500
+
+	;--[Explications]
+	; Idem state 30000
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 30050] ; Initialisation des données du TM arrière high
+type = S
+movetype = I
+physics = N
+anim = 30000
+velset = 0,0
+ctrl = 0
+
+[State 30010, VelMove]
+type = VarSet
+trigger1 = Time = 0
+var(58) = -12
+
+	;--[Explications]
+	; Idem state 30000 : arrière = - ; fort = 12
+	;--[End]--
+
+[State 30010, ToMove]
+type = ChangeState
+trigger1 = Time = 1
+value = 30500
+
+	;--[Explications]
+	; Idem state 30000
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 30500] ; Départ
+type = S
+movetype = I
+physics = N
+velset = 0,0
+ctrl = 0
+
+	;--[Explications]
+	; On ne précise pas d'animation ici, si bien que KFM va simplement
+	; rester dans l'anim précisée dans le state précédent.
+	;
+	; Ce state va faire partir KFM en sens inverse par rapport à la
+	; direction du mouvement (si le mouvement va vers l'avant, KFM
+	; va aller vers l'arrière). Ceci va créer un léger effet de glisse
+	; que j'aime bien ;)
+	;--[End]--
+
+[State 30500, Snd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 30000,0
+
+	;--[Explications]
+	; Son du déplacement.
+	;--[End]--
+
+[State 30500, SkidVel]
+type = VelSet
+trigger1 = Time = 0
+X = IfElse(var(58)>0, -3, 3)
+
+	;--[Explications]
+	; On se base sur la vitesse du mouvement pour donner, au départ, une
+	; vitesse fixe de 3 avec une direction opposée à celle paramétrée.
+	;
+	; Ici, on ne s'occupe donc que du signe de la valeur de la var(58),
+	; pas de sa valeur.
+	;--[End]--
+
+[State 30500, Change]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 30600
+
+	;--[Explications]
+	; Quand la "glissade" est terminée, on passe au state principal du
+	; mouvement : le vrai déplacement.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 30600] ; Déplacement Transversal
+type = S
+movetype = I
+physics = N
+anim = IfElse(var(58)>0,30100,30200)
+velset = 0,0
+ctrl = 0
+
+	;--[Explications]
+	; Là encore, on règle l'animation utilisée selon le signe de la
+	; variable (Rappel : c'est à dire selon la direction du mouvement).
+	;--[End]--
+
+[State 30600, AfterI]
+type = AfterImage
+trigger1 = Time = 0
+time = 30
+palcontrast = 110,110,120
+palpostbright = 0,0,0
+paladd = 0,0,0
+palmul = 1,1,1
+trans = add
+
+	;--[Explications]
+	; On crée un effet de traînée au début du mouvement. Cet effet dure
+	; 30 ticks, soit la durée normale du mouvement.
+	;--[End]--
+
+[State 30600, VelApp]
+type = VelSet
+trigger1 = Time = 0
+X = var(58)
+
+	;--[Explications]
+	; On règle maintenant la vitesse selon la variable défini dans les
+	; states de paramétrage.
+	;--[End]--
+
+[State 30600, VelSlacken]
+type = VelAdd
+trigger1 = Time > 19
+trigger1 = Vel X != 0
+X = IfElse((Vel X)*var(58)>0,-(var(58)/10.0), (var(58)/10.0))
+
+	;--[Explications]
+	; Ne vous arrachez pas les cheveux ! En fait, comme beaucoup de
+	; formules qui semblent complexes, il suffit de détailler pour
+	; s'apercevoir que c'est en fait très simple.
+	;
+	; Tout d'abord, à quoi sert ce state ? Eh bien, le mouvement est
+	; censé durer 30 ticks (valeur que j'ai définie arbitrairement).
+	; Pour éviter que KFM ne s'arrête de façon brutale, on va le faire
+	; ralentir de façon progressive sur les 10 derniers ticks. Pour cela,
+	; on va juste enlever 1/10 ème de la vitesse de départ à chacun de
+	; ces 10 ticks (conclusion, à la fin des 10 ticks, on doit être à 0).
+	;
+	; Ensuite, le trigger : le controller doit se déclencher tant que la
+	; vitesse de KFM est différente de 0.
+	;
+	; Enfin, la formule : la condition du IfElse est que la vitesse 
+	; actuelle, multipliée par la vitesse de départ, soit supérieure à 0.
+	; Le but de ce calcul est tout simplement de déterminer si KFM s'est
+	; retourné ou non pendant le déplacement.
+	;
+	; Car, comme on va le voir plus loin, si lors de son déplacement, KFM
+	; dépasse son adversaire, il va se retourner et du coup, sa vitesse
+	; va changer : au début du mouvement, il va vers l'avant, mais en se
+	; retournant après avoir dépassé son adversaire, sa direction change.
+	;
+	; Si sa direction change, le signe de sa vitesse change (au début,
+	; le signe est positif, et après le déplacement, il devient négatif).
+	; Multiplier la vitesse de départ par la vitesse actuelle va nous
+	; fournir un renseignement sur le changement éventuel de signe : si
+	; les deux signes sont identiques, alors le résultat sera forcément
+	; positif ("- par - donne +" et "+ par + donne +"), alors que s'ils
+	; sont différents, le résultat sera négatif ("+ par - donne -").
+	;
+	; Si les signes sont identiques, on enlève 1/10ème de la vitesse de
+	; départ, alors que s'ils sont différents, on rajoute 1/10ème de
+	; cette vitesse.
+	;
+	; Enfin, un petit mot sur le calcul de la vitesse enlevée : on divise
+	; par "10.0"et non par "10" car on souhaite utiliser une valeur
+	; décimale. Or var(58) est une variable entière, et "10" est lue aussi
+	; comme une valeur entière. Et dans Mugen au moins, le résultat d'une
+	; division entre 2 entiers est forcément un entier. Donc si on a par
+	; exemple var(58) = 12, alors var(58)/10 = 1. En revanche, le résultat
+	; d'une division entre un entier et un décimal donnera un décimal (la
+	; valeur entière est convertie en décimale avant l'opération) et donc
+	; var(58)/10.0 = 1.2
+	;
+	; Ceci a son importance pour le déplacement faible : la var(58) vaut
+	; 4 et 4/10 = 0, ce qui implique qu'on ne toucherait pas à la vitesse
+	; de KFM dans ce state.
+	;--[End]--
+
+[State 30600, VelStop]
+type = VelSet
+trigger1 = Time = 29
+X = 0
+
+	;--[Explications]
+	; Due à quelques arrondis/approximations de Mugen dans ces calculs,
+	; qui peuvent laisser la vitesse à 0.0000001 par exemple, on fixe 
+	; la vitesse à 0 après le délai de 10 ticks.
+	;--[End]--
+
+[State 30600, AnimOnTurn]
+type = ChangeAnim
+trigger1 = Facing = Enemy, facing
+value = IfElse(var(58)>0,30200,30100)
+
+	;--[Explications]
+	; Si les deux joueurs ont le même facing, ça veut dire que KFM a
+	; dépassé son adversaire : on va le retourner et il faut donc
+	; changer son animation (KFM allait vers l'avant, alors qu'une
+	; fois retourné, il ira vers l'arrière).
+	;--[End]--
+
+[State 30600, Turn]
+type = Turn
+trigger1 = Facing = Enemy, facing
+
+	;--[Explications]
+	; Comme expliqué ci-avant, si les deux joueurs ont le même facing,
+	; c'est que KFM a dépassé son adversaire, donc on le retourne pour
+	; qu'il reste face à son adversaire.
+	;--[End]--
+
+[State 30600, End]
+type = ChangeState
+trigger1 = Time = 29
+value = 30700
+
+	;--[Explications]
+	; On a arrêté KFM : on l'envoie dans le state de fin du mouvement.
+	;--[End]--
+
+;------------------------------------------------
+[StateDef 30700] ; Retour au stance
+type = S
+movetype = I
+physics = S
+anim = IfElse(Anim=30100,30150,30250)
+velset = 0
+ctrl = 0
+
+	;--[Explications]
+	; Selon l'anim qu'utilisait KFM (anim elle-même déterminée par la
+	; direction dans laquelle il allait), on va lui donner une nouvelle
+	; anim de transition vers l'avant ou vers l'arrière.
+	;--[End]--
+
+[State 30700]
+type = CtrlSet
+trigger1 = AnimElem = 2
+value = 1
+
+	;--[Explications]
+	; On rend le contrôle un peu avant la fin du mouvement.
+	;--[End]--
+
+[State 30700]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+	;--[Explications]
+	; Fin du mouvement, on revient en stance.
+	;--[End]--
+
+;===========================================================================
+; KUNG FU HYPER CHAIN
+;===========================================================================
+
+
+;---------------------------------------------------------------------------
+; ƒX[ƒp[•SŠÑ—‚Æ‚µ(T`)
+;---------------------------------------------------------------------------
+[Statedef 7710]
+type = S
+movetype= A
+physics = S
+juggle  = 0
+velset = 3,0
+poweradd = 162
+ctrl = 0
+anim = 7710
+sprpriority = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S777,5
+
+
+
+[State 1000, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA                     ;Attribute: Standing, Normal Attack
+damage = 100, 0                   ;Damage that move inflicts, guard damage
+animtype = heavy                 ;Animation type: Light, Medium, Heavy, Back (def: Light)
+guardflag = MA                   ;Flags on how move is to be guarded against
+hitflag = MAF                    ;Flags of conditions that move can hit
+priority = 3, hit                ;Attack priority: 0 (least) to 7 (most), 4 default
+;Hit/Miss/Dodge type (Def: Hit)
+pausetime = 14, 30                ;Time attacker pauses, time opponent shakes
+sparkno = -1                      ;Spark anim no (Def: set above)
+sparkxy = -5, -20              ;X-offset for the "hit spark" rel. to p2,
+;Y-offset for the spark rel. to p1
+hitsound = 5,2                 ;Sound to play on hit
+guardsound = 6, 0                ;Sound to play on guard
+ground.type = low               ;Type: High, Low, Trip (def: Normal)
+ground.slidetime = 10             ;Time that the opponent slides back
+ground.hittime  = 25            ;Time opponent is in hit state
+ground.velocity = 15, 0             ;Velocity at which opponent is pushed
+airguard.velocity = -1.9,-.8     ;Guard velocity in air (def: (air.xvel*1.5, air.yvel/2))
+air.type = High                  ;Type: High, Low, Trip (def: same as ground.type)
+air.velocity = 10, 5           ;X-velocity at which opponent is pushed,
+;Y-velocity at which opponent is pushed
+air.hittime = 12                 ;Time before opponent regains control in air
+
+
+[State 200, end]
+type = ChangeState
+trigger1 = movehit
+value = 7720
+ctrl = 1
+
+
+[State 200, end]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;-------------------------------------------------------------------
+[Statedef 7720]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+poweradd= 22
+ctrl = 0
+velset = 0,0
+anim = 7720
+
+[State 230, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+
+
+;===========================================================================
+;=====[END OF NEW MOVES FOR KFM MASTER BY MIKE WEREWOLF]====================
+;===========================================================================
+	;--[Explications]
+	; 
+	;--[End]--

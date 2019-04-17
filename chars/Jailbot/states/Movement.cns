@@ -1,0 +1,1606 @@
+; Jailbot by altoiddealer
+;---------------------------------------------------------------------------
+;MOVEMENT
+;---------------------------------------------------------------------------
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; VARIABLES
+
+; var(1)     =     Intro poses
+; var(2)     =     Detect Enemy Blood Color
+; var(3)     =     Set special transition anims
+; var(4)     =     Temporary info logging
+; var(5)     =     Dynamic Face Configuration
+; var(6)     =     Face Type (Healthy/hurt/almost dead)
+; var(7)     =     Face Control (Dynamic Face)
+; var(8)     =     Face Glitch Scanlines
+; var(9)     =     Face Glitch-erizer
+; var(10)    =     Temporary info logging
+; var(11)    =     Arcade Stuff
+; var(12)    =     Arcade Stuff
+; var(13)    =     Pong Player Control Setting
+;
+; var(56)    =     Artificial Intelligence
+; var(57)    =     Palette Selection
+; var(58)    =     Log current target's ID for custom win state manipulation.
+; var(59)    =     Win poses
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; STAND
+[Statedef 0]
+type = S
+physics = S
+sprpriority = 0
+
+[State 0, Invisible player anims for dynamic face]
+type = AssertSpecial
+trigger1 = var(5) ;Dynamic face is active
+flag = Invisible
+
+[State 0, Refresh Dynamic Explods]
+type = RemoveExplod
+trigger1 = var(5) ;Dynamic face is active
+persistent = 0
+
+[State 0, Transition from Walk FWD]
+type = Changeanim
+trigger1 = var(3) = [1,2] ;was walking forward
+trigger1 = anim && anim != 5 && (anim != [33,37]) ;Not standing, turning, or transitioning from walk
+trigger1 = PrevStateNo = 20 || PrevStateNo = 100 ;Was walking or running forward
+value = 33
+elem = var(3) ;start from correct elem
+persistent = 0
+
+[State 0, Transition from Walk BACK]
+type = Changeanim
+trigger1 = var(3) = 3 ;was walking back
+trigger1 = anim && anim != 5 && (anim != [33,37]) ;Not standing, turning, or transitioning from walk
+trigger1 = PrevStateNo = 20 || PrevStateNo = 105 ;Was walking or running back
+value = 36
+persistent = 0
+
+[State 0, Change to Stand]
+type = Changeanim
+trigger1 = anim && anim != 5 && (anim != [33,37]) ;Not standing, turning, or transitioning from walk
+trigger2 = anim = 5 && !animtime ;Turn anim over
+trigger3 = (anim = [33,37]) && !animtime ;Walk transition anim over
+value = 0
+
+;--------------------------------------------------------
+;Dynamic face Explods
+
+[State 0, Stand scanlines]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+triggerall = var(6) ;Damaged enough for glitch FX
+trigger1 = !anim ;Standing
+ID = 11000
+anim = 11000 + var(8)
+
+[State 0, Stand face]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+triggerall = !numexplod(9) ;not idle
+trigger1 = !anim
+;shadow = -1
+ID = 1000
+anim = 10000 + var(7)
+
+[State 0, Walk FWD transition scanlines]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+triggerall = var(6) ;Damaged enough for glitch FX
+trigger1 = anim = 33
+ID = 11000
+anim = Cond(animelem = 2, >= 0,11018,11036) + var(8) ;determined by animelem
+
+[State 0, Walk FWD transition face]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 33
+;shadow = -1
+ID = 1000
+anim = Cond(animelem = 2, >= 0,10018,10036) + var(7) ;determined by animelem
+
+[State 0, Walk/Run BACK transition scanlines]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+triggerall = var(6) ;Damaged enough for glitch FX
+trigger1 = anim = 36 ;Walk back transition
+ID = 11000
+anim = 11054 + var(8)
+
+[State 0, Walk/Run BACK transition face]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 36 ;Walk back transition
+;shadow = -1
+ID = 1000
+anim = 10054 + var(7)
+
+[State 0, Turn scanlines]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+triggerall = var(6) ;Damaged enough for glitch FX
+trigger1 = anim = 5 ;Turning
+facing = Cond(animelem = 2, < 0,-1,1) ;Because turn anim acts funny
+ID = 11000
+anim = Cond(animelem = 2, >= 0 && animelem = 3, < 0,11150,11132) + var(8) ;determined by animelem
+
+[State 0, Turn face]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 5 ;Turning
+;shadow = -1
+facing = Cond(animelem = 2, < 0,-1,1) ;Because turn anim acts funny
+ID = 1000
+anim = Cond(animelem = 2, >= 0 && animelem = 3, < 0,10150,10132) + var(7) ;determined by animelem
+
+;--------------------------------------------------------
+;Player Explods for dynamic face
+
+[State 0, Transition from Walk FWD Explod]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 33
+shadow = -1
+anim = Cond(animelem = 2, < 0,34,35)
+
+[State 0, Transition from Walk BACK Explod]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 36
+shadow = -1
+anim = 37
+
+[State 0, Turn Explod]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 5
+shadow = -1
+anim = Cond(animelem = 2, < 0,13,Cond(animelem = 3, >= 0,15,14))
+
+[State 0, Stand Explod]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = !anim
+shadow = -1
+anim = 1
+
+;--------------------------------------------------------
+
+[State 0, Turn Sound]
+type = PlaySnd
+trigger1 = Anim = [2,8]
+trigger1 = animelem = 1
+value = 2,0
+volumescale = 40
+
+[State 0, Start/Reset Idle Timer]
+type = varset
+trigger1 = var(4) >= 500
+trigger2 = StateNo = 0 && !Time
+trigger3 = numenemy
+trigger3 = enemynear,StateNo != [0,1]
+trigger3 = var(4) > 0
+var(4) = 0
+
+[State 0, Increment Idle Timer]
+type = varadd
+trigger1 = numenemy
+trigger1 = enemynear,StateNo = [0,1]
+var(4) = 1
+
+[State 0, Idle face]
+type = Explod
+trigger1 = var(4) = 500
+trigger1 = var(9) = [0,6] ;Not a "Glitch" face
+removeongethit = 1
+bindtime = -1
+sprpriority = 1
+id = 9
+anim = 9
+
+[State 0, Remove Idle Face]
+type = RemoveExplod
+trigger1 = numenemy
+trigger1 = enemynear,StateNo != [0,1]
+id = 9
+
+[State 0, Stop Intro Snd]
+type = stopsnd
+trigger1 = !Time
+channel = 30
+
+[State 0, Ctrl Workaround for Arcade Win Pose]
+type = CtrlSet
+trigger1 = var(59) = 5 ;Arcade custom winpose
+value = Time%60 = 59 ;toggle active for 1 out of 60 ticks
+
+[State 0, 10]
+type = VelSet
+trigger1 = !Time
+y = 0
+
+[State 0, Stop moving] ;if low velocity or 4 ticks pass
+type = VelSet
+trigger1 = Abs(vel x) < Const(movement.stand.friction.threshold)
+trigger2 = Time = 4
+x = 0
+
+[State 0, Dead check]
+type = ChangeState
+trigger1 = !alive
+value = 5050
+ctrl = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; DO NOT CROUCH
+[Statedef 10]
+type = S
+physics = S
+anim = 0
+
+[State 10, 3]
+type = ChangeState
+trigger1 = 1
+value = 11
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; DO NOT CROUCH
+[Statedef 11]
+type = S
+physics = S
+sprpriority = 0
+
+[State 11, 1]
+type = VelMul
+trigger1 = !Time
+x = .75
+
+[State 11, 2] ;Stop moving if low velocity
+type = VelSet
+trigger1 = abs(vel x) < Const(movement.crouch.friction.threshold)
+x = 0
+
+[State 11, Invisible player anims for dynamic face]
+type = AssertSpecial
+trigger1 = var(5) ;Dynamic face is active
+flag = Invisible
+
+[State 11, Refresh Dynamic Explods]
+type = RemoveExplod
+trigger1 = var(5) ;Dynamic face is active
+persistent = 0
+
+[State 11, Change to Stand]
+type = Changeanim
+trigger1 = anim != 0 && anim != 5
+trigger2 = anim = 5 && !animtime ;Turn anim over
+value = 0
+
+;--------------------------------------------------------
+;Dynamic face Explods
+
+[State 11, Stand scanlines]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+triggerall = var(6) ;Damaged enough for glitch FX
+trigger1 = !anim ;Standing
+ID = 11000
+anim = 11000 + var(8)
+
+[State 11, Stand face]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+triggerall = !numexplod(9) ;not idle
+trigger1 = !anim
+;shadow = -1
+ID = 1000
+anim = 10000 + var(7)
+
+[State 11, Turn scanlines]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+triggerall = var(6) ;Damaged enough for glitch FX
+trigger1 = anim = 5 ;Turning
+facing = Cond(animelem = 2, < 0,-1,1) ;Because turn anim acts funny
+ID = 11000
+anim = Cond(animelem = 2, >= 0 && animelem = 3, < 0,11150,11132) + var(8) ;determined by animelem
+
+[State 11, Turn face]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 5 ;Turning
+;shadow = -1
+facing = Cond(animelem = 2, < 0,-1,1) ;Because turn anim acts funny
+ID = 1000
+anim = Cond(animelem = 2, >= 0 && animelem = 3, < 0,10150,10132) + var(7) ;determined by animelem
+
+;--------------------------------------------------------
+;Player Explods for dynamic face
+
+[State 11, Turn Explod]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 5
+shadow = -1
+anim = Cond(animelem = 2, < 0,13,Cond(animelem = 3, >= 0,15,14))
+
+[State 11, Stand Explod]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = !anim
+shadow = -1
+anim = 1
+
+;--------------------------------------------------------
+
+[State 11, Start/Reset Idle Timer]
+type = varset
+trigger1 = var(4) >= 500
+trigger2 = numenemy
+trigger2 = enemynear,StateNo != [0,1]
+trigger2 = var(4) > 0
+var(4) = 0
+
+[State 11, Increment Idle Timer]
+type = varadd
+trigger1 = StateNo = 1
+trigger1 = numenemy
+trigger1 = enemynear,StateNo = [0,1]
+var(4) = 1
+
+[State 11, 10]
+type = VelSet
+trigger1 = !Time
+y = 0
+
+[State 11, Stop moving] ;if low velocity or 4 ticks pass
+type = VelSet
+trigger1 = Abs(vel x) < Const(movement.stand.friction.threshold)
+trigger2 = Time = 4
+x = 0
+
+[State 11, Dead check]
+type = ChangeState
+trigger1 = !alive
+value = 5050
+ctrl = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; WALK
+[Statedef 20]
+type = S
+physics = S
+sprpriority = 0
+
+[State 20, Invisible player anims for dynamic face]
+type = AssertSpecial
+trigger1 = var(5) ;Dynamic face is active
+flag = Invisible
+
+[State 20, Vel Walk FWD]
+type = VelSet
+trigger1 = command = "holdfwd"
+x = const(velocity.walk.fwd.x)
+
+[State 20, Vel Walk BACK]
+type = VelSet
+trigger1 = command = "holdback"
+x = const(velocity.walk.back.x)
+
+[State 20, Walk FWD]
+type = Changeanim
+triggerall = vel x > 0
+trigger1 = (anim != [2,5]) && anim != 7 && anim != 20 ;Not turning, not walking
+trigger2 = (anim = [2,5]) || anim = 7 ;Turning...
+trigger2 = !animtime ;...and turn anim ended
+value = 20
+
+[State 20, Walk BACK]
+type = Changeanim
+triggerall = vel x < 0
+trigger1 = (anim != [2,5]) && anim != 7 && anim != 21 ;Not turning, not walking
+trigger2 = (anim = [2,5]) || anim = 7 ;Turning...
+trigger2 = !animtime ;...and turn anim ended
+value = 21
+
+;--------------------------------------------------------
+;Dynamic face Explods
+
+[State 20, Walk scanlines]
+type = Explod
+triggerall = var(6) ;Damaged enough for glitch FX
+trigger1 = anim = 20
+ID = 11000
+anim = Cond(AnimElem = 2, < 0,11000,Cond(animelem = 3, < 0,11018,11036)) + var(8) ;determined by animelem
+
+[State 20, Walk face]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 20
+;shadow = -1
+ID = 1000
+anim = Cond(AnimElem = 2, < 0,10000,Cond(animelem = 3, < 0,10018,10036)) + var(7) ;determined by animelem
+
+[State 20, Walk BACK scanlines]
+type = Explod
+triggerall = var(6) ;Damaged enough for glitch FX
+trigger1 = anim = 21
+ID = 11000
+anim = Cond(AnimElem = 2, < 0,11000,Cond(animelem = 3, < 0,11054,11072)) + var(8) ;determined by animelem
+
+[State 20, Walk BACK face]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 21
+;shadow = -1
+ID = 1000
+anim = Cond(AnimElem = 2, < 0,10000,Cond(animelem = 3, < 0,10054,10072)) + var(7) ;determined by animelem
+
+[State 20, Set transition anim]
+type = Null
+trigger1 = !Time || anim = 2 || anim = 7
+trigger1 = var(3) := 0
+trigger2 = anim = 20 && AnimElem = 3
+trigger2 = var(3) := 2
+trigger3 = anim = 20 && AnimElem = 4
+trigger3 = var(3) := 1
+trigger4 = anim = 21 && AnimElem = 3
+trigger4 = var(3) := 3
+
+[State 20, Transition turn]
+type = Changeanim
+trigger1 = var(3) ;Transition set
+trigger1 = anim = 5 && AnimElem = 1
+value = Cond(var(3) = 2,2,7) ;determined by animelem
+
+[State 20, Turn scanlines]
+type = Explod
+trigger1 = Anim = [2,7] ;Turning
+facing = Cond(animelem = 2, < 0,-1,1) ;Because turn anim acts funny
+ID = 11000
+anim = Cond(animelem = 2, >= 0 && animelem = 3, < 0,11150,11132) + var(8) ;determined by animelem
+
+[State 20, Turn face]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = [2,7] ;Turning
+facing = Cond(animelem = 2, < 0,-1,1) ;Because turn anim acts funny
+;shadow = -1
+ID = 1000
+anim = Cond(animelem = 2, >= 0 && animelem = 3, < 0,10150,10132) + var(7) ;determined by animelem
+
+[State 20, Turn Explod]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 5 ;Turning just after started walking
+shadow = -1
+anim = Cond(animelem = 3, >= 0,15,Cond(animelem = 2, < 0,13,14)) ;determined by animelem
+
+[State 20, Turn Explod]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 2 ;Turning just after started walking
+shadow = -1
+anim = Cond(animelem = 3, >= 0,15,Cond(animelem = 2, < 0,16,14)) ;determined by animelem
+
+[State 20, Turn Explod]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 7 ;Turning after walking
+shadow = -1
+anim = Cond(animelem = 3, >= 0,15,Cond(animelem = 2, < 0,17,18)) ;determined by animelem
+
+[State 20, Help dynamic walk]
+type = VarSet
+triggerall = var(5) ;Dynamic face is active
+trigger1 = !Time || (anim != [20,21])
+var(4) = 0
+
+[State 20, Help dynamic walk]
+type = VarAdd
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 20 && (animelem = 2 || animelem = 3 || animelem = 4 || animelem = 5 || animelem = 6 || animelem = 7 || !animtime)
+trigger2 = anim = 21 && (animelem = 2 || animelem = 3 || !animtime)
+var(4) = 1
+
+[State 20, Help dynamic walk]
+type = VarSet
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 20 && var(4) > 6
+trigger2 = anim = 21 && var(4) > 2
+var(4) = Cond(anim = 20,3,2)
+
+[State 20, Walk Explod]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 20
+shadow = -1
+anim = 23+var(4)
+
+[State 20, Walk BACK Explod]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+trigger1 = anim = 21
+shadow = -1
+anim = 30+var(4)
+
+[State 20, Turn Sound]
+type = PlaySnd
+trigger1 = (Anim = [2,8]) && animelem = 1
+value = 2,0
+volumescale = 40
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; JUMP UP
+[Statedef 50]
+type = A
+physics = A
+
+[State 50, 1]
+type = varSet
+trigger1 = !Time
+sysvar(1) = 0
+
+[State 50, Jump flame sounds]
+type = PlaySnd
+trigger1 = Time = 1
+trigger2 = Time = 8
+value = 3990,0
+
+[State 50, Neutral flame left]
+type = Explod
+trigger1 = anim = 41
+anim = 61
+id = 61
+sprpriority = -1
+pos = -12,-19
+ignorehitpause = 1
+bindTime = -1
+persistent = 0
+removeongethit = 1
+
+[State 50, Neutral flame right]
+type = Explod
+trigger1 = anim = 41
+anim = 61
+id = 61
+sprpriority = -1
+pos = 13,-20
+ignorehitpause = 1
+bindTime = -1
+persistent = 0
+removeongethit = 1
+
+[State 50, Forward/Back flame left]
+type = Explod
+trigger1 = anim = [42,43]
+anim = 60
+id = 61
+sprpriority = 2
+facing = Cond(anim = 42,1,-1)
+pos = Cond(anim = 42,-10,6),Cond(anim = 42,-19,-20)
+ignorehitpause = 1
+bindTime = -1
+persistent = 0
+removeongethit = 1
+
+[State 50, Forward/Back flame right]
+type = Explod
+trigger1 = anim = [42,43]
+anim = 60
+id = 61
+sprpriority = 2
+facing = Cond(anim = 42,1,-1)
+pos = Cond(anim = 42,12,23),Cond(anim = 42,-16,-21)
+ignorehitpause = 1
+bindTime = -1
+persistent = 0
+removeongethit = 1
+
+[State 50, Neutral Dust Left]
+type = Explod
+trigger1 = anim = 41
+anim = 8110
+sprpriority = -1
+scale = .6,.6
+pos = 0,4
+ownpal = 1
+persistent = 0
+
+[State 50, Neutral Dust Right]
+type = Explod
+trigger1 = anim = 41
+anim = 8110
+facing = -1
+sprpriority = -1
+scale = .6,.6
+pos = 0,4
+ownpal = 1
+persistent = 0
+
+[State 50, Front/Back Dust Left]
+type = Explod
+trigger1 = anim = [42,43]
+anim = 8110
+sprpriority = -1
+scale = Cond(anim = 42,.75,.6),Cond(anim = 42,.75,.6)
+pos = Cond(anim = 42,0,5),Cond(anim = 42,4,7)
+ownpal = 1
+persistent = 0
+
+[State 50, Front/Back Dust Right]
+type = Explod
+trigger1 = anim = [42,43]
+anim = 8110
+facing = -1
+sprpriority = -1
+scale = Cond(anim = 42,.6,.75),Cond(anim = 42,.6,.75)
+pos = Cond(anim = 42,-5,0),Cond(anim = 42,7,4)
+ownpal = 1
+persistent = 0
+
+[State 50, 4]
+type = Changeanim
+trigger1 = !Time
+value = Cond((vel x)=0, 41, Cond((vel x)>0, 42, 43))
+
+[State 50, 5]
+type = Changeanim
+trigger1 = Vel y > Const720p(-8)
+trigger1 = SelfanimExist(anim + 3)
+trigger1 = anim >= 41 && anim <= 43
+persistent = 0
+value = anim + 3
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;SUPER JUMP START
+[Statedef 55]
+type = S
+physics = S
+anim = 50
+ctrl = 0
+sprpriority = -1
+
+[State 55, Allow Enemy Walkthrough]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 55, Super Jump rocket blast sound]
+type = PlaySnd
+trigger1 = Time = 1
+value = 7000,0
+volumescale = 255
+channel = 0
+
+[State 55, Flames back layer]
+type = Explod
+trigger1 = AnimElem = 4
+anim = 52
+bindTime = -1 ;attached!
+sprpriority = -4
+removeongethit = 1 ;remove if hit
+persistent = 0
+
+[State 55, Flames front layer]
+type = Explod
+trigger1 = AnimElem = 4
+anim = 53
+sprpriority = -3
+removeongethit = 1 ;remove if hit
+persistent = 0
+
+[State 55, Smoke back layer]
+type = Explod
+trigger1 = AnimElem = 4
+anim = 54
+sprpriority = -5
+persistent = 0
+
+[State 55, Smoke front layer]
+type = Explod
+trigger1 = AnimElem = 4
+anim = 55
+sprpriority = 5
+persistent = 0
+
+[State 55, Shake screen]
+type = EnvShake
+trigger1 = AnimElem = 4
+persistent = 0
+Time = 26
+freq = 140
+ampl = -2
+
+[State 55, Change to Super Jump]
+type = ChangeState
+trigger1 = !animtime
+value = 56
+ctrl = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; SUPER JUMP
+[Statedef 56]
+type = A
+physics = A
+movetype = A
+poweradd = 20
+ctrl = 0
+anim = 51
+velset = 0,-7
+sprpriority = -1
+
+[State 56, Allow Enemy Walkthrough]
+type = PlayerPush
+trigger1 = Time < 10
+value = 0
+
+[State 56, HitDef]
+type = HitDef
+trigger1 = anim = 51
+trigger1 = Time%4 = 0
+trigger1 = AnimElem = 2, >= 0 && animelem = 4, < 0
+;trigger1 = AnimElem = 2 || AnimElem = 3 || AnimElem = 4
+attr = A,NA
+damage = 40,1
+animtype = Medium
+guardflag = HA
+hitflag = MAF
+priority = 3, Hit
+pauseTime = 6,6
+sparkno = 1;s7771
+sparkxy = -10,-48
+guard.sparkno = -1
+guard.dist = 0
+hitsound = S200,250 ;5,1
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 12
+ground.hitTime = 12
+ground.velocity = -5,0
+air.type = Low
+air.hitTime = 5
+air.velocity = -2,-8
+fall = 1
+fall.recover = 0
+id = 55
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 56, VelAdd Y]
+type = VelAdd
+trigger1 = Time <= 10
+y = -.65
+
+[State 56, Allow Ctrl]
+type = CtrlSet
+trigger1 = Time = 28
+value = 1
+
+[State 56, Attack End]
+type = StateTypeSet
+trigger1 = Time = 28
+movetype = I
+
+[State 56, Random Number]
+type = VarSet
+trigger1 = 1
+var(10) = Random
+
+[State 56, Reset Var]
+type = VarSet
+trigger1 = Time%16 = 15
+var(4) = 0 ;reset to 0
+
+[State 56, AI Controller]
+type = Null
+triggerall = AILevel && ctrl
+triggerall = Time%16 = 0
+trigger1 = Random < 300-(var(56))*2
+trigger1 = var(4) := 6 ;Do nothing
+trigger2 = var(4) != 6
+trigger2 = ((BackEdgeBodyDist < 100 || P2BodyDist X > 20) && var(10) < 300+(var(56))*2) || var(10) < 100
+trigger2 = var(4) := 1+(Random < 800) ;fwd or up+fwd
+trigger3 = var(4) != 6
+trigger3 = ((FrontEdgeBodyDist < 100 || P2BodyDist X < -20) && var(10) > 700-(var(56))*2) || var(10) >= 900
+trigger3 = var(4) := 3+(Random < 800) ;back or up+back
+trigger4 = var(4) != [1,6]
+trigger4 = var(4) := 5 ;just up
+
+[State 56, Jump flame sounds]
+type = PlaySnd
+triggerall = ctrl
+triggerall = Time%8 = 0
+trigger1 = !AILevel
+trigger1 = command = "holdfwd" || command = "holdback" || command = "holdup"
+trigger2 = AILevel && var(4)
+value = 3990,0
+
+[State 56, VelAdd X]
+type = VelAdd
+triggerall = ctrl
+triggerall = Vel X <= 5
+trigger1 = !AIlevel && command = "holdfwd"
+trigger2 = AIlevel && (var(4) = [1,2])
+x = .5
+
+[State 56, VelAdd X]
+type = VelAdd
+triggerall = ctrl
+triggerall = Vel X >= -4.5
+trigger1 = !AIlevel && command = "holdback"
+trigger2 = AIlevel && (var(4) = [3,4])
+x = -.5
+
+[State 56, VelAdd Y]
+type = VelAdd
+triggerall = ctrl
+triggerall = Vel Y >= 2
+trigger1 = !AIlevel && command = "holdup"
+trigger2 = AILevel && (var(4) = 2 || var(4) = 4)
+y = -.25
+
+[State 56, Jet Up]
+type = Changeanim
+triggerall = ctrl
+triggerall = anim != 57 ;let anim play through
+trigger1 = !AILevel
+trigger1 = command = "holdup" && command != "holdupfwd" && command != "holdupback"
+trigger2 = AILevel && var(4) = 5
+value = 57
+
+[State 56, Jet Forward]
+type = Changeanim
+triggerall = ctrl
+triggerall = anim != 58 ;let anim play through
+trigger1 = !AILevel && command = "holdfwd"
+trigger2 = AIlevel && (var(4) = [1,2])
+value = 58
+
+[State 56, Jet Back]
+type = Changeanim
+triggerall = ctrl
+triggerall = anim != 59 ;let anim play through
+trigger1 = !AILevel && command = "holdback"
+trigger2 = AIlevel && (var(4) = [3,4])
+value = 59
+
+[State 56, Up flame left]
+type = Explod
+triggerall = ctrl
+triggerall = numexplod(7002) = 0
+trigger1 = !AILevel
+trigger1 = command = "holdup" && command != "holdupfwd" && command != "holdupback"
+trigger2 = AILevel && var(4) = 5
+anim = 61
+id = 7002
+sprpriority = -1
+pos = -12,-19
+bindTime = -1
+removeTime = -1
+removeongethit = 1
+
+[State 56, Up flame right]
+type = Explod
+triggerall = ctrl
+triggerall = numexplod(7002) = 1
+trigger1 = !AILevel
+trigger1 = command = "holdup" && command != "holdupfwd" && command != "holdupback"
+trigger2 = AILevel && var(4) = 5
+anim = 61
+id = 7002
+sprpriority = -1
+pos = 13,-20
+bindTime = -1
+removeTime = -1
+removeongethit = 1
+
+[State 56, Forward/Back flame left]
+type = Explod
+triggerall = ctrl
+triggerall = numexplod(7001) = 0
+trigger1 = !AILevel && (command = "holdfwd" || command = "holdback")
+trigger2 = AILevel && ((var(4) = [1,2]) || (var(4) = [3,4]))
+anim = 60
+id = 7001
+sprpriority = Cond(anim = 58,-2,2)
+facing = Cond(anim = 58,1,-1)
+pos = Cond(anim = 58,-16,4),Cond(anim = 58,-19,-20)
+bindTime = -1
+removeTime = -1
+removeongethit = 1
+
+[State 56, Forward/Back flame right]
+type = Explod
+triggerall = ctrl
+triggerall = numexplod(7001) = 1
+trigger1 = !AILevel && (command = "holdfwd" || command = "holdback")
+trigger2 = AILevel && ((var(4) = [1,2]) || (var(4) = [3,4]))
+anim = 60
+id = 7001
+sprpriority = Cond(anim = 58,-2,2)
+facing = Cond(anim = 58,1,-1)
+pos = Cond(anim = 58,12,22),Cond(anim = 58,-17,-20)
+bindTime = -1
+removeTime = -1
+removeongethit = 1
+
+[State 56, Remove super jump flames 2]
+type = RemoveExplod 
+triggerall = ctrl
+trigger1 = anim = 57
+trigger2 = Cond(AILevel,(var(4) = [1,2]),command = "holdfwd") && anim = 59
+trigger3 = Cond(AILevel,(var(4) = [3,4]),command = "holdback") && anim = 58
+trigger4 = Cond(AILevel,(var(4) != [1,4]),(command != "holdfwd" && command != "holdback"))
+ID = 7001
+
+[State 56, Remove super jump flames 3]
+type = RemoveExplod 
+triggerall = ctrl
+trigger1 = anim != 57
+trigger2 = !AILevel && command != "holdup"
+trigger3 = AILevel && var(4) != 2 && (var(4) != [4,5])
+ID = 7002
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; RUN FWD
+[Statedef 100]
+type = S
+physics = S
+anim = 100
+sprpriority = 1
+
+[State 100, Invisible player anims for dynamic face]
+type = AssertSpecial
+trigger1 = var(5) ;Dynamic face is active
+flag = Invisible
+
+[State 100, No walk or auto-turn]
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+flag2 = NoAutoTurn
+
+[State 100, Run speed]
+type = VelSet
+trigger1 = 1
+x = const(velocity.run.fwd.x)
+
+[State 100, Run FWD scanlines]
+type = Explod
+trigger1 = var(6) ;Damaged enough for glitch FX
+ID = 11000
+anim = Cond(animelem = 2, < 0,11090,11108) + var(8)
+
+[State 100, Run FWD face]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+triggerall = numexplod(1002) = 0 && numexplod(1003) = 0 && numexplod(1004) = 0
+trigger1 = numenemy && p2dist x > 0 ;Enemy is in front
+trigger2 = !numenemy
+;shadow = -1
+ID = 1000
+anim = Cond(animelem = 2, < 0,10090,10108) + var(7)
+
+[State 100, Run FWD face - Enemy walked by]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+triggerall = animelem = 2, >= 0 ;running forward elem2
+triggerall = !numexplod(1003) && !numexplod(1004)
+triggerall = numenemy
+trigger1 = p2dist x <= 0 && p2dist y > -40
+trigger1 = enemynear,statetype != C ;Enemy is not crouching
+trigger2 = numexplod(1002)
+;shadow = -1
+ID = 1002
+anim = Cond((p2dist x < -20),10127,10126)
+
+[State 100, Run FWD face - Enemy jumped over]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+triggerall = AnimElem = 2, >= 0 ;running forward elem2
+triggerall = !numexplod(1002) && !numexplod(1004)
+triggerall = numenemy
+trigger1 = p2dist x <= 0 && p2dist y <= -40
+trigger2 = numexplod(1003)
+;shadow = -1
+ID = 1003
+anim = Cond((p2dist x < -20),10129,10128)
+
+[State 100, Run FWD face - Enemy ducked under]
+type = Explod
+triggerall = var(5) ;Dynamic face is active
+triggerall = AnimElem = 2, >= 0 ;running forward elem2
+triggerall = !numexplod(1002) && !numexplod(1003)
+triggerall = numenemy
+trigger1 = p2dist x <= 0 && p2dist y > -10
+trigger1 = enemynear,statetype = C ;Enemy is crouching
+trigger2 = numexplod(1004)
+;shadow = -1
+ID = 1004
+anim = Cond((p2dist x < -20),10131,10130)
+
+[State 100, Run FWD Explod]
+type = Explod
+trigger1 = var(5) ;Dynamic face is active
+shadow = -1
+anim = Cond(animelem = 2, < 0,96,Cond(animelem = 3, < 0,97,Cond(animelem = 4, < 0,98,99)))
+
+[State 100, Set transition anim]
+type = Null
+trigger1 = !Time
+trigger1 = var(3) := 0
+trigger2 = AnimElem = 2
+trigger2 = var(3) := 1
+
+[State 100, Run Sound]
+type = PlaySnd
+trigger1 = !Time
+value = 100,0
+
+[State 100, Dash Dust]
+type = Explod
+triggerall = Time%7 = 0
+triggerall = FrontEdgeBodyDist > 10 ;Not running into the edge of screen
+trigger1 = !Time
+trigger2 = numenemy && p2bodydist x > 10
+anim = 8102
+pos = -30,0
+sprpriority = -5
+scale = .3,.3
+ownpal = 1
+
+[State 100, Pick Random Number for AI]
+type = VarSet
+triggerall = AILevel
+trigger1 = !Time
+var(4) = Random%40
+
+[State 100, Change to Stand]
+type = ChangeState
+trigger1 = !AILevel
+trigger1 = command != "holdfwd"
+trigger2 = AILevel
+trigger2 = abs(P2BodyDist X) < var(4) || Time > 120
+value = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;RUN BACK
+[Statedef 105]
+type = S
+physics = S
+anim = 105
+sprpriority = 0
+ctrl = 0
+
+[State 105, Invisible player anims for dynamic face]
+type = AssertSpecial
+trigger1 = var(5) ;Dynamic face is active
+flag = Invisible
+
+[State 105, No walking] 
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+[State 105, Pick Number for AI]
+type = VarSet
+triggerall = AILevel
+trigger1 = !Time
+var(4) = Random%40
+
+[State 105, Run back speed]
+type = VelSet
+trigger1 = !AILevel
+trigger1 = command = "holdback"
+trigger2 = AILevel
+x = const(velocity.run.back.x)
+
+[State 105, Run BACK scanlines]
+type = Explod
+trigger1 = var(6) ;Damaged enough for glitch FX
+ID = 11000
+anim = Cond(animelem = 2, < 0,11054,11072) + var(8)
+
+[State 105, Run BACK face]
+type = Explod
+trigger1 = var(5) ;Dynamic face is active
+;shadow = -1
+ID = 1000
+anim = Cond(animelem = 2, < 0,10054,10072) + var(7)
+
+[State 105, Run BACK Explod]
+type = Explod
+trigger1 = var(5) ;Dynamic face is active
+shadow = -1
+anim = Cond(animelem = 2, < 0,107,108)
+
+[State 105, Run sound]
+type = PlaySnd
+trigger1 =  !Time
+value = 100,0
+
+[State 105, Dash Dust]
+type = Explod
+trigger1 = !Time
+trigger2 = Time%7 = 0
+trigger2 = BackEdgeBodyDist > 10
+anim = 8102
+pos = 10,0
+facing = -1
+sprpriority = -5
+scale = .3,.3
+ownpal = 1
+
+[State 105, Set transition anim]
+type = Null
+trigger1 = !Time
+trigger1 = var(3) := 0
+trigger2 = AnimElem = 2
+trigger2 = var(3) := 3
+
+[State 105, Jump]
+type = changestate
+trigger1 = !AILevel
+trigger1 = command = "holdback" && command = "holdup"
+trigger2 = AILevel
+trigger2 = Random < var(56)*2
+trigger2 = inguarddist
+trigger2 = enemynear,numproj || enemynear,MoveType = A
+value = 40
+
+[State 105, AI Guard]
+type = changestate
+trigger1 = AILevel
+trigger1 = Random < var(56)*4
+trigger1 = inguarddist
+trigger1 = enemynear,numproj || enemynear,MoveType = A
+value = 120
+
+[State 105, SuperJump]
+type = changestate
+trigger1 = !AILevel
+trigger1 = command = "Super_Jump"
+trigger2 = AILevel
+trigger2 = (var(7) = [1,3])
+trigger2 = Random < 200
+value = 55
+
+[State 105, AI Change to Stand]
+type = ChangeState
+triggerall = AILevel
+trigger1 = Time >= var(4)
+value = 0
+ctrl = 1
+
+[State 105, Change to Stand]
+type = ChangeState
+triggerall = !AILevel
+triggerall = command != "holdback"
+trigger1 = command != "holdup"
+trigger2 = command != "Super_Jump"
+trigger3 = command = "holddown"
+trigger4 = command = "down"
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; GUARD START
+[Statedef 120]
+type = U    ;Leave state type unchanged
+physics = U ;Leave physics unchanged
+
+[State 120, 1]
+type = ChangeAnim
+trigger1 = Time = 0
+value = 120 + (statetype = C) + (statetype = A)*2
+
+[State 120, 2]
+type = StateTypeSet
+trigger1 = Time = 0 && statetype = S
+physics = S
+
+[State 120, 3]
+type = StateTypeSet
+trigger1 = Time = 0 && statetype = C
+physics = C
+
+[State 120, 4]
+type = StateTypeSet
+trigger1 = Time = 0 && statetype = A
+physics = A
+
+[State 120, Hi to Lo]
+type = StateTypeSet
+trigger1 = !AILevel
+trigger1 = statetype = S && command = "holddown"
+statetype = C
+physics = C
+
+[State 120, Lo to Hi]
+type = StateTypeSet
+trigger1 = !AILevel
+trigger1 = statetype = C && command != "holddown"
+statetype = S
+physics = S
+
+[State 120, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 130 + (statetype = C) + (statetype = A)*2
+
+[State 120, Stop Guarding]
+type = ChangeState
+trigger1 = !AILevel
+trigger1 = command != "holdback"
+trigger2 = AILevel
+trigger2 = P2MoveType != A
+trigger3 = !inguarddist
+value = 140
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; STAND GUARD
+[Statedef 130]
+type    = S
+physics = S
+
+[State 130, 1]
+type = ChangeAnim
+trigger1 = Anim != 130
+value = 130
+
+[State 130, Hi to Lo]
+type = ChangeState
+trigger1 = !AILevel
+trigger1 = command = "holddown"
+value = 131
+
+[State 130, Stop Guarding]
+type = ChangeState
+trigger1 = !AILevel
+trigger1 = command != "holdback"
+trigger2 = AILevel
+trigger2 = P2MoveType != A || Time > 60+(AILevel*10)
+trigger3 = !inguarddist
+value = 140
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; AIR GUARD
+[Statedef 132]
+type    = A
+physics = N
+
+[State 132, 1]
+type = ChangeAnim
+trigger1 = Anim != 132
+value = 132
+
+[State 132, 2]
+type = VelAdd
+trigger1 = 1
+y = Const(movement.yaccel)
+
+[State 132, 3]
+type = VarSet
+trigger1 = 1
+sysvar(0) = (pos y >= 0) && (vel y > 0)
+
+[State 132, 4]
+type = VelSet
+trigger1 = sysvar(0)
+y = 0
+
+[State 132, 5]
+type = PosSet
+trigger1 = sysvar(0)
+y = 0
+
+[State 132, 6]
+type = ChangeState
+trigger1 = sysvar(0)
+trigger1 = Cond(AILevel,P2MoveType = A,command = "holdback")
+trigger1 = inguarddist
+value = 130
+
+[State 132, 7]
+type = ChangeState
+trigger1 = sysvar(0)
+value = 52
+
+[State 132, Stop Guarding]
+type = ChangeState
+trigger1 = !AILevel
+trigger1 = command != "holdback"
+trigger2 = AILevel
+trigger2 = P2MoveType != A || Random < var(56)
+trigger3 = !inguarddist
+value = 140
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; TAUNT
+[Statedef 160]
+type = S
+physics = S
+sprpriority = 0
+anim = 160
+ctrl = 0
+
+[State 160, Start Sound]
+type = PlaySnd
+trigger1 = !Time
+value = 160,0
+channel = 0
+
+[State 160, Looped Sound]
+type = PlaySnd
+trigger1 = anim = 160
+trigger1 = Time >= 25
+value = 160,1
+channel = 0
+loop = 1
+persistent = 0
+
+[State 160, End Sound]
+type = PlaySnd
+trigger1 = anim = 161
+value = 160,2
+channel = 0
+persistent = 0
+
+[State 160, Get jiggy]
+type = velset
+triggerall = anim = 160
+trigger1 = AnimElem = 8, > 0
+x = -1+(random%3)
+
+[State 160, Gun Bursts]
+type = Explod
+trigger1 = Time = 22
+bindtime = -1
+removeongethit = 1
+removetime = -1
+bindtime = -1
+anim = 162
+id = 162
+sprpriority = 5
+
+[State 1000, Shells]
+type = Helper
+trigger1 = anim = 160
+trigger1 = Time = 22
+stateno = 1005
+id = 1005
+persistent = 0
+
+[State 160, Change to Taunt End]
+type = ChangeAnim
+triggerall = Time >= 54
+triggerall = Time%8 = 4
+trigger1 = !ailevel
+trigger1 = command != "holds"
+trigger2 = ailevel && Random < var(56)*4
+trigger3 = ailevel && P2StateNo != 5110 && Random < 400
+value = 161
+persistent = 0
+
+[State 160, Remove Gun Bursts]
+type = RemoveExplod
+trigger1 = anim = 161
+id = 162
+persistent = 0
+
+[State 160, Change to Stand]
+type = ChangeState
+trigger1 = Anim = 161 && !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; AIR GET-HIT (KNOCKED AWAY)
+[Statedef 5030]
+type    = A
+movetype= H
+physics = N
+ctrl = 0
+
+[State 5030, 1]
+type = VelAdd
+trigger1 = time > 0  ;Vans Fix !!!
+y = GetHitVar(yaccel)
+
+[State 5030, 2]
+type = VelSet
+trigger1 = !Time
+x = GetHitVar(xvel) * facing
+y = gethitvar(yvel)
+
+[State 5030, 3]
+type = ChangeState
+triggerall = !HitFall
+trigger1 = HitOver
+trigger2 = Vel Y > 0    ;Hit ground
+trigger2 = Pos Y >= Const(movement.air.gethit.groundlevel)
+value = 5040 ;HITA_RECOV
+
+[State 5030, 4]
+type = ChangeState
+triggerall = HitFall
+trigger1 = HitOver
+trigger2 = Vel Y > 0    ;Hit ground
+trigger2 = Pos Y >= Const(movement.air.gethit.groundlevel)
+value = 5050 ;HITA_FALL
+
+[State 5030, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 5035 ;HITA_UP (transition)
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; AIR GET-HIT (TRANSITION)
+[Statedef 5035]
+type    = A
+movetype= H
+physics = N
+
+[State 5035, 1]
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = SelfAnimExist(5035)
+trigger1 = Anim != [5051,5059] ;Not if in hit up anim
+trigger1 = Anim != 5090 ;Not if hit off ground anim
+value = 5035
+
+[State 5035, 2]
+type = VelAdd
+trigger1 = time > 0  ;Vans Fix !!!
+y = GetHitVar(yaccel)
+
+[State 5035, 3]
+type = ChangeState
+triggerall = !HitFall
+trigger1 = HitOver  ;Hit is over
+trigger2 = AnimTime = 0 ;Animation over
+trigger3 = Vel Y > 0    ;Hit ground
+trigger3 = Pos Y >= Const(movement.air.gethit.groundlevel)
+trigger4 = Time = 0     ;No transition anim
+trigger4 = Anim != 5035
+value = 5040 ;Air get-hit (recovering in air, not falling)
+
+[State 5035, 4]
+type = ChangeState
+triggerall = HitFall
+trigger1 = HitOver  ;Hit is over
+trigger2 = AnimTime = 0 ;Anim is over
+trigger3 = Vel Y > 0    ;Hit ground
+trigger3 = Pos Y >= Const(movement.air.gethit.groundlevel)
+trigger4 = Time = 0     ;No transition anim
+trigger4 = Anim != 5035
+value = 5050 ;Air get-hit (falling)
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; AIR GET-HIT (RECOVERING IN AIR)
+[Statedef 5040]
+type    = A
+movetype= H
+physics = N
+
+[State 5040, 1]
+type = ChangeState
+trigger1 = !Alive
+value = 5050
+ctrl = 0
+
+[State 5040, 2]
+type = ChangeAnim
+trigger1 = AnimTime = 0
+trigger1 = Anim != 5040
+trigger2 = Time = 0
+trigger2 = Anim != 5035
+value = 5040
+
+[State 5040, 3]
+type = CtrlSet
+trigger1 = HitOver
+value = 1
+
+[State 5040, 4]
+type = StateTypeSet
+trigger1 = HitOver
+movetype = I
+
+[State 5040, 5]
+type = VelAdd
+trigger1 = time > 0  ;Vans Fix !!!
+y = GetHitVar(yaccel)
+
+[State 5040, 6]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 52 ;Jump land
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+; AIR GET-HIT (FALLING)
+[Statedef 5050]
+type    = A
+movetype= H
+physics = N
+
+[State 5050, 1] ;Change anim when done with transition
+type = ChangeAnim
+trigger1 = AnimTime = 0
+trigger1 = Anim = 5035
+trigger2 = Time = 0     ;If no transition anim
+trigger2 = Anim != 5035
+trigger2 = (Anim != [5051, 5059]) && (Anim != [5061, 5069])
+trigger2 = Anim != 5090 ;Not if hit off ground anim
+value = 5050
+
+[State 5050, 2] ;Coming down anim
+type = ChangeAnim
+trigger1 = anim = [5050,5059]
+trigger1 = Vel Y >= ifelse(anim = 5050, Const720p(4), Const720p(-8))
+trigger1 = SelfAnimExist(anim+10)
+value = anim+10
+persistent = 0
+
+[State 5050, 3] ;Gravity
+type = VelAdd
+trigger1 = time > 0  ;Vans Fix !!!
+y = GetHitVar(yaccel)
+
+[State 5050, 4] ;Recover near ground
+type = ChangeState
+triggerall = Vel Y > 0
+triggerall = Pos Y >= Const(movement.air.gethit.groundrecover.ground.threshold)
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+value = 5200 ;Air get-hit (fall recovery on ground)
+
+[State 5050, 5]; Recover in mid air
+type = ChangeState
+triggerall = Vel Y > Const(movement.air.gethit.airrecover.threshold)
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+value = 5210 ;Air get-hit (fall recovery in air)
+
+[State 5050, 6]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= ifelse((anim = [5051,5059]) || (anim = [5061,5069]), 0, Const(movement.air.gethit.groundlevel))
+value = 5100 ;Downed get-hit (hit ground from fall)
+
+;[State 5050, 4] ;Recover near ground
+;type = ChangeState
+;triggerall = Vel Y > 0
+;triggerall = Pos Y >= Const(movement.air.gethit.groundrecover.ground.threshold)
+;triggerall = alive && CanRecover
+;trigger1 = !AILevel
+;trigger1 = Command = "recovery"
+;trigger2 = AILevel
+;trigger2 = Time%10 = 0
+;trigger2 = Random < 300+(var(56)*2)
+;value = 5200 ;Air get-hit (fall recovery on ground)
+;
+;[State 5050, 5]; Recover in mid air
+;type = ChangeState
+;triggerall = Vel Y > Const(movement.air.gethit.airrecover.threshold)
+;triggerall = alive && CanRecover
+;trigger1 = !AILevel
+;trigger1 = Command = "recovery"
+;trigger2 = AILevel
+;trigger2 = Time%10 = 0
+;trigger2 = Random < 300+(var(56)*2)
+;value = 5210 ;Air get-hit (fall recovery in air)
+;
+;[State 5050, 6]
+;type = ChangeState
+;trigger1 = Vel Y > 0
+;trigger1 = Pos Y >= ifelse((anim = [5051,5059]) || (anim = [5061,5069]), 0, Const(movement.air.gethit.groundlevel))
+;value = 5100 ;Downed get-hit (hit ground from fall)

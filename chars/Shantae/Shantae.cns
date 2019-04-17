@@ -1,0 +1,5168 @@
+; Constants and state file.
+; There are comments scattered through this file, so you may like to
+; take a look if would like to learn more about the cns.
+
+[Data]
+life = 1000			;Amount of life to start with
+power = 3000		;Amount of maximum power
+attack = 100		;attack power (more is stronger)
+defence = 100		;defensive power (more is stronger)
+fall.defence_up = 0	;Percentage to increase defense everytime player is knocked down
+liedown.time = 25		;Time which player lies down for, before getting up
+airjuggle = 15		;Number of points for juggling
+sparkno = 2			;Default hit spark number for HitDefs
+guard.sparkno = 40	;Default guard spark number
+KO.echo = 0			;1 to enable echo on KO
+volume = 0			;Volume offset (negative for softer)
+IntPersistIndex = 60	;Variables with this index and above will not have their values
+FloatPersistIndex = 40  ;reset to 0 between rounds or matches. There are 60 int variables,
+  				;indexed from 0 to 59, and 40 float variables, indexed from 0 to 39.
+  				;If omitted, then it defaults to 60 and 40 for integer and float
+  				;variables repectively, meaning that none are persistent, i.e. all
+  				;are reset. If you want your variables to persist between matches,
+  				;you need to override state 5900 from common1.cns.
+
+
+[Size]
+xscale = 2.15			;Horizontal scaling factor.
+yscale = 2.15			;Vertical scaling factor.
+ground.back = 15		;Player width (back, ground)
+ground.front = 16		;Player width (front, ground)
+air.back = 12		;Player width (back, air)
+air.front = 12		;Player width (front, air)
+height = 60			;Height of player (for opponent to jump over)
+attack.dist = 160		;Default attack distance
+proj.attack.dist = 90	;Default attack distance for projectiles
+proj.doscale = 0		;Set to 1 to scale projectiles too   
+head.pos = 0, -50	;Approximate position of head
+mid.pos = 0, -30		;Approximate position of midsection
+shadowoffset = 0		;Number of pixels to vertically offset the shadow
+draw.offset = 0,0		;Player drawing offset in pixels (x, y)
+
+[Velocity]
+walk.fwd  = 2.4		;Walk forward
+walk.back = -2.2		;Walk backward
+run.fwd  = 4.6, 0		;Run forward (x, y)
+run.back = -4.5,-3.8	;Hop backward (x, y)
+jump.neu = 0,-8.4		;Neutral jumping velocity (x, y)
+jump.back = -2.55		;Jump back Speed (x, y)
+jump.fwd = 2.5		;Jump forward Speed (x, y)
+runjump.back = -2.55,-8.1;Running jump speeds (opt)
+runjump.fwd = 4,-8.1	;.
+airjump.neu = 0,-8.1	;.
+airjump.back = -2.55	;Air jump speeds (opt)
+airjump.fwd = 2.5		;.
+
+[Movement]
+airjump.num = 1		;Number of air jumps allowed (opt)
+airjump.height = 35	;Minimum distance from ground before you can air jump (opt)
+yaccel = .44		;Vertical acceleration
+stand.friction = .85	;Friction coefficient when standing
+crouch.friction = .82	;Friction coefficient when crouching
+
+[Quotes]
+; Up to 100 victory quotes can be specified per language (victory0 - victory99)
+victory1 = "Men! Spank this one EXTRA hard for mommy!"
+victory2 = "Someday, I'll slice you into tiny bits and dance on your runny innards!"
+victory3 = "I certainly hope you mean through my heart or soul or something."
+victory4 = "Thanks for the fight and all, but I really need to go now. I don't wanna miss Uncle Mimic's new presentation!"
+victory5 = "Phew... Glad I have my powers... They're a real lifesaver..."
+victory6 = "Okay. I win. Now just back away and I won't hurt you anymore."
+victory7 = "Oh hey, you're that guy from that Toadstool Town or whatever it's called!" ;vs Mario
+victory8 = "Don't listen to what they say. You're a great hero just like your brother!" ;vs Luigi
+victory9 = "Careful. Your kingdom needs you." ;vs Princess Peach
+victory10 = "So...you sure you're not a half genie? I mean, we both have magic and we both have pointy ears, so uh...you sure?" ;vs. Zelda
+victory11 = "SANTA?! Wait.. a penguin? With a hammer? YOU FAKE!" ;vs Dedede
+victory12 = "Wait, so does this make me the Queen of Dreamland now since I've overthrown the king?" ;vs Dedede
+victory13 = "Make sure Risky Boots doesn't find out about that emerald you're guarding." ;vs Knuckles
+victory14 = "As if Risky Boots' machines don't give me enough trouble..." ;vs Eggman or Wily
+victory15 = "I wish our mayor could be more like you... But noooo, he'd rather fire the town hero over things out of her control." ;vs Haggar
+victory16 = "How do you wear stuff like that in the cold weather so easily?! That stuff is FREEZING!" ;vs Zangief
+victory17 = "It's just a stupid game, no need to flip out over it!" ;vs Angry Video Game Nerd
+victory18 = "So you wanna have a...dance off? That's a...weird request, but I'll take you up on it!" ;vs Deadpool
+victory19 = "Where's my lamp? Well, I don't live in one. I am only half genie after all." ;vs Aladdin
+victory20 = "Well, you're right about one thing. I've never had a friend like you!" ;vs Aladdin
+victory21 = "A robot? You HAVE to come with me. My uncle is gonna FLIP when he sees this!" ;vs Robots
+victory22 = "Aw, well maybe they can still use all this scrap..." ;vs Robots
+victory23 = "Easy there, girl, it's just a little hair!" ;vs Hair Users
+victory24 = "I love the ocean and all, but this is a bit much." ;vs Water Users
+victory25 = "What's with the sword? Are you trying to terrorize MY town, huh?!" ;vs Sword Users
+
+;---------------------------------------------------------------------------
+; Format:
+; [Statedef STATENO]
+; type = ?      S/C/A/L  stand/crouch/air/liedown
+; movetype = ?  I/A/H    idle/attack/gethit
+; physics = ?   S/C/A/N  stand/crouch/air/none
+; juggle = ?             air juggle points move requires
+;
+; [State STATENO, ?]     ? - any number you choose
+; type = ?
+; ...
+
+;---------------------------------------------------------------------------
+; Lose by Time Over
+; CNS difficulty: basic
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0
+
+[State 170, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S32,0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win state decider
+; CNS difficulty: basic
+[Statedef 180]
+type = S
+
+[State 180, Victory Quote]
+type = VictoryQuote
+trigger1 = time = 0
+value = 1+random%6
+
+[State 180, Victory Quote vs. Mario]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="SuperMario"
+trigger2= Enemy, Name ="Super_Mario"
+trigger3= Enemy, Name ="Mario"
+trigger4= Enemy, Name ="Super Mario 64"
+trigger5= Enemy, Name ="Fighting Mario"
+trigger6= Enemy, Name ="Old School Mario"
+trigger7= Enemy, Name ="NGPC Mario"
+trigger8= Enemy, Name ="DKmario"
+trigger9= Enemy, Name ="NES Super Mario"
+trigger10= Enemy, Name ="Nesmario"
+trigger11= Enemy, Name ="Super Paper Mario"
+trigger12= Enemy, Name ="[Txpot's] Mario Combat Deluxe Mario"
+trigger13= Enemy, Name ="SMB 1 Mario"
+trigger14= Enemy, Name ="Super.mario"
+trigger15= Enemy, Name ="Kart Fighter Mario"
+trigger16= Enemy, Name ="CDIMario"
+trigger17= Enemy, Name ="Paper Mario"
+trigger18= Enemy, Name ="SSBM Mario"
+trigger19= Enemy, Name ="SSBB Mario"
+trigger20= Enemy, Name ="Mario Kart Fighter"
+trigger21= Enemy, Name ="Chibi Mario"
+trigger22= Enemy, Name ="Smash HD Mario"
+trigger23= Enemy, Name ="Fire Mario"
+trigger24= Enemy, Name ="Hotel Mario"
+trigger25= Enemy, Name ="MarioTH"
+trigger26= Enemy, Name ="MvC Mario"
+trigger27= Enemy, Name ="WH 2 Mario"
+value = 7
+
+[State 180, Victory Quote vs. Luigi]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="SuperLuigi"
+trigger2= Enemy, Name ="Super_Luigi"
+trigger3= Enemy, Name ="Luigi"
+trigger4= Enemy, Name ="NGPC Luigi"
+trigger5= Enemy, Name ="Fighting Luigi"
+trigger6= Enemy, Name ="Luigi_ver 2"
+trigger7= Enemy, Name ="Kart Fighter Luigi"
+trigger8= Enemy, Name ="MLSS Luigi"
+trigger9= Enemy, Name ="LuigiSMB"
+trigger10= Enemy, Name ="Mama Luigi"
+trigger11= Enemy, Name ="Luigi Kart Fighter"
+trigger12= Enemy, Name ="Smash Bros Luigi"
+trigger13= Enemy, Name ="CDILuigi"
+trigger14= Enemy, Name ="Gay Luigi"
+trigger15= Enemy, Name ="Hotel Luigi"
+trigger16= Enemy, Name ="SMW Super Luigi"
+trigger17= Enemy, Name ="MvC Luigi"
+trigger18= Enemy, Name ="NESLUIGI V2"
+trigger19= Enemy, Name ="Paper Luigi"
+trigger20= Enemy, Name ="Super Paper Luigi"
+trigger21= Enemy, Name ="SSBM Luigi"
+trigger22= Enemy, Name ="SuperLuigiKart"
+trigger23= Enemy, Name ="YouTube Poop Luigi"
+value = 8
+
+[State 180, Victory Quote vs. Princess Peach]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="Peach"
+trigger2= Enemy, Name ="Princess Peach Toadstool"
+trigger3= Enemy, Name ="Peach Kart Fighter"
+trigger4= Enemy, Name ="MvC Peach"
+trigger5= Enemy, Name ="Princess Peach"
+trigger6= Enemy, Name ="SuperPeachKart"
+trigger7= Enemy, Name ="Tanooki Peach"
+value = 9
+
+[State 180, Victory Quote vs. Zelda]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="Zelda"
+trigger2= Enemy, Name ="TLoZ Zelda"
+trigger3= Enemy, Name ="Zelda-Cdi"
+trigger4= Enemy, Name ="CvS_Zelda"
+trigger5= Enemy, Name ="Princess Zelda"
+value = 10
+
+[State 180, Victory Quote vs. King Dedede]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="Dedede"
+trigger2= Enemy, Name ="King DeDeDe"
+trigger3= Enemy, Name ="kdedede"
+value = 11+random%2
+
+[State 180, Victory Quote vs. Knuckles]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="Knuckles"
+trigger2= Enemy, Name ="Knuckles by supermystery"
+trigger3= Enemy, Name ="Knuckles By Cyanide"
+trigger4= Enemy, Name ="Knuckles The Echidna"
+value = 13
+
+[State 180, Victory Quote vs. Dr. Eggman or Wily]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="Robotnik"
+trigger2= Enemy, Name ="Dr_Robotnik"
+trigger3= Enemy, Name ="Dr. Robotnik"
+trigger4= Enemy, Name ="Youtube Poop Robotink"
+trigger5= Enemy, Name ="M. Robotnik"
+trigger6= Enemy, Name ="Dr. Ivo Robotnik"
+trigger7= Enemy, Name ="Robotnik S2 FB"
+trigger8= Enemy, Name ="[Txpot's] Dr Robotnik (Ver 2.0)"
+trigger9= Enemy, Name ="Eggman"
+trigger10= Enemy, Name ="Dr. Eggman"
+trigger11= Enemy, Name ="Dr.Ivo Robotnik (Eggman)"
+trigger12= Enemy, Name ="Wily"
+trigger13= Enemy, Name ="Dr. Wily"
+trigger14= Enemy, Name ="Dr.Wily"
+trigger15= Enemy, Name ="Dr Wily"
+value = 14
+
+[State 180, Victory Quote vs. Hagger]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="Mike Hagger"
+value = 15
+
+[State 180, Victory Quote vs. Zangief]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="cvszangief"
+trigger2= Enemy, Name ="Zangief"
+trigger3= Enemy, Name ="ZangiefHD"
+trigger4= Enemy, Name ="Zangyura"
+trigger5= Enemy, Name ="Zangeese"
+trigger6= Enemy, Name ="ZangiefHD"
+trigger7= Enemy, Name ="[KoYotae]'s Zangief"
+trigger8= Enemy, Name ="Zangief_A"
+trigger9= Enemy, Name ="DragonEdition-Zangief"
+trigger10= Enemy, Name ="MvC2 Zangief By Kamekaze"
+trigger11= Enemy, Name ="zangief (sftm)"
+trigger12= Enemy, Name ="Arrange-Zangief"
+trigger13= Enemy, Name ="Pocket Zangief"
+trigger14= Enemy, Name ="Ultimate Zangief"
+trigger15= Enemy, Name ="Anti.Guile.Zangief"
+trigger16= Enemy, Name ="DSJ_Zangief"
+trigger17= Enemy, Name ="Zangief3rd"
+trigger18= Enemy, Name ="cvszangief_ex"
+trigger19= Enemy, Name ="cvszangief_normal"
+value = 16
+
+[State 180, Victory Quote vs. Angry Video Game Nerd]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="AVGN"
+value = 17
+
+[State 180, Victory Quote vs. Deadpool]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="Deadpool"
+trigger2= Enemy, Name ="DeadPoolx"
+trigger3= Enemy, Name ="Deadpool by Infinite"
+value = 18
+
+[State 180, Victory Quote vs. Aladdin]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="Aladdin"&&authorname="DJ HANNIBALROYCE"
+trigger2= Enemy, Name ="Soraparty"
+trigger3= Enemy, Name ="Aladdan"
+value = 19+random%2
+
+[State 180, Victory Quote vs. Robots]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="Slash-Beast"
+trigger2= Enemy, Name ="DORAemon"
+trigger3= Enemy, Name ="nikoTV"
+trigger4= Enemy, Name ="Forte"
+trigger5= Enemy, Name ="Killer Majinga"
+trigger6= Enemy, Name ="Guardian"
+trigger7= Enemy, Name ="Metal Max Boss"
+trigger8= Enemy, Name ="Jet-Stingray"
+trigger9= Enemy, Name ="Fenri-Lunaedge"
+trigger10= Enemy, Name ="Panter-Flauclaws"
+trigger11= Enemy, Name ="Crueltear=Relinquish"
+trigger12= Enemy, Name ="G-JET"
+trigger13= Enemy, Name ="Cyber-peacock"
+trigger14= Enemy, Name ="Mattrex"
+trigger15= Enemy, Name ="ARX-7"
+trigger16= Enemy, Name ="Magma-Dragoon"
+trigger17= Enemy, Name ="Theskiver"
+trigger18= Enemy, Name ="EVANGELION"
+trigger19= Enemy, Name ="EVA-00"
+trigger20= Enemy, Name ="EVA-01"
+trigger21= Enemy, Name ="EVA01"
+trigger22= Enemy, Name ="EVA-02"
+trigger23= Enemy, Name ="EVA-02K"
+trigger24= Enemy, Name ="BROCKEN"
+trigger25= Enemy, Name ="EVA-03"
+trigger26= Enemy, Name ="BARDIEL"
+trigger27= Enemy, Name ="EVA-04"
+trigger28= Enemy, Name ="EVA-05"
+trigger29= Enemy, Name ="syamsheru"
+trigger30= Enemy, Name ="Galivan"
+trigger31= Enemy, Name ="Classic Cyrax"
+trigger32= Enemy, Name ="SACHIEL"
+trigger33= Enemy, Name ="SHAMSHEL"
+trigger34= Enemy, Name ="RAMIEL"
+trigger35= Enemy, Name ="GAGHIEL"
+trigger36= Enemy, Name ="ISRAFEL"
+trigger37= Enemy, Name ="SANDALPHON"
+trigger38= Enemy, Name ="MATARAEL"
+trigger39= Enemy, Name ="SAHAQUIEL"
+trigger40= Enemy, Name ="IREUL"
+trigger41= Enemy, Name ="LELIEL"
+trigger42= Enemy, Name ="ZERUEL"
+trigger43= Enemy, Name ="ARAEL"
+trigger44= Enemy, Name ="ARMISAEL"
+trigger45= Enemy, Name ="JET ALONE"
+trigger46= Enemy, Name ="Boss Borotto"
+trigger47= Enemy, Name ="Boss Borot"
+trigger48= Enemy, Name ="Mazinger Z"
+trigger49= Enemy, Name ="ShinGetter1"
+trigger50= Enemy, Name ="tekkaman"
+trigger51= Enemy, Name ="Tekkaman Dagger"
+trigger52= Enemy, Name ="mekazawa"
+trigger53= Enemy, Name ="Chromia"
+trigger54= Enemy, Name ="Elita_One"
+trigger55= Enemy, Name ="Fortress_Maximus"
+trigger56= Enemy, Name ="Galvatron"
+trigger57= Enemy, Name ="God_Ginrai"
+trigger58= Enemy, Name ="Ironhide"
+trigger59= Enemy, Name ="Jazz"
+trigger60= Enemy, Name ="Megatron"
+trigger61= Enemy, Name ="Optimus Prime"
+trigger62= Enemy, Name ="Overlord"
+trigger63= Enemy, Name ="Scorponok"
+trigger64= Enemy, Name ="Reflector"
+trigger65= Enemy, Name ="Rodimus Prime"
+trigger66= Enemy, Name ="Shockwave"
+trigger67= Enemy, Name ="Sideswipe"
+trigger68= Enemy, Name ="Skywarp"
+trigger69= Enemy, Name ="Soundwave"
+trigger70= Enemy, Name ="Starscream"
+trigger71= Enemy, Name ="Sunstreaker"
+trigger72= Enemy, Name ="Thundercracker"
+trigger73= Enemy, Name ="Victory_Saber"
+trigger74= Enemy, Name ="Android 16"
+trigger75= Enemy, Name ="Mech-HISUI"
+trigger76= Enemy, Name ="Mech Hisui"
+trigger77= Enemy, Name ="mechhisuiex"
+trigger78= Enemy, Name ="Giant_Mech-HISUI"
+trigger79= Enemy, Name ="necochaosblackG666mk2"
+trigger80= Enemy, Name ="justice"
+trigger81= Enemy, Name ="ROBO-Ky"
+trigger82= Enemy, Name ="ROBO-Ky?"
+trigger83= Enemy, Name ="robocain 2"
+trigger84= Enemy, Name ="RoboCop"
+trigger85= Enemy, Name ="robo-kula"
+trigger86= Enemy, Name ="ROBO-KY"
+trigger87= Enemy, Name ="ROBO-KY MK-?"
+trigger88= Enemy, Name ="Mech Gouki"
+trigger89= Enemy, Name ="Cyber Dan"
+trigger90= Enemy, Name ="Shadow Lady"
+trigger91= Enemy, Name ="[KoYotae]'s Zangief"
+trigger92= Enemy, Name ="Blade"
+trigger93= Enemy, Name ="Ravange"
+trigger94= Enemy, Name ="Megaman1"
+trigger95= Enemy, Name ="Megaman"
+trigger96= Enemy, Name ="MegaMan X"
+trigger97= Enemy, Name ="Roll"
+trigger98= Enemy, Name ="ServBot"
+trigger99= Enemy, Name ="Zero"&&!(authorname="ICCHA")
+trigger100= Enemy, Name ="Saber Zero"
+trigger101= Enemy, Name ="Apocalypse"
+trigger102= Enemy, Name ="OnslaughtX"
+trigger103= Enemy, Name ="Sentinel"
+trigger104= Enemy, Name ="Abyss"
+trigger105= Enemy, Name ="Iron Man"
+trigger106= Enemy, Name ="Marvel vs. Capcom's WarMachine"
+trigger107= Enemy, Name ="Abyss Form 1"
+trigger108= Enemy, Name ="Abyss Form 2"
+trigger109= Enemy, Name ="Abyss Form 3"
+trigger110= Enemy, Name ="Robo Rock"
+trigger111= Enemy, Name ="Robo Rock Type-2"
+trigger112= Enemy, Name ="ROBO-K'"
+trigger113= Enemy, Name ="ochamaro"
+trigger114= Enemy, Name ="Musafar"
+trigger115= Enemy, Name ="Tin's politankz"
+trigger116= Enemy, Name ="Tesse"
+trigger117= Enemy, Name ="Gaits"
+trigger118= Enemy, Name ="Warlock"
+trigger119= Enemy, Name ="Super-8"
+trigger120= Enemy, Name ="Zero-Akuma"
+trigger121= Enemy, Name ="Blodia"
+trigger122= Enemy, Name ="Cyclone"
+trigger123= Enemy, Name ="Fordy"
+trigger124= Enemy, Name ="Guldin"
+trigger125= Enemy, Name ="Helion"
+trigger126= Enemy, Name ="Jackal"
+trigger127= Enemy, Name ="KillerBee"
+trigger128= Enemy, Name ="Lightning"
+trigger129= Enemy, Name ="Reptos"
+trigger130= Enemy, Name ="Riot"
+trigger131= Enemy, Name ="Swordsman"
+trigger132= Enemy, Name ="Tarantula"
+trigger133= Enemy, Name ="Vise"
+trigger134= Enemy, Name ="Dr.Doom"
+trigger135= Enemy, Name ="DrDoom"
+trigger136= Enemy, Name ="MvC2 Doom By Kamekaze"
+trigger137= Enemy, Name ="CyberAkuma"
+trigger138= Enemy, Name ="Bospider"
+trigger139= Enemy, Name ="Karakuri Hei"
+trigger140= Enemy, Name ="Mimi by Luchini"
+trigger141= Enemy, Name ="Astrotrain"
+trigger142= Enemy, Name ="tank-reimu"
+trigger143= Enemy, Name ="Gespenst"
+trigger144= Enemy, Name ="KnightGundam"
+trigger145= Enemy, Name ="no.8"
+trigger146= Enemy, Name ="Robotnik Fire Machine"
+trigger147= Enemy, Name ="SDF"
+trigger148= Enemy, Name ="Izen"
+trigger149= Enemy, Name ="ZGMF-X10A FREEDOM"
+trigger150= Enemy, Name ="Kira Yamato"
+trigger151= Enemy, Name ="Freedom Gundam"
+trigger152= Enemy, Name ="O.M.N.I.Enforcer"
+trigger153= Enemy, Name ="AILE STRIKE GUNDAM"
+trigger154= Enemy, Name ="edonokiba"
+trigger155= Enemy, Name ="sazabi"
+trigger156= Enemy, Name ="GUNCANNON MASS-PRO TYPE"
+trigger157= Enemy, Name ="RX-79 GUNDAM"
+trigger158= Enemy, Name ="Rx-93"
+trigger159= Enemy, Name ="Gungul"
+trigger160= Enemy, Name ="left wing"
+trigger161= Enemy, Name ="Zuku"
+trigger162= Enemy, Name ="Z"
+trigger163= Enemy, Name ="Wing Gundam"
+trigger164= Enemy, Name ="WING GUNDAM ZERO"
+trigger165= Enemy, Name ="Gundam Death Scythe"
+trigger166= Enemy, Name ="Shenlong"
+trigger167= Enemy, Name ="Gundam Sandrock"
+trigger168= Enemy, Name ="SandRock by Kamekaze"
+trigger169= Enemy, Name ="HeavyArms"
+trigger170= Enemy, Name ="Gundam Heavyarms"
+trigger171= Enemy, Name ="Zechs Marquise"
+trigger172= Enemy, Name ="Mercurius by Snowfire"
+trigger173= Enemy, Name ="VAYEATE"
+trigger174= Enemy, Name ="Epyon"
+trigger175= Enemy, Name ="God Gundam"
+trigger176= Enemy, Name ="Shining Gundam"
+trigger177= Enemy, Name ="Bolt Gundam"
+trigger178= Enemy, Name ="Dragon Gundam"
+trigger179= Enemy, Name ="Kyoji Kasshu"
+trigger180= Enemy, Name ="QUEEN THE SPADE"
+trigger181= Enemy, Name ="JACK in DIA"
+trigger182= Enemy, Name ="BLACK JOKER"
+trigger183= Enemy, Name ="Devil Gundam"
+trigger184= Enemy, Name ="GOUF"
+trigger185= Enemy, Name ="MS-09 DOM"
+trigger186= Enemy, Name ="DOM"
+trigger187= Enemy, Name ="Char's Zugock"
+trigger188= Enemy, Name ="A Federal White-Guy"
+trigger189= Enemy, Name ="naito-gandam"
+trigger190= Enemy, Name ="GUNDAM MK-3 FA"
+trigger191= Enemy, Name ="GAN TANKU"
+trigger192= Enemy, Name ="GAN CANNON"
+trigger193= Enemy, Name ="GANDAM X"
+trigger194= Enemy, Name ="NEMO"
+trigger195= Enemy, Name ="RICKDOM-CHAR AZNABLE"
+trigger196= Enemy, Name ="BOUND-DOC"
+trigger197= Enemy, Name ="SUPER GUNDAM"
+trigger198= Enemy, Name ="GAZA-C"
+trigger199= Enemy, Name ="GABTHLEY"
+trigger200= Enemy, Name ="BYALANT"
+trigger201= Enemy, Name ="HAMBRABI"
+trigger202= Enemy, Name ="RMS-117"
+trigger203= Enemy, Name ="ZSSA"
+trigger204= Enemy, Name ="BORINOK-SAMMAHN"
+trigger205= Enemy, Name ="DOVEN-WOLF"
+trigger206= Enemy, Name ="DREISSEN"
+trigger207= Enemy, Name ="GEYMALK"
+trigger208= Enemy, Name ="PALAS-ATHENE"
+trigger209= Enemy, Name ="ZZ GUNDAM"
+trigger210= Enemy, Name ="QUBELEY"
+trigger211= Enemy, Name ="MASS-PRO TYPE QUBELEY"
+trigger212= Enemy, Name ="DRA-C"
+trigger213= Enemy, Name ="Hi N-GUNDAM"
+trigger214= Enemy, Name ="Re-GZ"
+trigger215= Enemy, Name ="JAGD-DOGA"
+trigger216= Enemy, Name ="F91"
+trigger217= Enemy, Name ="ZAKU2 KAI"
+trigger218= Enemy, Name ="zakufuriper"
+trigger219= Enemy, Name ="GP-01fb"
+trigger220= Enemy, Name ="GP-02A"
+trigger221= Enemy, Name ="GELGOOG JAGER"
+trigger222= Enemy, Name ="GM typeC"
+trigger223= Enemy, Name ="GM SNIPER 2"
+trigger224= Enemy, Name ="GEDLAV"
+trigger225= Enemy, Name ="ZOLOAT"
+trigger226= Enemy, Name ="G-BIT"
+trigger227= Enemy, Name ="HOBER"
+trigger228= Enemy, Name ="RX-93-NuGundam"
+trigger229= Enemy, Name ="BLACK SELENA"
+trigger230= Enemy, Name ="YATENKOU"
+trigger231= Enemy, Name ="GP-03"
+trigger232= Enemy, Name ="getta-1"
+trigger233= Enemy, Name ="daita-n3"
+trigger234= Enemy, Name ="saibasuta"
+trigger235= Enemy, Name ="Wing Gundam Zero Custom"
+trigger236= Enemy, Name ="art"
+trigger237= Enemy, Name ="soul"
+trigger238= Enemy, Name ="tausentfesrar"
+trigger239= Enemy, Name ="Megaman/Bass/Protoman by Ribeiro"
+trigger240= Enemy, Name ="METOL-SV"
+trigger241= Enemy, Name ="Metool"
+trigger242= Enemy, Name ="zero_X4"
+trigger243= Enemy, Name ="Yellow Devil"
+trigger244= Enemy, Name ="Yellow-PiPo"
+trigger245= Enemy, Name ="Slash Beast"
+trigger246= Enemy, Name ="FrostMan"
+trigger247= Enemy, Name ="NES Megaman"
+trigger248= Enemy, Name ="Cutman"
+trigger249= Enemy, Name ="ElecMan"
+trigger250= Enemy, Name ="Air Man"
+trigger251= Enemy, Name ="AIRMAN"
+trigger252= Enemy, Name ="Wood Man"
+trigger253= Enemy, Name ="Hard Man from Megaman 3"
+trigger254= Enemy, Name ="Shadow Man from Megaman 3"
+trigger255= Enemy, Name ="Snake Man from Megaman 3"
+trigger256= Enemy, Name ="Top Man from Megaman 3"
+trigger257= Enemy, Name ="Ring Man from Megaman 4"
+trigger258= Enemy, Name ="Wave Man from Megaman 5"
+trigger259= Enemy, Name ="BombMan"
+trigger260= Enemy, Name ="fireman"
+trigger261= Enemy, Name ="Gutsman"
+trigger262= Enemy, Name ="Mercury from Megaman V"
+trigger263= Enemy, Name ="napalmman"
+trigger264= Enemy, Name ="Needle Man from Megaman 3"
+trigger265= Enemy, Name ="pharohman"
+trigger266= Enemy, Name ="Duo"
+trigger267= Enemy, Name ="Spring Man from Megaman 7"
+trigger268= Enemy, Name ="Cold Man from Megaman & Forte"
+trigger269= Enemy, Name ="Rhino from Rockman And Forte"
+trigger270= Enemy, Name ="Blazing Flizzard from 'Megaman Zero 3'"
+trigger271= Enemy, Name ="BLIZZARD MAN"
+trigger272= Enemy, Name ="FREEZEMAN"
+trigger273= Enemy, Name ="Magnet Man from Megaman: The Power Battle"
+trigger274= Enemy, Name ="Turbo Man from Megaman Power and Fighters"
+trigger275= Enemy, Name ="Dust Man"
+trigger276= Enemy, Name ="Napalm Man"
+trigger277= Enemy, Name ="Blues"
+trigger278= Enemy, Name ="Pegasolta-Ekrail"
+trigger279= Enemy, Name ="vava Mk-2"
+trigger280= Enemy, Name ="War Machine"
+trigger281= Enemy, Name ="KOUBU(kai)"
+trigger282= Enemy, Name ="NineBall-Seraph"
+trigger283= Enemy, Name ="Fio"
+trigger284= Enemy, Name ="sol canon"
+trigger285= Enemy, Name ="OMEGA"
+trigger286= Enemy, Name ="Mirror Cube Square"
+trigger287= Enemy, Name ="zettaiaku"
+trigger288= Enemy, Name ="BLITZTANK"
+trigger289= Enemy, Name ="Bomber Man"
+trigger290= Enemy, Name ="kos-mos"
+trigger291= Enemy, Name ="KOSMOS"
+trigger292= Enemy, Name ="armor"
+trigger293= Enemy, Name ="????"
+trigger294= Enemy, Name ="???? ???? Ver0.35 "
+trigger295= Enemy, Name ="Samus Aran by Sion184"
+trigger296= Enemy, Name ="Samus Aran"
+trigger297= Enemy, Name ="Vic Viper"
+trigger298= Enemy, Name ="Fire Leo 3 [STYX]"
+trigger299= Enemy, Name ="Opa_Opa"
+trigger300= Enemy, Name ="R-9"
+trigger301= Enemy, Name ="haniwa"
+trigger302= Enemy, Name ="Final Defence System"
+trigger303= Enemy, Name ="ED 209"
+trigger304= Enemy, Name ="Death Star"
+trigger305= Enemy, Name ="Dandy Blue"
+trigger306= Enemy, Name ="pioneer"
+trigger307= Enemy, Name ="Katana"
+trigger308= Enemy, Name ="Pyros"
+trigger309= Enemy, Name ="Gargoyle"
+trigger310= Enemy, Name ="Chronos"
+trigger311= Enemy, Name ="Electra"
+trigger312= Enemy, Name ="Nova + AI"
+trigger313= Enemy, Name ="Shredder"
+trigger314= Enemy, Name ="Flail"
+trigger315= Enemy, Name ="Thorn"
+trigger316= Enemy, Name ="Shadow"
+trigger317= Enemy, Name ="Jaguar v2.0"
+trigger318= Enemy, Name ="Blockhead Enhanced"
+trigger319= Enemy, Name ="Biomenace Skullman"
+trigger320= Enemy, Name ="Zinc"
+trigger321= Enemy, Name ="Dragon Claw"
+trigger322= Enemy, Name ="Tekno"
+trigger323= Enemy, Name ="Zeeky H. Bomb"
+trigger324= Enemy, Name ="titans"
+trigger325= Enemy, Name ="Bender Rodriguez"
+trigger326= Enemy, Name ="GOLIATH-IF"
+trigger327= Enemy, Name ="Honda Tadakatsu"
+trigger328= Enemy, Name ="Ultimate Armor"
+trigger329= Enemy, Name ="Final Sigma W"
+trigger330= Enemy, Name ="MUSHA-G"
+trigger331= Enemy, Name ="HIGYO-PAM"
+trigger332= Enemy, Name ="Doparmin"
+trigger333= Enemy, Name ="yawaraka"
+trigger334= Enemy, Name ="bola"
+trigger335= Enemy, Name ="Sp-X"
+trigger336= Enemy, Name ="Restroier"
+trigger337= Enemy, Name ="MissingNumber"
+trigger338= Enemy, Name ="nukunuku"
+trigger339= Enemy, Name ="rockdevil"
+trigger340= Enemy, Name ="astrorobo sasa"
+trigger341= Enemy, Name ="Classic Z-Gundam"
+trigger342= Enemy, Name ="Ultra Magnus"
+trigger343= Enemy, Name ="Tiger"
+trigger344= Enemy, Name ="Senju"
+trigger345= Enemy, Name ="Eye"
+trigger346= Enemy, Name ="Sasuku"
+trigger347= Enemy, Name ="Skapon"
+trigger348= Enemy, Name ="Boco Boco"
+trigger349= Enemy, Name ="kubirai"
+trigger350= Enemy, Name ="psyco-g"
+trigger351= Enemy, Name ="F1"
+trigger352= Enemy, Name ="Chomper"
+trigger353= Enemy, Name ="Big Core"
+trigger354= Enemy, Name ="srobo"
+trigger355= Enemy, Name ="famicomwars"
+trigger356= Enemy, Name ="CADILLACS"
+trigger357= Enemy, Name ="King Fossil"
+trigger358= Enemy, Name ="Mercedes Benz"
+trigger359= Enemy, Name ="Gi Gi"
+trigger360= Enemy, Name ="IronMan"
+trigger361= Enemy, Name ="WarMachine"
+trigger362= Enemy, Name ="Neco Chaos Black G666"
+trigger363= Enemy, Name ="CLUB ACE"
+trigger364= Enemy, Name ="Juuhachigou"
+trigger365= Enemy, Name ="Androide 18 by _Vision"
+trigger366= Enemy, Name ="Android 18"
+trigger367= Enemy, Name ="Android 17 by HyperionX"
+trigger368= Enemy, Name ="anna"&&authorname="kayui uma"
+trigger369= Enemy, Name ="Arale"
+trigger370= Enemy, Name ="MvC EoH- Huitzil"
+trigger371= Enemy, Name ="Rockman"
+trigger372= Enemy, Name ="Bass / Forte"
+trigger373= Enemy, Name ="colonel_X4"
+trigger374= Enemy, Name ="iris_X4"
+trigger375= Enemy, Name ="MERCURIUS"
+trigger376= Enemy, Name ="TALLGEESE"
+trigger377= Enemy, Name ="OZ-06MS LEO"
+trigger378= Enemy, Name ="XXXG-01SR GUNDAM SANDROCK"
+trigger379= Enemy, Name ="GUNDAM HEAVY ARMS"
+trigger380= Enemy, Name ="GUNDAM SHENLONG"
+trigger381= Enemy, Name ="GUNDAM DEATHSCYTHE"
+trigger382= Enemy, Name ="GUNDAM DRAGON"
+trigger383= Enemy, Name ="GUNDAM MAXTER 2.0"
+trigger384= Enemy, Name ="GUNDAM ROSE"
+trigger385= Enemy, Name ="Z'Gok"
+trigger386= Enemy, Name ="Gelgoog"
+trigger387= Enemy, Name ="GunCannon"
+trigger388= Enemy, Name ="GYAN"
+trigger389= Enemy, Name ="Zeong"
+trigger390= Enemy, Name ="Dolmel"
+trigger391= Enemy, Name ="ZAKU CHAR CUSTOM"
+trigger392= Enemy, Name ="GUNDAM DOUBLE ZETA"
+trigger393= Enemy, Name ="BIG ZAM"
+trigger394= Enemy, Name ="Zechs Merquise"
+trigger395= Enemy, Name ="GUNDAM EPYON"
+trigger396= Enemy, Name ="Heero Yuy"
+trigger397= Enemy, Name ="Gundam"
+trigger398= Enemy, Name ="RX-78 Gundam"
+trigger399= Enemy, Name ="RX-78-2 Gundam"
+trigger400= Enemy, Name ="GM"
+trigger401= Enemy, Name ="EDDIE"&&authorname="DarkRiem"
+trigger402= Enemy, Name ="Megaman PLUS"
+trigger403= Enemy, Name ="MegaManEXE"
+trigger404= Enemy, Name ="Roboman"
+trigger405= Enemy, Name ="GUNDAM ZETA"
+trigger406= Enemy, Name ="CATHERINE-MVC"
+trigger407= Enemy, Name ="Gun Form"
+trigger408= Enemy, Name ="Copy ToadMan by Neon Tiger"
+trigger409= Enemy, Name ="Key Q"
+trigger410= Enemy, Name ="Slot Machine by Neon Tiger"
+trigger411= Enemy, Name ="KINGJOE"
+trigger412= Enemy, Name ="Mecha Dragon"
+trigger413= Enemy, Name ="Omega Zero"
+trigger414= Enemy, Name ="DAIMAJIN"
+trigger415= Enemy, Name ="DEVIL DAIMAJIN"
+trigger416= Enemy, Name ="KUROHIGE"
+trigger417= Enemy, Name ="SKIBOOTS"
+trigger418= Enemy, Name ="Bubble Man"
+trigger419= Enemy, Name ="Centauros Man"
+trigger420= Enemy, Name ="Heat Man"
+trigger421= Enemy, Name ="Plant Man"
+trigger422= Enemy, Name ="Quick Man"
+trigger423= Enemy, Name ="Explose Horneck"
+trigger424= Enemy, Name ="Frozen Buffalio"
+trigger425= Enemy, Name ="AV-8"
+trigger426= Enemy, Name ="F-4"
+trigger427= Enemy, Name ="Super Hornet"
+trigger428= Enemy, Name ="F-117"
+trigger429= Enemy, Name ="Iceman"&&authorname="Excursion"
+trigger430= Enemy, Name ="ROBO-KY3"
+trigger431= Enemy, Name ="Metalman"
+trigger432= Enemy, Name ="Iron-Man"
+trigger433= Enemy, Name ="Sexx on Wings"
+trigger434= Enemy, Name ="Taros"
+trigger435= Enemy, Name ="Omni-Psych justice"
+trigger436= Enemy, Name ="cyborg_mai"
+trigger437= Enemy, Name ="Megaman X1 - X3"
+trigger438= Enemy, Name ="drache"
+trigger439= Enemy, Name ="Irritating run and gun enemy soldier"
+trigger440= Enemy, Name ="BocoBoco"
+trigger441= Enemy, Name ="Classic Wagyan"
+trigger442= Enemy, Name ="Houou"&&authorname="Tokinokuni-Kei"
+trigger443= Enemy, Name ="Sukapon"
+trigger444= Enemy, Name ="tetrisman"
+trigger445= Enemy, Name ="unknown"&&authorname="otto"
+trigger446= Enemy, Name ="SUPER ZERO"
+trigger447= Enemy, Name ="Old School Megaman"
+trigger448= Enemy, Name ="Brass"
+trigger449= Enemy, Name ="Metabee"
+trigger450= Enemy, Name ="PepperCat"
+trigger451= Enemy, Name ="Rokusho"
+trigger452= Enemy, Name ="Zero_by_Diego_Sanches"
+trigger453= Enemy, Name ="Kyashan"
+trigger454= Enemy, Name ="Futurama's BENDER"
+trigger455= Enemy, Name ="Android 20"
+trigger456= Enemy, Name ="robo"
+trigger457= Enemy, Name ="Death Force"
+trigger458= Enemy, Name ="Slug Wanzer"
+trigger459= Enemy, Name ="Strang Loli"
+trigger460= Enemy, Name ="turn-A"
+trigger461= Enemy, Name ="turn-X"
+trigger462= Enemy, Name ="kiti"&&authorname="asagao"
+trigger463= Enemy, Name ="AxAyAzSSS"
+trigger464= Enemy, Name ="Wea"
+trigger465= Enemy, Name ="Mad Grinder"
+trigger466= Enemy, Name ="Victor"
+trigger467= Enemy, Name ="tibigintou"
+trigger468= Enemy, Name ="sinku"
+trigger469= Enemy, Name ="Jissou seki"
+trigger470= Enemy, Name ="another jissou seki"
+trigger471= Enemy, Name ="HebiItigo"
+trigger472= Enemy, Name ="Shantotto's Doll"
+trigger473= Enemy, Name ="wagyan"
+trigger474= Enemy, Name ="Hanny"
+trigger475= Enemy, Name ="Elecman-o"
+trigger476= Enemy, Name ="ROBO-KY1"
+trigger477= Enemy, Name ="ROBO-KY2"
+trigger478= Enemy, Name ="Bionic Cage"
+trigger479= Enemy, Name ="big viper"
+trigger480= Enemy, Name ="samus"
+trigger481= Enemy, Name ="Lina"&&authorname="Sakuraka"
+trigger482= Enemy, Name ="RajaaMechHisui"
+trigger483= Enemy, Name ="Baikinman"&&authorname="tachi"
+trigger484= Enemy, Name ="Metal Slug Train"
+trigger485= Enemy, Name ="d4_skapon"
+trigger486= Enemy, Name ="temtan"
+trigger487= Enemy, Name ="Mei-Fang"
+trigger488= Enemy, Name =" Metallo"
+trigger489= Enemy, Name ="ApeBag"
+trigger490= Enemy, Name ="OLD_ROBO-KY"
+trigger491= Enemy, Name ="Walkyrie"&&authorname="mass"
+trigger492= Enemy, Name ="Bio Weapon"
+trigger493= Enemy, Name ="G.Canno"
+trigger494= Enemy, Name ="ROBO-JAM"
+trigger495= Enemy, Name ="MEKAkfm"
+trigger496= Enemy, Name ="DOBLE"
+trigger497= Enemy, Name ="Eraser"
+trigger498= Enemy, Name ="STORM FUKUROUL"
+trigger499= Enemy, Name ="Gate"
+trigger500= Enemy, Name ="MAGMARD-DRAGOON"
+trigger501= Enemy, Name ="Ultimate_X"
+trigger502= Enemy, Name ="ZERO-NIGHTMARE"
+trigger503= Enemy, Name ="ZERO VIRUS"
+trigger504= Enemy, Name ="golems"
+trigger505= Enemy, Name ="Android 17"
+trigger506= Enemy, Name ="Cursor"
+trigger507= Enemy, Name ="Metal_Sonic by MUGENHunter"
+trigger508= Enemy, Name ="Metal_Sonic"
+trigger509= Enemy, Name ="Metal Sonic"
+trigger510= Enemy, Name ="MikuMikuDance"
+trigger511= Enemy, Name ="Meifan"
+trigger512= Enemy, Name ="omegaman"
+trigger513= Enemy, Name ="MegaMari"
+trigger514= Enemy, Name ="snakeman"
+trigger515= Enemy, Name ="God Emperor"
+trigger516= Enemy, Name ="METAL MAN"
+trigger517= Enemy, Name ="Zero Nightmare"
+trigger518= Enemy, Name ="C-18"
+trigger519= Enemy, Name ="Super MechaGodzilla"
+trigger520= Enemy, Name ="Robotnik S2 FB"
+trigger521= Enemy, Name ="Mecha-gorilla"
+trigger522= Enemy, Name ="Crashman"
+trigger523= Enemy, Name ="Dr.SLUMP ARALEchan"
+trigger524= Enemy, Name ="IronMan_ZEROGOU"
+trigger525= Enemy, Name ="Slot Machine Mk II"
+trigger526= Enemy, Name ="SF3SHADOWLADY"
+trigger527= Enemy, Name ="NineBall=Seraph"
+trigger528= Enemy, Name ="MAXMILIAN"
+trigger529= Enemy, Name ="BIKEMAN"
+trigger530= Enemy, Name ="PHANTASMA"
+trigger531= Enemy, Name ="Chrome Dome"
+trigger532= Enemy, Name ="Cyber-Woo"
+trigger533= Enemy, Name ="Providence"
+trigger534= Enemy, Name ="deathscythe"
+trigger535= Enemy, Name ="CARAMELMAN No.2"
+trigger536= Enemy, Name ="Legend"&&authorname="Tamago Kanten"
+trigger537= Enemy, Name ="Ziboru"&&authorname="Tamago Kanten"
+trigger538= Enemy, Name ="Ra"&&authorname="Tamago Kanten"
+trigger539= Enemy, Name ="shenron"&&authorname="Tamago Kanten"
+trigger540= Enemy, Name ="Ninja-Senshi Tobikage"
+trigger541= Enemy, Name ="nakoruru"&&authorname="????"
+trigger542= Enemy, Name ="Astroboy OmegaFactor"
+trigger543= Enemy, Name ="Astroboy"
+trigger544= Enemy, Name ="tatami"
+trigger545= Enemy, Name ="HAKUREI"&&authorname="Nachel_Arrange_By_RockMARISA"
+trigger546= Enemy, Name ="houou"&&authorname="Tamago Kanten"
+trigger547= Enemy, Name ="wy"&&authorname="Tamago Kanten"
+trigger548= Enemy, Name ="Golyat"
+trigger549= Enemy, Name ="dachon"
+trigger550= Enemy, Name ="garakku"
+trigger551= Enemy, Name ="ghoston"
+trigger552= Enemy, Name ="gigant"
+trigger553= Enemy, Name ="skapokan"
+trigger554= Enemy, Name ="skater"
+trigger555= Enemy, Name ="Shanghai"
+trigger556= Enemy, Name ="Helmetless MegaMan"
+trigger557= Enemy, Name ="Cyber Akuma"
+trigger558= Enemy, Name ="Baby Commando"
+trigger559= Enemy, Name ="Politank Z"
+trigger560= Enemy, Name ="Geneshic Gaogaiger"
+trigger561= Enemy, Name ="RYUKO-ROBO"
+trigger562= Enemy, Name ="VAVA"
+trigger563= Enemy, Name ="009-sb"
+trigger564= Enemy, Name ="F03"
+trigger565= Enemy, Name ="CC"
+trigger566= Enemy, Name ="Toa-Mata"
+trigger567= Enemy, Name ="monolith"
+trigger568= Enemy, Name ="Rock Volnutt"
+trigger569= Enemy, Name ="RX78-GUNDAM"
+trigger570= Enemy, Name ="Gold Lightan"
+trigger571= Enemy, Name ="Megaman X By ChAoTiC "
+trigger572= Enemy, Name ="ROBO-SOL"
+trigger573= Enemy, Name ="Nui-Rama"
+trigger574= Enemy, Name ="Ming-Vase"
+trigger575= Enemy, Name ="Jureimen"
+trigger576= Enemy, Name ="Mei-Fang_R"
+trigger577= Enemy, Name ="Lina2"
+trigger578= Enemy, Name ="Tron Bonne SxP"
+trigger579= Enemy, Name ="Toron"
+trigger580= Enemy, Name ="Tron Bonne"
+trigger581= Enemy, Name ="MvC2 Tron Bonne"
+trigger582= Enemy, Name ="TronBonne"
+trigger583= Enemy, Name ="GUNDAM GP02A"
+trigger584= Enemy, Name ="GUNDAM PSYCHO MKIII"
+trigger585= Enemy, Name ="QUIN MANTHA"
+trigger586= Enemy, Name ="GUNDAM WING"
+trigger587= Enemy, Name ="ZAKU II CHAR CUSTOM"
+trigger588= Enemy, Name ="MSM-04 ACGUY"
+trigger589= Enemy, Name ="Kaen"&&authorname="Tamago Kanten"
+trigger590= Enemy, Name ="Ashura"&&authorname="Tamago Kanten"
+trigger591= Enemy, Name ="Hanzor"&&authorname="Tamago Kanten"
+trigger592= Enemy, Name ="Jhon"&&authorname="Tamago Kanten"
+trigger593= Enemy, Name ="Leo"&&authorname="Tamago Kanten"
+trigger594= Enemy, Name ="Nay"&&authorname="Tamago Kanten"
+trigger595= Enemy, Name ="Regend"&&authorname="Tamago Kanten"
+trigger596= Enemy, Name ="Guarborg"
+trigger597= Enemy, Name ="Gian"
+trigger598= Enemy, Name ="Giganto Prototype"
+trigger599= Enemy, Name ="Grak"
+trigger600= Enemy, Name ="Hover"
+trigger601= Enemy, Name ="Jibber"
+trigger602= Enemy, Name ="Iron Lantern"
+trigger603= Enemy, Name ="Maverick Hunter Zero"
+trigger604= Enemy, Name ="b-comp"
+trigger605= Enemy, Name ="Mecha-Birdo"
+trigger606= Enemy, Name ="UFO"
+trigger607= Enemy, Name ="MotherUFO"
+trigger608= Enemy, Name ="EG-X Soul Gain"
+trigger609= Enemy, Name ="R-9 LEO"
+trigger610= Enemy, Name ="Red-Warrior"
+trigger611= Enemy, Name ="Marvel vs. Capcom - Eternity of Heroes: Roll"
+trigger612= Enemy, Name ="Megaman - Robot Master Mayhem: Roll"
+trigger613= Enemy, Name ="Mamoru Bicycle"
+trigger614= Enemy, Name ="PorkyMinch_IWBTG"
+trigger615= Enemy, Name ="MetalYoshi3"
+trigger616= Enemy, Name ="haizilyo"
+trigger617= Enemy, Name ="Freedom"&&authorname="hyuga_Arrange_By_Noir"
+trigger618= Enemy, Name ="God"&&authorname="hyuga_Arrange_By_Noir"
+trigger619= Enemy, Name ="Zero"&&authorname="hyuga_Arrange_By_Noir"
+trigger620= Enemy, Name ="donaiya"
+trigger621= Enemy, Name ="ohaou"
+trigger622= Enemy, Name ="GOTENGO"
+trigger623= Enemy, Name ="AE86"
+trigger624= Enemy, Name ="Proto-Omega"
+trigger625= Enemy, Name ="Morph_ball"
+trigger626= Enemy, Name ="EMZ-02.TERRARED"
+trigger627= Enemy, Name ="RMZ-01.GARIUS"
+trigger628= Enemy, Name ="ZOIDS.GOLDOS-HG"
+trigger629= Enemy, Name ="ZOIDS.GOLDOS"
+trigger630= Enemy, Name ="RMZ-02.GLIDRER"
+trigger631= Enemy, Name ="ZOIDS.DIMETRODON"
+trigger632= Enemy, Name ="Dual Koa"
+trigger633= Enemy, Name ="Borot"
+trigger634= Enemy, Name ="WG"
+trigger635= Enemy, Name ="concept-X project-6 division-1 block-2"
+trigger636= Enemy, Name ="1st Chaos Satellite"
+trigger637= Enemy, Name ="Coustwell Brachium"
+trigger638= Enemy, Name ="Granzon"
+trigger639= Enemy, Name ="Gundam Nataku"
+trigger640= Enemy, Name ="Dis Astranagant"
+trigger641= Enemy, Name ="SladeGelmir"
+trigger642= Enemy, Name ="R-1"
+trigger643= Enemy, Name ="living armor"
+trigger644= Enemy, Name ="Master Gundam"
+trigger645= Enemy, Name ="Wing Gundam0"
+trigger646= Enemy, Name ="Char's Zaku"
+trigger647= Enemy, Name ="GN-pioneer"
+trigger648= Enemy, Name ="GundamExia_SD"
+trigger649= Enemy, Name ="R-2"
+trigger650= Enemy, Name ="VaiSaga"
+trigger651= Enemy, Name ="HeavyArmsCustom"
+trigger652= Enemy, Name ="ZZ_Gundam"
+trigger653= Enemy, Name ="GarmRaid"
+trigger654= Enemy, Name ="ZGundam_SD"
+trigger655= Enemy, Name ="Dai Rai Oh"
+trigger656= Enemy, Name ="Person-lichkeit"
+trigger657= Enemy, Name ="ROBO-LEN"
+trigger658= Enemy, Name ="zaku"
+trigger659= Enemy, Name ="GonzalesCT"
+trigger660= Enemy, Name ="IBIS"
+trigger661= Enemy, Name ="evange"
+trigger662= Enemy, Name ="barikan"
+trigger663= Enemy, Name ="Ironman DCvsM"
+trigger664= Enemy, Name ="copy-x"
+trigger665= Enemy, Name ="Skiller masin"
+trigger666= Enemy, Name ="Super killer Masin"
+trigger667= Enemy, Name ="Killer_Masin 3"
+trigger668= Enemy, Name ="F.KillerBee"
+trigger669= Enemy, Name ="G.Vise"
+trigger670= Enemy, Name ="zero suicide"
+trigger671= Enemy, Name ="F.Tarantula"
+trigger672= Enemy, Name ="B.Swordsman"
+trigger673= Enemy, Name ="R-GUN"
+trigger674= Enemy, Name ="Card Gunner"
+trigger675= Enemy, Name ="OSAISEN BAKO"
+trigger676= Enemy, Name ="Char's Acguy"
+trigger677= Enemy, Name ="GundamX_SD"
+trigger678= Enemy, Name ="Megaman - Robot Master Mayhem: Airman"
+trigger679= Enemy, Name ="Servbot Night"
+trigger680= Enemy, Name ="B-Megaman"
+trigger681= Enemy, Name ="alissa"
+trigger682= Enemy, Name ="viola"
+trigger683= Enemy, Name ="TCRB"
+trigger684= Enemy, Name ="Jet Jaguar"
+trigger685= Enemy, Name ="3get-joe"
+trigger686= Enemy, Name ="Meta Jade"
+trigger687= Enemy, Name ="flying-amida"
+trigger688= Enemy, Name ="mechanical-amida"
+trigger689= Enemy, Name ="aianrox"
+trigger690= Enemy, Name ="TL-T"
+trigger691= Enemy, Name ="Fragile"
+trigger692= Enemy, Name ="Masaki_Kihara"&&authorname="lol"
+trigger693= Enemy, Name ="alteisen"
+trigger694= Enemy, Name ="SuperiorDragon"
+trigger695= Enemy, Name ="Mist-san"
+trigger696= Enemy, Name ="R-3_STG"
+trigger697= Enemy, Name ="ZAGI"
+trigger698= Enemy, Name ="E-123 Omega"
+trigger699= Enemy, Name ="Wai"&&authorname="Tamago Kanten"
+trigger700= Enemy, Name ="Star"&&authorname="Tamago Kanten"
+trigger701= Enemy, Name ="Old"&&authorname="Tamago Kanten"
+trigger702= Enemy, Name ="Super_Zak"
+trigger703= Enemy, Name ="HYPER GREATTHING"
+trigger704= Enemy, Name ="pulse-K"
+trigger705= Enemy, Name ="kanikousen"
+trigger706= Enemy, Name ="M-PrincessJade"
+trigger707= Enemy, Name ="cube"
+trigger708= Enemy, Name ="Nighmare Snake"
+trigger709= Enemy, Name ="Sun God"
+trigger710= Enemy, Name ="Curly_Brace"
+trigger711= Enemy, Name ="Gunsniper"
+trigger712= Enemy, Name ="Zero by Fusion"
+trigger713= Enemy, Name ="VIC VIPER NII"
+trigger714= Enemy, Name ="arcbeetle"
+trigger715= Enemy, Name ="beastmaster"
+trigger716= Enemy, Name ="BURIKI_DAIOH"
+trigger717= Enemy, Name ="Sniper Joe-01a"
+trigger718= Enemy, Name ="Big Ptolemaic Tank"
+trigger719= Enemy, Name ="Mozock"
+trigger720= Enemy, Name ="Blodia-k"
+trigger721= Enemy, Name ="R.Jackal"
+trigger722= Enemy, Name ="R.Lightning"
+trigger723= Enemy, Name ="Super-8-k"
+trigger724= Enemy, Name ="UVA-02_Helion"
+trigger725= Enemy, Name ="Warlock-k"
+trigger726= Enemy, Name ="Phobos"
+trigger727= Enemy, Name ="Gundum Death-Scythe"
+trigger728= Enemy, Name ="Zweizergain"
+trigger729= Enemy, Name ="Stone Man by Neon Tiger"
+trigger730= Enemy, Name ="BROKKEN"
+trigger731= Enemy, Name ="Mecha Zangief"
+trigger732= Enemy, Name ="GiantCrab"
+trigger733= Enemy, Name ="Great Axion"
+trigger734= Enemy, Name ="Great Axion EX"
+trigger735= Enemy, Name ="Mark Sein"
+trigger736= Enemy, Name ="heavy rob"
+trigger737= Enemy, Name ="Super Forte"
+trigger738= Enemy, Name ="Killer-Masin-3"
+trigger739= Enemy, Name ="Robo-Mizuchi"
+trigger740= Enemy, Name ="Gel"&&authorname="Tamago Kanten"
+trigger741= Enemy, Name ="[Txpot's] Collateral Damages 2 STOOFA AK021"
+trigger742= Enemy, Name ="]-[|/34<#!"
+trigger743= Enemy, Name ="STG A-EX"
+trigger744= Enemy, Name ="STG_DoDonPachi"
+trigger745= Enemy, Name ="ToadMan"
+trigger746= Enemy, Name ="Roboes"
+trigger747= Enemy, Name ="cvsk"
+trigger748= Enemy, Name ="hvso"
+trigger749= Enemy, Name ="ShinoGozi"
+trigger750= Enemy, Name ="FC-Rockman"
+trigger751= Enemy, Name ="shelltank"
+trigger752= Enemy, Name ="Marvel vs Capcom - Eternity of Heroes: Rockman Copy"
+trigger753= Enemy, Name ="Kunoichi_NWA"
+trigger754= Enemy, Name ="Ninja_NWA"
+trigger755= Enemy, Name ="X"
+trigger756= Enemy, Name ="Deathtanz-mantisk"
+trigger757= Enemy, Name ="Devilbat-schilt"
+trigger758= Enemy, Name ="Heat-Genblem"
+trigger759= Enemy, Name ="Tretista-Kelverian"
+trigger760= Enemy, Name ="Protectos"
+trigger761= Enemy, Name ="ShinZero"
+trigger762= Enemy, Name ="Storm-Owl"
+trigger763= Enemy, Name ="bloody"
+trigger764= Enemy, Name ="Dangaioh"
+trigger765= Enemy, Name ="weissritter"
+trigger766= Enemy, Name ="Kisaragi"&&authorname="Haloveli"
+trigger767= Enemy, Name ="RED ATTACKER"
+trigger768= Enemy, Name ="Tekkaman-Lance"
+trigger769= Enemy, Name ="B-Bld"
+trigger770= Enemy, Name ="Bh-Tb01"
+trigger771= Enemy, Name ="Kamaitachi_NWA"
+trigger772= Enemy, Name ="Chill Penguin"
+trigger773= Enemy, Name ="Kobun 43"
+trigger774= Enemy, Name ="SFIIM Cyborg"
+trigger775= Enemy, Name ="X-Aestivalis"
+trigger776= Enemy, Name ="Kunoichi"&&authorname="D, The Red Cloak"
+trigger777= Enemy, Name ="Kamaitachi"&&authorname="D, The Red Cloak"
+trigger778= Enemy, Name ="Dorniar EX"
+trigger779= Enemy, Name ="Eregion"
+trigger780= Enemy, Name ="Mega Scorpia"
+trigger781= Enemy, Name ="SuperBot"
+trigger782= Enemy, Name ="Tarantulra_DFO"
+trigger783= Enemy, Name ="BigRigs"
+trigger784= Enemy, Name ="Ghetto WarMachine"
+trigger785= Enemy, Name ="Rocket Tank"
+trigger786= Enemy, Name ="Metallo"
+trigger787= Enemy, Name ="Mechrisui"
+trigger788= Enemy, Name ="Maximum_Cute_Hisui"
+trigger789= Enemy, Name ="Chun-Li, but a robot or something"
+trigger790= Enemy, Name ="FREEDOM -Meteor-"
+trigger791= Enemy, Name ="HEAVYARMS CUSTOM"
+trigger792= Enemy, Name ="SWORD IMPULSE"
+trigger793= Enemy, Name ="V2AssaultBusterGundam"
+trigger794= Enemy, Name ="VGUNDAM"
+trigger795= Enemy, Name ="kikoutei purasido infinite"
+trigger796= Enemy, Name ="OF"
+trigger797= Enemy, Name ="16"&&authorname="Chrono_Strife and BenHazard"
+trigger798= Enemy, Name ="Lio Convoy"
+trigger799= Enemy, Name ="DUAL SHEARS SP"
+trigger800= Enemy, Name ="MetalMax"
+trigger801= Enemy, Name ="EINS"
+trigger802= Enemy, Name ="Blizzard Wolfang"
+trigger803= Enemy, Name ="lt_vayeate"
+trigger804= Enemy, Name ="layzner"
+trigger805= Enemy, Name ="Phobos-C"
+trigger806= Enemy, Name ="Saviour Gundam"
+trigger807= Enemy, Name ="KAMPFAR"
+trigger808= Enemy, Name ="Deathscythe Gundam"
+trigger809= Enemy, Name ="Getter3"
+trigger810= Enemy, Name ="C.Akuma_MvC"
+trigger811= Enemy, Name ="GGKY"
+trigger812= Enemy, Name ="ROBO-KY_Type-P"
+trigger813= Enemy, Name ="XECHS"
+trigger814= Enemy, Name ="Sandrock Gundam"
+trigger815= Enemy, Name ="Heavyarms Gundam"
+trigger816= Enemy, Name ="Shenlong Gundam"
+trigger817= Enemy, Name ="Tallgeese Gundam"
+trigger818= Enemy, Name ="NeoArmstrongCycloneJetArmstrongCannon"
+trigger819= Enemy, Name ="Vayeate Doll Prototype"
+trigger820= Enemy, Name ="Tank"
+trigger821= Enemy, Name ="Mercurius Doll Prototype"
+trigger822= Enemy, Name ="Zero (Ariel AleX Co.//RedLine)"
+trigger823= Enemy, Name ="Mega Tigerzord"
+trigger824= Enemy, Name ="Epyon Gundam"
+trigger825= Enemy, Name ="WingGundam-Z2"
+trigger826= Enemy, Name ="Zphiroude"
+trigger827= Enemy, Name ="Neko&Mech"
+trigger828= Enemy, Name ="Gulpfer"
+trigger829= Enemy, Name ="Tina"&&authorname="rakkasei"
+trigger830= Enemy, Name ="CaramelManJ by talic"
+trigger831= Enemy, Name ="J_mantis"
+trigger832= Enemy, Name ="DESTROYOUS"
+trigger833= Enemy, Name ="DSJ_C.Dome"
+trigger834= Enemy, Name ="Krang"
+trigger835= Enemy, Name ="DcatKrang"
+trigger836= Enemy, Name ="Huitzil"
+trigger837= Enemy, Name ="BomberMan"
+trigger838= Enemy, Name ="God Bomberman"
+trigger839= Enemy, Name ="Rare BomberMan"
+trigger840= Enemy, Name ="greendragon"
+trigger841= Enemy, Name ="Thunder Megazord"
+trigger842= Enemy, Name ="Mega"
+trigger843= Enemy, Name ="bob-omb"
+trigger844= Enemy, Name ="Tekno (Body Blows Galactic)"
+trigger845= Enemy, Name ="Ferroman"
+trigger846= Enemy, Name ="Iron Man by Xasor"
+trigger847= Enemy, Name ="ironman/gunslinger"
+trigger848= Enemy, Name ="IronPatriot"
+trigger849= Enemy, Name ="Souryu"
+trigger850= Enemy, Name ="Getter1"
+trigger851= Enemy, Name ="GN-Pioneer-R"
+trigger852= Enemy, Name ="Ninja Megazord"
+trigger853= Enemy, Name ="Android Sixteen"
+trigger854= Enemy, Name ="Android 16 DBZ 1"
+trigger855= Enemy, Name ="Meta Kooler"
+trigger856= Enemy, Name ="Metal Coola"
+trigger857= Enemy, Name ="FusedRobotPilaf"
+trigger858= Enemy, Name ="Android 19"
+trigger859= Enemy, Name ="Android19 by Szowel"
+trigger860= Enemy, Name ="RM9-ConcreteMan-NES"
+trigger861= Enemy, Name ="RM9-FakeMan-NES"
+trigger862= Enemy, Name ="RM5-GyroMan-NES"
+trigger863= Enemy, Name ="RM9-PlugMan-NES"
+trigger864= Enemy, Name ="ShadowMan-WW"
+trigger865= Enemy, Name ="RM6-TomahawkMan-NES"
+trigger866= Enemy, Name ="TornadoMan"
+trigger867= Enemy, Name ="Proto Man from Megaman 3"
+trigger868= Enemy, Name ="Star Man from Megaman 5"
+trigger869= Enemy, Name ="Coldman"
+trigger870= Enemy, Name ="Crash Man"
+trigger871= Enemy, Name ="CrystalMan"
+trigger872= Enemy, Name ="Diveman"
+trigger873= Enemy, Name ="DrillMan"
+trigger874= Enemy, Name ="Enker"
+trigger875= Enemy, Name ="Flameman"
+trigger876= Enemy, Name ="Flash Man"
+trigger877= Enemy, Name ="Iceman"&&authorname="Roberto23"
+trigger878= Enemy, Name ="Marte"
+trigger879= Enemy, Name ="Bass"
+trigger880= Enemy, Name ="Punk"
+trigger881= Enemy, Name ="Skullman"
+trigger882= Enemy, Name ="SunGod"
+trigger883= Enemy, Name ="MegaMan X GBC"
+trigger884= Enemy, Name ="JunkMan-RM7"
+trigger885= Enemy, Name ="PBRingMan"
+trigger886= Enemy, Name ="Snakeman_PB"
+trigger887= Enemy, Name ="Blizzardman_PB"
+trigger888= Enemy, Name ="Burstman"
+trigger889= Enemy, Name ="Cloudman"
+trigger890= Enemy, Name ="Crashman_PB"
+trigger891= Enemy, Name ="Dive Man"
+trigger892= Enemy, Name ="Dr. Wily"
+trigger893= Enemy, Name ="Dustman_PB"
+trigger894= Enemy, Name ="Freezeman_PB"
+trigger895= Enemy, Name ="Gemini Man"
+trigger896= Enemy, Name ="Gravityman_PB"
+trigger897= Enemy, Name ="Gyroman_PB"
+trigger898= Enemy, Name ="Junkman"
+trigger899= Enemy, Name ="Srash Man"
+trigger900= Enemy, Name ="Needleman_PB"
+trigger901= Enemy, Name ="Jewel Man"
+trigger902= Enemy, Name ="Magma Man"
+trigger903= Enemy, Name ="Pharaoh Man from Megaman Power and Fighters"
+trigger904= Enemy, Name ="Plug Man"
+trigger905= Enemy, Name ="Ringman_PB"
+trigger906= Enemy, Name ="Shade Man"
+trigger907= Enemy, Name ="Shadow_Man_PB"
+trigger908= Enemy, Name ="Skullman_MM7"
+trigger909= Enemy, Name ="Slashman - Power Fighter 2"
+trigger910= Enemy, Name ="Sparkman"
+trigger911= Enemy, Name ="Starman_PB"
+trigger912= Enemy, Name ="Toadman_PB"
+trigger913= Enemy, Name ="Topman_PB"
+trigger914= Enemy, Name ="Tornado Man"
+trigger915= Enemy, Name ="Aqua Man"
+trigger916= Enemy, Name ="Astro Man"
+trigger917= Enemy, Name ="Mega Man 9 Bass"
+trigger918= Enemy, Name ="Burnerman - Rockman & Forte"
+trigger919= Enemy, Name ="Burner Man"
+trigger920= Enemy, Name ="Clown Man"
+trigger921= Enemy, Name ="Duo - Megaman 8"
+trigger922= Enemy, Name ="fiman"
+trigger923= Enemy, Name ="Grenade Man"
+trigger924= Enemy, Name ="King"&&authorname="Heyakes"
+trigger925= Enemy, Name ="Magicman - Rockman & Forte"
+trigger926= Enemy, Name ="Roll_MM8_by_Zetah_y_TheMegaFBX"
+trigger927= Enemy, Name ="Needle Man"
+trigger928= Enemy, Name ="Pharaoh Man"
+trigger929= Enemy, Name ="Protoman"
+trigger930= Enemy, Name ="Skull Man"
+trigger931= Enemy, Name ="TenguMan"
+trigger932= Enemy, Name ="Tengu Man"
+trigger933= Enemy, Name ="Megaman X"
+trigger934= Enemy, Name ="Grenade-RMX4"
+trigger935= Enemy, Name ="Vile-MK1"
+trigger936= Enemy, Name ="Awakened Zero"
+trigger937= Enemy, Name ="Black Zero"
+trigger938= Enemy, Name ="Colonel"&&authorname="Diego Sanches & Z-Sabre User"
+trigger939= Enemy, Name ="Dynamo"
+trigger940= Enemy, Name ="FrostWalrus"
+trigger941= Enemy, Name ="Gaea Armor - Megaman/Rockman X5"
+trigger942= Enemy, Name ="General_by_Diego_Sanches"
+trigger943= Enemy, Name ="Grizzly"
+trigger944= Enemy, Name ="Guard Fish"
+trigger945= Enemy, Name ="High Max"
+trigger946= Enemy, Name ="Infinity Mijinion"
+trigger947= Enemy, Name ="Izzy Glow"
+trigger948= Enemy, Name ="Fourth Armor X"
+trigger949= Enemy, Name ="spike rosered"
+trigger950= Enemy, Name ="Ultimate Armor Megaman/Rockman X6"
+trigger951= Enemy, Name ="Volt Kraken"
+trigger952= Enemy, Name ="Hyleg Ourobuckle"
+trigger953= Enemy, Name ="Kraft"
+trigger954= Enemy, Name ="Leviathan"&&authorname="The_Virus_X"
+trigger955= Enemy, Name ="Phantomsheet"
+trigger956= Enemy, Name ="Anubis Necromancis III"
+trigger957= Enemy, Name ="Blaze Heatnix "
+trigger958= Enemy, Name ="Childre Inarabitta"
+trigger959= Enemy, Name ="Dr.Vile"
+trigger960= Enemy, Name ="Elpizo"
+trigger961= Enemy, Name ="GolemE"
+trigger962= Enemy, Name ="polerkamrous"
+trigger963= Enemy, Name ="techkraken"
+trigger964= Enemy, Name ="Volteel Biblio"
+trigger965= Enemy, Name ="Neo X"
+trigger966= Enemy, Name ="fefnir"
+trigger967= Enemy, Name ="Fenri-Lunaedge"
+trigger968= Enemy, Name ="Sage Harpuia"
+trigger969= Enemy, Name ="chronoforce"
+trigger970= Enemy, Name ="Fistleo"
+trigger971= Enemy, Name ="Grey"
+trigger972= Enemy, Name ="hivolt"
+trigger973= Enemy, Name ="Hurricaune"
+trigger974= Enemy, Name ="Model Z"
+trigger975= Enemy, Name ="Giro"
+trigger976= Enemy, Name ="model Z GNR"
+trigger977= Enemy, Name ="Football Head"
+trigger978= Enemy, Name ="Prometheus"
+trigger979= Enemy, Name ="Purprill"
+trigger980= Enemy, Name ="Aile"
+trigger981= Enemy, Name ="DroidX"
+trigger982= Enemy, Name ="Vent"
+trigger983= Enemy, Name ="Magicman"
+trigger984= Enemy, Name ="Yamatoman"
+trigger985= Enemy, Name ="aquabeastexe"
+trigger986= Enemy, Name ="Colonel EXE"
+trigger987= Enemy, Name ="Dream V"
+trigger988= Enemy, Name ="dustbeastexe"
+trigger989= Enemy, Name ="elecbeastexe"
+trigger990= Enemy, Name ="Bowlman.Exe"
+trigger991= Enemy, Name ="falzar"
+trigger992= Enemy, Name ="FireMan.EXE by Neon Tiger"
+trigger993= Enemy, Name ="Forte"
+trigger994= Enemy, Name ="Gateman"
+trigger995= Enemy, Name ="grondbeastexe"
+trigger996= Enemy, Name ="Gutsmanexe"
+trigger997= Enemy, Name ="Gyroman.EXE"
+trigger998= Enemy, Name ="heatmanexe"
+trigger999= Enemy, Name ="kendo-man"
+trigger1000= Enemy, Name ="kingman"
+trigger1001= Enemy, Name ="Laserman.EXE"
+trigger1002= Enemy, Name ="magnetmanexe"
+trigger1003= Enemy, Name ="Megaman Falzer"
+trigger1004= Enemy, Name ="Megaman Gregar"
+trigger1005= Enemy, Name ="Metalman.exe"
+trigger1006= Enemy, Name ="Mettaur EXE"
+trigger1007= Enemy, Name ="Blues, The Red"
+trigger1008= Enemy, Name ="Protoman_EXE"
+trigger1009= Enemy, Name ="Quickman"
+trigger1010= Enemy, Name ="RockManEXE"
+trigger1011= Enemy, Name ="rollexe"
+trigger1012= Enemy, Name ="shademanexe"
+trigger1013= Enemy, Name ="Shadowman Exe"
+trigger1014= Enemy, Name ="slashbeastexe"
+trigger1015= Enemy, Name ="SolMegaman"
+trigger1016= Enemy, Name ="tengubeastexe"
+trigger1017= Enemy, Name ="Tomahawkbeast"
+trigger1018= Enemy, Name ="Tomahawkman_exe"
+trigger1019= Enemy, Name ="Rockman EXE wood "
+trigger1020= Enemy, Name ="Zero Virus"
+trigger1021= Enemy, Name ="Geo Stelar"
+trigger1022= Enemy, Name ="Solo"
+trigger1023= Enemy, Name ="Knightman MVC"
+trigger1024= Enemy, Name ="Shadowman"
+trigger1025= Enemy, Name ="Wily"
+trigger1026= Enemy, Name ="fxr"
+trigger1027= Enemy, Name ="MegamanX"
+trigger1028= Enemy, Name ="Bomb Man"
+trigger1029= Enemy, Name ="Elec Man"
+trigger1030= Enemy, Name ="Rock"&&authorname="shimon"
+trigger1031= Enemy, Name ="Rock"&&authorname="xed (xedarts)"
+trigger1032= Enemy, Name ="rockman zero"
+trigger1033= Enemy, Name ="Pocket Megaman Zero"
+trigger1034= Enemy, Name ="RMM PLAYER"
+trigger1035= Enemy, Name ="RMM BOSS"
+trigger1036= Enemy, Name ="Bifrost The Crocoroid"
+trigger1037= Enemy, Name ="Rocket Tank NES"
+trigger1038= Enemy, Name ="Woodman"
+trigger1039= Enemy, Name ="Mech-Gouki"
+trigger1040= Enemy, Name ="Godmars"
+trigger1041= Enemy, Name ="Gaogaigar"
+trigger1042= Enemy, Name ="Yun_Fang"
+trigger1043= Enemy, Name ="Armored_Armadillo"
+trigger1044= Enemy, Name ="Boomer_Kuwanger"
+trigger1045= Enemy, Name ="Chill_Penguin"
+trigger1046= Enemy, Name ="Flame_Mammoth"
+trigger1047= Enemy, Name ="Launch_Octopus"
+trigger1048= Enemy, Name ="Spark_Mandrill"
+trigger1049= Enemy, Name ="Sting_Chameleon"
+trigger1050= Enemy, Name ="Storm_Eagle"
+trigger1051= Enemy, Name ="Rocky"&&authorname="xxxXx"
+trigger1052= Enemy, Name ="MEGAMAMI"
+trigger1053= Enemy, Name ="D-Rex Boss EX"
+trigger1054= Enemy, Name ="Ultimate Copy X"
+trigger1055= Enemy, Name ="Ultimate Zero"
+trigger1056= Enemy, Name ="Model Ox"
+trigger1057= Enemy, Name ="Model X"
+trigger1058= Enemy, Name ="Model zx"
+trigger1059= Enemy, Name ="TEMJIN747J"
+trigger1060= Enemy, Name ="Uran 80's"
+trigger1061= Enemy, Name ="VariaThirtyOneSamus"
+trigger1062= Enemy, Name ="THE MOBILE COP JIBAN"
+trigger1063= Enemy, Name ="IG-88"
+trigger1064= Enemy, Name ="Kiriko kyubyi"
+trigger1065= Enemy, Name ="GundamF91"
+trigger1066= Enemy, Name ="MONOKUMA"
+trigger1067= Enemy, Name ="ChromeDome M/TF"
+trigger1068= Enemy, Name ="minerva x"
+trigger1069= Enemy, Name ="Pz.Kpfw.IV_From_Anglerfish_Team"
+trigger1070= Enemy, Name ="AEGIS"&&authorname="hitachi"
+trigger1071= Enemy, Name ="Riyuka Fo Ruyaka"
+trigger1072= Enemy, Name ="Choryujin"
+trigger1073= Enemy, Name ="Gekiryujin"
+trigger1074= Enemy, Name ="Zonuda"
+trigger1075= Enemy, Name ="Canine Carrier"
+trigger1076= Enemy, Name ="RAIDEN512E1"
+trigger1077= Enemy, Name ="Magma Dragoon"
+trigger1078= Enemy, Name ="Mega Man Volnutt 3D"
+trigger1079= Enemy, Name ="leopardon"&&authorname="fu-lin"
+trigger1080= Enemy, Name ="Agrail"
+trigger1081= Enemy, Name ="astranagant"
+trigger1082= Enemy, Name ="Sladegelmir_p"
+trigger1083= Enemy, Name ="Gypsy Danger"
+trigger1084= Enemy, Name ="BELLZELUTE"
+trigger1085= Enemy, Name ="Big Volfogg"
+trigger1086= Enemy, Name ="CFJ_Dural"
+trigger1087= Enemy, Name ="Robo-Akatsuki"
+trigger1088= Enemy, Name ="Refrigerator"
+trigger1089= Enemy, Name ="Ironman by XASOR"
+trigger1090= Enemy, Name ="Ultron_X"
+trigger1091= Enemy, Name ="Sergeant_R-A"
+trigger1092= Enemy, Name ="VAN Pookin"
+trigger1093= Enemy, Name ="Mazinger-Z"
+trigger1094= Enemy, Name ="JET VTOL"
+trigger1095= Enemy, Name ="SSSP pelcider"
+trigger1096= Enemy, Name ="SPACE_PENDRAGON"
+trigger1097= Enemy, Name ="Meka Dragon"
+trigger1098= Enemy, Name ="robofo"
+trigger1099= Enemy, Name ="ironrox"
+trigger1100= Enemy, Name ="T-28"
+trigger1101= Enemy, Name ="Gaea"
+trigger1102= Enemy, Name ="Metool Boss"
+trigger1103= Enemy, Name ="CvS_JackTAG"
+trigger1104= Enemy, Name ="Black Getter"
+trigger1105= Enemy, Name ="Getter 1"
+trigger1106= Enemy, Name ="Getter Queen"
+trigger1107= Enemy, Name ="Grendizer"
+trigger1108= Enemy, Name ="Kotetsu Jeeg"
+trigger1109= Enemy, Name ="UFO Robot Gattaiger"
+trigger1110= Enemy, Name ="Proto-Getter"
+trigger1111= Enemy, Name ="Dragon Tank"
+trigger1112= Enemy, Name ="Skylla Chimere"
+trigger1113= Enemy, Name ="Robot Steven"
+trigger1114= Enemy, Name ="Mech Hisui 404"
+trigger1115= Enemy, Name ="The_Slot_Machine"
+trigger1116= Enemy, Name ="Iron Man -MGMX-"
+trigger1117= Enemy, Name ="RoboCop"
+trigger1118= Enemy, Name ="Dark Samus"
+trigger1119= Enemy, Name ="CvS_SuitSamus"
+trigger1120= Enemy, Name ="Samus"
+trigger1121= Enemy, Name ="VariaThirtyOneSamus"
+trigger1122= Enemy, Name ="CvS_COMBOTTAG"
+trigger1123= Enemy, Name ="Iron Patriot"
+trigger1124= Enemy, Name ="Opa-Opa"
+trigger1125= Enemy, Name ="Goemon Impact"
+trigger1126= Enemy, Name ="WING0"
+trigger1127= Enemy, Name ="Selkerius"
+trigger1128= Enemy, Name ="Janperson"
+trigger1129= Enemy, Name ="Ereg-1000"
+trigger1130= Enemy, Name ="DiveKick_Doom"
+trigger1131= Enemy, Name ="hakolen_tank"
+trigger1132= Enemy, Name ="F.P#701"
+trigger1133= Enemy, Name ="BIG-O"
+trigger1134= Enemy, Name ="shrikes"
+trigger1135= Enemy, Name ="Robotic Operating Buddy"
+trigger1136= Enemy, Name ="M-E-Reptos"
+trigger1137= Enemy, Name ="M-E-Warlock"
+trigger1138= Enemy, Name ="?????????"
+trigger1139= Enemy, Name ="Robo-Mukai"
+trigger1140= Enemy, Name ="N-NineBall=Seraph"
+trigger1141= Enemy, Name ="Sordios Orbit"
+trigger1142= Enemy, Name ="VENUS"&&authorname="suteneko"
+trigger1143= Enemy, Name ="AutoBattleData"
+trigger1144= Enemy, Name ="colonel_exe"
+trigger1145= Enemy, Name ="ROCKMAN_EXE"
+trigger1146= Enemy, Name ="Alpha_Zero"
+trigger1147= Enemy, Name ="Quickman.exe"
+trigger1148= Enemy, Name ="Mecha-Barney"
+trigger1149= Enemy, Name ="OLD_MECHAGODZILLA"
+trigger1150= Enemy, Name ="Blitzwing"
+trigger1151= Enemy, Name ="Grimlock"
+trigger1152= Enemy, Name ="Thrust"
+trigger1153= Enemy, Name ="Deathsarus"
+trigger1154= Enemy, Name ="artoo"
+trigger1155= Enemy, Name ="Souryu"
+trigger1156= Enemy, Name ="Big Shiee"
+trigger1157= Enemy, Name ="Tani-Oh"
+trigger1158= Enemy, Name ="BLUE DESTINY 2"
+trigger1159= Enemy, Name ="Gundam Wing Zero"
+trigger1160= Enemy, Name ="Master Mecha Sonic"
+trigger1161= Enemy, Name ="Metal Sonic"
+trigger1162= Enemy, Name ="Robotnik"
+trigger1163= Enemy, Name ="Opa-Opa"
+trigger1164= Enemy, Name ="Beelzemon"
+trigger1165= Enemy, Name ="ED-209"
+trigger1166= Enemy, Name ="R2 Prototype A"
+trigger1167= Enemy, Name ="IronSuit"
+trigger1168= Enemy, Name ="Iron Suit"
+trigger1169= Enemy, Name ="NeuroBrain"
+trigger1170= Enemy, Name ="Old"
+trigger1171= Enemy, Name ="Wai"
+trigger1172= Enemy, Name ="Speed"
+trigger1173= Enemy, Name ="GONG"
+trigger1174= Enemy, Name ="ABSOLUTELY_SAFETY_CAPSULE"
+trigger1175= Enemy, Name ="P_Theseus"
+trigger1176= Enemy, Name ="Balert"
+trigger1177= Enemy, Name ="???????????????!???????"
+trigger1178= Enemy, Name ="FK540"
+trigger1179= Enemy, Name ="MS-ALICE"
+trigger1180= Enemy, Name ="SA-X"
+trigger1181= Enemy, Name ="MH-6 Little bird"
+trigger1182= Enemy, Name ="Ryousan Gata Patchouli"
+trigger1183= Enemy, Name ="R.O.B."
+trigger1184= Enemy, Name ="Mazinger-ZERO"
+trigger1185= Enemy, Name ="Eltnum(POTS)"
+trigger1186= Enemy, Name ="Super mech hisui Revenger"
+trigger1187= Enemy, Name ="Bomber Man"
+trigger1188= Enemy, Name ="Samus Aran by endoedgarjunior"
+trigger1189= Enemy, Name ="Samus Aran (Fusion) by endoedgarjunior"
+trigger1190= Enemy, Name ="SA-X by endoedgarjunior"
+trigger1191= Enemy, Name ="Samus Aran by Jupiter"
+trigger1192= Enemy, Name ="Knights of the Round - Balbars"
+trigger1193= Enemy, Name ="Babbage"
+trigger1194= Enemy, Name ="Mega Man"
+trigger1195= Enemy, Name ="Megaman-Zero"
+trigger1196= Enemy, Name ="Nightmare-Zero"
+trigger1197= Enemy, Name ="Zero"&&authorname="aznperson569M"
+trigger1198= Enemy, Name ="ZeroAnthem"
+trigger1199= Enemy, Name ="Bad Megaman"
+trigger1200= Enemy, Name ="Quint"
+trigger1201= Enemy, Name ="Napalmman PB/PF"
+trigger1202= Enemy, Name ="Sniper Joe"
+trigger1203= Enemy, Name ="OilMan"
+trigger1204= Enemy, Name ="TimeMan"
+trigger1205= Enemy, Name ="Subaru Hosikawa"
+trigger1206= Enemy, Name ="Magma Dragoon by Gladiacloud"
+trigger1207= Enemy, Name ="Cyber_Destroyer_Tank"
+trigger1208= Enemy, Name ="Slalingaru"
+trigger1209= Enemy, Name ="Battle City Tank"
+trigger1210= Enemy, Name ="Nay"&&authorname="Kousa"
+trigger1211= Enemy, Name ="Master-Metal-Man"
+trigger1212= Enemy, Name ="EVA-00-Prototype"
+trigger1213= Enemy, Name ="Spark Man from Megaman 3"
+trigger1214= Enemy, Name ="Mega Man por GatoSoft"
+trigger1215= Enemy, Name ="Ballade"
+trigger1216= Enemy, Name ="Blade man"
+trigger1217= Enemy, Name ="Chill man"
+trigger1218= Enemy, Name ="commando man"
+trigger1219= Enemy, Name ="Concrete Man"
+trigger1220= Enemy, Name ="Cutman - Megaman/Rockman 8"
+trigger1221= Enemy, Name ="Cutman V Form"
+trigger1222= Enemy, Name ="Galaxy Man"
+trigger1223= Enemy, Name ="Hornet Man"
+trigger1224= Enemy, Name ="Magic Man"
+trigger1225= Enemy, Name ="Megaman Zelda"
+trigger1226= Enemy, Name ="NES Mega Man"
+trigger1227= Enemy, Name ="Nitro man"
+trigger1228= Enemy, Name ="Octopus Furnace"
+trigger1229= Enemy, Name ="Pirateman - Rockman & Forte"
+trigger1230= Enemy, Name ="pump man"
+trigger1231= Enemy, Name ="Splash Woman"
+trigger1232= Enemy, Name ="Strike man"
+trigger1233= Enemy, Name ="Beastman_exe"
+trigger1234= Enemy, Name ="Dr Wily"
+trigger1235= Enemy, Name ="Kunoichi Roll"
+trigger1236= Enemy, Name ="ROCKMAN ZERO 4"
+trigger1237= Enemy, Name ="RMM2 BOSS"
+trigger1238= Enemy, Name ="mecha-king_ghidorah"
+trigger1239= Enemy, Name ="new_mechagodzilla"
+trigger1240= Enemy, Name ="Rodimus"
+trigger1241= Enemy, Name ="Rodimus2010"
+trigger1242= Enemy, Name ="zeorymer"
+trigger1243= Enemy, Name ="yamirobo"
+trigger1244= Enemy, Name ="Neo_Geo"
+trigger1245= Enemy, Name ="Snake Man"
+trigger1246= Enemy, Name ="Fire man"
+trigger1247= Enemy, Name ="Top Man"
+trigger1248= Enemy, Name ="Shadow Man"
+trigger1249= Enemy, Name ="Burst Man"
+trigger1250= Enemy, Name ="GUNBUSTER"
+trigger1251= Enemy, Name ="Ideon"
+trigger1252= Enemy, Name ="Dann of Thursday"
+trigger1253= Enemy, Name ="Hellbat Schilt"
+trigger1254= Enemy, Name ="Robo Bonanza"
+trigger1255= Enemy, Name ="Mobo Bonanza"
+trigger1257= Enemy, Name ="Tin Star"
+trigger1256= Enemy, Name ="Porygon-Z"
+trigger1257= Enemy, Name ="Vectorman"
+value = 21+random%2
+
+[State 180, Victory Quote vs. Hair Users]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="Filia"
+trigger2= Enemy, Name ="Yang Xiao Long"
+trigger3= Enemy, Name ="Puri*Princess"
+value = 23
+
+[State 180, Victory Quote vs. Water Users]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="Squirlte by Bruno_SS - Pokemon MUGEN EDITION"
+trigger2= Enemy, Name ="Squirtle"
+trigger3= Enemy, Name ="Blastoise"
+trigger4= Enemy, Name ="Psyduck"
+trigger5= Enemy, Name ="Omanyte"
+trigger6= Enemy, Name ="Gyaradosu"
+trigger7= Enemy, Name ="Gyarados"
+trigger8= Enemy, Name ="I Don't Need No Megastone"
+trigger9= Enemy, Name ="Mirokaross"
+trigger10= Enemy, Name ="Kyogre"
+trigger11= Enemy, Name ="Oshawott"
+trigger12= Enemy, Name ="Clauncher"
+trigger13= Enemy, Name ="Greninja"
+trigger14= Enemy, Name ="Chaos"
+trigger15= Enemy, Name ="Chaos 0"
+trigger16= Enemy, Name ="Chaos 0 By Latroy6"
+trigger17= Enemy, Name ="Chaos Zero"
+trigger18= Enemy, Name ="Sonic's Weakness"
+trigger19= Enemy, Name ="Chaos By MUGENHunter"
+trigger20= Enemy, Name ="Perfect Chaos"
+trigger21= Enemy, Name ="Chaos By Cyanide"
+trigger22= Enemy, Name ="C. Kidd"
+trigger23= Enemy, Name ="CAPTAIN KIDD"
+trigger24= Enemy, Name ="Lavos Core"
+trigger25= Enemy, Name ="Hydron"
+trigger26= Enemy, Name ="Nool"
+trigger27= Enemy, Name ="Nitori"
+trigger28= Enemy, Name ="Freedom Nitori"
+trigger29= Enemy, Name ="Nitori Kawashiro"
+trigger30= Enemy, Name ="murasa"
+trigger31= Enemy, Name ="Namazu"
+value = 24
+
+[State 180, Victory Quote vs. Sword Users]
+type = VictoryQuote
+triggerall = numenemy
+triggerall = Time = 0
+trigger1= Enemy, Name ="Date Masamune"
+trigger2= Enemy, Name ="Wang-Fu"
+trigger3= Enemy, Name ="Keiji"
+trigger4= Enemy, Name ="Maeda Keiji"
+trigger5= Enemy, Name ="ky"&&authorname="muteki"
+trigger6= Enemy, Name ="Ky_and_Sol"
+trigger7= Enemy, Name ="KY KISKE"
+trigger8= Enemy, Name ="Kyle Dunamis"
+trigger9= Enemy, Name ="Ky=kiske"
+trigger10= Enemy, Name ="KYOUDOU SENNA"
+trigger11= Enemy, Name ="SENNA"
+trigger12= Enemy, Name ="Senna Kyodo"
+trigger13= Enemy, Name ="Senna_Kyoudou"
+trigger14= Enemy, Name ="hibiki"
+trigger15= Enemy, Name ="Hibiki Takane"
+trigger16= Enemy, Name ="Hibiki_Takane"
+trigger17= Enemy, Name ="darkordersol"
+trigger18= Enemy, Name ="solengrenado"
+trigger19= Enemy, Name ="sol"
+trigger20= Enemy, Name ="order-Sol=Badguy"
+trigger21= Enemy, Name ="Sol=Badguy"
+trigger22= Enemy, Name ="SOL BADGUY"
+trigger23= Enemy, Name ="J_cirno"
+trigger24= Enemy, Name ="Shartel"
+trigger25= Enemy, Name ="tamtam"
+trigger26= Enemy, Name ="Acirno"
+trigger27= Enemy, Name ="Inuyasha"
+trigger28= Enemy, Name ="SAKURA SHINGOUJI"
+trigger29= Enemy, Name ="Hikaru Shidou"
+trigger30= Enemy, Name ="Hikaru"&&authorname="Elecbyte"
+trigger31= Enemy, Name ="Guts"&&authorname="OGGY"
+trigger32= Enemy, Name ="Kenshin"
+trigger33= Enemy, Name ="Disciple's Kenshin"
+trigger34= Enemy, Name ="Kenshin Himura"
+trigger35= Enemy, Name ="SHINOMORI AOSHI"
+trigger36= Enemy, Name ="Makoto Shishio"
+trigger37= Enemy, Name ="Shishio Makoto"
+trigger38= Enemy, Name ="SAITOH HAJIME"
+trigger39= Enemy, Name ="SETA SOUJIRO"
+trigger40= Enemy, Name ="berserker"
+trigger41= Enemy, Name ="assassin"
+trigger42= Enemy, Name ="johnny"&&authorname="muteki"
+trigger43= Enemy, Name ="Evil Johnny"
+trigger44= Enemy, Name ="baiken"
+trigger45= Enemy, Name ="baiken_GGX"
+trigger46= Enemy, Name ="Bishamon"
+trigger47= Enemy, Name ="DS_Bishamon"
+trigger48= Enemy, Name ="Oboro Bishamon"
+trigger49= Enemy, Name ="Mukuro by MAPPY"
+trigger50= Enemy, Name ="Mukuro"&&authorname="ahuron"
+trigger51= Enemy, Name ="Shikyoh BY M@PPY"
+trigger52= Enemy, Name ="cvshaohmaru"
+trigger53= Enemy, Name ="cvshaohmaru_ex"
+trigger54= Enemy, Name ="cvshaohmaru_normal"
+trigger55= Enemy, Name ="Silver Samurai"
+trigger56= Enemy, Name ="SilverSamurai"
+trigger57= Enemy, Name ="Haohmaru"
+trigger58= Enemy, Name ="Haoumaru"
+trigger59= Enemy, Name ="HaohmaruMG"
+trigger60= Enemy, Name ="CHARLOTTE"
+trigger61= Enemy, Name ="Jubei"
+trigger62= Enemy, Name ="Kibagami Genjuro"
+trigger63= Enemy, Name ="Tin's Kibagami"
+trigger64= Enemy, Name ="zankuro"
+trigger65= Enemy, Name ="Minazuki Zankuro"
+trigger66= Enemy, Name ="Rasetumaru"
+trigger67= Enemy, Name ="Yumeji Kurokouchi"
+trigger68= Enemy, Name ="Kazama Sogetsu"
+trigger69= Enemy, Name ="Setsuna"
+trigger70= Enemy, Name ="Tashigi"
+trigger71= Enemy, Name ="YOH"
+trigger72= Enemy, Name ="Tam Tam"
+trigger73= Enemy, Name ="TamTam Samurai Shodown"
+trigger74= Enemy, Name ="Ukyo Tachibana"
+trigger75= Enemy, Name ="Ukyo by intense_mc"
+trigger76= Enemy, Name ="kaede"
+trigger77= Enemy, Name ="Kaede by Ribeiro"
+trigger78= Enemy, Name ="Shinnosuke Kagami By Third"
+trigger79= Enemy, Name ="Shinnosuke Kagami"
+trigger80= Enemy, Name ="?? ???"
+trigger81= Enemy, Name ="Sanada kojiroh"
+trigger82= Enemy, Name ="Moriya Minakata"
+trigger83= Enemy, Name ="washizuka"
+trigger84= Enemy, Name ="Kouryu By Third"
+trigger85= Enemy, Name ="Pielle "
+trigger86= Enemy, Name ="Pielle"
+trigger87= Enemy, Name ="Mahael"
+trigger88= Enemy, Name ="Janne Dulk"
+trigger89= Enemy, Name ="JANNE"
+trigger90= Enemy, Name ="s_crea-f"
+trigger91= Enemy, Name ="Rosa"
+trigger92= Enemy, Name ="li hua"
+trigger93= Enemy, Name ="Lihua"
+trigger94= Enemy, Name ="Kabuki Danjurou"
+trigger95= Enemy, Name ="ROZE"
+trigger96= Enemy, Name ="erile"
+trigger97= Enemy, Name ="KABUKI"
+trigger98= Enemy, Name ="Benten"
+trigger99= Enemy, Name ="Kamui"
+trigger100= Enemy, Name ="Kamui_Tokinomiya"
+trigger101= Enemy, Name ="Saya Otonashi"
+trigger102= Enemy, Name ="Youmu_Konpaku"
+trigger103= Enemy, Name ="SilverChariot_Youmu"
+trigger104= Enemy, Name ="Youmu Double Blade"
+trigger105= Enemy, Name ="Youmu_K"
+trigger106= Enemy, Name ="YoumuSS"
+trigger107= Enemy, Name ="Vergil"
+trigger108= Enemy, Name ="Mai_K"
+trigger109= Enemy, Name ="Mai Kawasumi"
+trigger110= Enemy, Name ="Mai Kawasumi from Sougetu"
+trigger111= Enemy, Name ="Reika Murasame"
+trigger112= Enemy, Name ="god"&&authorname="ken"
+trigger113= Enemy, Name ="Crono"
+trigger114= Enemy, Name ="Walkyrie"
+trigger115= Enemy, Name ="Walkure"
+trigger116= Enemy, Name ="Clovis"
+trigger117= Enemy, Name ="Walkure-n3"
+trigger118= Enemy, Name ="Game Master"
+trigger119= Enemy, Name ="seph"
+trigger120= Enemy, Name ="uesugi kensin"
+trigger121= Enemy, Name ="GIL_NC"
+trigger122= Enemy, Name ="Gil"
+trigger123= Enemy, Name ="Gilgamesh"&&authorname="White hair knight"
+trigger124= Enemy, Name ="CLESS ALVEIN"
+trigger125= Enemy, Name ="Cless Alvain"
+trigger126= Enemy, Name ="Cless"
+trigger127= Enemy, Name ="Lloyd Irving"
+trigger128= Enemy, Name ="Lloyd_Irving"
+trigger129= Enemy, Name ="Kyle"
+trigger130= Enemy, Name ="DRAGON QUEST3 YUSYA"
+trigger131= Enemy, Name ="SLink"
+trigger132= Enemy, Name ="metaknight"
+trigger133= Enemy, Name ="krayce"
+trigger134= Enemy, Name ="KurouYoshitune Minamoto"
+trigger135= Enemy, Name ="Yoritomo"
+trigger136= Enemy, Name ="RIMLE"
+trigger137= Enemy, Name ="Rid Hershel"
+trigger138= Enemy, Name ="dc_stan"
+trigger139= Enemy, Name ="Stan"
+trigger140= Enemy, Name ="Stan Aileron"
+trigger141= Enemy, Name ="Kratos"
+trigger142= Enemy, Name ="Judas"
+trigger143= Enemy, Name ="Sango Zhao Yun"
+trigger144= Enemy, Name ="Yashaoh"
+trigger145= Enemy, Name ="senna kyoudou"
+trigger146= Enemy, Name ="Kyo_ONI"
+trigger147= Enemy, Name ="Yukimura Sanada"&&authorname="AOAO"
+trigger148= Enemy, Name ="Uino"
+trigger149= Enemy, Name ="Swordman"
+trigger150= Enemy, Name ="Masayoshi"
+trigger151= Enemy, Name ="Ogata Genpaku"
+trigger152= Enemy, Name ="Kibagami Takezo"
+trigger153= Enemy, Name ="dc_lion"
+trigger154= Enemy, Name ="lion"
+trigger155= Enemy, Name ="Buront"
+trigger156= Enemy, Name ="peco"&&authorname="hazuki"
+trigger157= Enemy, Name ="Bankai Ichigo"
+trigger158= Enemy, Name ="Hollow Ichigo"
+trigger159= Enemy, Name ="Ichigo"
+trigger160= Enemy, Name ="StormEX--Ichigo"
+trigger161= Enemy, Name ="Kuchiki Byakuya"
+trigger162= Enemy, Name ="Byakuya"
+trigger163= Enemy, Name ="Urahara"
+trigger164= Enemy, Name ="Kisuke Urahara"
+trigger165= Enemy, Name ="Agito_Of_The_Dark"
+trigger166= Enemy, Name ="Sonozaki_Shion"
+trigger167= Enemy, Name ="ryougishiki"&&authorname="ouchi"
+trigger168= Enemy, Name ="DQ2"
+trigger169= Enemy, Name ="Sophitia"
+trigger170= Enemy, Name ="eiki"
+trigger171= Enemy, Name ="hollow_pelle"
+trigger172= Enemy, Name ="Isshin Kurosaki"
+trigger173= Enemy, Name ="Ulquiorra"
+trigger174= Enemy, Name ="Zoro"
+trigger175= Enemy, Name ="Sesshomaru"
+trigger176= Enemy, Name ="sesshoumaru"
+trigger177= Enemy, Name ="Trunks"&&authorname="ReySpriter/ReyMugen"
+trigger178= Enemy, Name ="Hiei by Ribeiro"
+trigger179= Enemy, Name ="UndeadHero"
+trigger180= Enemy, Name ="Serena"
+trigger181= Enemy, Name ="Asura"
+trigger182= Enemy, Name ="Diety_Link"
+trigger183= Enemy, Name ="RajaaHibiki"
+trigger184= Enemy, Name ="MasterHibiki"
+trigger185= Enemy, Name ="Duna"
+trigger186= Enemy, Name ="Cecilia"
+trigger187= Enemy, Name ="zelos"
+trigger188= Enemy, Name ="Kill Bill v.1 Jhonny_Mo"
+trigger189= Enemy, Name ="Kill Bill v.1 O-Ren_Ishii"
+trigger190= Enemy, Name ="Kill Bill v.1 Uma Thurman"
+trigger191= Enemy, Name ="Akaneko"
+trigger192= Enemy, Name ="riku"
+trigger193= Enemy, Name ="raira"
+trigger194= Enemy, Name ="chibi kenpachi"
+trigger195= Enemy, Name ="Kenpachi"
+trigger196= Enemy, Name ="Zaraki Kenpachi by Yurichi"
+trigger197= Enemy, Name ="Zaraki Kenpachi"
+trigger198= Enemy, Name ="Kaname Tosen"
+trigger199= Enemy, Name ="Foxy"
+trigger200= Enemy, Name ="Trunks por ssonic"
+trigger201= Enemy, Name ="Mysty"
+trigger202= Enemy, Name ="[BRJ]LightNing"
+trigger203= Enemy, Name ="ruili"
+trigger204= Enemy, Name ="YUSHA30"
+trigger205= Enemy, Name ="Trunks"&&authorname="CHOUJIN"
+trigger206= Enemy, Name ="Nakoruru"
+trigger207= Enemy, Name ="nakoruruss0"
+trigger208= Enemy, Name ="New Nakoruru"
+trigger209= Enemy, Name ="Muranako"
+trigger210= Enemy, Name ="Shishioh"
+trigger211= Enemy, Name ="DokuganP"
+trigger212= Enemy, Name ="Oda Nobunaga"
+trigger213= Enemy, Name ="Tin's Linn_Kurosawa"
+trigger214= Enemy, Name ="linn kurosawa"
+trigger215= Enemy, Name ="Railu Lesoul"
+trigger216= Enemy, Name ="nbc_S_shishioh"
+trigger217= Enemy, Name ="nbc_shishioh"
+trigger218= Enemy, Name ="Kojiroh"
+trigger219= Enemy, Name ="edonokiba"
+trigger220= Enemy, Name ="Lynia"
+trigger221= Enemy, Name ="raigu's Maxim"
+trigger222= Enemy, Name ="Lion-O"
+trigger223= Enemy, Name ="Tyris Flare"
+trigger224= Enemy, Name ="Leonardo"
+trigger225= Enemy, Name ="Carlos Myahmoto"
+trigger226= Enemy, Name ="Stern - Golden Axe"
+trigger227= Enemy, Name ="Young Link"
+trigger228= Enemy, Name ="DQ5-son"
+trigger229= Enemy, Name ="Smoke & Claudia"
+trigger230= Enemy, Name ="Reanji"
+trigger231= Enemy, Name ="kurisakiichigo"
+trigger232= Enemy, Name ="Faust"&&authorname="AIACOS"
+trigger233= Enemy, Name ="chibi momiji"
+trigger234= Enemy, Name ="Sinclair"
+trigger235= Enemy, Name ="Musashi Akatsuki"
+trigger236= Enemy, Name ="momizi"
+trigger237= Enemy, Name ="MURAKUMO"
+trigger238= Enemy, Name ="Hiei"&&authorname="Kamekaze"
+trigger239= Enemy, Name ="Ukitake"
+trigger240= Enemy, Name ="Rem"&&authorname="mtr"
+trigger241= Enemy, Name ="Link"
+trigger242= Enemy, Name ="Hikaru"&&authorname="Nyankoro"
+trigger243= Enemy, Name ="SENGOKU MANJIMARU"
+trigger244= Enemy, Name ="95"&&authorname="woman"
+trigger245= Enemy, Name ="95ani"&&authorname="man"
+trigger246= Enemy, Name ="Harpagos"
+trigger247= Enemy, Name ="Moyomoto"
+trigger248= Enemy, Name ="Musashi Akatsuki By Third"
+trigger249= Enemy, Name ="Madain"
+trigger250= Enemy, Name ="Youmu Konpaku"
+trigger251= Enemy, Name ="MOTOKO_AOYAMA_by_kinbo"
+trigger252= Enemy, Name ="UKYO"&&authorname="mikenuko"
+trigger253= Enemy, Name ="crawd"&&authorname="ORETAMA"
+trigger254= Enemy, Name ="Shana"
+trigger255= Enemy, Name ="Setsuna Sakurazaki"
+trigger256= Enemy, Name ="Cloud Strife"
+trigger257= Enemy, Name ="Cloud from Advent Children"
+trigger258= Enemy, Name ="cloud"
+trigger259= Enemy, Name ="Akatsuki Cloud"
+trigger260= Enemy, Name ="Aleti"
+trigger261= Enemy, Name ="Sarashina"
+trigger262= Enemy, Name ="Syaoran"
+trigger263= Enemy, Name ="Shaoran Lee"
+trigger264= Enemy, Name ="rasetsumaru"
+trigger265= Enemy, Name ="Genjuro"
+trigger266= Enemy, Name ="GRIMMJOW"
+trigger267= Enemy, Name ="Lyndis"
+trigger268= Enemy, Name ="masato"&&authorname="vein"
+trigger269= Enemy, Name ="Zetu Akatuki"
+trigger270= Enemy, Name ="goat"
+trigger271= Enemy, Name ="Shuvait"
+trigger272= Enemy, Name ="Tiberius"
+trigger273= Enemy, Name ="chaka"
+trigger274= Enemy, Name ="Fritz"
+trigger275= Enemy, Name ="spinyoumu"
+trigger276= Enemy, Name ="Youmu Zero"
+trigger277= Enemy, Name ="YUMEJI"
+trigger278= Enemy, Name ="Saki Mitonoya"
+trigger279= Enemy, Name ="LightNing"&&authorname="Binho and Doruji"
+trigger280= Enemy, Name ="rassius"
+trigger281= Enemy, Name ="yae"
+trigger282= Enemy, Name ="Chabo Youmu"
+trigger283= Enemy, Name ="Human Paladin"
+trigger284= Enemy, Name ="Taoroh"
+trigger285= Enemy, Name ="Youmu"
+trigger286= Enemy, Name ="nako_1st"
+trigger287= Enemy, Name ="Jyubei Yagyu"
+trigger288= Enemy, Name ="Shovel Knight"
+trigger289= Enemy, Name ="Asha"&&authorname="RoySquadRocks"
+trigger290= Enemy, Name ="Shin Bishamon"
+trigger291= Enemy, Name ="CharlotteSS4"
+trigger292= Enemy, Name ="Milan Flare"
+trigger293= Enemy, Name ="Takane Hibiki"
+trigger294= Enemy, Name ="J_tenko"
+trigger295= Enemy, Name ="Himura Kenshin"
+trigger296= Enemy, Name ="kongara"
+trigger297= Enemy, Name ="Ryuza"
+trigger298= Enemy, Name ="dc_dimlos"
+trigger299= Enemy, Name ="dc_hugo"
+trigger300= Enemy, Name ="Shin_Donovan"
+trigger301= Enemy, Name ="Takenaka Hambe"
+trigger302= Enemy, Name ="Aizen Sousuke"
+trigger303= Enemy, Name ="ogihcI ikasoruK"
+trigger304= Enemy, Name ="Hakumen"
+trigger305= Enemy, Name ="cattleya 1.0 by grafo_maxi"
+trigger306= Enemy, Name ="MvC ImWar (MapleStory)"
+trigger307= Enemy, Name ="Captain James Hook"
+trigger308= Enemy, Name ="Sajin Komamura"
+trigger309= Enemy, Name ="kempachi saraki by grafo_maxi"
+trigger310= Enemy, Name ="ragnamau"
+trigger311= Enemy, Name ="Real Shishioh"
+trigger312= Enemy, Name ="sanada_ani"
+trigger313= Enemy, Name ="asellus"
+trigger314= Enemy, Name ="Rutee_Kartret"
+trigger315= Enemy, Name ="Milan"
+trigger316= Enemy, Name ="StormEX--Toushirou"
+trigger317= Enemy, Name ="StormEX--Ogihci"
+trigger318= Enemy, Name ="DARINKU"
+trigger319= Enemy, Name ="Akira Rikudou"
+trigger320= Enemy, Name ="Nobunaga"
+trigger321= Enemy, Name ="Ky = kiske"
+trigger322= Enemy, Name ="daimonhaku"
+trigger323= Enemy, Name ="Laurencin"
+trigger324= Enemy, Name ="dc_Mictlan"
+trigger325= Enemy, Name ="kirikou"
+trigger326= Enemy, Name ="Tusk"&&authorname="Shift b is B"
+trigger327= Enemy, Name ="ShiShin"
+trigger328= Enemy, Name ="Shing Meteoryte"
+trigger329= Enemy, Name ="Yuri Lowell"
+trigger330= Enemy, Name ="orsted"
+trigger331= Enemy, Name ="Naitou"
+trigger332= Enemy, Name ="Lord Viper Delacroix"
+trigger333= Enemy, Name ="slimeknight"
+trigger334= Enemy, Name ="Rasetsu-haoumaru"
+trigger335= Enemy, Name ="Heaven's_Gate"
+trigger336= Enemy, Name ="Signum"
+trigger337= Enemy, Name ="living armor"
+trigger338= Enemy, Name ="DcatLeonardo"
+trigger339= Enemy, Name ="Genjuro Kibagami"
+trigger340= Enemy, Name ="raid"&&authorname="MANIA"
+trigger341= Enemy, Name ="Isabella Valentine"
+trigger342= Enemy, Name ="MyonGitsune"
+trigger343= Enemy, Name ="Miacis"
+trigger344= Enemy, Name ="SAYAKA.M.KISCHINE"
+trigger345= Enemy, Name ="Katima"
+trigger346= Enemy, Name ="Mint"&&authorname="rakurai"
+trigger347= Enemy, Name ="Sabnock_Youmu"
+trigger348= Enemy, Name ="shogun"&&authorname="KFC?"
+trigger349= Enemy, Name ="DQ1"
+trigger350= Enemy, Name ="cvsnakoruru"
+trigger351= Enemy, Name ="GETUHUMA"
+trigger352= Enemy, Name ="S.Geist"
+trigger353= Enemy, Name ="R-Masamune"
+trigger354= Enemy, Name ="goat_B"
+trigger355= Enemy, Name ="zinsuke"
+trigger356= Enemy, Name ="DuranSD"
+trigger357= Enemy, Name ="TLOZ Link"
+trigger358= Enemy, Name ="Takenaka Hanbei"
+trigger359= Enemy, Name ="Himura Battousai"
+trigger360= Enemy, Name ="Kagami"&&authorname="tukisuna"
+trigger361= Enemy, Name ="yu-to"
+trigger362= Enemy, Name ="Johnny"&&authorname="ShouBuySpirit"
+trigger363= Enemy, Name ="Kain Blade"
+trigger364= Enemy, Name ="DnF_Berserker"
+trigger365= Enemy, Name ="yoshimitsu"
+trigger366= Enemy, Name ="osol"
+trigger367= Enemy, Name ="P4hero"
+trigger368= Enemy, Name ="Windows 95-Tan"
+trigger369= Enemy, Name ="Adol Christin"
+trigger370= Enemy, Name ="Adol Christin(dot)"
+trigger371= Enemy, Name ="dante"
+trigger372= Enemy, Name ="krasnaya"
+trigger373= Enemy, Name ="Rindou"
+trigger374= Enemy, Name ="Shinra"&&authorname="Hanayakuro"
+trigger375= Enemy, Name ="SS6_youmu"
+trigger376= Enemy, Name ="Han Samuel"
+trigger377= Enemy, Name ="Reinhart Valgar"
+trigger378= Enemy, Name ="Keiichiro Washizuka"
+trigger379= Enemy, Name ="Ichigo Kurosaki"
+trigger380= Enemy, Name ="nozomu(murakumo)"
+trigger381= Enemy, Name ="nozomu(reimei)"
+trigger382= Enemy, Name ="Priecia"
+trigger383= Enemy, Name ="Seyren_Windsor"
+trigger384= Enemy, Name ="SS6_senna"
+trigger385= Enemy, Name ="Jecht"
+trigger386= Enemy, Name ="FritzTypeW"
+trigger387= Enemy, Name ="Meira"
+trigger388= Enemy, Name ="RAIDOU"
+trigger389= Enemy, Name ="U_raidou"
+trigger390= Enemy, Name ="Renji_Abarai"
+trigger391= Enemy, Name ="DQ4 Tenku no Yusha"
+trigger392= Enemy, Name ="Charles"
+trigger393= Enemy, Name ="MGR"
+trigger394= Enemy, Name ="Macheta"
+trigger395= Enemy, Name ="lehyu"
+trigger396= Enemy, Name ="MN"&&authorname="Cerenas"
+trigger397= Enemy, Name ="RKR"&&authorname="Cerenas"
+trigger398= Enemy, Name ="Kouryu"&&authorname="abuhachi"
+trigger399= Enemy, Name ="Evil Q"
+trigger400= Enemy, Name ="Kaigen Ishima"
+trigger401= Enemy, Name ="Slash v2.0 by Inverse"
+trigger402= Enemy, Name ="Yohko"&&authorname="mtr"
+trigger403= Enemy, Name ="barns"
+trigger404= Enemy, Name ="MvC Young Link"
+trigger405= Enemy, Name ="Link"&&authorname="RMX & Silencer"
+trigger406= Enemy, Name ="USAPI-"
+trigger407= Enemy, Name ="EXTRA USAPI-"
+trigger408= Enemy, Name ="Nitro Ignis"
+trigger409= Enemy, Name ="LESTY"&&authorname="woman"
+trigger410= Enemy, Name ="rusty"&&authorname="woman"
+trigger411= Enemy, Name ="nobuhiko"&&authorname="man"
+trigger412= Enemy, Name ="Hyuuga A Akiko By CAP"
+trigger413= Enemy, Name ="Hayato"&&authorname="Ryou Win"
+trigger414= Enemy, Name ="Hayato SXP"
+trigger415= Enemy, Name ="cvshayato"
+trigger416= Enemy, Name ="Hayato"&&authorname="Nabeshin"
+trigger417= Enemy, Name ="Gades"&&authorname="kumomaru"
+trigger418= Enemy, Name ="Ares_BB"
+trigger419= Enemy, Name ="MC_Youmu"
+trigger420= Enemy, Name ="Ichigo_InnerHollow"
+trigger421= Enemy, Name ="Sosuke_Aizen"
+trigger422= Enemy, Name ="Kenpachi_Zaraki"
+trigger423= Enemy, Name ="YokoWP"
+trigger424= Enemy, Name ="Stahn Aileron"
+trigger425= Enemy, Name ="Sam & Ixnaydk Solzin"
+trigger426= Enemy, Name ="LOWREN"
+trigger427= Enemy, Name ="RI-NE"
+trigger428= Enemy, Name ="RIRU"
+trigger429= Enemy, Name ="Lucian Kaltz"
+trigger430= Enemy, Name ="Saga_F2_Johan"
+trigger431= Enemy, Name ="Soldier"
+trigger432= Enemy, Name ="Moriya"
+trigger433= Enemy, Name ="aselia of eternal"
+trigger434= Enemy, Name ="HanreiYoumu"
+trigger435= Enemy, Name ="kaeru(Chrono)"
+trigger436= Enemy, Name ="Toshiro Hitsugaya"
+trigger437= Enemy, Name ="Sosuke Aizen"
+trigger438= Enemy, Name ="Fritz-PW"
+trigger439= Enemy, Name ="KY-PW"
+trigger440= Enemy, Name ="double_sword"
+trigger441= Enemy, Name ="ZeroHaohmaru"
+trigger442= Enemy, Name ="ZeroHibiki"
+trigger443= Enemy, Name ="miki sayaka"
+trigger444= Enemy, Name ="Saito Hajime"
+trigger445= Enemy, Name ="Byakuya Kuchiki"
+trigger446= Enemy, Name ="Renji Abarai"
+trigger447= Enemy, Name ="Kosanjou"
+trigger448= Enemy, Name ="Chloe Valens"
+trigger449= Enemy, Name ="Mikitaka"
+trigger450= Enemy, Name ="Shion"&&authorname="DrKelexo"
+trigger451= Enemy, Name ="Johnny Two By Four"
+trigger452= Enemy, Name ="LargeFencer_Mysty"
+trigger453= Enemy, Name ="Tiberius"
+trigger454= Enemy, Name ="HawkEyes"
+trigger455= Enemy, Name ="Hibito"
+trigger456= Enemy, Name ="Kung Fu Stick (Pivot Style)"
+trigger457= Enemy, Name ="Kurokishineko"
+trigger458= Enemy, Name ="Necorsair"
+trigger459= Enemy, Name ="ZeroTashigi"
+trigger460= Enemy, Name ="Pietro"
+trigger461= Enemy, Name ="akuji"&&authorname="way-oh"
+trigger462= Enemy, Name ="Veigue_lungberg"
+trigger463= Enemy, Name ="Meu_IF"
+trigger464= Enemy, Name ="Kenpachi Zaraki"
+trigger465= Enemy, Name ="Agrias_Oaks"
+trigger466= Enemy, Name ="Killer Plaster"
+trigger467= Enemy, Name ="Sittara"
+trigger468= Enemy, Name ="Magna"
+trigger469= Enemy, Name ="Roronoa Zoro (1.2)"
+trigger470= Enemy, Name ="Roronoa Zoro"
+trigger471= Enemy, Name ="Byakuya Kuchiki by Websta"
+trigger472= Enemy, Name ="Jin"&&authorname="Speedy9199"
+trigger473= Enemy, Name ="Ragna"
+trigger474= Enemy, Name ="Agrias"
+trigger475= Enemy, Name ="zero_celica"
+trigger476= Enemy, Name ="kurosawa yuichi"
+trigger477= Enemy, Name ="celica_sylphil"
+trigger478= Enemy, Name ="moriya B"
+trigger479= Enemy, Name ="washizuka B"
+trigger480= Enemy, Name ="DarkCornian"
+trigger481= Enemy, Name ="Jin Kisaragi"
+trigger482= Enemy, Name ="touka"
+trigger483= Enemy, Name ="a-karasu"
+trigger484= Enemy, Name ="Genjyuro Kibagami"
+trigger485= Enemy, Name ="conpaku_golem"
+trigger486= Enemy, Name ="Squalward"
+trigger487= Enemy, Name ="Saint of Cecilia"
+trigger488= Enemy, Name ="G_Fiona"
+trigger489= Enemy, Name ="Zoro Roronoa"
+trigger490= Enemy, Name ="Kaku"
+trigger491= Enemy, Name ="Nako_xvi"
+trigger492= Enemy, Name ="lute"
+trigger493= Enemy, Name ="Shimo"
+trigger494= Enemy, Name ="AgriasOaks"
+trigger495= Enemy, Name ="dc_Grebam"
+trigger496= Enemy, Name ="Blade"
+trigger497= Enemy, Name ="Order_Sol_Fist_of_North_Star"
+trigger498= Enemy, Name ="Kurosaki Ichigo"
+trigger499= Enemy, Name ="svcathena"
+trigger500= Enemy, Name ="Athena-Goddess"
+trigger501= Enemy, Name ="Princess_Athena"
+trigger502= Enemy, Name ="Frog"&&authorname="SilentProtagonist"
+trigger503= Enemy, Name ="Kiryl"
+trigger504= Enemy, Name ="Roronoa Zoro by Renegade"
+trigger505= Enemy, Name ="Luciel"
+trigger506= Enemy, Name ="UMVC_Youmu"
+trigger507= Enemy, Name ="Minakata Moriya"
+trigger508= Enemy, Name ="Hisui&Kohaku"
+trigger509= Enemy, Name ="Kohaku"
+trigger510= Enemy, Name ="Kohaku By Toshi"
+trigger511= Enemy, Name ="Kohaku_K"
+trigger512= Enemy, Name ="Brook"
+trigger513= Enemy, Name ="Kzinssie"
+trigger514= Enemy, Name ="NakoruruS"
+trigger515= Enemy, Name ="Wataru Itabashi"
+trigger516= Enemy, Name ="Mohican"
+trigger517= Enemy, Name ="manjimaru"
+trigger518= Enemy, Name ="Terry_DQ"
+trigger519= Enemy, Name ="Kenshin JUS"
+trigger520= Enemy, Name ="Naomi Kokoro"
+trigger521= Enemy, Name ="Ragna The Bloodedge"
+trigger522= Enemy, Name ="Oniska"
+trigger523= Enemy, Name ="Strongheart"
+trigger524= Enemy, Name ="Tsan"
+trigger525= Enemy, Name ="Ryo fu"
+trigger526= Enemy, Name ="kinoppi"
+trigger527= Enemy, Name ="Menelikke"
+trigger528= Enemy, Name ="ryomou"
+trigger529= Enemy, Name ="Haohmaru Samurai Shodown"
+trigger530= Enemy, Name ="Youmu_RP"
+trigger531= Enemy, Name ="Kill Bill v.1 O-Ren_Ishii"
+trigger532= Enemy, Name ="Hina"&&authorname="cafe"
+trigger533= Enemy, Name ="Kill Bill v.1 Uma Thurman"
+trigger534= Enemy, Name ="Stern - Golden Axe"
+trigger535= Enemy, Name ="Sophitia"
+trigger536= Enemy, Name ="ULRagna"
+trigger537= Enemy, Name ="P4U_mai"
+trigger538= Enemy, Name ="Super-Japanese"
+trigger539= Enemy, Name ="Agrias_BB"
+trigger540= Enemy, Name ="SvCGenJyuro"
+trigger541= Enemy, Name ="Joshua"
+trigger542= Enemy, Name ="Lowe"
+trigger543= Enemy, Name ="Tachibana Ukyo"
+trigger544= Enemy, Name ="Rukia Shikai"
+trigger545= Enemy, Name ="Sol AH"
+trigger546= Enemy, Name ="kenshi"&&authorname="Pre-to"
+trigger547= Enemy, Name ="Rangle"
+trigger548= Enemy, Name ="Faud"
+trigger549= Enemy, Name ="caius"
+trigger550= Enemy, Name ="UMVC_AsgardYoumu"
+trigger551= Enemy, Name ="Sephiroth Kingdom Hearts"
+trigger552= Enemy, Name ="Sephiroth"
+trigger553= Enemy, Name ="Oboro Bishamon Cpu"
+trigger554= Enemy, Name ="Bandit"
+trigger555= Enemy, Name ="Captin Hook"
+trigger556= Enemy, Name ="Hyper Knight"
+trigger557= Enemy, Name ="Mirror Knight"
+trigger558= Enemy, Name ="Captain James Hook"
+trigger559= Enemy, Name ="DSaber"
+trigger560= Enemy, Name ="Zack"
+trigger561= Enemy, Name ="KH2 Auron"
+trigger562= Enemy, Name ="NBC_Haohmaru"
+trigger563= Enemy, Name ="SS_Yoshitora EX"
+trigger564= Enemy, Name ="SS_Ukyo 2"
+trigger565= Enemy, Name ="S_Ukyo"
+trigger566= Enemy, Name ="D-Mai_Kawasumi_by_Nachel"
+trigger567= Enemy, Name ="Noa"
+trigger568= Enemy, Name ="jentai"
+trigger569= Enemy, Name ="Aleksandr"
+trigger570= Enemy, Name ="Arshes Nei"
+trigger571= Enemy, Name ="Gara"
+trigger572= Enemy, Name ="Kai Harn"
+trigger573= Enemy, Name ="Lars"
+trigger574= Enemy, Name ="Tsu"&&authorname="chibasin"
+trigger575= Enemy, Name ="Jinnu"
+trigger576= Enemy, Name ="Tiria Flay"
+trigger577= Enemy, Name ="Squall FFVIII"
+trigger578= Enemy, Name ="Agrius_by_kinbo"
+trigger579= Enemy, Name ="Areuhat"
+trigger580= Enemy, Name ="KH2 Auron"
+trigger581= Enemy, Name ="Ayame"
+trigger582= Enemy, Name ="Naji"
+trigger583= Enemy, Name ="Lady Lyndis"
+trigger584= Enemy, Name ="Marth"
+trigger585= Enemy, Name ="Aladian"
+trigger586= Enemy, Name ="Soraparty"
+trigger587= Enemy, Name ="Kanda Yuu"
+trigger588= Enemy, Name ="ShanksLTTD"
+trigger589= Enemy, Name ="Stahn"
+trigger590= Enemy, Name ="NBC_Asura"
+trigger591= Enemy, Name ="M_Kaede"
+trigger592= Enemy, Name ="NBC_Shin Shishioh"
+trigger593= Enemy, Name ="Sirou by the Aboriginal One"
+trigger594= Enemy, Name ="D'Inuyasha"
+trigger595= Enemy, Name ="CDI Link"
+trigger596= Enemy, Name ="Link 0.95"
+trigger597= Enemy, Name ="Link 64"
+trigger598= Enemy, Name ="link1"
+trigger599= Enemy, Name ="LinkDX"
+trigger600= Enemy, Name ="klinku"
+trigger601= Enemy, Name ="Toon Link"
+trigger602= Enemy, Name ="Young Link edit of smash link by Tako"
+trigger603= Enemy, Name ="Meta-Knight"
+trigger604= Enemy, Name ="Lipsyncher"
+trigger605= Enemy, Name ="Ra's Al Ghul"
+trigger606= Enemy, Name ="119way-nako"
+trigger607= Enemy, Name ="Sogetsu Kazama"
+trigger608= Enemy, Name ="SS_Rasetsumaru"
+trigger609= Enemy, Name ="SS_Sogetsu"
+trigger610= Enemy, Name ="SS_Tam Tam"
+trigger611= Enemy, Name ="SS_Tam Tam 2"
+trigger612= Enemy, Name ="Prince Endymion"
+trigger613= Enemy, Name ="Falcon by O ILUSIONISTA"
+trigger614= Enemy, Name ="Nightmare"
+trigger615= Enemy, Name ="Awakened Kaede"
+trigger616= Enemy, Name ="HyperKagami"
+trigger617= Enemy, Name ="Kojiroh Sanada"
+trigger618= Enemy, Name ="Dread Pirate Roberts"
+trigger619= Enemy, Name ="Pielle EX by Shadowtak"
+trigger620= Enemy, Name ="The Mask of ERO"
+trigger621= Enemy, Name ="chibi momiji"
+trigger622= Enemy, Name ="Goddes Saber Revision-1"
+trigger623= Enemy, Name ="Cloud KH"
+trigger624= Enemy, Name ="Cloud by MGSSJ2"
+trigger625= Enemy, Name ="Pocket-Cloud"
+trigger626= Enemy, Name ="ZeroCloud"
+trigger627= Enemy, Name ="Celes"
+trigger628= Enemy, Name ="Martha"
+trigger629= Enemy, Name ="SPizzaCats"
+trigger630= Enemy, Name ="Princess Jasmine"
+trigger631= Enemy, Name ="Ratix Farrence"
+trigger632= Enemy, Name ="Cius Warren"
+trigger633= Enemy, Name ="SDK Mukurou"
+trigger634= Enemy, Name ="Future Trunks SSJ4 by Lip USSJ"
+trigger635= Enemy, Name ="Gohan Sword"
+trigger636= Enemy, Name ="s_cless-f"
+trigger637= Enemy, Name ="Frio"
+trigger638= Enemy, Name ="lion magnus"
+trigger649= Enemy, Name ="Lloyd"
+trigger640= Enemy, Name ="Rutee Katrea "
+trigger641= Enemy, Name ="armor"
+trigger642= Enemy, Name ="Erza"
+trigger643= Enemy, Name ="Leus Hunter"
+trigger644= Enemy, Name ="sqIVswordman"
+trigger645= Enemy, Name ="Tekken6 2nd outfit Yoshimitsu"
+trigger646= Enemy, Name ="Full Kusya"
+trigger647= Enemy, Name ="Momo-Kirby"
+trigger648= Enemy, Name ="Kirin Musume"
+trigger649= Enemy, Name ="Kagekiyo"
+trigger650= Enemy, Name ="Kamui_MA"
+trigger651= Enemy, Name ="D4_KENSIN"
+trigger652= Enemy, Name ="KENSIN"
+trigger653= Enemy, Name ="Ixnaydk Pocket SOl Badguy"
+trigger654= Enemy, Name ="solengrenado"
+trigger655= Enemy, Name ="FIDEI"
+trigger656= Enemy, Name ="True Power Sol"
+trigger657= Enemy, Name ="darkordersol"
+trigger658= Enemy, Name ="o_sol"
+trigger659= Enemy, Name ="Puss in MUGEN"
+trigger660= Enemy, Name ="Asutorea"
+trigger661= Enemy, Name ="kamui tokinomiya"
+trigger662= Enemy, Name ="S_KAMUI"
+trigger663= Enemy, Name ="XMVCHakX"
+trigger664= Enemy, Name ="Chartette"
+trigger665= Enemy, Name ="Kurosaki-IchigoED3"
+trigger666= Enemy, Name ="Erza_FM"
+trigger667= Enemy, Name ="MIO SAKAMOTO"
+trigger668= Enemy, Name ="Hayato Kanzaki"
+trigger669= Enemy, Name ="Zelos_IF"
+trigger670= Enemy, Name ="GKnight"
+trigger671= Enemy, Name ="Sophitia by CVS Artist"
+trigger672= Enemy, Name ="Kutsuna_Yui"
+trigger673= Enemy, Name ="Lyner_Barsett"
+trigger674= Enemy, Name ="ZoroRoronoa"
+trigger675= Enemy, Name ="Brave_Alex"
+trigger676= Enemy, Name ="King Lion"
+trigger677= Enemy, Name ="SC Mitsurugi 3D"
+trigger678= Enemy, Name ="Youz"
+trigger679= Enemy, Name ="asuka"&&authorname="rakurai"
+trigger680= Enemy, Name ="Werleck"
+trigger681= Enemy, Name ="mumei"
+trigger682= Enemy, Name ="Momiji"
+trigger683= Enemy, Name ="kakouton"&&authorname="suigin"
+trigger684= Enemy, Name ="sonken"&&authorname="suigin"
+trigger685= Enemy, Name ="kannei"&&authorname="suigin"
+trigger686= Enemy, Name ="Charlotte"&&authorname="Christine"
+trigger687= Enemy, Name ="InuYasha By CVS Artist"
+trigger688= Enemy, Name ="SPINAL KI1"
+trigger689= Enemy, Name ="Siegfried By CVS Atrist"
+trigger690= Enemy, Name ="sephiroth_ak"
+trigger691= Enemy, Name ="Ivy by CVS Artist"
+trigger692= Enemy, Name ="lenneth Valkyrie"
+trigger693= Enemy, Name ="kabaji"
+trigger694= Enemy, Name ="BRS"
+trigger695= Enemy, Name ="Vista"&&authorname="Hermoduro"
+trigger696= Enemy, Name ="ss3youmu"
+trigger697= Enemy, Name ="Mitsurugi By CVS Artist"
+trigger698= Enemy, Name ="Saki_Mitonoya"
+trigger699= Enemy, Name ="Samuel Han By Ryon"
+trigger700= Enemy, Name ="Cervantes By CVS Artist"
+trigger701= Enemy, Name ="Saber By CVS Artist"
+trigger702= Enemy, Name ="Rikimaru"
+trigger703= Enemy, Name ="VIPRPG_Alex"
+trigger704= Enemy, Name ="KY_S"
+trigger705= Enemy, Name ="Leonardo M/TF"
+trigger706= Enemy, Name ="takiyasya"
+trigger707= Enemy, Name ="takiyasya_R"
+trigger708= Enemy, Name ="Mihawk"
+trigger709= Enemy, Name ="Taskmaster"
+trigger710= Enemy, Name ="injya"&&authorname="Pre-to"
+trigger711= Enemy, Name ="Nyarukami Nyuu"
+trigger712= Enemy, Name ="Vritra"
+trigger713= Enemy, Name ="Gogan-IF"
+trigger714= Enemy, Name ="Mitsurugi"
+trigger715= Enemy, Name ="ukyo"&&authorname="ali"
+trigger716= Enemy, Name ="Guy_Cecil"
+trigger717= Enemy, Name ="Pachet"
+trigger718= Enemy, Name ="Soul Calibur By CVS Artist"
+trigger719= Enemy, Name ="Huuma Kotetu"
+trigger720= Enemy, Name ="inubashiri momiji"
+trigger721= Enemy, Name ="Grimmjow Jaegerjaquez by Giovanni"
+trigger722= Enemy, Name ="Coyote Stark by Giovanni"
+trigger723= Enemy, Name ="Uqluiorra Schiffer by Giovanni"
+trigger724= Enemy, Name ="Szayel Apollo Granz by Giovanni"
+trigger725= Enemy, Name ="Ichigo Vizard by Giovanni"
+trigger726= Enemy, Name ="vasto lorde byakuya"
+trigger727= Enemy, Name ="JailLance"
+trigger728= Enemy, Name ="Byakuya_RA"
+trigger729= Enemy, Name ="Milan By CVS Artist"
+trigger730= Enemy, Name ="dc_judas"
+trigger731= Enemy, Name ="Cross"
+trigger732= Enemy, Name ="Zeke"
+trigger733= Enemy, Name ="Yamato from Dragoon Might"
+trigger734= Enemy, Name ="Princess"&&authorname="RoySquadRocks"
+trigger735= Enemy, Name ="butcher"
+trigger736= Enemy, Name ="DT2 Beatrix"
+trigger737= Enemy, Name ="Ayatane_Michitaka"
+trigger738= Enemy, Name ="Diana"
+trigger739= Enemy, Name ="SDK Oda Nobunaga"
+trigger740= Enemy, Name ="Konpaku_Youmu"
+trigger741= Enemy, Name ="ZSYoumu"
+trigger742= Enemy, Name ="Mattick"
+trigger743= Enemy, Name ="HARADA ORIE"
+trigger744= Enemy, Name ="Yu Narukami"
+trigger745= Enemy, Name ="FritzTypeG"
+trigger746= Enemy, Name ="CvS_YoshimitsuTAG"
+trigger747= Enemy, Name ="SD-zizel"
+trigger748= Enemy, Name ="yuho"
+trigger749= Enemy, Name ="Uzuki_Shimamura_SB"
+trigger750= Enemy, Name ="Future-Trunks-By cliff-A"
+trigger751= Enemy, Name ="DQ3"
+trigger752= Enemy, Name ="Saber_Alter"
+trigger753= Enemy, Name ="Leonardo by Ryon"
+trigger754= Enemy, Name ="Asuna"
+trigger755= Enemy, Name ="Kirito"
+trigger756= Enemy, Name ="Ukyo"&&authorname="Ironjw"
+trigger757= Enemy, Name ="Silver Samurai by rahlonnir"
+trigger758= Enemy, Name ="Baron Von Strucker"
+trigger759= Enemy, Name ="Elion"
+trigger760= Enemy, Name ="Senna_K"
+trigger761= Enemy, Name ="Pielle Montario"
+trigger762= Enemy, Name ="inubisu"
+trigger763= Enemy, Name ="Hyde"
+trigger764= Enemy, Name ="K_Saber"
+trigger765= Enemy, Name ="Shizuru"&&authorname="kouya"
+trigger766= Enemy, Name ="Trafalgar Law"
+trigger767= Enemy, Name ="CecilHarvey"
+trigger768= Enemy, Name ="Shakugan No Shana"
+trigger769= Enemy, Name ="saber_Extra"
+trigger770= Enemy, Name ="Erza By CVS Artist"
+trigger771= Enemy, Name ="Siegfried by CVS Artist"
+trigger772= Enemy, Name ="Takios the Black Blade"
+trigger773= Enemy, Name ="JED By JEDDRAGON"
+trigger774= Enemy, Name ="Nightmare by CVS Artist"
+trigger775= Enemy, Name ="Haohmaru Whu Shin Hun NES"
+trigger776= Enemy, Name ="Serena By Ryon"
+trigger777= Enemy, Name ="Akame"
+trigger778= Enemy, Name ="Gogyou Setsuna"
+trigger779= Enemy, Name ="Isane Kotetsu"
+trigger780= Enemy, Name ="Sandra"
+trigger781= Enemy, Name ="hayato_R"
+trigger782= Enemy, Name ="Ulquiorra"
+trigger783= Enemy, Name ="youmu_konpaku_R"
+trigger784= Enemy, Name ="CFJ_Link"
+trigger785= Enemy, Name ="Hiyoi"
+trigger786= Enemy, Name ="RaiUn"
+trigger787= Enemy, Name ="Trunks EB"
+trigger788= Enemy, Name ="Yato"
+trigger789= Enemy, Name ="Ono Kohaku"
+trigger790= Enemy, Name ="tuna"&&authorname="Masukenpu-kun"
+trigger791= Enemy, Name ="samurai"
+trigger792= Enemy, Name ="ge_alisa_ak"
+trigger793= Enemy, Name ="Yuzuriha"
+trigger794= Enemy, Name ="talonarten"
+trigger795= Enemy, Name ="SolaR"
+trigger796= Enemy, Name ="yumeko"
+trigger797= Enemy, Name ="Uzuki_Shimamura_GF"
+trigger798= Enemy, Name ="Shana_K"
+trigger799= Enemy, Name ="Gradriel"
+trigger800= Enemy, Name ="Willard H.Wright"
+trigger801= Enemy, Name ="Asuna_K"
+trigger802= Enemy, Name ="p1hero"
+trigger803= Enemy, Name ="Tidus"
+trigger804= Enemy, Name ="tequila"
+trigger805= Enemy, Name ="Anthropromorpic Musk Cat"
+trigger806= Enemy, Name ="Shanks"
+trigger807= Enemy, Name ="Headmaster Murakumo"
+trigger808= Enemy, Name ="Fujitora"
+trigger809= Enemy, Name ="LF2Deep"
+trigger810= Enemy, Name ="LF2NeoDeep"
+trigger811= Enemy, Name ="LF2Rudolf"
+trigger812= Enemy, Name ="Yuuki"
+trigger813= Enemy, Name ="Adol_Christin"
+trigger814= Enemy, Name ="Chester_Stoddart"
+trigger815= Enemy, Name ="Hina.H"
+trigger816= Enemy, Name ="Youmu_RP"
+trigger817= Enemy, Name ="Uneri_Youmu"
+trigger818= Enemy, Name ="fusagiko-AOB"
+trigger819= Enemy, Name ="ahya-AOB"
+trigger820= Enemy, Name ="Super-Knight-Kaede"
+trigger821= Enemy, Name ="Saber"&&authorname="humi"
+trigger822= Enemy, Name ="Martial Champion - Avu"
+trigger823= Enemy, Name ="G-Saber-Revision-1"
+trigger824= Enemy, Name ="G_Saber_Revision_2"
+trigger825= Enemy, Name ="nbc_genguro"
+trigger826= Enemy, Name ="SS_Haohmaru"
+trigger827= Enemy, Name ="Haoh Maru"
+trigger828= Enemy, Name ="Kaede+Z"
+trigger829= Enemy, Name ="NBC Kaede"
+trigger830= Enemy, Name ="xi_Washizuka"
+trigger831= Enemy, Name ="GOEMONsamurai"
+trigger832= Enemy, Name ="The Peace Keepers - Blade"
+trigger833= Enemy, Name ="sabutai"
+trigger834= Enemy, Name ="Legaia Sabutai"
+trigger835= Enemy, Name ="DSJ_Janne"
+trigger836= Enemy, Name ="Future Yamamotto"
+trigger837= Enemy, Name ="Future Yamamoto"
+trigger838= Enemy, Name ="Rinka Yoshino"
+trigger839= Enemy, Name ="Haoh"
+trigger840= Enemy, Name ="Yagyu Jubei"
+trigger841= Enemy, Name ="heroineX[alter]"
+trigger842= Enemy, Name ="kojirou"
+trigger843= Enemy, Name ="Time Killers - Matrix"
+trigger844= Enemy, Name ="Time Killers - Orion"
+trigger845= Enemy, Name ="Shogun Warriors / Fujiyama Buster - Samurai EX"
+trigger846= Enemy, Name ="QUEEN OF HEART"
+trigger847= Enemy, Name ="Lucina"
+trigger848= Enemy, Name ="Ike"
+trigger849= Enemy, Name ="Master_Rosa"
+trigger850= Enemy, Name ="Shadow_James"
+trigger851= Enemy, Name ="SC_Sain_Tonedo"
+trigger852= Enemy, Name ="SCWU_Zenka"
+trigger853= Enemy, Name ="SDK Kyo"
+trigger854= Enemy, Name ="SDK Akira"
+trigger855= Enemy, Name ="SDK Kyoshiro"
+trigger856= Enemy, Name ="eyelina"
+trigger857= Enemy, Name ="yurin"
+trigger858= Enemy, Name ="XMVCTsubakiX"
+trigger859= Enemy, Name ="stock"
+trigger860= Enemy, Name ="Akame_Ga_Kill"
+trigger861= Enemy, Name ="Rasetsu-haohmaru"
+trigger862= Enemy, Name ="Kagekiyo"
+trigger863= Enemy, Name ="Kuroudo Shindou"
+trigger864= Enemy, Name ="MEGA-MAI-ZERO"
+trigger865= Enemy, Name ="Mai Kawasumi-KFX"
+trigger866= Enemy, Name ="Maede"
+trigger867= Enemy, Name ="kaede B"
+trigger868= Enemy, Name ="kojiroh B"
+trigger869= Enemy, Name ="seruzad"
+trigger870= Enemy, Name ="Octor"
+trigger871= Enemy, Name ="Charlotta"
+trigger872= Enemy, Name ="okita"
+trigger873= Enemy, Name ="Hijikata"
+trigger874= Enemy, Name ="D_Lion"
+trigger875= Enemy, Name ="SK'Link"
+trigger876= Enemy, Name ="Fancer"
+trigger877= Enemy, Name ="Erika Wagner"
+trigger878= Enemy, Name ="K_Yashaoh"
+trigger879= Enemy, Name ="Ashido Kano"
+trigger880= Enemy, Name ="Hirako"
+trigger881= Enemy, Name ="Shinji Hirako"
+trigger882= Enemy, Name ="Stark by Giovanni"
+trigger883= Enemy, Name ="T.Z. by dw11"
+trigger884= Enemy, Name ="Urahara Kisuke"
+trigger885= Enemy, Name ="Szayelaporro Grantz"
+trigger886= Enemy, Name ="Emi_K"
+trigger887= Enemy, Name ="YoungLink"
+trigger888= Enemy, Name ="BlackPrincess_Tohka"
+trigger889= Enemy, Name ="Udo Jinei"
+trigger890= Enemy, Name ="XMVCRagnaX"
+trigger891= Enemy, Name ="Neo-Sephiroth"
+trigger892= Enemy, Name ="Pielle_A"
+trigger893= Enemy, Name ="SENNAAAAAAAAAAAAA!!!!!"
+trigger894= Enemy, Name ="Time Killers - Musashi"
+trigger895= Enemy, Name ="Time Killers - Lord W·f"
+trigger896= Enemy, Name ="Knights of the Round - Muramasa"
+trigger897= Enemy, Name ="Lancelot"
+trigger898= Enemy, Name ="Chrom"
+trigger899= Enemy, Name ="Human Paladin MOP Ver"
+trigger900= Enemy, Name ="SK'Rukia"
+trigger901= Enemy, Name ="Abarai Renji by Mesiepivot and Giovanni"
+trigger902= Enemy, Name ="Kira Izuru"
+trigger903= Enemy, Name ="Rukia by Giovanni"
+trigger904= Enemy, Name ="Ichimaru Gin"
+trigger905= Enemy, Name ="Tensa Zangetsu Ichigo"
+trigger906= Enemy, Name ="Ichigo Bankai by Giovanni (Update)"
+trigger907= Enemy, Name ="Vasto Lorde Ichigo"
+trigger908= Enemy, Name ="SSJ Ichigo"
+trigger909= Enemy, Name ="Super Saiyan Toshiro Hitsugaya"
+trigger910= Enemy, Name ="StormEX-Ogihci"
+trigger911= Enemy, Name ="Sosuke_Aizen"
+trigger912= Enemy, Name ="CLIFF-Captain-Shigekuni"
+trigger913= Enemy, Name ="Yachiru Kusajishi"
+trigger914= Enemy, Name ="OLGrimmjow'95"
+trigger915= Enemy, Name ="Hiei by Hiei SSJ"
+trigger916= Enemy, Name ="ZoroMVC"
+trigger917= Enemy, Name ="M_Bstyle_youmu"
+trigger918= Enemy, Name ="Youmu_BASARAX-Style"
+trigger919= Enemy, Name ="momizisan"
+trigger920= Enemy, Name ="Genocide Route Kirby"
+trigger921= Enemy, Name ="Konpaku Youmu"
+trigger922= Enemy, Name ="Z-Ukyo"
+trigger923= Enemy, Name ="HAKUMYON"
+trigger924= Enemy, Name ="justicia"
+trigger925= Enemy, Name ="Ms-X"
+trigger926= Enemy, Name ="Galacta Knight"
+trigger927= Enemy, Name ="Luke"&&authorname="DJ HANNIBALROYCE"
+trigger928= Enemy, Name ="Luke Skywalker"
+trigger929= Enemy, Name ="Kat"&&authorname="Daigoro"
+trigger930= Enemy, Name ="Ana"&&authorname="Daigoro"
+value = 25
+
+[State 180, ChangeState 2]
+type = ChangeState
+trigger1 = time = 0
+value = 181+random%3
+
+;---------------------------------------------------------------------------
+; Win pose 1
+; CNS difficulty: basic
+[Statedef 181]
+type = S
+ctrl = 0
+anim = 180
+velset = 0,0
+
+[State 181, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S33,0
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win pose 2
+; CNS difficulty: basic
+[Statedef 182]
+type = S
+ctrl = 0
+anim = 181
+velset = 0,0
+
+[State 182, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 6
+value = S33,3
+
+[State 182, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 11
+value = S33,4
+
+[State 182, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 15
+value = S33,5
+
+[State 182, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win pose 3
+; CNS difficulty: basic
+[Statedef 183]
+type = S
+ctrl = 0
+anim = 182
+velset = 0,0
+
+[State 182, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S33,1
+
+[State 182, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 50
+value = S33,2
+
+[State 183, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S1000,0
+
+[State 183, 1]
+type = NotHitBy
+trigger1 = AnimElem = 1
+value = SCA
+time = 100
+
+[State 183, AssertSpecial]
+type = AssertSpecial
+trigger1 = Time <= 250
+flag = roundnotover
+
+;---------------------------------------------------------------------------
+; Introduction State Decider
+; CNS difficulty: basic
+[Statedef 190]
+type = S
+
+[State 190, 1]
+type = VarRandom
+trigger1 = Time = 0
+v = 1
+range = 0,50
+
+[State 190, 2]
+type = ChangeState
+trigger1 = time = 0
+value = 191+random%4
+
+;---------------------------------------------------------------------------
+; Introduction
+; CNS difficulty: basic
+[Statedef 191]
+type = S
+ctrl = 0
+anim = 190
+velset = 0,0
+
+[State 191, Explod]
+type = Explod
+trigger1 = AnimElem = 1
+anim = 10000
+ID = 10000
+pos = -2,0
+postype = p1
+scale = 3,3
+sprpriority = -7
+shadow = -1,0,0
+ownpal = 1
+removeongethit = 1
+
+[State 191, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S190,0
+
+[State 191, PlaySnd]
+type = PlaySnd
+trigger1 = time = 130
+value = S190,1
+
+[State 191, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 25
+value = S34,0
+
+[State 191, 2] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = Time = [0, 6000]
+flag = Intro
+
+[State 191, 3] ;Change to stand state
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+;---------------------------------------------------------------------------
+; Introduction 2
+; CNS difficulty: basic
+[Statedef 192]
+type = S
+ctrl = 0
+anim = 191
+velset = 0,0
+
+[State 192, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 4
+value = S34,1
+
+[State 192, 2] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 192, 4] ;Change to stand state
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+;---------------------------------------------------------------------------
+; Introduction 3
+; CNS difficulty: basic
+[Statedef 193]
+type = S
+ctrl = 0
+anim = 192
+velset = 0,0
+
+[State 193, PalFX]
+type = PalFX
+trigger1 = AnimElem = 2
+trigger2 = AnimElem = 4
+trigger3 = AnimElem = 6
+trigger4 = AnimElem = 8
+trigger5 = AnimElem = 10
+time = 5
+add = 255,255,255
+mul = 255,255,255
+invertall = 0
+color = 25
+
+[State 193, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 2
+value = S1603,0
+
+[State 193, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 11
+value = S3500,1
+
+[State 193, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 12
+value = S34,2
+
+[State 193, EnvColor]
+type = EnvColor
+trigger1 = animelem = 11
+value = 255,255,255
+time = 11
+
+[State 3000, Explod]
+type = explod
+trigger1 = animelem = 11
+anim = 1921
+pos = 0,0
+vfacing = 1
+postype = back
+scale = 3,3
+bindtime = -1
+sprpriority = -5
+ontop = 1
+ownpal = 1
+
+[State 193, 2] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 193, 4] ;Change to stand state
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+;---------------------------------------------------------------------------
+; Introduction 2
+; CNS difficulty: basic
+[Statedef 194]
+type = S
+ctrl = 0
+anim = 193
+velset = 0,5
+
+[State 0, PosAdd]
+type = PosAdd
+trigger1 = time = 0
+x = 0
+y = -150
+
+[State 194, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+
+[State 194, VelAdd]
+type = VelAdd
+trigger1 = 1
+x = 0
+y = -.1
+
+[State 194, 1]
+type = Explod
+trigger1 = AnimElem = 15
+anim = 901
+postype = p1
+sprpriority = 2
+pos = 5, -55
+ownpal = 1
+scale = 3,3
+
+[State 194, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S194,0
+
+[State 194, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 15
+value = S194,1
+
+[State 194, 2] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 194, 4] ;Change to stand state
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 1941
+
+;---------------------------------------------------------------------------
+[Statedef 1941]
+type = S
+ctrl = 0
+anim = 44
+velset = 0,-7
+
+[State 194, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+
+[State 1941, VelAdd]
+type = VelAdd
+trigger1 = 1
+x = 0
+y = .5
+
+[State 1941, 2]
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 1941, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 1941, 1]
+type = ChangeState
+trigger1 = pos y >= 0 && vel y >= 0
+value = 1942
+ctrl = 0
+
+;---------------------------------------------------------------------------
+[Statedef 1942]
+type = S
+ctrl = 0
+anim = 47
+velset = 0,0
+
+[State 1942, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S41,0
+
+[State 1942, 3]
+type = MakeDust
+trigger1 = 1
+pos = 0,0
+spacing = 5
+
+[State 1942, 2]
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 1942, 1]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 0
+
+;---------------------------------------------------------------------------
+; Taunt State Decider
+; CNS difficulty: basic
+[Statedef 195]
+type = S
+
+[State 195, 2]
+type = ChangeState
+trigger1 = time = 0
+value = 196+random%3
+
+;---------------------------------------------------------------------------
+; Taunt 1
+[Statedef 196]
+type = S
+ctrl = 0
+anim = 195
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State 196, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = S35,0
+
+[State 196, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Taunt 2
+[Statedef 197]
+type = S
+ctrl = 0
+anim = 196
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State 197, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = S35,1
+
+[State 197, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Taunt 3
+[Statedef 198]
+type = S
+ctrl = 0
+anim = 197
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State 198, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = S35,2
+
+[State 198, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Standing Light Punch
+; CNS difficulty: easy
+[Statedef 200]
+type    = S				;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A				;Move-type: A-attack, I-idle, H-gethit
+physics = S				;Physics: S-stand, C-crouch, A-air
+juggle  = 1				;Number of air juggle points move takes
+;Commonly-used controllers:
+velset = 0,0			;Set velocity (x,y) (Def: no change)
+ctrl = 0				;Set ctrl (Def: no change)
+anim = 200				;Change animation (Def: no change)
+poweradd = 20			;Power to add (Def: 0)
+sprpriority = 2			;Set layering priority to 2 (in front)
+
+[State 200, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S1,0
+
+[State 200, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,0
+
+[State 200, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 25, 0
+animtype = Light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 8
+sparkno = S6000
+sparkxy = -5, -35
+hitsound = S20,0
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 9
+ground.velocity = -2
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 9
+
+[State 200, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Standing Medium Punch
+; CNS difficulty: easy
+[Statedef 210]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+poweradd= 40
+ctrl = 0
+velset = 0,0
+anim = 210
+
+[State 210, PlaySnd]
+type = Velset
+trigger1 = AnimElem = 1
+x = -1
+y = 0
+
+[State 210, PlaySnd]
+type = Velset
+trigger1 = AnimElem = 3
+x = 3
+y = 0
+
+[State 440, PlaySnd]
+type = Velset
+trigger1 = movehit
+x = -2
+ignorehitpause = 1
+
+[State 210, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S1,1
+
+[State 210, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,1
+
+[State 210, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 45, 0
+animtype = Medium
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = S6001
+sparkxy = -15, -35
+hitsound  = S20,1
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 18
+ground.velocity = -3
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 18
+
+[State 210, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Standing Strong Punch
+; CNS difficulty: easy
+[Statedef 220]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+poweradd= 60
+ctrl = 0
+velset = 0,0
+anim = 220
+
+[State 220, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 3
+value = S220,0
+
+[State 200, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = S36,2
+
+[State 220, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 65, 0
+animtype = Hard
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 3, 9
+sparkno = S6006
+sparkxy = -15, -35
+hitsound  = S23,0
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 15
+ground.velocity = -4
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 15
+
+[State 220, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Standing Light Kick
+; CNS difficulty: easy
+[Statedef 230]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+poweradd= 20
+ctrl = 0
+velset = 0,0
+anim = 230
+
+[State 230, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2,0
+
+[State 230, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,3
+
+[State 230, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 25, 0
+animtype = Light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 8
+sparkno = S6000
+sparkxy = -5, -25
+hitsound = S21,0
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 9
+ground.velocity = -2
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 9
+
+[State 230, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Standing Meduim Kick
+; CNS difficulty: easy
+[Statedef 240]
+type    = S
+movetype= A
+physics = S
+juggle  = 5
+poweradd= 40
+ctrl = 0
+velset = 0,0
+anim = 240
+
+[State 240, PlaySnd]
+type = Velset
+trigger1 = AnimElem = 3
+x = 5
+y = 0
+
+[State 240, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2,1
+
+[State 240, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,4
+
+[State 240, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 45, 0
+animtype = Medium
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = S6001
+sparkxy = -15, -15
+hitsound  = S21,1
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime  = 18
+ground.velocity = -3
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 18
+
+[State 240, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Standing Strong Kick
+; CNS difficulty: easy
+[Statedef 250]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+poweradd= 60
+ctrl = 0
+velset = 0,0
+anim = 250
+
+[State 250, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2,2
+
+[State 250, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,5
+
+[State 250, VelSet]
+type = VelSet
+trigger1 = AnimElem = 1
+trigger2 = AnimElem = 2
+trigger3 = AnimElem = 3
+trigger4 = AnimElem = 4
+x = -5
+y = 0
+
+[State 250, VelSet]
+type = VelSet
+trigger1 = AnimElem = 5
+x = 15
+y = 0
+
+[State 250, VelSet]
+type = VelSet
+trigger1 = movehit
+x = -2
+y = 0
+ignorehitpause = 1
+
+[State 250, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 65, 0
+animtype = Hard
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 5, 5
+sparkno = S6002
+sparkxy = -15, -35
+hitsound = S21,2
+guardsound = S6003,0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 19
+ground.velocity = -7
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 19
+yaccel = .5
+
+[State 250, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouching Light Punch
+; CNS difficulty: easy
+; Description: Simple crouching attack. The HitDef's guardflag parameter
+;     is set to "L", meaning that the move can only be guarded low
+;     (crouching), and not by standing or jumping opponents.
+;     Like for all light attacks, it's a good idea to keep the slidetime
+;     and hittime parameters at a smaller number, so the opponent isn't
+;     stunned for too long. For all crouching attacks you have to
+;     remember to set the attr parameter to indicate that it is crouching
+;     attack. In this case, "C, NA" stands for "crouching, normal attack".
+;     The HitDef's priority is set at 3, instead of the default of 4,
+;     so this attack has a lower priority than most others, meaning the
+;     player will get hit instead of trading hits with the opponent if
+;     their attack collision boxes (Clsn1) intersect each other's Clsn2
+;     boxes at the same time.
+[Statedef 400]
+type    = C
+movetype= A
+physics = C
+juggle  = 5
+poweradd= 20
+ctrl = 0
+anim = 400
+
+[State 400, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S1,0
+
+[State 400, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,0
+
+[State 400, 1]
+type = HitDef
+trigger1 = time = 0
+attr = C, NA
+damage = 25, 0
+animtype = Light
+guardflag = L
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = S6000
+sparkxy = -5, 0
+hitsound = S20,0
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 10
+ground.velocity = -2
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 10
+
+[State 400, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouching Medium Punch
+[Statedef 410]
+type    = C
+movetype= A
+physics = C
+juggle  = 6
+poweradd= 40
+ctrl = 0
+anim = 410
+
+[State 410, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S1,1
+
+[State 410, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,1
+
+[State 410, 1]
+type = HitDef
+trigger1 = time = 0
+attr = C, NA
+damage = 45, 0
+animtype = Medium
+guardflag = L
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = s6004
+guard.sparkno = S6008
+sparkxy = -25, 0
+hitsound  = S22,1
+guardsound = S6003, 0
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 18
+ground.velocity = -3
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 18
+
+[State 410, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouching Strong Punch
+[Statedef 420]
+type    = C
+movetype= A
+physics = C
+juggle  = 6
+poweradd= 60
+ctrl = 0
+anim = 420
+
+[State 420, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = S220,0
+
+[State 420, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = S36,2
+
+[State 420, 1]
+type = HitDef
+trigger1 = time = 0
+attr = C, NA
+damage = 65, 0
+animtype = Hard
+guardflag = L
+hitflag = MAF
+priority = 3, Hit
+pausetime = 3, 9
+sparkno = S6006
+sparkxy = -15, -15
+hitsound = S23,0
+guardsound = S6003,0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 15
+ground.velocity = -4
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 15
+
+[State 420, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouching Light Kick
+; CNS difficulty: easy
+[Statedef 430]
+type    = C
+movetype= A
+physics = C
+juggle  = 5
+poweradd= 20
+ctrl = 0
+anim = 430
+
+[State 430, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2,0
+
+[State 430, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,3
+
+[State 430, 1]
+type = HitDef
+trigger1 = time = 0
+attr = C, NA
+damage = 25, 0
+animtype = Light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = S6000
+sparkxy = -5, -25
+hitsound = S21,0
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 10
+ground.velocity = -2
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 10
+
+[State 430, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouching Medium Kick
+[Statedef 440]
+type    = C
+movetype= A
+physics = C
+juggle  = 6
+poweradd= 40
+ctrl = 0
+anim = 440
+
+[State 440, PlaySnd]
+type = Velset
+trigger1 = AnimElem = 3
+x = 6
+y = 0
+
+[State 440, PlaySnd]
+type = Velset
+trigger1 = movehit
+x = -2
+ignorehitpause = 1
+
+[State 440, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2,1
+
+[State 440, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,4
+
+[State 440, 1]
+type = HitDef
+trigger1 = time = 0
+attr = C, NA
+damage = 45, 0
+animtype = Medium
+guardflag = L
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = s6001
+guard.sparkno = S6008
+sparkxy = -25, -5
+hitsound  = S21,1
+guardsound = S6003, 0
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 18
+ground.velocity = -3
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 18
+
+[State 440, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouching Strong Kick
+; CNS difficulty: easy
+[Statedef 450]
+type    = C
+movetype= A
+physics = C
+juggle  = 5
+poweradd= 60
+ctrl = 0
+anim = 450
+
+[State 400, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2,2
+
+[State 400, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,5
+
+[State 450, PlaySnd]
+type = Velset
+trigger1 = AnimElem = 3
+x = 10
+y = 0
+
+[State 450, 1]
+type = HitDef
+trigger1 = time = 0
+attr = C, NA
+damage = 45, 0
+animtype = Hard
+guardflag = MA
+hitflag = MAF
+pausetime = 8, 10
+sparkno = S6002
+sparkxy = -15, -55
+hitsound = S21,2
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 20
+ground.velocity = -0,-13
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -0,-13
+air.hittime = 20
+
+[State 450, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Jump Light Punch
+; CNS difficulty: easy
+[Statedef 600]
+type    = A
+movetype= A
+physics = A
+juggle  = 2
+poweradd= 20
+ctrl = 0
+anim = 600
+
+[State 600, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S1,0
+
+[State 600, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,0
+
+[State 600, 1]
+type = HitDef
+trigger1 = time = 0
+attr = A, NA
+damage = 25, 0
+animtype = Light
+guardflag = HA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = S6000
+sparkxy = -5, -35
+hitsound = S20,0
+guardsound = S6003,0
+guard.sparkno = S6008
+ground.type = High
+ground.slidetime = 5
+ground.hittime = 16
+ground.velocity = -1.3
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = -0.4,-3
+air.hittime = 16
+
+;---------------------------------------------------------------------------
+; Jump Medium Punch
+; CNS difficulty: easy
+[Statedef 610]
+type    = A
+movetype= A
+physics = A
+juggle  = 4
+poweradd= 40
+ctrl = 0
+anim = 610
+
+[State 610, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S1,1
+
+[State 610, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,1
+
+[State 610, 1]
+type = HitDef
+trigger1 = time = 0
+attr = A, NA
+damage = 45, 0
+animtype = Medium
+guardflag = HA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = S6001
+sparkxy = -10, -35
+hitsound = S20,1
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = High
+ground.slidetime = 5
+ground.hittime = 18
+ground.velocity = -4
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = -0.4,-3
+air.hittime = 18
+
+;---------------------------------------------------------------------------
+; Jump Strong Punch
+; CNS difficulty: easy
+[Statedef 620]
+type    = A
+movetype= A
+physics = A
+juggle  = 4
+poweradd= 60
+ctrl = 0
+anim = 620
+
+[State 620, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 3
+value = S220,0
+
+[State 620, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = S36,2
+
+[State 620, 1]
+type = HitDef
+trigger1 = time = 0
+attr = A, NA
+damage = 25, 0
+animtype = Hard
+guardflag = HA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 3, 9
+sparkno = S6006
+sparkxy = -15, -35
+hitsound = S23,0
+guardsound = S6003,0
+guard.sparkno = S6008
+ground.type = High
+ground.slidetime = 5
+ground.hittime = 15
+ground.velocity = -4
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = -0.4,-3
+air.hittime = 15
+
+;---------------------------------------------------------------------------
+; Jump Light Kick
+; CNS difficulty: easy
+[Statedef 630]
+type    = A
+movetype= A
+physics = A
+juggle  = 3
+poweradd= 20
+ctrl = 0
+anim = 630
+
+[State 630, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2,0
+
+[State 630, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,3
+
+[State 630, 1]
+type = HitDef
+trigger1 = time = 0
+attr = A, NA
+damage = 25, 0
+animtype = Light
+guardflag = HA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = S6000
+sparkxy = -10, -35
+hitsound = S21,0
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = High
+ground.slidetime = 5
+ground.hittime = 16
+ground.velocity = -1.3
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = -0.4,-3
+air.hittime = 16
+
+;---------------------------------------------------------------------------
+; Jump Medium Kick
+; CNS difficulty: easy
+[Statedef 640]
+type    = A
+movetype= A
+physics = A
+juggle  = 4
+poweradd= 40
+ctrl = 0
+anim = 640
+
+[State 640, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2,0
+
+[State 640, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,4
+
+[State 640, 1]
+type = HitDef
+trigger1 = time = 0
+attr = A, NA
+damage = 45, 0
+animtype = Medium
+guardflag = HA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = S6001
+sparkxy = -10, 0
+hitsound = S21,1
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = High
+ground.slidetime = 5
+ground.hittime = 18
+ground.velocity = -4
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = -0.4,-3
+air.hittime = 18
+
+;---------------------------------------------------------------------------
+; Jump Strong Kick
+; CNS difficulty: easy
+[Statedef 650]
+type    = A
+movetype= A
+physics = A
+juggle  = 4
+poweradd= 60
+ctrl = 0
+anim = 650
+
+[State 650, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2,2
+
+[State 650, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,5
+
+[State 650, VelSet]
+type = VelSet
+trigger1 = animelem = 6
+x = 10
+y = -5
+
+[State 650, VelSet]
+type = VelSet
+trigger1 = animelem = 11
+x = 3
+
+[State 650, VelSet]
+type = VelSet
+trigger1 = movehit
+x = 3
+
+[State 650, 1]
+type = VelAdd
+Trigger1 = 1
+y = .3
+
+[State 650, 1]
+type = HitDef
+trigger1 = time = 0
+attr = A, NA
+damage = 65, 0
+animtype = Hard
+guardflag = HA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 7, 7
+sparkno = S6002
+sparkxy = -15, -35
+hitsound = S21,2
+guardsound = S6003,0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 20
+ground.velocity = -8,-5
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -8,-5
+air.hittime = 20
+yaccel = .8
+fall = 1
+fall.recover = 0
+
+;---------------------------------------------------------------------------
+;Ground Parry
+[Statedef 700]
+type = S
+movetype = I
+physics = S
+anim = 700
+velset=0,0
+ctrl=0
+poweradd=75
+
+[State 700, EnvColor]
+type = EnvColor
+trigger1 = animelem = 1
+value = 255,255,255
+time = 5
+ignorehitpause = 1
+
+[State 700, 1]
+type = Explod
+trigger1 = AnimElem = 2
+id = 703
+anim = 703
+postype = p1
+sprpriority = 4
+pos = 5, -40
+ownpal = 1
+pausemovetime = 60
+scale = 2.5,2.5
+
+[State 700, Modify]
+type = ModifyExplod
+trigger1 = NumExplod(703)
+ID = 703
+scale = 0.5*(time*.90),0.5*(time*.90)
+
+[State 700, PalFXWiz]
+type = BGPalFX
+trigger1 = AnimElem = 2
+time = 8
+add = 0,0,0
+mul = 255,255,255
+sinadd = 0,0,0,10
+invertall = 1
+color = 256
+ignorehitpause = 0
+
+[State 700, pause]
+type=pause
+trigger1=!time
+time=20
+movetime=20
+
+[State 700, nhb]
+type=hitby
+trigger1=time<=20
+time=1
+value=SCA,AT
+
+[State 700, stop]
+type=posfreeze
+trigger1=time<=20
+value=1
+
+[State 700, snd]
+type=playsnd
+trigger1=!time
+value=700,0
+
+[State 700, asserts]
+type=assertspecial
+trigger1=1
+flag=nowalk
+flag2=nostandguard
+flag3=nocrouchguard
+
+[State 700, ctrl]
+type=ctrlset
+trigger1=time>20
+value=1
+
+[State 700, end]
+type=changestate
+trigger1=!animtime
+value=0
+ctrl=1
+
+;---------------------------------------------------------------------------
+;Parry crouching
+[Statedef 701]
+type=C
+physics=C
+movetype=I
+anim=701
+velset=0,0
+ctrl=0
+sprpriority=2
+poweradd=75
+
+[State 701, EnvColor]
+type = EnvColor
+trigger1 = animelem = 1
+value = 255,255,255
+time = 5
+ignorehitpause = 1
+
+[State 701, 1]
+type = Explod
+trigger1 = AnimElem = 2
+id = 703
+anim = 703
+postype = p1
+sprpriority = 4
+pos = 5, -25
+ownpal = 1
+pausemovetime = 60
+scale = 2.5,2.5
+
+[State 701, Modify]
+type = ModifyExplod
+trigger1 = NumExplod(703)
+ID = 703
+scale = 0.5*(time*.90),0.5*(time*.90)
+
+[State 701, PalFXWiz]
+type = BGPalFX
+trigger1 = AnimElem = 2
+time = 8
+add = 0,0,0
+mul = 255,255,255
+sinadd = 0,0,0,10
+invertall = 1
+color = 256
+ignorehitpause = 0
+
+[State 701, pause]
+type=pause
+trigger1=!time
+time=20
+movetime=20
+
+[State 701, nhb]
+type=hitby
+trigger1=time<=20
+time=1
+value=SCA,AT
+
+[State 701, stop]
+type=posfreeze
+trigger1=time<=20
+value=1
+
+[State 701, snd]
+type=playsnd
+trigger1=!time
+value=700,0
+
+[State 701, asserts]
+type=assertspecial
+trigger1=1
+flag=nowalk
+flag2=nostandguard
+flag3=nocrouchguard
+
+[State 701, ctrl]
+type=ctrlset
+trigger1=time>20
+value=1
+
+[State 701, end]
+type=changestate
+trigger1=!animtime
+value=11
+ctrl=1
+
+;---------------------------------------------------------------------------
+;Parry air
+[Statedef 702]
+type=A
+physics=A
+movetype=I
+anim=702
+ctrl=0
+sprpriority=2
+poweradd=75
+
+[State 702, EnvColor]
+type = EnvColor
+trigger1 = animelem = 1
+value = 255,255,255
+time = 5
+ignorehitpause = 1
+
+[State 702, 1]
+type = Explod
+trigger1 = AnimElem = 2
+id = 703
+anim = 703
+postype = p1
+sprpriority = 4
+pos = 5, -40
+ownpal = 1
+pausemovetime = 60
+scale = 2.5,2.5
+
+[State 702, Modify]
+type = ModifyExplod
+trigger1 = NumExplod(703)
+ID = 703
+scale = 0.5*(time*.90),0.5*(time*.90)
+
+[State 700, PalFXWiz]
+type = BGPalFX
+trigger1 = AnimElem = 2
+time = 8
+add = 0,0,0
+mul = 255,255,255
+sinadd = 0,0,0,10
+invertall = 1
+color = 256
+ignorehitpause = 0
+
+[State 702, pause]
+type=pause
+trigger1=!time
+time=20
+movetime=20
+
+[State 702, nhb]
+type=hitby
+trigger1=time<=20
+time=1
+value=SCA,AT
+
+[State 702, sts]
+type=statetypeset
+trigger1=time<=20
+physics=N
+
+[State 702, stop]
+type=posfreeze
+trigger1=time<=20
+value=1
+
+[State 702, sts]
+type=statetypeset
+trigger1=time>20
+physics=A
+
+[State 702, snd]
+type=playsnd
+trigger1=!time
+value=700,0
+
+[State 702, asserts]
+type=assertspecial
+trigger1=1
+flag=noairguard
+
+[State 702, ctrl]
+type=ctrlset
+trigger1=time>20
+value=1
+
+;---------------------------------------------------------------------------
+; Dodge Forward
+[Statedef 710]
+type    = S
+movetype= I
+physics = N
+juggle  = 0
+poweradd= 0
+velset = 8,0
+ctrl = 0
+anim = 710
+sprpriority = -1
+
+[State 710, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+time = 20
+timegap = 1
+framegap = 5
+length = 20
+palcontrast = 220,220,220
+paladd = 10,10,10
+palmul = .65,.65,.65
+trans = add1
+
+[State 710, 3]
+type = MakeDust
+trigger1 = 1
+pos = 0,0
+spacing = 5
+
+[State 710, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S710,0
+
+[State 710, 1]
+type = PlayerPush
+trigger1 = Time >= 0
+value = 0
+
+[State 710, 2]
+type = VelSet
+trigger1 = AnimTime = 0
+x = 0
+
+[State 710, 3]
+type = PosSet
+trigger1 = Time >= 0
+y = 0
+
+[State 710, 5]
+type = HitBy
+triggerall = !numhelper(1505)
+trigger1 = time <= 18
+value = SC, NT, ST, HT
+
+[State 710, 6]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Dodge Backward
+[Statedef 720]
+type    = S
+movetype= I
+physics = N
+juggle  = 0
+poweradd= 0
+velset = -8,0
+ctrl = 0
+anim = 720
+sprpriority = -1
+
+[State 720, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+time = 20
+timegap = 1
+framegap = 5
+length = 20
+palcontrast = 220,220,220
+paladd = 10,10,10
+palmul = .65,.65,.65
+trans = add1
+
+[State 720, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S710,0
+
+[State 720, 1]
+type = PlayerPush
+trigger1 = Time >= 0
+value = 0
+
+[State 720, 2]
+type = VelSet
+trigger1 = AnimTime = 0
+x = 0
+
+[State 720, 3]
+type = PosSet
+trigger1 = Time >= 0
+y = 0
+
+[State 720, 5]
+type = HitBy
+triggerall = !numhelper(1505)
+trigger1 = time <= 18
+value = SC, NT, ST, HT
+
+[State 720, 6]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Foward Recovery Jump
+[Statedef 730]
+type    = S
+movetype= I
+physics = N
+juggle  = 0
+poweradd= 0
+velset = 10,-10
+ctrl = 0
+anim = 5211
+sprpriority = -1
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = time = 0
+y = -2
+
+[State 730, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = SCA,NT,ST,HT
+time = 35
+
+[State 730, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+time = 20
+timegap = 1
+framegap = 5
+length = 20
+palcontrast = 220,220,220
+paladd = 10,10,10
+palmul = .65,.65,.65
+trans = add1
+
+[State 730, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = normal ;player
+name = "Reovery Ring"
+ID = 5211
+stateno = 5211
+pos = 0,-25
+postype = p1
+ownpal = 1
+size.xscale = 1
+size.yscale = 1
+
+[State 730, 1]
+type = PlayerPush
+trigger1 = Time >= 0
+value = 0
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = 1
+
+[State 730, 4]
+type = MakeDust
+trigger1 = Time >= 0
+pos = -16,0
+spacing = 6
+
+[State 1111, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 730, 6]
+type = ChangeState
+trigger1 = pos y >= 0 && vel y >= 0
+value = 731
+ctrl = 0
+
+;---------------------------------------------------------------------------
+[StateDef 731]
+type = S
+movetype= A
+physics = N
+ctrl = 0
+anim = 47
+velset = 0,0
+facep2 = 1
+
+[State 1111, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 731, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S40,1
+
+[State 731, end]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Backward Recovery Jump
+[Statedef 740]
+type    = S
+movetype= I
+physics = N
+juggle  = 0
+poweradd= 0
+velset = -10,-10
+ctrl = 0
+anim = 5210
+sprpriority = -1
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = time = 0
+y = -2
+
+[State 740, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = SCA,NT,ST,HT
+time = 35
+
+[State 740, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+time = 20
+timegap = 1
+framegap = 5
+length = 20
+palcontrast = 220,220,220
+paladd = 10,10,10
+palmul = .65,.65,.65
+trans = add1
+
+[State 740, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = normal ;player
+name = "Reovery Ring"
+ID = 5211
+stateno = 5211
+pos = 0,-25
+postype = p1
+ownpal = 1
+size.xscale = 1
+size.yscale = 1
+
+[State 740, 1]
+type = PlayerPush
+trigger1 = Time >= 0
+value = 0
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = 1
+
+[State 740, 4]
+type = MakeDust
+trigger1 = Time >= 0
+pos = -16,0
+spacing = 6
+
+[State 1111, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 740, 6]
+type = ChangeState
+trigger1 = pos y >= 0 && vel y >= 0
+value = 731
+ctrl = 0
+
+;---------------------------------------------------------------------------
+; Throw - Attempt
+; CNS difficulty: medium-advanced
+; Description: Throws are not difficult to make, although then can be
+;     tedious at times. Throw attempt states have a HitDef of a
+;     special format. The key parameters in a throw are p1stateno
+;     and p2stateno. If the HitDef successfully connects, then
+;     the attacker will change to the state number specified by
+;     p1stateno, and the opponent will be change to the state
+;     number assigned to p2stateno. The special thing about p2stateno
+;     is that the opponent will be temporarily brought into the
+;     attacker's state file. In this case, no matter who the
+;     opponent is, he will be taken to state 820 of this file (kfm.cns)
+;     and remain here until the end of the throw (look at his debug
+;     information when he is being thrown; the text changes to yellow
+;     to mean that he is in another player's state file).
+[Statedef 800]
+type    = S
+movetype= A
+physics = S
+juggle  = 0
+velset = 0,0
+ctrl = 0
+anim = 800
+
+; Notes: The '-' symbol in the hitflag field means that it only affects
+;   players who are not in a hit state. This prevents the player from combo-ing
+;   into the throw. The priority should be set to a low number, such as
+;   1 or 2, so that the throw does not take precedence over normal attacks.
+;   The type of priority must always be set to "Miss" or "Dodge" for throws,
+;   otherwise strange behavior can result.
+[State 800, 1]
+type = HitDef
+Trigger1 = Time = 0
+attr = S, NT          ;Attributes: Standing, Normal Throw
+hitflag = M-          ;Affect only ground people who are not being hit
+priority = 1, Miss    ;Throw has low priority, must be miss or dodge type.
+sparkno = -1          ;No spark
+sprpriority = 1       ;Draw in front of p2
+p1facing = 1 ;Turn if holding forwards
+p2facing = 1          ;Force p2 to face player
+p1stateno = 810       ;On success, player changes to state 810
+p2stateno = 820       ;If hit, p2 changes to state 820 in player's cns
+fall = 1              ;Force p2 into falling down
+
+[State 800, 2]
+type = ChangeState
+Trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Throwing the opponent
+; Description: In this state, the player throws the opponent by binding him to
+;     various offsets based on his current frame of animation. For
+;     example, [State 810, Bind 1] binds the opponent to an offset of
+;     28 pixels in front of the player. That puts him around where the hand
+;     is at. Is is important to keep the opponent bound using a
+;     TargetBind controller at all times, until you let him go. This
+;     is especially important if your player has a Clsn2 box that
+;     allows him to get hit while throwing someone. Each time a player
+;     gets hit, all his bound targets will be set to a fall state. If
+;     the opponent is not bound, then he might get stuck in his thrown
+;     state when his attacker is knocked out of the throw halfway.
+; Notes: There is a TargetLifeAdd controller to decrease the opponent's
+;     life, and a TargetState controller to change his state to a
+;     falling state when KFM lets go of him.
+[Statedef 810]
+type    = S
+movetype= A
+physics = N
+anim = 810
+poweradd = 60
+
+[State 810, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S800,0
+
+[State 810, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,6
+
+[State 810, Bind 1]
+type = TargetBind
+trigger1 = animelem = 1
+pos = 30, 0
+
+[State 810, 1]
+type = targetlifeadd
+trigger1 = AnimElem = 7
+value = -60
+
+[State 810, 3]
+type = PlaySnd
+trigger1 = AnimElem = 7
+value = S810,0
+volume = 200
+
+[State 810, 4]
+type = SprPriority
+trigger1 = animelem = 2
+value = 1
+
+[State 815, 5]
+type = Explod
+trigger1 = AnimElem = 7
+id = 3
+anim = 6001
+pos = 15, -15
+sprpriority = 7
+ownpal = 0
+facing = 1
+
+[State 810, TargetState]
+type = TargetState
+trigger1 = AnimElem = 7
+value = 821
+ID = -1
+
+[State 810, State End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Opponent Thrown
+; (a custom gethit state)
+; Description: This is the state that the opponent changes to after being
+;     hit by the throw HitDef. The important thing here is to use a
+;     ChangeAnim2 controller. The difference between ChangeAnim2 and
+;     ChangeAnim is that ChangeAnim2 changes the player's animation to
+;     an action in the AIR file of the attacker (in this case, kfm.air),
+;     whereas ChangeAnim always changes the player to an action in his
+;     own AIR file. Look at Action 820 in kfm.air for some extra
+;     comments.
+[Statedef 820]
+type    = A
+movetype= H
+physics = N
+velset = 0,0
+
+[State 820, 1]
+type = ChangeAnim2
+Trigger1 = Time = 0
+value = 820
+
+;---------------------------------------------------------------------------
+; Opponent thrown into the air
+; (a custom gethit state)
+; Description: This state has the opponent flying through the air and
+;     falling down onto the ground. The SelfState controller sets the
+;     opponent back using to his own state file when he his the ground.
+;     Controllers 821,2 and 821,3 allow the opponent to recover by
+;     hitting his recovery command when he is falling.
+[Statedef 821]
+type    = A
+movetype= H
+physics = N
+velset = -8,-4
+poweradd = 40
+
+[State 821, 1] ;Gravity
+type = VelAdd
+Trigger1 = 1
+y = .4
+
+[State 821, 2] ; Recover near ground (use ChangeState)
+type = ChangeState
+triggerall = Vel Y > 0
+triggerall = Pos Y >= -20
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+value = 5200 ;HITFALL_RECOVER
+
+[State 821, 3] ; Recover in mid air (use SelfState)
+type = SelfState
+triggerall = Vel Y > 0
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+value = 5210 ;HITFALL_AIRRECOVER
+
+[State 821, 4] ;Hit ground
+type = SelfState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 5100 ;Hit ground
+
+---------------------------------------------------------------------------------------------
+;Beginning of the super jump
+[Statedef 7000]
+type = S
+physics = S
+anim = 40
+ctrl = 0
+sprpriority = 1
+facep2 = 1
+
+[State 7000, PlaySnd]
+type = PlaySnd
+trigger1 =  AnimElem = 1
+value = 7000,0
+
+[State 7000, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+length = 13
+palbright = 30,30,30
+palcontrast = 140,140,140
+paladd = -10,-10,-10
+palmul = 0.85,0.85,0.85
+timegap = 1
+framegap = 2
+trans = Add
+time = 2
+
+[State 7000, AfterImageTime]
+type = AfterImageTime
+trigger1 = 1
+time = 2
+
+[State 7000, VarSet]
+type = VarSet
+trigger1 = Time = 0
+v = 11
+value = 0
+
+[State 7000, VarSet]
+type = VarSet
+trigger1 = command = "holdfwd"
+v = 11
+value = 1
+
+[State 7000, VarSet]
+type = VarSet
+trigger1 = command = "holdback"
+v = 11
+value = -1
+
+[State 7000, ChangeState]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 7001
+ctrl = 1
+
+;---------------------------------------------------------------------------------------------
+;Super Jump
+[Statedef 7001]
+type = A
+physics = A
+ctrl = 1
+anim = 7000
+velset = 0,-12.5
+facep2 = 1
+
+[State 7000, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+length = 13
+palbright = 30,30,30
+palcontrast = 140,140,140
+paladd = -10,-10,-10
+palmul = 0.85,0.85,0.85
+timegap = 1
+framegap = 2
+trans = Add
+time = 2
+
+[State 7000, AfterImageTime]
+type = AfterImageTime
+trigger1 = 1
+time = 2
+
+[State 7001, VelAdd]
+type = VelAdd
+triggerall = Vel X >= -2
+trigger1 = command = "holdback"
+trigger1 = Anim != 7002
+x = -1
+
+[State 7001, VelAdd]
+type = VelAdd
+triggerall = Vel X <= 2.5
+trigger1 = command = "holdfwd"
+trigger1 = Anim != 7001
+x = 1
+
+[State 7001, VelSet]
+type = VelSet
+trigger1 = Anim = 7001
+trigger1 = Time = [0,5]
+x = 4
+
+[State 7001, VelSet]
+type = VelSet
+trigger1 = Anim = 7002
+trigger1 = Time = [0,5]
+x = -3.5
+
+[State 7001, ChangeAnim]
+type = ChangeAnim
+trigger1 = Var(11) = 0
+trigger1 = Time = [0,4]
+value = 7000
+
+[State 7001, ChangeAnim]
+type = ChangeAnim
+trigger1 = Var(11) = 1
+trigger1 = Time = [0,4]
+value = 7001
+
+[State 7001, ChangeAnim]
+type = ChangeAnim
+trigger1 = Var(11) = -1
+trigger1 = Time = [0,4]
+value = 7002
+
+[State 7001, Var Mute]
+type = VarSet
+trigger1 = Time = 0
+v = 12
+value = 1
+
+;---------------------------------------------------------------------------------------------
+;Super Jump
+[Statedef 7002]
+type    = A
+physics = A
+ctrl = 1
+facep2 = 1
+
+[State 7002, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+length = 13
+palbright = 30,30,30
+palcontrast = 140,140,140
+paladd = -10,-10,-10
+palmul = 0.85,0.85,0.85
+timegap = 1
+framegap = 2
+trans = Add
+time = 2
+
+[State 7002, AfterImageTime]
+type = AfterImageTime
+trigger1 = 1
+time = 2
+
+[State 7002, Vel]
+type = VelAdd
+triggerall = Vel X >= -2
+trigger1 = command = "holdback"
+trigger1 = Anim != 43
+x = -0.1
+
+[State 7002, Vel]
+type = VelAdd
+triggerall = Vel X <= 2.5
+trigger1 = command = "holdfwd"
+trigger1 = Anim != 42
+x = 0.25
+
+;---------------------------------------------------------------------------------------------
+;Beginning of the super jump for AI Launcher
+[Statedef 7500]
+type = S
+physics = S
+anim = 40
+ctrl = 0
+sprpriority = 1
+
+[State 7500, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+length = 13
+palbright = 30,30,30
+palcontrast = 140,140,140
+paladd = -10,-10,-10
+palmul = 0.85,0.85,0.85
+timegap = 1
+framegap = 2
+trans = Add
+time = 2
+
+[State 7500, AfterImageTime]
+type = AfterImageTime
+trigger1 = 1
+time = 2
+
+[State 7500, PlaySnd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 7000,0
+
+[State 7500, ChangeState]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 7501
+ctrl = 1
+
+;---------------------------------------------------------------------------------------------
+;Super Jump for AI Launcher
+[Statedef 7501]
+type = A
+physics = A
+ctrl = 0
+anim = 41
+velset = 4,-12.5
+
+[State 7501, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+length = 13
+palbright = 30,30,30
+palcontrast = 140,140,140
+paladd = -10,-10,-10
+palmul = 0.85,0.85,0.85
+timegap = 1
+framegap = 2
+trans = Add
+time = 2
+
+[State 7501, AfterImageTime]
+type = AfterImageTime
+trigger1 = 1
+time = 2
+
+[State 7501, ChangeState]
+type = ChangeState
+trigger1 = pos y <= -50
+value = 600
+ctrl = 0
+
+;---------------------------------------------------------------------------------------------
+;Super Jump for AI Launcher
+[Statedef 7502]
+type    = A
+physics = A
+ctrl = 1
+
+[State 7502, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+length = 13
+palbright = 30,30,30
+palcontrast = 140,140,140
+paladd = -10,-10,-10
+palmul = 0.85,0.85,0.85
+timegap = 1
+framegap = 2
+trans = Add
+time = 2
+
+[State 7502, AfterImageTime]
+type = AfterImageTime
+trigger1 = 1
+time = 2
+
+[State 7505, Vel]
+type = VelAdd
+triggerall = Vel X <= 2.5
+trigger1 = command = "holdfwd"
+trigger1 = Anim != 42
+x = 0.25
+
+;-----------------------------------------------------------------------
+[Statedef 8420]
+type = S
+movetype = I
+physics = N
+anim = 11111
+
+[State 8420, EnvShake]
+type = EnvShake
+trigger1 = (!Time)
+time = 12
+freq = 120
+ampl = -3
+phase = 90
+
+[State 8420, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S8420,0
+abspan = 1
+
+[State 8420, EnvColor]
+type = EnvColor
+trigger1 = time = 0
+trigger2 = time = 5
+trigger3 = time = 10
+trigger4 = time = 15
+trigger5 = time = 20
+value = 255,255,255
+time = 2
+
+[State 0, AllPalFX]
+type = AllPalFX
+trigger1 = time = 0
+trigger2 = time = 5
+trigger3 = time = 10
+trigger4 = time = 15
+trigger5 = time = 20
+time = 2
+add = 255,255,255
+
+[State 8420, 15]
+type = Explod
+trigger1 = Time = 0
+ID = 8420
+anim = 8420
+postype = Back
+pos = 0,0
+scale = 1,1
+sprpriority = -1
+ownpal = 0
+ignorehitpause = 1
+bindtime = -1
+removetime = 20
+
+
+;-----------------------------------------------------------------------
+[Statedef 8400]
+type = S
+movetype = I
+physics = N
+anim = 11111 ;Invisible anim.
+
+[State 8400: EnvColor]
+type = EnvColor
+trigger1 = (Time < 12)
+value = 0,0,0
+time = 1
+under = 1
+
+[State 8400, PlaySnd]
+type = PlaySnd
+trigger1 =  time = 0
+value = s8400,0
+abspan = 1
+
+[State 8400, PlaySnd]
+type = PlaySnd
+trigger1 =  time = 0
+value = s8400,1
+abspan = 1
+
+[State 3315, 15]
+type = Explod
+trigger1 = Time = 0
+sprpriority = -4
+supermovetime = -1
+ID = 8040
+anim = 8400
+postype = Back
+pos = 0,0
+sprpriority = -1
+ownpal = 1
+ignorehitpause = 1
+bindtime = -1
+
+[State 3315, 15]
+type = Explod
+trigger1 = Time = 0
+sprpriority = 10
+supermovetime = -1
+anim = 8401
+postype = Back
+pos = 0,0
+sprpriority = -1
+ownpal = 1
+ignorehitpause = 1
+bindtime = -1
+
+[State 8400, Super Finish]
+type = explod
+trigger1 = time = 0
+anim = 8402
+pos = 160,120
+id = 8402
+bindtime = -1
+postype = left
+sprpriority = 9
+scale = .5,.5
+ownpal = 1
+supermove = 1
+removeongethit = 1
+
+[State 8400, Modify]
+type = ModifyExplod
+trigger1 = time < 10
+ID = 8402
+scale = .7*(time*.8),.7*(time*.8)

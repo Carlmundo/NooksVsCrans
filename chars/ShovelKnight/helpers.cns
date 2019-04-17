@@ -1,0 +1,1577 @@
+;---------------------------------------------------------------------------
+;Assist Plague Knight
+[StateDef 2000]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2000
+poweradd = 25
+
+[State 2000, Helper]
+type = Helper
+trigger1 = time = 0
+helpertype = normal ;player
+name = "Plague Knight"
+ID = 2001
+stateno = 2001
+pos = -60,0
+postype = p1
+ownpal = 1
+size.xscale = 2.5
+size.yscale = 2.5
+
+[State 2000, end]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Plague Knight Appears and Attacks
+[StateDef 2001]
+type = S
+movetype= A
+physics = N
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2001
+sprpriority = 2
+
+[State 2001, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+trigger2 = animelem = 32
+value = S2000,0
+
+[State 2001, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 4
+trigger2 = animelem = 9
+trigger3 = animelem = 14
+value = S2000,1
+
+[State 2001, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 19
+value = S40,1
+
+[State 2001, Plague Teleport]
+type = Explod
+trigger1 = animelem = 1
+trigger2 = animelem = 32
+anim = 2005
+pos = 0,0
+postype = p1
+scale = 3,3
+sprpriority = 4
+shadow = -1,0,0
+
+[State 2001, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2001, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2002
+time = -1
+
+[State 2001, Helper]
+type = Helper
+trigger1 = animelem = 4
+trigger2 = animelem = 9
+trigger3 = animelem = 14
+helpertype = normal ;player
+name = "Plague Bomb"
+stateno = 2003
+pos = 20,-25
+postype = p1
+ownpal = 1
+size.xscale = 2.5
+size.yscale = 2.5
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[State 2001, StateTypeSet]
+type = StateTypeSet
+trigger1 = time = 44
+movetype = I
+
+[State 2001, 3]
+type = Destroyself
+trigger1 = time = 225
+
+;---------------------------------------------------------------------------
+;Plague Knight Hit
+[Statedef 2002]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+ctrl = 0
+velset = -10,0
+sprpriority = 2
+anim = 2002
+
+[State 2002, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 2
+value = S2000,0
+
+[State 2002, Plague Teleport]
+type = Explod
+trigger1 = animelem = 2
+anim = 2005
+pos = 0,0
+postype = p1
+scale = 3,3
+sprpriority = 4
+shadow = -1,0,0
+
+[State 2002, end]
+type = Destroyself
+trigger1 = time = 150
+
+;---------------------------------------------------------------------------
+[Statedef 2003]
+type    = A
+movetype= A
+physics = N
+juggle  = 0
+velset = 10,-10
+ctrl = 0
+anim = 2003
+poweradd = 0
+sprpriority = 4
+
+[State 2003, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2004
+time = -1
+
+[State 2003, AfterImageTime]
+type = AfterImageTime
+trigger1 = 1
+time = 2
+
+[State 2003, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = 1
+
+[State 2003, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 2003, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2003, HitDef]
+type = HitDef
+trigger1 = time = 0
+attr = A, SP
+damage = 10, 0
+animtype = light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 0, 10
+sparkno = -1
+guard.sparkno = s10006
+sparkxy = 0, 0
+hitsound = -1
+guardsound = -1
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = -4
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = -1.4,-3
+air.hittime = 12
+
+[State 2003, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2003, 2]
+type = changestate
+trigger1 = movecontact
+trigger2 =  pos y >= 0 && vel y >= 0
+value = 2004
+ignorehitpause = 1
+
+[State 2003, AssertSpecial]
+type = AssertSpecial
+trigger1 = pos y > 0
+flag = noshadow
+
+[State 2003, 2]
+type = destroyself
+trigger1 = time = 100
+
+;---------------------------------------------------------------------------
+[Statedef 2004]
+type    = A
+movetype= A
+physics = N
+juggle  = 0
+velset = 0,0
+ctrl = 0
+poweradd = 0
+anim = 2004
+sprpriority = 4
+
+[State 2004, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S2000,2
+
+[State 2004, 2]
+type = destroyself
+trigger1 = animtime = 0
+
+;---------------------------------------------------------------------------
+;Assist King Knight
+[StateDef 2100]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2000
+poweradd = 45
+
+[State 2100, Helper]
+type = Helper
+trigger1 = time = 0
+helpertype = normal ;player
+name = "King Knight"
+ID = 2001
+stateno = 2101
+pos = -200,-150
+postype = p1
+ownpal = 1
+size.xscale = 2.5
+size.yscale = 2.5
+
+[State 2100, end]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;King Knight Appears
+[StateDef 2101]
+type = A
+movetype= A
+physics = N
+juggle  = 1
+velset = 12,-5
+ctrl = 0
+anim = 2101
+
+[State 2101, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S40,1
+
+[State 2101, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = 1
+
+[State 2101, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2101, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2104
+time = -1
+
+[State 2102, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2102, end]
+type = ChangeState
+trigger1 = pos y >= 0 && vel y >= 0
+value = 2102
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;King Knight Attacks
+[StateDef 2102]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2102
+facep2 = 1
+
+[State 2102, PlaySnd]
+type = VelSet
+trigger1 = animelem = 7
+x = 30
+
+[State 2102, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 7
+value = S1,2
+
+[State 2102, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 9
+value = S2100,0
+
+[State 2102, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2102, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2102, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2104
+time = -1
+
+[State 2102, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, SA
+damage = 45, 0
+animtype = Medium
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 0, 10
+sparkno = s10001
+guard.sparkno = s10006
+sparkxy = -25, -25
+hitsound  = S20,6
+guardsound = S8500, 0
+ground.type = Low
+ground.slidetime = 5
+ground.hittime  = 25
+ground.velocity = -4
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 12
+
+[State 2102, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 2102, 3]
+type = ChangeState
+trigger1 = animtime = 0
+value = 2103
+
+;---------------------------------------------------------------------------
+;King Knight Leaves
+[StateDef 2103]
+type = S
+movetype= A
+physics = N
+juggle  = 1
+velset = -20,-20
+ctrl = 0
+anim = 2101
+
+[State 2103, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S41,0
+
+[State 2103, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = 1
+
+[State 2103, DestroySelf]
+type = DestroySelf
+trigger1 = time = 150
+
+;---------------------------------------------------------------------------
+;King Knight Hit 1
+[StateDef 2104]
+type = A
+movetype= A
+physics = N
+juggle  = 1
+velset = -5,-13
+ctrl = 0
+anim = 2103
+
+[State 2104, Explod]
+type = Explod
+trigger1 = time = 0
+anim = 2105
+pos = -30,-30
+postype = p1
+velocity = -10,-15
+accel = 0,1
+removetime = 100
+scale = 2.5,2.5
+sprpriority = 4
+
+[State 2104, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = 1
+
+[State 2104, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2104, end]
+type = ChangeState
+trigger1 = pos y >= 0 && vel y >= 0
+value = 2105
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;King Knight Hit - 1
+[StateDef 2105]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2104
+
+[State 2105, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2105, 3]
+type = Destroyself
+trigger1 = animtime = 0
+
+;---------------------------------------------------------------------------
+;Assist Specter Knight
+[StateDef 2200]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2000
+poweradd = 65
+
+[State 2200, Helper]
+type = Helper
+trigger1 = time = 0
+helpertype = normal ;player
+name = "Specter Knight"
+ID = 2001
+stateno = 2201
+pos = 50,0
+postype = p1
+ownpal = 1
+size.xscale = 2
+size.yscale = 2
+
+[State 2200, end]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Specter Knight Appears
+[StateDef 2201]
+type = A
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2201
+
+[State 2201, Velset]
+type = PosSet
+trigger1 = FrontEdgeBodyDist < 10
+trigger2 = p2bodydist X < 10
+x = -30
+ignorehitpause = 1
+
+[State 2201, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2200,0
+
+[State 2201, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2201, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2203
+time = -1
+
+[State 2201, ChangeState]
+type = ChangeState
+trigger1 = animtime = 0
+value = 2202
+
+;---------------------------------------------------------------------------
+;Specter Knight Attacks
+[StateDef 2202]
+type = A
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2202
+facep2 = 1
+
+[State 2202, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 5
+value = S2200,1
+
+[State 2202, PlaySnd]
+type = PlaySnd
+trigger1 = Animelem = 12
+value = S2200,2
+
+[State 2202, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 15
+value = S2200,0
+
+[State 2202, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2202, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2203
+time = -1
+
+[State 2202, PlaySnd]
+type = VelSet
+trigger1 = animelem = 3
+x = -15
+ignorehitpause = 1
+
+[State 2202, PlaySnd]
+type = VelSet
+trigger1 = animelem = 4
+x = 30
+ignorehitpause = 1
+
+[State 2202, PlaySnd]
+type = VelSet
+trigger1 = animelem = 9
+x = -15
+ignorehitpause = 1
+
+[State 2202, 1]
+type = HitDef
+trigger1 = animelem = 5
+attr = A, SA
+damage = 15, 0
+animtype = hard
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 5, 5
+sparkno = s10005
+guard.sparkno = s10006
+sparkxy = -45, -75
+hitsound  = S20,4
+guardsound = S8500, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 25
+ground.velocity = -3,-10
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 12
+fall = 1
+fall.recover = 0
+
+[State 1300, Helper]
+type = Helper
+trigger1 = Animelem = 12
+ID = 3101
+pos = 50,-120
+postype = p1
+stateno = 2205
+keyctrl = 0
+ownpal = 1
+sprpriority = 2
+size.xscale = 2
+size.yscale = 2
+helpertype = normal
+name = "Specter Knight's Scythe"
+
+[State 2202, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 2202, 3]
+type = destroyself
+trigger1 = animtime = 0
+
+;---------------------------------------------------------------------------
+;Specter Knight Hit 1
+[StateDef 2203]
+type = A
+movetype= A
+physics = N
+juggle  = 1
+velset = -5,-13
+ctrl = 0
+anim = 2203
+
+[State 2203, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = 1
+
+[State 2203, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2203, end]
+type = ChangeState
+trigger1 = pos y >= 0 && vel y >= 0
+value = 2204
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;Specter Knight Hit 2
+[StateDef 2204]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2204
+
+[State 2204, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2204, 3]
+type = Destroyself
+trigger1 = animtime = 0
+
+;---------------------------------------------------------------------------
+[Statedef 2205]
+type    = A
+movetype= A
+physics = N
+juggle  = 0
+velset = 15,-5
+ctrl = 0
+anim = 2205
+poweradd = 0
+sprpriority = 4
+
+[State 2205, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2205, VelAdd]
+type = VelAdd
+trigger1 = 1
+x = -1
+y = -.1
+
+[State 2205, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2205, HitDef]
+type = HitDef
+trigger1 = !time
+trigger2 = time%5 = 0
+attr = A, SP
+damage = 15, 1
+animtype = hard
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 5, 5
+sparkno = s10005
+guard.sparkno = s10006
+sparkxy = 0, 0
+hitsound = S20,4
+guardsound = S8500, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = 5,-10
+guard.velocity = -20
+airguard.velocity = -20,-.8
+air.type = High
+air.velocity = 5,-10
+air.hittime = 12
+fall = 1
+fall.recover = 0
+yaccel = .5
+envshake.time = 10
+envshake.ampl = 10
+
+[State 2205, 2]
+type = destroyself
+trigger1 = time = 150
+
+;---------------------------------------------------------------------------
+;Assist Propeller Knight
+[StateDef 2300]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2000
+poweradd = 25
+
+[State 2300, Helper]
+type = Helper
+trigger1 = time = 0
+helpertype = normal ;player
+name = "Propeller Knight"
+ID = 2001
+stateno = 2301
+pos = -300,0
+postype = p1
+ownpal = 1
+size.xscale = 2.5
+size.yscale = 2.5
+
+[State 2300, end]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Propeller Knight Attacks
+[StateDef 2301]
+type = S
+movetype= A
+physics = N
+juggle  = 1
+velset = 20
+ctrl = 0
+anim = 2300
+facep2 = 1
+
+[State 2301, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S910,0
+
+[State 2301, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2301, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2303
+time = -1
+
+[State 2301, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, SA
+damage = 25, 0
+animtype = light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 0, 10
+sparkno = s10003
+guard.sparkno = s10006
+sparkxy = -25, -45
+hitsound  = S20,3
+guardsound = S8500, 0
+ground.type = Low
+ground.slidetime = 5
+ground.hittime  = 25
+ground.velocity = -4,-8
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 12
+yaccel = .5
+
+[State 2301, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[State 0, AllPalFX]
+type = Envcolor
+trigger1 = movehit
+time = 10
+value = -255,-255,-255
+ignorehitpause = 1
+
+[State 2301, 3]
+type = ChangeState
+trigger1 = movecontact
+value = 2302
+ignorehitpause = 1
+
+[State 2301, 3]
+type = Destroyself
+trigger1 = time = 100
+
+;---------------------------------------------------------------------------
+;Propeller Knight Leaves
+[StateDef 2302]
+type = S
+movetype= A
+physics = N
+juggle  = 1
+velset = 7,-1
+ctrl = 0
+anim = 2301
+
+[State 2205, VelAdd]
+type = VelAdd
+trigger1 = 1
+x = -.3
+y = -.05
+
+[State 2103, DestroySelf]
+type = DestroySelf
+trigger1 = time = 150
+
+;---------------------------------------------------------------------------
+;Propeller Knight Hit 1
+[StateDef 2303]
+type = A
+movetype= A
+physics = N
+juggle  = 1
+velset = -5,-13
+ctrl = 0
+anim = 2302
+
+[State 2104, Explod]
+type = Explod
+trigger1 = time = 0
+anim = 2304
+pos = 0,0
+postype = p1
+velocity = 5,-1
+accel = .5,-.5
+removetime = 100
+scale = 2.5,2.5
+sprpriority = 4
+
+[State 2303, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = 1
+
+[State 2303, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2303, end]
+type = ChangeState
+trigger1 = pos y >= 0 && vel y >= 0
+value = 2304
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;Propeller Knight Hit - 1
+[StateDef 2304]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2303
+
+[State 2304, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2304, 3]
+type = Destroyself
+trigger1 = animtime = 0
+
+;---------------------------------------------------------------------------
+;Assist Mole Knight
+[StateDef 2400]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2000
+poweradd = 45
+
+[State 2400, Helper]
+type = Helper
+trigger1 = time = 0
+helpertype = normal ;player
+name = "Mole Knight"
+ID = 2001
+stateno = 2401
+pos = 0,0
+postype = p1
+ownpal = 1
+size.xscale = 2.25
+size.yscale = 2.25
+
+[State 2400, end]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Mole Knight Appears and Attacks
+[StateDef 2401]
+type = S
+movetype= A
+physics = N
+juggle  = 1
+ctrl = 0
+sprpriority = 2
+anim = 2400
+
+[State 2201, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2400,0
+
+[State 2201, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 11
+value = S2400,1
+
+[State 1301, PosAdd]
+type = PosAdd
+trigger1 = time = 0
+x = (P2Dist X)
+
+[State 2402, Explod]
+type = Explod
+trigger1 = time = 49
+anim = 2401
+pos = 0,0
+postype = p1
+scale = 4,4
+sprpriority = 4
+
+[State 2401, VelSet]
+type = VelSet
+trigger1 = animelem = 11
+y = -15
+
+[State 2401, VelAdd]
+type = VelAdd
+trigger1 = time >= 50
+y = .8
+
+[State 2401, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2401, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2402
+time = -1
+
+[State 2401, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, SA
+damage = 45, 0
+animtype = Medium
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 0, 0
+sparkno = s10001
+guard.sparkno = s10006
+sparkxy = -25, -55
+hitsound  = S20,6
+guardsound = S8500, 0
+ground.type = Low
+ground.slidetime = 5
+ground.hittime  = 25
+ground.velocity = -5,-15
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -5,-15
+air.hittime = 12
+fall = 1
+yaccel = .7
+
+[State 2401, PosSet]
+type = Assertspecial
+trigger1 = pos y >= 1
+flag = noshadow
+
+[State 2401, end]
+type = Destroyself
+trigger1 = time = 150
+
+;---------------------------------------------------------------------------
+;Mole Knight Hit 1
+[StateDef 2402]
+type = A
+movetype= A
+physics = N
+juggle  = 1
+velset = -5,-13
+ctrl = 0
+anim = 2402
+
+[State 2402, Explod]
+type = Explod
+trigger1 = time = 0
+anim = 2401
+pos = 0,0
+postype = p1
+scale = 4,4
+sprpriority = 4
+
+[State 2402, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = 1
+
+[State 2402, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2402, end]
+type = ChangeState
+trigger1 = pos y >= 0 && vel y >= 0
+value = 2403
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;Mole Knight Hit - 1
+[StateDef 2403]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2403
+
+[State 2403, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S1501,1
+
+[State 2403, EnvShake]
+type = EnvShake
+trigger1 = time = 0
+time = 10
+ampl = 20
+
+[State 2403, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2403, 3]
+type = Destroyself
+trigger1 = animtime = 0
+
+;---------------------------------------------------------------------------
+;Assist Polar Knight
+[StateDef 2500]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2000
+poweradd = 65
+
+[State 2500, Helper]
+type = Helper
+trigger1 = time = 0
+helpertype = normal ;player
+name = "Polar Knight"
+ID = 2001
+stateno = 2501
+pos = 50,400
+postype = p1
+ownpal = 1
+size.xscale = 2
+size.yscale = 2
+
+[State 2500, end]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Polar Knight Appears
+[StateDef 2501]
+type = A
+movetype= A
+physics = N
+juggle  = 1
+ctrl = 0
+sprpriority = 2
+velset = 2,-25
+anim = 2500
+
+[State 2503, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S2500,0
+
+[State 2502, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S40,1
+
+[State 2501, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = .7
+
+[State 2501, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2501, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2505
+time = -1
+
+[State 2501, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, SA
+damage = 65, 0
+animtype = hard
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = s10002
+guard.sparkno = s10006
+sparkxy = -0, -175
+hitsound  = S20,7
+guardsound = S8500, 0
+ground.type = Low
+ground.slidetime = 5
+ground.hittime  = 25
+ground.velocity = -3,-9
+guard.velocity = -30
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -3,-9
+air.hittime = 12
+yaccel = .2
+fall = 1
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = pos y >= 10
+flag = noshadow
+ignorehitpause = 1
+
+[State 2501, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2501, end]
+type = ChangeState
+trigger1 = pos y >= 0 && vel y >= 0
+value = 2502
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;Polar Knight Attacks
+[StateDef 2502]
+type = A
+movetype= A
+physics = N
+juggle  = 1
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+facep2 = 1
+anim = 2501
+
+[State 2502, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S1501,1
+
+[State 2503, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 5
+value = S2500,1
+
+[State 2502, EnvShake]
+type = EnvShake
+trigger1 = time = 0
+time = 20
+ampl = 20
+
+[State 2501, VelSet]
+type = VelSet
+trigger1 = animelem = 7
+x = 3
+
+[State 2501, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2501, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2505
+time = -1
+
+[State 2501, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2501, Helper]
+type = Helper
+trigger1 = time = 40
+helpertype = normal ;player
+name = "Big Snowball"
+stateno = 2503
+pos = 50,-20
+postype = p1
+size.xscale = 2
+size.yscale = 2
+
+[State 2501, Helper]
+type = Helper
+trigger1 = time = 43
+helpertype = normal ;player
+name = "Big Snowball"
+stateno = 2503
+pos = 50,-20
+postype = p1
+size.xscale = 2
+size.yscale = 2
+
+[State 2501, Helper]
+type = Helper
+trigger1 = time = 46
+helpertype = normal ;player
+name = "Big Snowball"
+stateno = 2503
+pos = 50,-20
+postype = p1
+size.xscale = 2
+size.yscale = 2
+
+[State 2501, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, SA
+damage = 65, 0
+animtype = hard
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = s10002
+guard.sparkno = s10006
+sparkxy = -0, -175
+hitsound  = S20,7
+guardsound = S8500, 0
+ground.type = Low
+ground.slidetime = 5
+ground.hittime  = 25
+ground.velocity = -3,-15
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -3,-8
+air.hittime = 12
+fall = 1
+
+[State 2501, end]
+type = Destroyself
+trigger1 = time = 300
+
+;---------------------------------------------------------------------------
+[Statedef 2503]
+type    = A
+movetype= A
+physics = N
+juggle  = 0
+velset = 3+random%10,-20+random%10
+ctrl = 0
+anim = 2505
+poweradd = 0
+sprpriority = 4
+
+[State 2503, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2504
+time = -1
+
+[State 2503, AfterImageTime]
+type = AfterImageTime
+trigger1 = 1
+time = 2
+
+[State 2503, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = .7
+
+[State 2503, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 2503, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 2503, HitDef]
+type = HitDef
+trigger1 = time = 5
+attr = A, SP
+damage = 25, 0
+animtype = hard
+guardflag = MA
+hitflag = MAFDP
+priority = 3, Hit
+pausetime = 3, 8
+sparkno = -1
+guard.sparkno = s10006
+sparkxy = 0, 0
+hitsound = -1
+guardsound = S8500, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = -7,-8
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = -7,-8
+air.hittime = 12
+yaccel = .5
+fall = 1
+getpower = 0
+envshake.time = 20
+envshake.ampl = 10
+
+[State 2503, 2]
+type = changestate
+trigger1 = movecontact
+value = 2504
+ignorehitpause = 1
+
+[State 2503, AssertSpecial]
+type = AssertSpecial
+trigger1 = pos y > 0
+flag = noshadow
+
+[State 2503, 2]
+type = destroyself
+trigger1 = time = 100
+
+;---------------------------------------------------------------------------
+[Statedef 2504]
+type    = A
+movetype= A
+physics = N
+juggle  = 0
+velset = 0,0
+ctrl = 0
+anim = 2506
+poweradd = 0
+sprpriority = 4
+
+[State 2504, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S2500,2
+
+[State 2504, 2]
+type = destroyself
+trigger1 = animtime = 0
+
+;---------------------------------------------------------------------------
+;Polar Knight Hit
+[StateDef 2505]
+type = A
+movetype= A
+physics = N
+juggle  = 1
+ctrl = 0
+sprpriority = 2
+velset = -3,-10
+anim = 2502
+
+[State 2104, Explod]
+type = Explod
+trigger1 = time = 0
+anim = 2504
+pos = -30,-30
+postype = p1
+velocity = -10,-15
+accel = 0,1
+removetime = 100
+scale = 2.5,2.5
+sprpriority = 4
+
+[State 2501, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = .5
+
+[State 2505, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2505, end]
+type = ChangeState
+trigger1 = pos y >= 0 && vel y >= 0
+value = 2506
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;Polar Knight Hit End
+[StateDef 2506]
+type = A
+movetype= A
+physics = N
+juggle  = 1
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+anim = 2503
+
+[State 2506, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S1501,1
+
+[State 2506, EnvShake]
+type = EnvShake
+trigger1 = time = 0
+time = 20
+ampl = 20
+
+[State 2506, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2506, end]
+type = Destroyself
+trigger1 = animtime = 0

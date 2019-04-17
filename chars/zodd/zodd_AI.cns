@@ -1,0 +1,914 @@
+
+;AI
+
+
+;■AI起動ヘルパー■
+
+[Statedef 9999]
+anim=0;なにも表示しないアニメ
+ctrl=0
+
+[State 9999]
+type = assertspecial
+trigger1 = 1
+flag = invisible
+
+[State 9999,間違いで本体が来たら立ちへ移行]
+type=selfstate
+trigger1=!ishelper
+value=0
+
+[State 9999,プレイヤー判定]
+type=varset
+trigger1=command="up"&&root,command="up"
+trigger2=command="down"&&root,command="down"
+trigger3=command="back"&&root,command="back"
+trigger4=command="fwd"&&root,command="fwd"
+trigger5=command="a"&&root,command="a"
+trigger6=command="b"&&root,command="b"
+trigger7=command="c"&&root,command="c"
+trigger8=command="x"&&root,command="x"
+trigger9=command="y"&&root,command="y"
+trigger10=command="z"&&root,command="z"
+trigger11=command="start"&&root,command="start"
+var(0)=-1
+
+[State 9999,立ったら消失]
+Type = DestroySelf
+triggerall = isHelper
+trigger1 = root,var(0) || var(0)=-1
+trigger2=command="up"&&root,command="up"
+trigger3=command="down"&&root,command="down"
+trigger4=command="back"&&root,command="back"
+trigger5=command="fwd"&&root,command="fwd"
+trigger6=command="a"&&root,command="a"
+trigger7=command="b"&&root,command="b"
+trigger8=command="c"&&root,command="c"
+trigger9=command="x"&&root,command="x"
+trigger10=command="y"&&root,command="y"
+trigger11=command="z"&&root,command="z"
+trigger12=command="start"&&root,command="start"
+
+[State 9999,ﾌﾗｸﾞON]
+type=varset
+triggerall=var(0)!=-1
+trigger1=root,command="up"
+trigger2=root,command="down"
+trigger3=root,command="back"
+trigger4=root,command="fwd"
+trigger5=root,command="a"
+trigger6=root,command="b"
+trigger7=root,command="c"
+trigger8=root,command="x"
+trigger9=root,command="y"
+trigger10=root,command="z"
+trigger11=root,command="start"
+var(0)=1
+
+
+
+
+
+[Statedef -3]
+
+
+;■ＡＩフラグ■
+
+[State -3, AIフラグセット]
+type = VarSet
+triggerall = !var(0)
+triggerall = RoundState = 2
+trigger1 = Command = "AI0"
+trigger2 = Command = "AI1"
+trigger3 = Command = "AI2"
+trigger4 = Command = "AI3"
+trigger5 = Command = "AI4"
+trigger6 = Command = "AI5"
+trigger7 = Command = "AI6"
+trigger8 = Command = "AI7"
+trigger9 = Command = "AI8"
+trigger10 = Command = "AI9"
+trigger11 = Command = "AI10"
+trigger12 = Command = "AI11"
+trigger13 = Command = "AI12"
+trigger14 = Command = "AI13"
+trigger15 = Command = "AI14"
+trigger16 = Command = "AI15"
+trigger17 = Command = "AI16"
+trigger18 = Command = "AI17"
+trigger19 = Command = "AI18"
+trigger20 = Command = "AI19"
+trigger21 = Command = "AI20"
+trigger22 = Command = "AI21"
+trigger23 = Command = "AI22"
+trigger24 = Command = "AI23"
+trigger25 = Command = "AI24"
+trigger26 = Command = "AI25"
+trigger27 = Command = "AI26"
+trigger28 = Command = "AI27"
+trigger29 = Command = "AI28"
+trigger30 = Command = "AI29"
+trigger31 = Command = "AI30"
+trigger32 = Command = "AI31"
+trigger33 = Command = "AI32"
+trigger34 = Command = "AI33"
+trigger35 = Command = "AI34"
+trigger36 = Command = "AI35"
+trigger37 = Command = "AI36"
+trigger38 = Command = "AI37"
+trigger39 = Command = "AI38"
+trigger40 = Command = "AI39"
+trigger41 = Command = "AI40"
+trigger42 = Command = "AI41"
+trigger43 = Command = "AI42"
+trigger44 = Command = "AI43"
+trigger45 = Command = "AI44"
+trigger46 = Command = "AI45"
+trigger47 = Command = "AI46"
+trigger48 = Command = "AI47"
+trigger49 = Command = "AI48"
+trigger50 = Command = "AI49"
+trigger51 = Command = "AI50"
+trigger52 = Helper(9999),var(0)
+var(0) = 5  ;■■■　ＡＩ レベル １(弱)～１０(強）　 AI Level  1(weak)～10(strong）■■■
+
+
+[State -3, AI起動用ヘルパー]
+type=helper
+trigger1=!NumHelper(9999)
+trigger1=roundstate=2
+trigger1=alive
+trigger1= Var(0) =0
+trigger1=PrevStateNo=191 || PrevStateNo=5900
+trigger1=ctrl && stateno=0
+helpertype=normal
+name="AI9999"
+stateno=9999
+ID=9999
+pos=9999,9999
+keyctrl=1
+pausemovetime=2147483647
+supermovetime=2147483647
+persistent = 0
+
+[State -3, 関係無いステートに行かないように]
+type=changestate
+trigger1= ishelper(9999)
+trigger1= stateno!=9999
+value=9999
+
+
+
+
+
+
+
+
+
+
+
+;■ＡＩ学習コマンド■ 
+
+
+[State -3] ;AI学習用  最少ヘルパー数
+type = VarSet
+triggerall = RoundState = 2 ;戦闘中
+triggerall = Enemynear, Alive = 1
+trigger1 = var(40) > EnemyNear, NumHelper
+var(40) =  EnemyNear, NumHelper
+
+[State -3] ;AI学習用カウンタ　上段飛び道具
+type = VarAdd
+triggerall = RoundState = 2 ;戦闘中
+triggerall = Enemynear, Alive = 1
+triggerall = var(41) < 100
+trigger1 = EnemyNear,HitDefAttr = SA,NP,SP,HP
+trigger2 = EnemyNear, NumHelper > var(40) || EnemyNear, NumProj > 0
+var(41) = 1
+
+[State -3] ;AI学習用カウンタ　下段飛び道具
+type = VarAdd
+triggerall = RoundState = 2 ;戦闘中
+triggerall = Enemynear, Alive = 1
+triggerall = var(42) < 100
+trigger1 =  EnemyNear,HitDefAttr = C,NP,SP,HP
+trigger2 = EnemyNear, NumHelper > var(40) || EnemyNear, NumProj > 0
+var(42) = 1
+
+[State -3] ;AI学習用カウンタ　投げ
+type = VarAdd
+triggerall = RoundState = 2 ;戦闘中
+triggerall = var(43) < 100
+trigger1 = P2BodyDist X <= 30
+trigger1 =  EnemyNear,HitDefAttr = SCA, NT, ST, HT
+var(43) = 1
+
+[State -3] ;AI学習用  投げが通用する
+type = Varset
+triggerall = RoundState = 2 ;戦闘中
+triggerall = var(45) <= 100
+trigger1 = stateno = 2000 ;投げの判定ステート
+trigger1 = movehit
+var(45) = 100
+
+[State -3] ;AI学習用カウンタ　相手滞空時間
+type = VarAdd
+triggerall = RoundState = 2 ;戦闘中
+triggerall = var(46) < 500
+trigger1 = P2statetype = A
+var(46) = 1
+
+
+[State -3] ;AI学習用カウンタ　時間経過で忘却
+type = VarAdd
+triggerall = MoveType != H
+triggerall = var(41) > 0
+trigger1 = (time%5) = 0
+var(41) = -1
+
+[State -3] ;AI学習用カウンタ　時間経過で忘却
+type = VarAdd
+triggerall = MoveType != H
+triggerall = var(42) > 0
+trigger1 = (time%5) = 0
+var(42) = -1
+
+[State -3] ;AI学習用カウンタ　時間経過で忘却
+type = VarAdd
+triggerall = MoveType != H
+triggerall = var(43) > 0
+trigger1 = (time%50) = 0
+var(43) = -1
+
+[State -3] ;AI学習用カウンタ　時間経過で忘却
+type = VarAdd
+triggerall = MoveType != H
+triggerall = var(44) > 0
+trigger1 = (time%50) = 0
+var(44) = -1
+
+[State -3] ;AI学習用カウンタ　時間経過で忘却
+type = VarAdd
+triggerall = MoveType != H
+triggerall = var(45) > 0
+trigger1 = (time%20) = 0
+var(45) = -1
+
+[State -3] ;AI学習用カウンタ　相手滞空時間初期化
+type = VarSet
+triggerall = RoundState = 2 ;戦闘中
+trigger1 = P2statetype != A
+var(46) = 0
+
+
+
+;■ＡＩ防御コマンド■
+
+
+[State -3] ;ガード
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 1 ;AI Lv制限
+triggerall = ctrl
+;triggerall =anim != 9400
+triggerall = StateNo != [120, 155]
+triggerall = InGuardDist
+;triggerall = P2movetype = A
+triggerall = statetype = S || statetype = C
+trigger1 = Random < Var(0) * 10   ;AI 使用頻度
+trigger2 = P2MoveType = A ;めくり対策
+trigger2 = P2BodyDist X = [-50, 0]
+trigger2 = Random < Var(0) * 10   ;AI 使用頻度
+trigger3 = var(41) > 20 || var(42) > 20 ;■ AI学習用カウンタ 飛び道具 ■
+trigger3 = Random < Var(0) * 30   ;AI 使用頻度
+trigger4 = var(41) > enemynear, NumHelper ;■ AI学習用カウンタ ヘルパー増加 ■
+trigger4 = Random < Var(0) * 30   ;AI 使用頻度
+Value = 120
+
+
+[State -3] ;ガード（立ち）
+type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 1 ;AI Lv制限
+triggerall = ctrl
+triggerall = InGuardDist
+triggerall = statetype = S || statetype = C
+triggerall = P2movetype = A
+trigger1 = StateType = S && (P2statetype = S || P2statetype = A)
+trigger1 = Random < Var(0) * 20   ;AI 使用頻度
+trigger2 = StateType = C && P2statetype = S
+trigger2 = Random < Var(0) * 20   ;AI 使用頻度
+trigger3 = StateType = C && P2statetype = A
+trigger3 = Random < Var(0) * 20   ;AI 使用頻度
+Value = 130
+
+[State -3] ;ガード（しゃがみ）
+type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 1 ;AI Lv制限
+triggerall = ctrl
+triggerall = InGuardDist
+triggerall = statetype = S || statetype = C
+triggerall = P2movetype = A
+trigger1 = StateType = C && P2statetype = C
+trigger1 = Random < Var(0) * 20   ;AI 使用頻度
+trigger2 = StateType = S && P2statetype = C
+trigger2 = Random < Var(0) * 20   ;AI 使用頻度
+Value = 131
+
+[State -3] ;ガード（空中）
+type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 1 ;AI Lv制限
+triggerall = ctrl
+;triggerall = StateNo != [120, 155]
+triggerall = InGuardDist
+triggerall = statetype = A
+triggerall = P2movetype = A
+trigger1 = Random < Var(0) * 20   ;AI 使用頻度
+trigger2 = var(41) > 20 || var(42) > 20 ;■ AI学習用カウンタ 飛び道具 ■
+trigger2 = Random < Var(0) * 20   ;AI 使用頻度
+trigger3 = var(41) > enemynear, NumHelper ;■ AI学習用カウンタ ヘルパー増加 ■
+trigger3 = Random < Var(0) * 10   ;AI 使用頻度
+Value = 132
+
+
+
+
+
+
+;■ＡＩ攻撃コマンド■
+
+[State -3] ;角返し01
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 4 ;AI Lv制限
+triggerall = power >= 1000
+triggerall = StateType = S || StateType = C
+triggerall = (stateno =[150, 153]) || stateno = 140
+trigger1 = P2MoveType = A
+trigger1 = P2BodyDist X = [-10, 60]
+trigger1 = P2BodyDist Y = [-30, 0]
+trigger1 = Random < Var(0) * 70   ;AI 使用頻度
+Value = ifelse(Statetype = S, 2050, 2055)
+
+
+[State -3] ;上段返し投げ
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 5 ;AI Lv制限
+triggerall = StateType = S || StateType = C
+triggerall = stateno = 0 || ctrl
+triggerall = P2MoveType = A
+triggerall = random < var(45)*10  ; ■ AI学習用カウンタ  投げが通用する■
+trigger1 = P2StateType = S ;相手地上立ち
+trigger1 = P2BodyDist X = [-10, 50]
+trigger1 = P2BodyDist Y = [-30, 0]
+trigger1 = var(41) < 20 && var(42) < 20 ;■■ AI学習用カウンタ 飛び道具が希薄 ■■
+trigger1 = Random < Var(0) * 20   ;AI 使用頻度
+trigger2 = EnemyNear, vel X > 5 ;相手突進
+trigger2 = EnemyNear, HitDefAttr = , NA, SA, HA ;打撃のみ
+trigger2 = P2BodyDist X = [0, 100]
+trigger2 = P2BodyDist Y = [-80, 0]
+trigger2 = var(41) < 20 && var(42) < 20 ;■■ AI学習用カウンタ 飛び道具が希薄 ■■
+trigger2 = Random < Var(0) * 30
+trigger3 = P2StateType = A ;相手空中
+trigger3 = P2BodyDist X = [-30, 150]
+trigger3 = P2BodyDist Y = [-150, 0]
+;trigger3 = EnemyNear, HitDefAttr = , NA, SA, HA ;打撃のみ
+trigger3 = EnemyNear, vel X > 0 || EnemyNear, vel Y > 0
+trigger3 = Random < Var(0) * 70
+Value = 2150
+
+[State -3] ;上段返し投げ 追撃
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 7 ;AI Lv制限
+triggerall = stateno =2155 && animelemtime(20)>=0 && animelemtime(23)<0
+trigger1 = Random < Var(0) * 50 ;AI 使用頻度
+Value = 2200
+
+
+[State -3] ;投げ01
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 3 ;AI Lv制限
+triggerall = StateType = S || StateType = C
+triggerall = stateno = 0 || ctrl
+triggerall = random < var(45)*10  ; ■ AI学習用カウンタ  投げが通用する■
+triggerall = P2StateType = S || P2StateType = C ;相手立ち or しゃがみ
+triggerall = P2stateno != 5120 ;相手否起き上がり中
+triggerall = P2BodyDist X = [-20, 80]
+triggerall = P2BodyDist Y = [-30, 0]
+trigger1 = Random < Var(0) * (10+var(44)*3) ;AI 使用頻度   ■ AI学習用カウンタ  対特殊防御■
+Value = 2000
+
+[State -3] ;投げ 追撃
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 6 ;AI Lv制限
+triggerall = stateno =2005 && animelemtime(20)>=0 && animelemtime(23)<0
+trigger1 = Random < Var(0) * 50 ;AI 使用頻度
+Value = 2250
+
+
+[State -3] ;引っかく01
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = stateno = 0 || ctrl
+triggerall = StateType = S
+;trigger1 = P2StateType = A  || P2StateType = S ;相手空中 or 地上立ち
+trigger1 = P2StateType != L  ;相手否ダウン
+trigger1 = P2BodyDist X = [0, 110]
+trigger1 = P2BodyDist Y = [-40, 0]
+trigger1 = Random < Var(0) * (30-var(44)) ;AI 使用頻度   ■ AI学習用カウンタ  対特殊防御■ 
+Value = 1100
+
+[State -3] ;引っかく01→02
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 3 ;AI Lv制限
+triggerall = stateno =1100 && animelemtime(9)>=0 && animelemtime(12)<0
+trigger1 = movecontact ||  P2StateType = C  ;相手しゃがみ
+trigger1 = P2BodyDist X = [-10, 90]
+trigger1 = P2BodyDist Y = [-50, 0]
+trigger1 = Random < Var(0) * 40 ;AI 使用頻度
+trigger2 =  movehit
+;trigger2 = P2BodyDist X = [-10, 90]
+;trigger2 = P2BodyDist Y = [-50, 0]
+trigger2 = Random < Var(0) * 70 ;AI 使用頻度
+Value = 1150
+
+[State -3] ;しゃがみ引っかき03(引っかく連携)
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 5 ;AI Lv制限
+triggerall = stateno =1150 && animelemtime(11)>=0 && animelemtime(15)<0
+trigger1 = P2StateType = A  || P2StateType = C ;相手空中 or 地上しゃがみ
+trigger1 = movecontact
+trigger1 = P2BodyDist X = [0, 90]
+trigger1 = P2BodyDist Y = [-50, 0]
+trigger1 = Random < Var(0) * 20 ;AI 使用頻度
+trigger2 = movehit || P2StateType = S  ;相手立ち
+;trigger2 = P2BodyDist X = [-20, 100]
+;trigger2 = P2BodyDist Y = [-50, 0]
+trigger2 = Random < Var(0) * 70 ;AI 使用頻度
+Value = 1650
+
+[State -3] ;踏む01(引っかく連携)
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 5 ;AI Lv制限
+triggerall = stateno =1150 && animelemtime(11)>=0 && animelemtime(15)<0
+trigger1 = P2StateType = A  || P2StateType = S ;相手空中 or 地上立ち
+trigger1 = movecontact
+trigger1 = P2BodyDist X = [0, 90]
+trigger1 = P2BodyDist Y = [-50, 0]
+trigger1 = Random < Var(0) * 20 ;AI 使用頻度
+trigger2 = movehit || P2StateType = C  ;相手しゃがみ
+;trigger2 = P2BodyDist X = [-20, 100]
+;trigger2 = P2BodyDist Y = [-50, 0]
+trigger2 = Random < Var(0) * 70 ;AI 使用頻度
+Value = 1600
+
+
+[State -3] ;引っかく03
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = stateno = 0 || ctrl
+triggerall = StateType = S
+;trigger1 = P2StateType = A  || P2StateType = S ;相手空中 or 地上立ち
+trigger1 = P2StateType != L  ;相手否ダウン
+trigger1 = P2BodyDist X = [0, 50]
+trigger1 = P2BodyDist Y = [-40, 0]
+trigger1 = Random < Var(0) * 10 ;AI 使用頻度
+Value = 1750
+
+
+[State -3] ;抜き手01
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = stateno = 0 || ctrl
+triggerall = StateType = S
+triggerall = P2StateType != L  ;相手否ダウン
+trigger1 = P2BodyDist X = [-10, 50]
+trigger1 = P2BodyDist Y = [-40, 0]
+trigger1 = BackEdgeDist < 50
+trigger1 = Random < Var(0) * (10-var(44)) ;AI 使用頻度   ■ AI学習用カウンタ  対特殊防御■ 
+trigger2 = P2StateType = S ;相手地上立ち
+trigger2 = P2BodyDist X = [90, 200]
+trigger2 = P2BodyDist Y = [-30, 0]
+trigger2 = var(41) < 20 && var(42) < 20 ;■■ AI学習用カウンタ 飛び道具が希薄 ■■
+trigger2 = Random < Var(0) * (10-var(44)) ;AI 使用頻度   ■ AI学習用カウンタ  対特殊防御■ 
+Value = 1800
+
+
+[State -3] ;打ち上げる01短距離
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = stateno = 0 || ctrl
+triggerall = StateType = S
+trigger1 = P2StateType = C ;相手しゃがみ
+trigger1 = P2BodyDist X = [-20, 79]
+trigger1 = P2BodyDist Y = [-50, 0]
+trigger1 = Random < Var(0) * 30   ;AI 使用頻度
+trigger2 = P2StateType = S ;地上立ち
+trigger2 = P2BodyDist X = [0, 79]
+trigger2 = P2BodyDist Y = [-30, 0]
+trigger2 = Random < Var(0) * 10   ;AI 使用頻度
+trigger3 = P2StateType = A ;相手空中
+trigger3 = P2BodyDist X = [-10, 79]
+trigger3 = P2BodyDist Y = [-100, 0]
+trigger3 = Random < Var(0) * 10   ;AI 使用頻度
+Value = 1255
+
+[State -3] ;打ち上げる01
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = stateno = 0 || ctrl
+triggerall = StateType = S
+trigger1 = P2StateType = C ;相手しゃがみ
+trigger1 = P2BodyDist X = [80, 110]
+trigger1 = P2BodyDist Y = [-50, 0]
+trigger1 = Random < Var(0) * 30   ;AI 使用頻度
+trigger2 = P2StateType = S ;地上立ち
+trigger2 = P2BodyDist X = [80, 110]
+trigger2 = P2BodyDist Y = [-30, 0]
+trigger2 = Random < Var(0) * 10   ;AI 使用頻度
+trigger3 = P2StateType = A ;相手空中
+trigger3 = P2BodyDist X = [-10, 110]
+trigger3 = P2BodyDist Y = [-100, 0]
+trigger3 = Random < Var(0) * 10   ;AI 使用頻度
+Value = 1250
+
+[State -3] ;打ち上げる01短距離→02
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 5 ;AI Lv制限
+triggerall = stateno =1255 && animelemtime(10)>=0 && animelemtime(15)<0
+trigger1 = movecontact
+trigger1 = P2BodyDist X = [-20, 130]
+trigger1 = P2BodyDist Y = [-100, 0]
+trigger1 = Random < Var(0) * 30 ;AI 使用頻度
+trigger2 = movehit
+trigger2 = P2BodyDist X = [-20, 130]
+trigger2 = P2BodyDist Y = [-100, 0]
+trigger2 = Random < Var(0) * 60 ;AI 使用頻度
+Value = 1300
+
+[State -3] ;打ち上げる01→02
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 5 ;AI Lv制限
+triggerall = stateno =1250 && animelemtime(14)>=0 && animelemtime(19)<0
+trigger1 = movecontact
+trigger1 = P2BodyDist X = [-20, 130]
+trigger1 = P2BodyDist Y = [-100, 0]
+trigger1 = Random < Var(0) * 30 ;AI 使用頻度
+trigger2 = movehit
+trigger2 = P2BodyDist X = [-20, 130]
+trigger2 = P2BodyDist Y = [-100, 0]
+trigger2 = Random < Var(0) * 60 ;AI 使用頻度
+Value = 1300
+
+
+
+[State -3] ;殴る01
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = stateno = 0 || ctrl
+triggerall = StateType = S
+trigger1 = P2StateType = L  ;相手ダウン時にダウン攻撃
+trigger1 = enemynear, alive = 1 ;ダウンで生存
+trigger1 = P2stateno != [2030, 2040] ;投げステート以外
+trigger1 = P2stateno != [2080, 2105] ;投げステート以外
+trigger1 = P2BodyDist X = [60, 120]
+trigger1 = P2BodyDist Y = [-30, 0]
+trigger1 = Random < Var(0) * 5   ;AI 使用頻度
+trigger2 = P2StateType = A  || P2StateType = S ;相手空中 or 地上立ち
+trigger2 = P2BodyDist X = [70, 150]
+trigger2 = P2BodyDist Y = [-50, 0]
+trigger2 = Random < Var(0) * (40-var(44)) ;AI 使用頻度   ■ AI学習用カウンタ  対特殊防御■ 
+Value = 1000
+
+[State -3] ;殴る01→02
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 3 ;AI Lv制限
+triggerall = stateno =1000 && animelemtime(15)>=0 && animelemtime(18)<0
+trigger1 = movecontact
+trigger1 = P2BodyDist X = [0, 140]
+trigger1 = P2BodyDist Y = [-50, 0]
+trigger1 = Random < Var(0) * 30 ;AI 使用頻度
+trigger2 = movehit
+trigger2 = P2BodyDist X = [0, 140]
+trigger2 = P2BodyDist Y = [-50, 0]
+trigger2 = Random < Var(0) * 60 ;AI 使用頻度
+Value = 1050
+
+[State -3] ;殴る02→03
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 5 ;AI Lv制限
+triggerall = stateno =1050 && animelemtime(16)>=0 && animelemtime(19)<0
+trigger1 = movecontact < 5
+trigger1 = P2BodyDist X = [-10, 140]
+trigger1 = P2BodyDist Y = [-50, 0]
+trigger1 = Random < Var(0) * 30 ;AI 使用頻度
+trigger2 = movehit
+trigger2 = P2BodyDist X = [-10, 140]
+trigger2 = P2BodyDist Y = [-50, 0]
+trigger2 = Random < Var(0) * 60 ;AI 使用頻度
+Value = 1200
+
+[State -3] ;殴る03→引っかく03
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 7 ;AI Lv制限
+triggerall = stateno =1200 && animelemtime(10)>=0 && animelemtime(13)<0
+trigger1 = movecontact < 5
+trigger1 = P2BodyDist X = [-10, 140]
+trigger1 = P2BodyDist Y = [-80, 0]
+trigger1 = Random < Var(0) * 20 ;AI 使用頻度
+trigger2 = movehit
+trigger2 = P2BodyDist X = [-10, 140]
+trigger2 = P2BodyDist Y = [-100, 0]
+trigger2 = Random < Var(0) * 70 ;AI 使用頻度
+Value = 1755
+
+
+
+[State -3] ;殴る06(水平)
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 4 ;AI Lv制限
+triggerall = stateno = 0 || ctrl
+triggerall = StateType = S
+trigger1 = P2StateType = A
+trigger1 = P2BodyDist X = [60, 200]
+trigger1 = P2BodyDist Y = [-150, -30]
+trigger1 = Random < Var(0) * 10   ;AI 使用頻度
+Value = 1700
+
+[State -3] ;引っかく03→殴る06(水平)
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 7 ;AI Lv制限
+trigger1 = stateno =1750 && animelemtime(14)>=0 && animelemtime(18)<0
+trigger1 = movehit
+trigger1 = P2BodyDist X = [-10, 200]
+trigger1 = P2BodyDist Y = [-150, -80]
+trigger1 = Random < Var(0) * 40   ;AI 使用頻度
+trigger2 = stateno =1755 && animelemtime(15)>=0 && animelemtime(19)<0
+trigger2 = movehit
+trigger2 = P2BodyDist X = [-10, 200]
+trigger2 = P2BodyDist Y = [-150, -80]
+trigger2 = Random < Var(0) * 40   ;AI 使用頻度
+Value = 1705
+
+
+[State -3] ;引っかく03→殴る07
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 7 ;AI Lv制限
+trigger1 = stateno =1750 && animelemtime(17)>=0 && animelemtime(22)<0
+trigger1 = movehit || movecontact
+trigger1 = P2BodyDist X = [-10, 180]
+trigger1 = P2BodyDist Y = [-80, 0]
+trigger1 = Random < Var(0) * 70   ;AI 使用頻度
+trigger2 = stateno =1755 && animelemtime(18)>=0 && animelemtime(23)<0
+trigger2 = movehit || movecontact
+trigger2 = P2BodyDist X = [-10, 180]
+trigger2 = P2BodyDist Y = [-80, 0]
+trigger2 = Random < Var(0) * 70   ;AI 使用頻度
+Value = 1850
+
+
+
+
+[State -3] ;しゃがみ殴り01
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = StateType = C || StateType = S
+triggerall = ctrl && pos y = 0
+trigger1 = P2StateType = A  || P2StateType = S ;相手空中 or 地上立ち
+trigger1 = P2BodyDist X = [70, 150]
+trigger1 = P2BodyDist Y = [-40, 0]
+trigger1 = Random < Var(0) * 10 ;AI 使用頻度
+trigger2 = P2StateType = C  ;相手しゃがみ時に距離をとる
+trigger2 = P2BodyDist X = [10, 60]
+trigger2 = P2BodyDist Y = [-30, 0]
+trigger2 = Random < Var(0) * (20-var(44)) ;AI 使用頻度   ■ AI学習用カウンタ  対特殊防御■ 
+Value = 1450
+
+
+[State -3] ;しゃがみ引っかき01
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = StateType = C || StateType = S
+triggerall = ctrl && pos y = 0
+trigger1 = P2StateType = S ;相手地上立ち
+trigger1 = P2BodyDist X = [10, 90]
+trigger1 = P2BodyDist Y = [-30, 0]
+trigger1 = Random < Var(0) * (20-var(44)) ;AI 使用頻度   ■ AI学習用カウンタ  対特殊防御■ 
+Value = 1350
+
+[State -3] ;しゃがみ引っかき01→02
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 3 ;AI Lv制限
+triggerall = stateno =1350 && animelemtime(6)>=0 && animelemtime(9)<0
+trigger1 = movecontact
+trigger1 = P2BodyDist X = [0, 50]
+trigger1 = P2BodyDist Y = [-30, 0]
+trigger1 = Random < Var(0) * 10 ;AI 使用頻度
+trigger2 = movehit
+trigger2 = P2BodyDist X = [0, 50]
+trigger2 = P2BodyDist Y = [-30, 0]
+trigger2 = Random < Var(0) * 50 ;AI 使用頻度
+Value = 1400
+
+
+[State -3] ;空中殴り01
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = StateType = A && ctrl
+trigger1 = P2StateType = S || P2StateType = C ;相手地上立ち or しゃがみ
+trigger1 = P2BodyDist X = [30, 110]
+trigger1 = P2BodyDist Y = [-100, 0]
+trigger1 = Random < Var(0) * (40-var(44)) ;AI 使用頻度   ■ AI学習用カウンタ  対特殊防御■
+trigger2 = P2StateType = A ;相手空中
+trigger2 = P2BodyDist X = [30, 110]
+trigger2 = P2BodyDist Y = [-100, 0]
+trigger2 = Random < Var(0) * (40-var(44)) ;AI 使用頻度   ■ AI学習用カウンタ  対特殊防御■
+Value = 1500
+
+
+[State -3] ;空中引っかき01
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = StateType = A && ctrl
+trigger1 = P2StateType = S ;相手地上立ち
+trigger1 = P2BodyDist X = [0, 150]
+trigger1 = P2BodyDist Y = [0, 100]
+trigger1 = Random < Var(0) * (40-var(44)) ;AI 使用頻度   ■ AI学習用カウンタ  対特殊防御■
+Value = 1550
+
+
+
+
+
+;■ＡＩ移動コマンド■
+
+[State -3] ;前ダッシュ
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = StateType = S || StateType = C
+triggerall = stateno = 0 || ctrl
+triggerall = StateNo != 100
+triggerall = P2StateType != L  ;相手否ダウン
+trigger1 = P2StateType != A
+trigger1 = P2BodyDist X > 120
+trigger1 = Random < Var(0) * 20 ;AI 使用頻度 
+trigger2 = P2StateType = A
+trigger2 = P2BodyDist X > 120
+trigger2 = var(41) < 40 && var(42) < 40 ;■ AI学習用カウンタ  飛び道具■
+trigger2 = Random < Var(0) * 10 ;AI 使用頻度 
+trigger3 = P2StateType = A ;相手空中
+trigger3 = P2MoveType = H ;相手ヒット
+trigger3 = P2BodyDist X > 120
+trigger3 = Random < Var(0) * 20 ;AI 使用頻度
+Value = 100
+ctrl = 1
+
+[State -3, AIコマンド] ;バックステップ
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 3 ;AI Lv制限
+triggerall = StateType = S || StateType = C
+triggerall = stateno = 0 || ctrl
+triggerall = BackEdgeBodyDist > 60
+triggerall = enemynear, pos y > -20
+triggerall = StateNo != 100
+trigger1 = P2StateNo = 5120 ;相手起き上がり時
+trigger1 = P2BodyDist X = [-50, 70]
+trigger1 = EnemyNear,Time < 3
+trigger1 = Random < Var(0) * 5 ;AI 使用頻度
+trigger2 = P2BodyDist X = [-20, 70] ;間合いを開ける
+trigger2 = Random < Var(0) * 5 ;AI 使用頻度
+trigger3 = P2StateType = L ;ステート奪取後のダウン
+trigger3 = P2BodyDist X = [-20, 60]
+trigger3 = Random < Var(0) * 5 ;AI 使用頻度
+trigger4 = P2BodyDist X = [0, 80] ;投げ警戒  さらに間合いを開ける
+trigger4 = random < var(43) * 10 ;■ AI学習用カウンタ 投げ■
+Value = 105
+
+
+[State -3] ;空中リカバリ
+type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 3 ;AI Lv制限
+triggerall = Vel Y > -1
+triggerall = alive
+triggerall = CanRecover
+triggerall = StateType = A
+trigger1 = Movetype = H ;ヒット中
+trigger1 = Pos Y = [-70, -60]
+trigger1 = Random < Var(0) * 1 ;AI 使用頻度  
+value = 5210 ;HITFALL_AIRRECOVER
+
+[State -3] ;足払いの受身
+type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 5 ;AI Lv制限
+triggerall = alive
+triggerall = stateno = 5071
+trigger1 = Vel Y > 0
+trigger1 = (Pos Y >= -10) &&  (Pos Y < 15)
+trigger1 = var(41) < 40 && var(42) < 30 ;■ AI学習用カウンタ 飛び道具 ■
+trigger1 = Random < Var(0) * 10 ;AI 使用頻度  
+value = 5600
+
+
+[State -3] ;前ジャンプフラグ オン
+Type = varset
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = StateType = S
+triggerall = FrontEdgeBodyDist > 100
+triggerall = stateno = 0 || ctrl
+triggerall = var(47) = 0
+trigger1 = P2BodyDist X >= 170
+trigger1 = var(41) < 40 && var(42) < 40 ;■ AI学習用カウンタ 飛び道具 ■
+trigger1 = Random < Var(0) * 2 ;AI 使用頻度 
+trigger2 = P2BodyDist X >= 170
+trigger2 = Random < Var(0) * 2 ;AI 使用頻度
+trigger3 = BackEdgeBodyDist < 10  ;相手ダウン時背面が壁
+trigger3 = P2Statetype = L ;相手ダウン
+trigger3 = P2BodyDist X = [-20, 30]
+trigger3 = enemynear, alive = 1
+trigger3 = Random < Var(0) * 2 ;AI 使用頻度
+var(47) = 2
+
+[State -3] ;ジャンプ
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = StateType = S || StateType = C
+triggerall = stateno = 0 || ctrl
+triggerall =! stateno = 40
+trigger1 = var(47) > 0
+value = 40
+
+
+[State -3] ;空中方向転換フラグ
+type = Varadd
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = var(0) > 4 ;AI Lv制限
+triggerall = StateType = A
+triggerall = Ctrl
+triggerall = P2Dist X < -30
+trigger1 = var(48) = 0
+trigger1 = Anim = 42 || Anim = 45
+trigger1 = stateno = 50
+trigger1 = Random < Var(0) * 30 ;AI 使用頻度 
+var(48) = 1
+
+[State -3] ;空中方向転換
+type = turn
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = StateType = A
+trigger1 = var(48) = 1
+
+[State -3] ;空中方向転換フラグ  プレ初期化(完全初期化は着地後)
+type = Varset
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+trigger1 = var(48) = 1
+var(48) = 2
+
+
+[State -3] ;しゃがむ
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = StateType = S
+triggerall = stateno = 0 || ctrl
+triggerall = pos y = 0
+triggerall = enemynear, StateType != L  ;相手否ダウン
+trigger1 = enemynear, movetype = A
+trigger1 = enemynear, StateType = C
+trigger1 = Random < Var(0) * 5 ;AI 使用頻度
+Value = 10
+ctrl = 1
+
+[State -3] ;立つ
+Type = ChangeState
+triggerall = RoundState = 2 && var(0) ;戦闘中 & ＡＩ判定
+triggerall = StateType = C
+triggerall = ctrl
+triggerall = Random < Var(0) * 5 ;AI 使用頻度
+trigger1 = enemynear, movetype = A
+trigger1 = enemynear, StateType = A || enemynear, StateType = S
+Value = 12
+ctrl = 1
+
+
+
+

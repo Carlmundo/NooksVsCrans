@@ -1,0 +1,283 @@
+;※※※※※※※※※※※※※※※※※※※※ストライカー
+;理論説明
+;本体がストライカーを呼び出し、後は何もしません、重要なのはヘルパーの行動です。
+;今回は「飛んで登場」その蹴りが当たったら空中の相手を蹴る
+;ストライカーは人間なので攻撃を食らったら消えるようにもします。
+;やること多いけどがんばりませうー
+;できるだけ簡潔にするために音や演出は入れてません。
+
+[Statedef 2000]
+type    = S
+movetype= A
+physics = S
+juggle  = 0
+poweradd= 0
+ctrl = 0
+velset = 0,0
+anim = 2100
+sprpriority = 2
+
+[State 810, Hurt 11];←パワーを減らす
+type = powerAdd
+trigger1 = animelem = 1
+value = -500
+
+[State 4100,1]];←ヘルパーを呼び出す
+type = Helper
+trigger1 = time = 1
+id = 4000
+name = "karate"
+sprpriority = 4
+pos = 300,-150
+postype = p2
+facing = -1
+stateno = 2110;←呼び出されたヘルパーはこのステートから始まる
+helpertype = normal
+keyctrl = 0          
+ownpal = 0
+
+[State -1, Kung Fu Throw];←これで本体の動きは終了
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;※※※※※※※※※※※※※※※※※※※※ストライカーステート
+;
+;ここは上で登場したヘルパーが使う専用ステートです。
+;基本的にすべてにチェンジステートを付けていろんな行動に対応させます
+;まず2110では蹴って地上に付くまでを作ります
+;途中で攻撃を食らったときのために「hitoverride」を使ってます、次もつかってるけど。
+
+[Statedef 2010]
+type    = S
+movetype= A
+physics = S
+juggle  = 0
+poweradd= 0
+ctrl = 0
+velset = 3,5
+anim = 2000
+sprpriority = 2
+
+[State 3250, 4]
+type = Explod
+trigger1 = time = 1
+anim = 4000
+pos = 0,-90
+supermove = 1
+sprpriority = 2
+bindtime = -1
+ownpal = 1
+facing = 1
+
+[State 821, 1];←とりあえず加速させてる
+type = VelAdd
+Trigger1 = 1
+y = .4
+x = 2
+
+[State 10011, 4];←あらゆる攻撃をくらったら2130の消滅ステートに移動
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA, NT, ST, HT, NA, SA, HA,NP,SP,HP
+stateno = 2050
+time = -1
+
+[State 230, 3];←着地したら次の蹴るステートへ
+type = ChangeState
+trigger1 = Vel Y > 0 && Pos Y >= 0
+value = 2020
+ctrl = 0
+
+
+;※※※※※※※※※※※※※※※※※※※※ストライカーステート２
+;
+;上のステートで地上についた瞬間にこのステートにきます。
+;そこでpossetを「y = 0」にすることできれいに着地することができます
+;もちろんここにも「hitoverride」いれています。
+
+[Statedef 2020]
+type    = S
+movetype= A
+physics = S
+juggle  = 0
+poweradd= 0
+ctrl = 0
+velset = 0,0
+anim = 2001
+sprpriority = 2
+
+[State 821, 1] 
+type = posset
+trigger1 = time = 0
+y = 5
+
+[State 10011, 4]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA, NT, ST, HT, NA, SA, HA,NP,SP,HP
+stateno = 2050        
+time = -1
+
+[State 230, 3]
+type = ChangeState
+trigger1 = animtime = 0
+value = 2030
+ctrl = 0
+
+;※※※※※※※※※※※※※※※※※※※※ストライカーステート３
+;
+;
+
+[Statedef 2030]
+type    = S
+movetype= A
+physics = S
+juggle  = 0
+poweradd= -500
+ctrl = 0
+velset = 0,0
+anim = 2003
+sprpriority = 2
+
+[State 3012, 2] 
+type = PlaySnd
+trigger1 = AnimElem = 1
+volume = 200
+value = 1050, 0
+
+[State 3012, 2] 
+type = PlaySnd
+trigger1 = AnimElem = 1
+volume = 200
+value = 2000, 1
+
+[State 3012, 2] 
+type = PlaySnd
+trigger1 = AnimElem = 6
+volume = 200
+value = 1050, 1
+
+[State 1050, 1]
+type = Projectile
+trigger1 = Animelem = 5
+projanim = 10007
+;projID = 1050
+;projhitanim = 1011
+offset = 50, -95
+velocity = 10, 0
+;remvelocity = 0, 0
+;velmul = 1.01, 1
+;accel = 0, 0
+; HitDef part of projectile info
+attr = S, SP
+damage    = 100,10
+animtype = Medium
+pausetime = 0,9
+sparkno = S30002
+sparkxy = 0, 0
+hitsound   = S3,2
+guardflag = L
+guardsound = 6,0
+ground.type = Low
+ground.slidetime = 4
+ground.hittime  = 4
+ground.velocity = -3
+air.animtype = Back
+air.velocity = -2.5,-5
+air.juggle = 3
+sparkno = -1
+fall.recover = 0
+fall = 1 
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+[State 10011, 4];←あらゆる攻撃をくらったら2130の消滅ステートに移動
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA, NT, ST, HT, NA, SA, HA,NP,SP,HP
+stateno = 2050        
+time = -1
+
+[State 230, 3]
+type = ChangeState
+trigger1 = animtime = 0
+value = 2040
+ctrl = 0
+
+;※※※※※※※※※※※※※※※※※※※※ストライカーステート４
+;
+;ストライカーが消えるステートです。
+;ジャンプして20フレーム後に「destroyself」で消えます
+
+[Statedef 2040]
+type    = S
+movetype= A
+physics = S
+juggle  = 0
+poweradd= 0
+ctrl = 0
+velset = 10,-10
+anim = 2004
+sprpriority = 2
+
+[State 821, 1] 
+type = VelAdd
+Trigger1 = 1
+y = -.4
+x = 1
+
+[State 230, 3]
+type = destroyself
+trigger1 = time = 20
+
+;※※※※※※※※※※※※※※※※※※※※ストライカーステート５
+;
+
+[Statedef 2050]
+type    = A
+movetype= H
+physics = N
+ctrl = 0
+velset = 4,-5
+anim = 2005
+sprpriority = 2
+
+[State 821, 1] 
+type = VelAdd
+Trigger1 = 1
+y = .4
+x = .1
+
+[State 9001, 5]
+type = changestate
+trigger1 = Pos Y >= 0 && Vel Y > 0
+value = 2060
+
+;※※※※※※※※※※※※※※※※※※※※ストライカーステート６
+;
+
+[Statedef 2060]
+type    = A
+movetype= H
+physics = S
+ctrl = 0
+velset = 0,0
+anim = 2006
+sprpriority = 2
+
+[State 1012, 1]
+type = posset
+trigger1 = 1
+y = 0
+
+[State 9001, 5]
+type = changestate
+trigger1 = animtime = 0
+value = 2040
+
+
+

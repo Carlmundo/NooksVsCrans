@@ -1,0 +1,403 @@
+[Data]
+life = 1000
+attack = 70
+defence = 100
+fall.defence_up = 50
+liedown.time = 60
+airjuggle = 15
+sparkno = 2
+guard.sparkno = 40
+KO.echo = 0
+volume = 0
+IntPersistIndex = 60
+FloatPersistIndex = 40
+
+[Size]
+xscale = 1           
+yscale = 1           
+ground.back = 15     
+ground.front = 16   
+air.back = 12        
+air.front = 12       
+height = 60        
+attack.dist = 160 
+proj.attack.dist = 90
+proj.doscale = 0    
+head.pos = -5, -90   
+mid.pos = -5, -60 
+shadowoffset = 0    
+draw.offset = 0,0
+
+[Velocity]
+walk.fwd  = 2.4   
+walk.back = -2.2  
+run.fwd  = 4.6, 0   
+run.back = -4.5,-3.8
+jump.neu = 0,-8.4    
+jump.back = -2.55  
+jump.fwd = 2.5    
+runjump.back = -2.55,-8.1 
+runjump.fwd = 4,-8.1     
+airjump.neu = 0,-8.1     
+airjump.back = -2.55      
+airjump.fwd = 2.5        
+
+[Movement]
+airjump.num = 1      
+airjump.height = 35 
+yaccel = .44         
+stand.friction = .85 
+crouch.friction = .82 
+
+[Quotes]
+victory1 = "I Gotta Believe!"
+victory2 = "I Gotta Reedeem!"
+victory3 = "I Gotta Believe! I Gotta Reedeem! But Most Importaint I Gotta BELIEVE!!"
+
+;-------------------------------------------------------------
+; Superjump
+[Statedef 70]
+type = A
+movetype = I
+physics = A
+ctrl = 1
+anim = 40
+velset = 0,0
+
+[State -3, Landing Sound]
+type = PlaySnd
+Triggerall = random <= 500
+trigger1 = time = 0
+value = 41, 0
+
+[State 55, PlaySnd]
+type = PlaySnd
+trigger1 = Time = 0
+value = 70,0
+
+[State 55, ChangeState]
+type = ChangeState
+trigger1 = command = "holdup"
+trigger1 = vel y > 0
+value = 45
+ctrl = 1
+
+[State 55, AfterImage]
+type = AfterImage
+trigger1 = time = 0
+time = 50
+length = 20
+paladd = 10,10,25
+
+[State 55, Effect]
+type = Explod
+trigger1 = Time = 0
+anim = F130
+pos = 0,(floor((-Pos Y)-Vel Y)) + 10
+postype = p1
+scale = 1,1
+sprpriority = 3
+ownpal = 1
+
+[State 55, ChangeAnim]
+type = ChangeAnim
+trigger1 = time = 1
+value = 41
+
+[State 55, VelSet]
+type = VelSet
+trigger1 = time = 0
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+x = 0
+y = -11.5
+
+[State 55, VelSet]
+type = VelSet
+trigger1 = time = 0
+trigger1 = command = "holdfwd"
+trigger1 = command != "holdback"
+x = 7
+y = -11.5
+
+[State 55, VelSet]
+type = VelSet
+trigger1 = time = 0
+trigger1 = command != "holdfwd"
+trigger1 = command = "holdback"
+x = -7
+y = -11.5
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = command = "holdfwd"
+x = 6
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = command = "holdback"
+x = -6
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+x = 0
+
+
+
+;---------------------------------------------------------------------------
+; Lose by Time Over
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S170,0
+channel = 0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win state decider
+; CNS difficulty: basic
+; CNS ƒŒƒxƒ‹: Šî–{
+[Statedef 180]
+type = S
+
+[State 180, 1]
+type = ChangeState
+trigger1 = Time = 0
+value = 181
+
+;---------------------------------------------------------------------------
+; Win pose 1
+[Statedef 181]
+type = S
+ctrl = 0
+anim = 181
+velset = 0,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S180,0
+channel = 0
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; PREINTRO
+[Statedef 190]
+type = S
+ctrl = 0
+velset = 0,0
+
+[State 191, 1] ;Freeze animation until PreIntro is over
+type = ChangeAnim
+trigger1 = RoundState = 0
+value = 190
+
+[State 190, 2] ;Go straight to intro.
+type = ChangeState
+trigger1 = RoundState > 0
+value = 191
+
+;---------------------------------------------------------------------------
+; Introduction
+[Statedef 191]
+type = S
+ctrl = 0
+anim = 190
+velset = 0,0
+
+[State 191, 1] ;Freeze animation until PreIntro is over
+type = ChangeAnim
+trigger1 = RoundState = 0
+value = 190
+
+[State 191, 2] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = animelem = 2
+value = 0, 0
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = animelem = 10
+value = 0, 1
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = animelem = 15
+value = 0, 2
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = animelem = 22
+value = 0, 3
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 32
+value = S190,0
+channel = 0
+
+[State 191, 3] ;Change to stand state when done
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+;---------------------------------------------------------------------------
+; Taunt
+; CNS difficulty: easy
+[Statedef 195]
+type = S
+ctrl = 0
+anim = 195
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State 195, 1]
+type = CtrlSet
+trigger1 = Time = 40
+value = 1
+
+[State 195, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Override common states (use same number to override) :
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------
+
+[Statedef -3]
+
+;This controller plays a sound everytime KFM lands from a jump, or
+;from his back-dash.
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52 ;Jump land
+trigger2 = stateno = 106 ;Run-back land
+value = 40, 0
+
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = anim = 20
+trigger1 = animelem = 4
+value = 40, 0
+
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = anim = 21
+trigger1 = animelem = 4
+value = 40, 0
+
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = anim = 100
+trigger1 = animelem = 2
+value = 20, 0
+
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = anim = 100
+trigger1 = animelem = 5
+value = 20, 1
+
+[State -3, VarAdd]
+type = VarAdd
+trigger1 = (HitPauseTime = 1) && (P2MoveType = H) && (MoveHit = 1) && (StateNo < 3000)
+trigger2 = ProjHitTime(0) = 1
+v = 21
+value = 1
+ignorehitpause = 1
+
+[State -3, VarReset]
+type = VarSet
+trigger1 = P2MoveType != H
+v = 21
+value = 0
+
+[State -3, AttackMulSet]
+type = AttackMulSet
+trigger1 = StateNo >= 3000
+value = 1
+
+[State -3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) <= 1
+value = 1
+
+[State -3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) = 2
+value = 0.8
+
+[State -3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) = 3
+value = 0.6
+
+[State -3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) = 4
+value = 0.4
+
+[State -3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) >= 5
+value = .2
+
+[State 0, VelSet]
+type = VelSet
+triggerall = stateno = 50
+trigger1 = command = "holdfwd"
+x = 6
+
+[State 0, VelSet]
+type = VelSet
+triggerall = stateno = 50
+trigger1 = command = "holdback"
+x = -6
+
+[State 0, VelSet]
+type = VelSet
+triggerall = stateno = 50
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+x = 0

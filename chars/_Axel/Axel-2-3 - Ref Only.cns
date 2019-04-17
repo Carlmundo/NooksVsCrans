@@ -1,0 +1,435 @@
+;===============================================================================
+; System variables usage
+; ----------------------
+; Var name    Type   Purpose
+; --------    ----   -------
+; sysvar(0)   Temp   Set by state 5081 (HITL_SLIDE) to 1 to prevent
+;                    showing ground hit frame in state 5110 (HIT_LIEDOWN).
+;                    Used by guarding states.
+; sysvar(1)   Temp   Used by state 40 (Jump Start) amd 45 (Air Jump Start)
+;                    to keep track of which way to jump.
+;                    Used by state 5100 and 5110 to remember downward
+;                    velocity of player just before hitting the ground.
+;                    Used in state 5080 for storing the anim # to display.
+;var(01) - unuse atm - Stun Break
+;var(02) - Player Config
+;var(03) - [2100] number of bomb
+;var(04) - [1300]Number of grenade
+;var(05) - [1200][1201] number of bullet
+;var(06) - [1200][1201] used in Shooting to determine bullet speed
+;          [1400] throwing Speed
+;var(07) -
+;var(08) - [960][970] Power kicks
+;var(09) -
+;var(10) - [8xx] used by SLams and Throws
+;var(11) - [1460] to [1466] Bonus Type use by Helper not the Root character
+;var(12) - [1300][1400] - Grenade / Throwing Knife
+;var(12) - [1500] to [1503] Melee weapon control
+;-------------------------------------------------------------------------------
+
+;===============================================================================
+[Statedef -2];; States that are always executed (use statedef -2)
+;===============================================================================
+[state -2, set_Config]     ;This variable is use to config Axel
+type = varset
+trigger1 = roundstate = 0  ;During Taunt
+var(2) = 2 ; 1; 2;         ;0 = Basic, 1= Bonus Drop 2= Life+Energy UP + Bonus Drop
+
+[state -2, set_bomb]
+type = varset              ;0: Pre-intro - screen fades in, 1: Intro, 2: Fight - during battle
+trigger1 = roundstate = 0  ;3: Pre-over - just a round is won or lost 4: Over - win poses
+var(3) = 3                 ;no. of bomb     Max = 3 gfx [more will not show up]
+
+[state -2, set_grenade]
+type = varset
+trigger1 = roundstate = 0
+var(4) = 5                 ;no. of bullets  Max = 5 gfx [more will not show up]
+
+[state -2, set_bullet]
+type = varset
+trigger1 = roundstate = 0
+var(5) = 6                 ;no. of bullets  Max = 6 gfx [more will not show up]
+;===============================================================================
+[State -2, Pbullet1]
+type = Explod
+triggerall = var(5)>0  ;&& teamside = 1 ;P1side
+trigger1 = roundstate >= 1
+anim = 1450
+ID = 14501
+pos = Ifelse(teamside=1,10,310),213 ;For 320,240 only, change x/y-value according to SCR-Res ;can start from 5,220
+postype = left                      ;Ifelse(teamside=1,left,right)  <===Doesnt work
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1;
+scale = .20,.20
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 0
+;---------------------------------------------------------------------------
+[State -2, Pbullet2]
+type = Explod
+triggerall = var(5)>1  ;&& teamside = 1 ;P1side
+trigger1 = roundstate >= 1
+anim = 1450
+ID = 14502
+pos = Ifelse(teamside=1,15,305),213 ;For 320,240 only, change x/y-value according to SCR-Res
+postype = left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1
+scale = .20,.20
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 0
+;---------------------------------------------------------------------------
+[State -2, Pbullet3]
+type = Explod
+triggerall = var(5)>2  ;&& teamside = 1 ;P1side
+trigger1 = roundstate >= 1
+anim = 1450
+ID = 14503
+pos = Ifelse(teamside=1,20,300),213 ;For 320,240 only, change x/y-value according to SCR-Res
+postype = left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1
+scale = .20,.20
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 0
+;---------------------------------------------------------------------------
+[State -2, Pbullet4]
+type = Explod
+triggerall = var(5)>3  ;&& teamside = 1 ;P1side
+trigger1 = roundstate >= 1
+anim = 1450
+ID = 14504
+pos = Ifelse(teamside=1,25,295),213 ;For 320,240 only, change x/y-value according to SCR-Res
+postype = left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1
+scale = .20,.20
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 0
+;---------------------------------------------------------------------------
+[State -2, Pbullet5]
+type = Explod
+triggerall = var(5)>4  ;&& teamside = 1 ;P1side
+trigger1 = roundstate >= 1
+anim = 1450
+ID = 14505
+pos = Ifelse(teamside=1,30,290),213 ;For 320,240 only, change x/y-value according to SCR-Res
+postype = left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1
+scale = .20,.20
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 0
+;---------------------------------------------------------------------------
+[State -2, Pbullet6]
+type = Explod
+triggerall = var(5)>5  ;&& teamside = 1 ;P1side
+trigger1 = roundstate >= 1
+anim = 1450
+ID = 14506
+pos = Ifelse(teamside=1,35,285),213 ;For 320,240 only, change x/y-value according to SCR-Res
+postype = left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1
+scale = .20,.20
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 0
+
+;===============================================================================
+[State -2, P1Grenade1]
+type = Explod
+triggerall = var(4)>0; && teamside = 1      ;P1side
+trigger1 = roundstate >= 1
+anim = 1466
+ID = 14661
+pos = Ifelse(teamside=1,10,310),225
+postype = left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1
+scale = .55,.55
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 0
+;---------------------------------------------------------------------------
+[State -2, P1Grenade2]
+type = Explod
+triggerall = var(4)>1; && teamside = 1      ;P1side
+trigger1 = roundstate >= 1
+anim = 1466
+ID = 14662
+pos = Ifelse(teamside=1,20,300),225
+postype = left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1
+scale = .55,.55
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 0
+;---------------------------------------------------------------------------
+[State -2, P1Grenade3]
+type = Explod
+triggerall = var(4)>2; && teamside = 1      ;P1side
+trigger1 = roundstate >= 1
+anim = 1466
+ID = 14663
+pos = Ifelse(teamside=1,30,290),225
+postype = left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1
+scale = .55,.55
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 0
+;---------------------------------------------------------------------------
+[State -2, P1Grenade4]
+type = Explod
+triggerall = var(4)>3; && teamside = 1      ;P1side
+trigger1 = roundstate >= 1
+anim = 1466
+ID = 14664
+pos = Ifelse(teamside=1,40,280),225
+postype = left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1
+scale = .55,.55
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 0
+;---------------------------------------------------------------------------
+[State -2, P1Grenade5]
+type = Explod
+triggerall = var(4)>4; && teamside = 1      ;P1side
+trigger1 = roundstate >= 1
+anim = 1466
+ID = 14665
+pos = Ifelse(teamside=1,50,270),225
+postype = left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1
+scale = .55,.55
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 0
+;===============================================================================
+;===========================================================================
+[State -2, P1bomb1];numexplod(62011)=0
+type = Explod
+triggerall = var(3)>0; && teamside = 1  ;P1side
+trigger1 = roundstate >= 1 ;|| roundstate = 2
+anim = 6201
+ID = 62011
+pos = Ifelse(teamside=1,20,300),237
+postype = Left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1;-1
+scale = .15,.15
+sprpriority = 7 ;;4
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 1
+;---------------------------------------------------------------------------
+[State -2, P1bomb2]
+type = Explod
+triggerall = var(3)>1; && teamside = 1  ;P1side
+trigger1 = roundstate >= 1
+anim = 6201
+ID = 62012
+pos = Ifelse(teamside=1,45,275),237
+postype = Left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1
+scale = .15,.15
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 1
+persistent = 0
+;---------------------------------------------------------------------------
+[State -2, P1bomb3]
+type = Explod
+triggerall = var(3)>2; && teamside = 1  ;P1side
+trigger1 = roundstate >= 1
+anim = 6201
+ID = 62013
+pos = Ifelse(teamside=1,70,250),237
+postype = Left
+facing = Ifelse(teamside=1,1,-1);1
+bindtime = -1
+removetime = 1
+scale = .15,.15
+sprpriority = 7 ;;4
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause = 0
+persistent = 0
+;---------------------------------------------------------------------------
+[State -2, Destroy 357-bullet helper] ;Remove bullet helper when they dont behave
+type=DestroySelf                     ;1200 bullet id, 1203 = bullet state
+triggerall = numhelper(1200)!=0
+triggerall = ishelper(1200)
+trigger1 = Helper(1200), stateno!= 1203
+
+[State -2, Destroy shotgun-bullet helper] ;Remove bullet helper when they dont behave
+type=DestroySelf                     ;1200 bullet id, 1203 = bullet state
+triggerall = numhelper(1601)!=0
+triggerall = ishelper(1601)
+trigger1 = Helper(1601), stateno!= 1603 || Helper(1601), stateno!= 1604
+trigger2 = Helper(1601), anim!=4000
+;---------------------------------------------------------------------------
+[State -2, Destroy grenade helper] ;Remove helper when they dont behave
+type=DestroySelf                     ;grenade 1400 or throwing knife 11400
+triggerall = numhelper(1300)!=0
+triggerall = ishelper(1300)
+trigger1 = (Helper(1300), stateno!= 1400) || (Helper(1300), stateno!= 11400)
+;---------------------------------------------------------------------------
+[State -2, Destroy Gift Helper] ;Remove helper when they dont behave
+type=DestroySelf                     ;grenade 1400 or throwing knife 11400
+triggerall = numhelper(1460)!=0
+triggerall = ishelper(1460)
+trigger1 = (Helper(11460), stateno!= 1461) || (Helper(1300), stateno!= 11462)
+trigger2 = (Helper(11460), stateno!= 1463) || (Helper(1300), stateno!= 11464)
+trigger3 = (Helper(11460), stateno!= 1465) || (Helper(1300), stateno!= 11466)
+trigger4 = (Helper(11460), stateno!= 1467) ;|| (Helper(1300), stateno!= 11468)
+;---------------------------------------------------------------------------
+[State -2, Break Slam]	;Stun counter works with -3 Stun Timer
+Type = null; Selfstate ;
+Triggerall = var(1)!=Gametime
+Trigger1 = command = "recovery"  ;&& stateType!=S ;=L
+Value = 80
+;===============================================================================
+[Statedef -3];; States that are always executed (use statedef -2)
+;===============================================================================
+[State -3, Var1_CounterStun Timer]   ;Use For TargetBind Break
+Type=Varset                          ;use by [State -2, Stun Break] above
+Trigger1=1
+var(1)=Gametime                      ;
+ignorehitpause=1
+;-------------------------------------------------------------------------------
+;[State -3, Landing Sound]
+;type = PlaySnd
+;triggerall = Time = 1
+;trigger1 = stateno = 52 ;Jump land
+;value = s5,2
+;volume = 200
+
+[State -3, ChangeState]
+type = ChangeState
+Triggerall = (stateno!=[800,899])
+trigger1 = pos y!=0 && statetype!=A && statetype!=L
+value = 50
+ctrl = 0
+;-------------------------------------------------------------------------------
+[State -3, 1461-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1461) && Anim!=1461
+value = 1461
+
+[State -3, 1462-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1462) && Anim!=1462
+value = 1462
+
+[State -3, 1463-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1463) && Anim!=1463
+value = 1463
+
+[State -3, 1464-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1464) && Anim!=1464
+value = 1464
+
+[State -3, 1465-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1465) && Anim!=1465
+value = 1465
+
+[State -3, 1466-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1466) && Anim!=1466
+value = 1466
+
+[State -3, 1467-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1467) && Anim!=1467
+value = 1467
+;-------------------------------------------------------------------------------
+; Section H. - Debugger to be remove when character goes final
+;-------------------------------------------------------------------------------
+[State -3, Wrong StateType]
+type= null;superpause;
+Triggerall = statetype!=A && statetype!=L
+trigger1= pos y!=0
+time= 99999
+ignorehitpause= 1
+;-------------------------------------------------------------------------------
+

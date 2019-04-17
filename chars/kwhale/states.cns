@@ -1,0 +1,887 @@
+; Killer Whale States
+;---------------------------------------------------------------------------
+; Start
+[Statedef 0]
+type = S
+movetype = I
+physics = N
+
+[State 0, Anim]
+type = ChangeAnim
+trigger1 = Anim != 0
+value = 0
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = 1
+x = 0
+y = 0
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = Pos Y <= 0
+y = 0
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = Pos Y >= 200
+y = 200
+
+;---------------------------------------------------------------------------
+; Crouch
+[Statedef 10]
+
+[State 10, 0]
+type = ChangeState
+trigger1 = 1
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Walk
+[Statedef 20]
+type = A
+movetype = I
+physics = N
+ctrl = 1
+
+[State 20, 1]
+type = VelSet
+trigger1 = command = "holdfwd"
+x = const(velocity.walk.fwd.x)
+
+[State 20, 2]
+type = VelSet
+trigger1 = command = "holdback"
+x = const(velocity.walk.back.x)
+
+[State 20, 3]
+type = ChangeAnim
+triggerall = vel x > 0
+trigger1 = Anim != 20 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0
+value = 20
+
+[State 20, 4]
+type = ChangeAnim
+triggerall = vel x < 0
+trigger1 = Anim != 21 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0
+value = 21
+
+[State 20, 5]
+type = PosSet
+trigger1 = Pos Y <= 0
+y = 0
+
+[State 20, 6]
+type = PosSet
+trigger1 = Pos Y >= 200
+y = 200
+
+;---------------------------------------------------------------------------
+; Idle
+[Statedef 30]
+type = A
+movetype = I
+physics = N
+ctrl = 1
+
+[State 30, Anim]
+type = ChangeAnim
+trigger1 = Anim != 0
+value = 0
+
+[State 30, State]
+type = ChangeState
+trigger1 = command = "holdfwd"
+trigger2 = command = "holdback"
+value = 20
+
+[State 30, VelSet]
+type = VelSet
+trigger1 = 1
+x = 0
+y = 0
+
+[State 30, PosSet]
+type = PosSet
+trigger1 = Pos Y <= 0
+y = 0
+
+[State 30, PosSet]
+type = PosSet
+trigger1 = Pos Y >= 200
+y = 200
+
+[State 30, Turn]
+type = Turn
+trigger1 = P2Dist X < 0
+
+;---------------------------------------------------------------------------
+; Hit
+[Statedef 35]
+movetype = H
+sprpriority = -10
+ctrl = 0
+
+[State 35, Anim]
+type = ChangeAnim
+trigger1 = 1
+value = Anim
+elem = AnimElemNo(0)
+
+[State 35, 0]
+type = PalFX
+trigger1 = Time = 0
+time = 2
+add = 100,100,100
+
+[State 35, PosFreeze]
+type = PosFreeze
+trigger1 = !HitShakeOver
+x = 1
+y = 1
+
+[State 35, 1]
+type = ChangeState
+trigger1 = HitShakeOver
+value = Var(10)
+ctrl = Var(11)
+
+;---------------------------------------------------------------------------
+; Jump
+[Statedef 40]
+
+[State 40, 0]
+type = ChangeState
+trigger1 = 1
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Lose by Time Over
+[Statedef 170]
+ctrl = 0
+velset = 0,0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win State
+[Statedef 180]
+velset = 0,0
+ctrl = 0
+
+[State 180, 0]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Intro
+[Statedef 190]
+sprpriority = 0
+velset = 0,0
+anim = 0
+ctrl = 0
+
+[State 190, 1]
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 190, Anim]
+type = ChangeAnim
+trigger1 = RoundState = 0
+value = 0
+
+[State 190, 3]
+type = PosSet
+trigger1 = 1
+y = 200
+
+[State 190, 4]
+type = ChangeState
+trigger1 = RoundState > 0
+value = 0
+
+;---------------------------------------------------------------------------
+; Attack
+[Statedef 200]
+type = A
+movetype = A
+physics = N
+anim = 200
+
+[State 200, Helper]
+type = Helper
+trigger1 = NumHelper(1) = 0
+helpertype = normal
+name = "Front"
+id = 1
+pos = 0
+postype = p1
+stateno = 1
+keyctrl = 0
+
+[State 200, Helper]
+type = Helper
+trigger1 = NumHelper(2) = 0
+helpertype = normal
+name = "Back"
+id = 2
+pos = 0
+postype = p1
+stateno = 2
+keyctrl = 0
+
+[State 200, Helper]
+type = Helper
+trigger1 = NumHelper(5) = 0
+helpertype = normal
+ignorehitpause = 1
+name = "Trap Back"
+size.ground.back = 20
+size.ground.front = 10
+size.air.back = 20
+size.air.front = 10
+id = 5
+facing = 1
+pos = 0,0
+postype = P1
+stateno = 5
+keyctrl = 0
+ownpal = 1
+
+[State 200, Helper]
+type = Helper
+trigger1 = NumHelper(6) = 0
+helpertype = normal
+ignorehitpause = 1
+name = "Trap Front"
+size.ground.back = 30
+size.ground.front = 10
+size.air.back = 30
+size.air.front = 10
+id = 6
+facing = -1
+pos = 0,0
+postype = P1
+stateno = 6
+keyctrl = 0
+ownpal = 1
+
+[State 200, VarSet]
+type = VarSet
+trigger1 = Time <= 0
+trigger1 = PrevStateNo != 35
+v = 20
+value = 0
+
+[State 200, VelSet]
+type = VelSet
+trigger1 = Var(20) <= 0
+x = 0
+y = -7
+
+[State 200, Anim]
+type = ChangeAnim
+trigger1 = Var(20) <= 0
+trigger2 = Vel Y <= -5
+trigger2 = AnimElem = 4, >= 0
+trigger2 = AnimElem = 5, < 0
+value = Anim
+elem = 4
+
+[State 200, VelAdd]
+type = VelAdd
+trigger1 = Vel Y < 0
+trigger1 = Pos Y <= 50
+y = .50
+
+[State 200, VelAdd]
+type = VelAdd
+trigger1 = Vel Y >= 0
+trigger1 = Pos Y < 200
+y = .10
+
+[State 200, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 5
+ignorehitpause = 1
+value = 2, 0
+channel = 0
+
+[State 200, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 6
+ignorehitpause = 1
+value = 0, 0
+channel = 2
+
+[State 200, PlaySnd]
+type = PlaySnd
+triggerall = NumTarget <= 0
+trigger1 = AnimElem = 7
+ignorehitpause = 1
+value = 0, 0
+freqmul = 0.75
+channel = 1
+
+[State 200, Shake]
+type = EnvShake
+triggerall = NumTarget <= 0
+trigger1 = AnimElem = 7
+time = 5
+ampl = -5
+freq = 100
+phase = 5
+
+[State 200, PlaySnd]
+type = PlaySnd
+triggerall = NumTarget > 0
+trigger1 = AnimElem = 7
+ignorehitpause = 1
+value = 1, 1
+freqmul = 0.75
+channel = 1
+
+[State 200, Shake]
+type = EnvShake
+triggerall = NumTarget > 0
+trigger1 = AnimElem = 7
+time = 10
+ampl = -10
+freq = 100
+phase = 10
+
+[State 200, HitDef]
+type = HitDef
+trigger1 = Vel Y <= 0
+trigger1 = P2Dist X < 10
+trigger1 = P2Dist X > -10
+trigger1 = Enemy, Pos Y >= -100
+trigger1 = MoveHit = 0
+sprpriority = -15
+p1sprpriority = -10
+p2sprpriority = -15
+ground.type = High
+air.type = High
+attr = A, NA
+hitflag = MAFD
+priority = 1, Miss
+sparkno = -1
+p2facing = 1
+p2stateno = 205
+numhits = 0
+
+[State 200, HitDef]
+type = HitDef
+triggerall = NumTarget > 0
+trigger1 = AnimElem = 7
+sprpriority = -15
+p1sprpriority = -10
+p2sprpriority = -15
+damage = 200,100
+ground.type = Low
+air.type = Low
+attr = A, NA
+hitflag = MAFD
+envshake.time = 10
+envshake.freq = 100
+envshake.ampl = -10
+envshake.phase = 10
+priority = 1, Miss
+sparkxy = -10,-100
+sparkno = 2
+p2facing = 1
+p2stateno = 205
+numhits = 0
+
+[State 200, VarSet]
+type = VarSet
+trigger1 = NumTarget > 0
+trigger1 = Vel Y <= 0
+fv = 0
+value = Target, Pos Y
+
+[State 200, Bind]
+type = TargetBind
+trigger1 = NumTarget > 0
+trigger1 = Vel Y >= 0
+pos = 0, FVar(0) + Vel Y * Vel Y
+time = 1
+
+[State 200, Anim]
+type = ChangeAnim
+trigger1 = Time > 0
+trigger1 = Vel Y > -5
+trigger1 = AnimElem = 1, >= 0
+trigger1 = AnimElem = 2, < 0
+value = Anim
+elem = 1
+
+[State 200, PosSet]
+type = PosSet
+trigger1 = Pos Y <= 0
+y = 0
+
+[State 200, PosSet]
+type = PosSet
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 200
+y = 200
+
+[State 200, VelSet]
+type = VelSet
+trigger1 = Time > 10
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 200
+y = 0
+
+[State 200, State]
+type = ChangeState
+triggerall = NumTarget > 0
+triggerall = Target, Alive
+trigger1 = Pos Y >= 200
+trigger1 = Time > 10
+value = 201
+ctrl = 0
+
+[State 200, State]
+type = ChangeState
+trigger1 = Pos Y >= 200
+trigger1 = Time > 10
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Killer Attack
+[Statedef 201]
+type = A
+movetype = A
+physics = N
+velset = 0,0
+anim = 201
+
+[State 200, NoJuggle]
+type = AssertSpecial
+trigger1 = 1
+ignorehitpause = 1
+flag = NoJuggleCheck
+
+[State 200, Bind]
+type = TargetBind
+triggerall = Time < 95
+trigger1 = NumTarget > 0
+pos = 0, 0
+ignorehitpause = 1
+time = 1
+
+[State 200, VarRandom]
+type = VarRandom
+trigger1 = 1
+v = 0
+range = -20,20
+
+[State 200, VarRandom]
+type = VarRandom
+trigger1 = 1
+v = 1
+range = 0,3
+
+[State 200, VarRandom]
+type = VarRandom
+trigger1 = 1
+v = 2
+range = 0,2
+
+[State 200, VarRandom]
+type = VarRandom
+trigger1 = 1
+v = 5
+range = -20,20
+
+[State 200, PlaySnd]
+type = PlaySnd
+triggerall = Time <= 100
+triggerall = NumTarget > 0
+trigger1 = AnimTime = 0
+ignorehitpause = 1
+value = 2, 0
+channel = 0
+
+[State 200, PlaySnd]
+type = PlaySnd
+triggerall = Time <= 100
+triggerall = NumTarget > 0
+trigger1 = AnimTime = 0
+ignorehitpause = 1
+value = 1, 0
+freqmul = 0.75
+channel = 1
+
+[State 200, Shake]
+type = EnvShake
+triggerall = Time < 100
+triggerall = NumTarget > 0
+trigger1 = AnimTime = 0
+time = 5
+ampl = -10
+freq = 100
+phase = 10
+
+[State 200, Spark]
+type = Explod
+triggerall = NumTarget > 0
+trigger1 = AnimTime = 0
+pausemovetime = -1
+supermovetime = -1
+ignorehitpause = 1
+pos = 0, -100
+postype = P1
+vel = Var(0),-20
+anim = F0 + Var(1)
+accel = 0,1
+id = 0
+
+[State 200, Blood]
+type = Explod
+triggerall = NumTarget > 0
+trigger1 = AnimTime = 0
+pausemovetime = -1
+supermovetime = -1
+ignorehitpause = 1
+pos = 0, -100
+postype = P1
+vel = Var(5),-20
+anim = F10 + Var(2)
+accel = 0,1
+id = 10
+
+[State 200, HitDef]
+type = HitDef
+triggerall = Time < 100
+triggerall = NumTarget > 0
+trigger1 = AnimTime = 0
+sprpriority = -15
+p1sprpriority = -10
+p2sprpriority = -15
+damage = 20,10
+attr = A, NA
+hitflag = MAFD+
+priority = 1, Miss
+sparkno = 2
+sparkxy = -10,-50
+ground.velocity = 0,0
+air.velocity = 0,0
+p2stateno = 205
+numhits = 0
+snap = 0,0
+kill = 0
+
+[State 200, PlaySnd]
+type = PlaySnd
+triggerall = NumTarget > 0
+trigger1 = Time >= 100
+trigger1 = AnimTime = 0
+ignorehitpause = 1
+value = 1, 1
+channel = 2
+
+[State 200, Shake]
+type = EnvShake
+triggerall = NumTarget > 0
+trigger1 = Time >= 100
+trigger1 = AnimTime = 0
+time = 20
+ampl = -20
+freq = 100
+phase = 20
+
+[State 200, HitDef]
+type = HitDef
+triggerall = NumTarget > 0
+trigger1 = Time >= 100
+trigger1 = AnimTime = 0
+sprpriority = -15
+p1sprpriority = -10
+p2sprpriority = -15
+damage = 100,50
+attr = A, NA
+hitflag = MAFD+
+priority = 1, Miss
+sparkxy = -10,-50
+sparkno = 2
+ground.velocity = -5,-30
+air.velocity = -5,-30
+fall.recover = 0
+p2stateno = 206
+air.fall = 1
+numhits = 0
+yaccel = 1
+fall = 1
+
+[State 200, Drop]
+type = TargetDrop
+triggerall = NumTarget > 0
+trigger1 = Target, StateNo != 205
+trigger2 = Target, Alive = 0
+trigger3 = Time >= 100
+
+[State 200, State]
+type = ChangeState
+trigger1 = Time > 100
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Opponent Swallowed
+[Statedef 205]
+type = A
+movetype = H
+physics = N
+velset = 0,0
+sprpriority = -15
+
+[State 205, State]
+type = ChangeState
+trigger1 = Alive = 0
+value = 5150
+ctrl = 0
+
+[State 205, Anim] ;Anim for HIT_LIGHT to HIT_HARD
+type = ChangeAnim
+trigger1 = Time <= 0
+trigger1 = GetHitVar(animtype) != [3,5]
+value = ifelse((GetHitVar(groundtype) = 1),5000,5010) + GetHitVar(animtype)
+
+[State 205, Anim] ;Anim for HIT_BACK
+type = ChangeAnim
+trigger1 = Time <= 0
+trigger1 = GetHitVar(animtype) = [3,5]
+value = 5030
+
+[State 205, Anim] ;Anim for HIT_UP/HIT_DIAGUP (only if it exists)
+type = ChangeAnim
+trigger1 = Time <= 0
+trigger1 = (GetHitVar(animtype) = [4,5]) && (SelfAnimExist(5047 + GetHitVar(animtype)))
+value = 5047 + GetHitVar(animtype) ;5051 - 4 + type
+
+[State 205, Anim] ;Freeze anim
+type = ChangeAnim
+trigger1 = Time > 0
+value = Anim
+
+[State 205, NotHitBy]
+type = NotHitBy
+trigger1 = Vel Y != 0
+value = SCA
+time = 1
+
+[State 205, Push]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 205, AssertSpecial]
+type = AssertSpecial
+trigger1 = Vel Y > 0
+trigger2 = Pos Y > 0
+flag = NoShadow
+
+;---------------------------------------------------------------------------
+; Hit Falling
+[Statedef 206]
+type = A
+movetype = H
+physics = N
+
+[State 206, State]
+type = ChangeState
+trigger1 = Alive = 0
+value = 5150
+ctrl = 0
+
+[State 206, HitVelSet]
+type = HitVelSet
+trigger1 = Time <= 0
+x = 1
+y = 1
+
+[State 206, Anim2]
+type = ChangeAnim2
+trigger1 = Time <= 0
+value = 6000
+
+[State 206, AssertSpecial]
+type = AssertSpecial
+trigger1 = Pos Y > 0
+trigger1 = Vel Y < 0
+flag = NoShadow
+
+[State 206, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = GetHitVar(yaccel)
+
+[State 206, 4]
+type = SelfState
+trigger1 = Time > 0
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 5100
+
+[State 206, AngleSet]
+type = AngleSet
+trigger1 = Time = 0
+value = 0
+
+[State 206, AngleAdd]
+type = AngleAdd
+trigger1 = Time > 0
+value = 30 ;22.5
+
+[State 206, AngleDraw]
+type = AngleDraw
+trigger1 = Time > 0
+
+[State 206, 5]
+type = SprPriority
+trigger1 = Vel Y < 0
+value = -15
+
+[State 206, 6]
+type = SprPriority
+trigger1 = Vel Y >= 0
+value = 15
+
+;---------------------------------------------------------------------------
+; Attack Start
+[Statedef 210]
+type = A
+movetype = A
+physics = N
+
+[State 210, Anim]
+type = ChangeAnim
+trigger1 = 1
+value = 0
+
+[State 210, VarSet]
+type = VarSet
+trigger1 = Time <= 0
+trigger1 = PrevStateNo != 35
+v = 20
+value = 0
+
+[State 210, VelSet]
+type = VelSet
+trigger1 = Var(20) <= 0
+x = 0
+y = 0
+
+[State 210, Turn]
+type = Turn
+trigger1 = P2Dist X < 0
+
+[State 210, VelAdd]
+type = VelAdd
+triggerall = Vel X < 5
+trigger1 = P2Dist X >= 0
+x = .25
+
+[State 210, State]
+type = ChangeState
+trigger1 = Var(20) > 100
+trigger1 = P2Dist X < 10
+trigger1 = P2Dist X > -10
+value = 200
+
+[State 210, State]
+type = ChangeState
+trigger1 = Var(20) > 200
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Swallowed - Lose
+[Statedef 5150]
+type = L
+movetype = H
+physics = N
+sprpriority = 0
+velset = 0,0
+anim = 5150
+ctrl = 0
+
+[State 5150, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = NoShadow
+flag2 = Invisible
+
+[State 5150, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5150, Push]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 5150, PosSet]
+type = PosSet
+trigger1 = Alive = 0
+x = EnemyNear, Pos X
+y = EnemyNear, Pos Y
+
+[State 5150, PosSet]
+type = PosSet
+trigger1 = Alive
+y = 0
+
+[State 5150, State]
+type = SelfState
+trigger1 = Alive
+value = 5120
+ctrl = 0
+
+;---------------------------------------------------------------------------
+; Initialize (at the start of the round)
+[Statedef 5900]
+type = S
+sprpriority = 0
+
+[State 5900, 0]
+type = PosSet
+trigger1 = 1
+y = 200
+
+[State 5900, 1] ;Clear all int variables
+type = null ;VarRangeSet
+trigger1 = RoundNo = 1
+value = 0
+
+[State 5900, 2] ;Clear all float variables
+type = VarRangeSet
+trigger1 = RoundNo = 1
+fvalue = 0
+
+[state 5900, 3] ;Intro
+type = ChangeState
+trigger1 = RoundNo = 1
+trigger2 = RoundsExisted = 0
+trigger2 = TeamMode = Turns
+trigger2 = RoundNo > 1
+value = 190
+
+;---------------------------------------------------------------------------

@@ -1,0 +1,1087 @@
+
+;-----------------------------------------------------------------------------
+[Statedef -2];常時監視ステート(相手に行動を制御されても関係無く常に実行される)
+;-----------------------------------------------------------------------------
+
+;----------------------------------------------------------------------------
+;デバッグ支援記述集
+
+[State -2, デバッグ表示]
+type = DisplayToClipboard
+trigger1 = 1
+text = "V53-D=%d,V32-D=%d,FV10-C=%f,V3-D=%d,PrevStateno=%d"
+params = Var(53),var(32),fvar(10),var(3),PrevStateno
+ignorehitpause = 1
+
+[State -2, デバッグ表示その3]
+type = AppendToClipboard
+trigger1 = 1
+text = "\nDist X=%d,Y=%d, Vel X=%d/10,Y=%d/10 : Power=%d"
+params = floor(P2BodyDist X),ceil(P2BodyDist Y),ceil(Vel X*10),floor(Vel Y*10),Power
+ignorehitpause = 1
+
+;***************************************************************************
+;---------------------------------------------------------------------------
+;----------------------------ヘルパーアーマー-------------------------------
+;---------------------------------------------------------------------------
+;***************************************************************************
+[state -2,ダメージ]
+type=lifeadd
+triggerall=!ishelper
+triggerall=numhelper(2906)
+trigger1=roundstate=2
+trigger1=helper(2906),gethitvar(damage)
+value=-helper(2906),GetHitVar(Damage)
+absolute=1
+ignorehitpause=1
+
+[State -2, 画像の色]
+type = PalFX
+trigger1=numhelper(2906)
+trigger1=helper(2906),gethitvar(damage)
+time = 5
+add = 200,200,200
+pausemovetime = 99999999
+IgnoreHitPause = 1
+
+;***************************************************************************
+;---------------------------------------------------------------------------
+;----------------------------補正云々---------------------------------------
+;---------------------------------------------------------------------------
+;***************************************************************************
+
+[State -2, 空中ガード不可]
+Type = AssertSpecial
+trigger1 = var(25) = 0
+trigger2 = var(25) = 1
+Trigger2 = !(EnemyNear(var(30)),HitDefAttr = A,AA,AP||EnemyNear(var(30)),statetype = A)
+flag = NoAirGuard
+ignorehitpause = 1
+
+[State -2, スクロール];負けて倒れたらカメラワークを相手に移す処理
+type = ScreenBound
+triggerall = (Life <= 0) || (!Alive) || (Lose)
+trigger1 = (StateNo = 5150) && (RoundState = 4)
+value = 0
+MoveCamera = 0,0
+IgnoreHitPause = 1
+
+
+;---------------------------------------------------------------------------
+;変数管理
+
+[state -2, コマンドリセット]
+type = VarSet
+trigger1 = StateNo = 0
+trigger2 = StateNo = 52
+trigger3 = StateNo = [5000,5210]
+trigger4 = MoveType = H
+var(1) = 0
+ignorehitpause = 1
+Persistent = 1
+
+;;;;;;;;ヒット;;;;;
+[state -2, ヒットリセット]
+type = VarSet
+trigger1 = var(3)
+var(3) = 0
+ignorehitpause = 1
+
+[state -2, 投げヒット確認]
+type = VarSet
+Triggerall = movetype != H
+Triggerall = time = 1
+triggerall = !var(3)
+trigger1 = stateno = [2900,2999]
+var(3) = 6
+ignorehitpause = 1
+
+[state -2, 相打ち確認]
+type = VarSet
+Triggerall = NumTarget
+Triggerall = Target,movetype = H
+Triggerall = movetype = H
+triggerall = !var(3)
+trigger1 = movehit
+var(3) = 30
+ignorehitpause = 1
+
+[state -2, 相打ち確認]
+type = VarSet
+Triggerall = EnemyNear(var(30)),movetype = H
+Triggerall = movetype = H
+triggerall = !var(3)
+trigger1 = movehit
+var(3) = 30
+ignorehitpause = 1
+
+[state -2, 弱ヒット確認]
+type = VarSet
+Triggerall = EnemyNear(Var(30)),movetype = H
+Triggerall = EnemyNear(Var(30)),time = 1
+triggerall = !var(3)
+triggerall = EnemyNear(Var(30)),GetHitVar(fall) = 0
+trigger1 = EnemyNear(Var(30)),GetHitVar(animtype) = 0
+trigger1 = movehit = 1||ProjHitTime(1310) = 1
+var(3) = 1
+ignorehitpause = 1
+
+[state -2, 中ヒット確認]
+type = VarSet
+Triggerall = EnemyNear(Var(30)),movetype = H
+Triggerall = EnemyNear(Var(30)),time = 1
+triggerall = !var(3)
+triggerall = EnemyNear(Var(30)),GetHitVar(fall) = 0
+trigger1 = EnemyNear(Var(30)),GetHitVar(animtype) = 1
+trigger1 = movehit = 1||ProjHitTime(1310) = 1
+var(3) = 2
+ignorehitpause = 1
+
+[state -2, 強ヒット確認]
+type = VarSet
+Triggerall = EnemyNear(Var(30)),movetype = H
+Triggerall = EnemyNear(Var(30)),time = 1
+triggerall = !var(3)
+triggerall = EnemyNear(Var(30)),GetHitVar(fall) = 0
+trigger1 = EnemyNear(Var(30)),GetHitVar(animtype) >= 2
+trigger1 = movehit = 1||ProjHitTime(1310) = 1
+var(3) = 3
+ignorehitpause = 1
+
+[state -2, ダウンヒット確認]
+type = VarSet
+Triggerall = EnemyNear(Var(30)),movetype = H
+Triggerall = EnemyNear(Var(30)),time = 1
+triggerall = !var(3)
+trigger1 = stateno < 2000
+trigger1 = EnemyNear(Var(30)),GetHitVar(fall) = 1
+trigger1 = movehit = 1||ProjHitTime(1310) = 1
+var(3) = 4
+ignorehitpause = 1
+
+[state -2, ダウンヒット確認]
+type = VarSet
+Triggerall = EnemyNear(Var(30)),movetype = H
+Triggerall = EnemyNear(Var(30)),time = 1
+triggerall = !var(3)
+trigger1 = stateno >= 2000
+trigger1 = EnemyNear(Var(30)),GetHitVar(fall) = 1
+trigger1 = movehit = 1||ProjHitTime(1310) = 1
+var(3) = 5
+ignorehitpause = 1
+
+
+[state -2, ガードヒット確認]
+type = VarSet
+Triggerall = EnemyNear(Var(30)),movetype = H
+Triggerall = EnemyNear(Var(30)),time = 1
+triggerall = !var(3)
+trigger1 = MoveGuarded = 1||ProjGuardedTime(1310) = 1
+var(3) = 10
+ignorehitpause = 1
+
+;**********************************
+
+[State -2, 投げぬけリセット]
+type = VarSet
+trigger1 = stateno != 2980
+var(11) = 0
+
+[State -2, アピール]
+type = VarSet
+trigger1 = stateno = 190
+var(12) = 1
+
+[State -2, アピール]
+type = VarSet
+trigger1 = (stateno = 3000)||(stateno = 3020)||(stateno = 3030)||(stateno = 3060)
+trigger1 = animtime = 0
+trigger2 = (stateno = 3011)||(stateno = 3041)||(stateno = 3051)||(stateno = 3101)
+trigger2 = animelem = 2
+var(12) = 0
+
+[State -2, ダッシュ]
+type = VarSet
+trigger1 = stateno = 100
+trigger2 = stateno = 107
+var(13) = 1
+
+[State -2, ダッシュリセット]
+type = VarSet
+trigger1 = stateno = 0||stateno = 52||stateno = 101
+trigger2 = movetype = H
+trigger3 = stateno = [700,769]
+trigger3 = animtime = 0
+var(13) = 0
+ignorehitpause = 1
+Persistent = 0
+
+;::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+;タッグ用生死判別
+;::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+[State -2, タッグ用生死判別]
+Type = VarSet
+trigger1 = RoundState = 2
+var(30) = 0 + (NumEnemy = 2 && EnemyNear(0),life <= 0)
+IgnoreHitPause = 1
+
+[State -2, アピール]
+type = VarSet
+trigger1 = RoundState = 2
+fvar(0) = ifelse(var(12),1.1,1)
+
+;***************************************************************************
+;--------------------------補正---------------------------------------------
+;***************************************************************************
+
+
+;******************補正合計******************************************************
+;---------------補正合計----------------------------------------
+
+[State -2, アタック]
+type = AttackMulSet
+trigger1 = roundstate = 2
+value = fVar(10)
+ignorehitpause = 1
+
+[State -2, ディフェンス]
+type = DefenceMulSet
+trigger1 = roundstate = 2
+trigger1 = fVar(20)
+value = 1/(fVar(20))
+ignorehitpause = 1
+
+[State -2, 補正合計]
+type = VarSet
+trigger1 = roundstate = 2
+fv = 10
+value = ((fVar(11)*fVar(21)*fVar(14)*fVar(15)*(fVar(16)*fVar(17)))+fVar(12))
+ignorehitpause = 1
+;******************補正合計******************************************************
+
+;******************コンボ補正******************************************************
+;---------------------------------------------------------------------------
+
+;******************連勝補正******************************************************
+
+[State -2, 通常]
+type = VarSet
+triggerall = roundstate = 2
+trigger1 = var(56) = 0
+trigger2 = var(28) != 0
+fv = 14
+value = 1
+
+[State -2, 勝ち越し]
+type = VarSet
+triggerall = roundstate = 2
+triggerall = var(29) = 0
+trigger1 = var(56) < 0
+fv = 14
+value = 0.8
+
+[State -2, 負け越し]
+type = VarSet
+triggerall = roundstate = 2
+triggerall = var(29) = 0
+trigger1 = var(56) > 0
+fv = 14
+value = 1.09
+;******************連勝補正******************************************************
+
+
+;******************部位ダメージ蓄積******************************************************
+[State -2, 部位ダメージ蓄積リセット]
+type = Varset
+trigger1 = fvar(15) < 1
+trigger2 = var(27) != 0
+trigger3 = var(31) = 0
+fv = 15
+value = 1
+ignorehitpause = 1
+
+[State -2, 部位ダメージ蓄積上限]
+type = Varset
+trigger1 = fvar(15) >= 1.3
+fv = 15
+value = 1.3
+ignorehitpause = 1
+
+[State -2, 部位ダメージ属性リセット]
+type = Varset
+triggerall = var(31) && var(32) 
+trigger1 = (var(31) = 1) && (var(32) != 1)
+trigger2 = (var(31) = 2) && (var(32) != 2)
+trigger3 = (var(31) = 3) && (var(32) != 3)
+trigger4 = var(31) = -1
+v = 31
+value = 0
+ignorehitpause = 1
+
+;@@@@@@@@@@@@@@@
+
+[State -2, 部位ダメージ属性頭部]
+type = Varset
+triggerall = NumTarget
+Triggerall = (target,stateno = [5000,5210])
+triggerall = var(27) = 0
+Triggerall = var(3)
+trigger1 = HitDefAttr = A,AA,AP
+v = 31
+value = 1
+ignorehitpause = 1
+
+[State -2, 部位ダメージ属性上半身]
+type = Varset
+triggerall = NumTarget
+Triggerall = (target,stateno = [5000,5210])
+triggerall = var(27) = 0
+Triggerall = var(3)
+trigger1 = HitDefAttr = S,AA,AP
+v = 31
+value = 2
+ignorehitpause = 1
+
+[State -2, 部位ダメージ属性下半身]
+type = Varset
+triggerall = NumTarget
+Triggerall = (target,stateno = [5000,5210])
+triggerall = var(27) = 0
+Triggerall = var(3)
+trigger1 = HitDefAttr = C,AA,AP
+v = 31
+value = 3
+ignorehitpause = 1
+
+[State -2, 部位ダメージ属性頭部投げ]
+type = Varset
+triggerall = var(27) = 0
+Triggerall = time = 2
+trigger1 = (stateno = 3030)||(stateno = 3060)
+trigger2 = (stateno = 3010)||(stateno = 3050)||(stateno = 3100)||(stateno = 3110)||(stateno = 3120)
+v = 31
+value = 1
+ignorehitpause = 1
+
+[State -2, 部位ダメージ属性上半身投げ]
+type = Varset
+triggerall = var(27) = 0
+Triggerall = time = 2
+trigger1 = (stateno = 3000)||(stateno = 3020)
+trigger2 = (stateno = 3040)
+v = 31
+value = 2
+ignorehitpause = 1
+
+[State -2, 部位ダメージ属性下半身投げ]
+type = Varset
+triggerall = var(27) = 0
+Triggerall = time = 2
+trigger1 = (stateno = 3060)
+v = 31
+value = 3
+ignorehitpause = 1
+
+[State -2, 部位ダメージ属性頭部打撃投げ]
+type = null;Varset
+triggerall = var(27) = 0
+Triggerall = var(3)
+triggerall = NumTarget
+Triggerall = (target,stateno != [5000,5210])
+Triggerall = target,time = 1
+trigger1 = (stateno = 710)
+v = 31
+value = 1
+ignorehitpause = 1
+
+[State -2, 部位ダメージ属性上半身打撃投げ]
+type = null;Varset
+triggerall = var(27) = 0
+Triggerall = var(3)
+triggerall = NumTarget
+Triggerall = (target,stateno != [5000,5210])
+Triggerall = target,time = 1
+trigger1 = (stateno = 700)
+v = 31
+value = 2
+ignorehitpause = 1
+
+[State -2, 部位ダメージ属性下半身打撃投げ]
+type = null;Varset
+triggerall = var(27) = 0
+Triggerall = var(3)
+triggerall = NumTarget
+Triggerall = (target,stateno != [5000,5210])
+Triggerall = target,time = 1
+trigger1 = 1
+v = 31
+value = 3
+ignorehitpause = 1
+
+;@@@@@@@@@@@@@@@
+
+[State -2, 部位ダメージ属性打撃]
+type = Varset
+triggerall = NumTarget
+Triggerall = (target,stateno = [5000,5210])
+triggerall = var(27) = 0
+triggerall = var(31)
+Trigger1 = movehit
+v = 32
+value = var(31)
+
+[State -2, 部位ダメージ属性投げ]
+type = Varset
+triggerall = var(27) = 0
+triggerall = var(31)
+Triggerall = time = 3
+trigger1 = (stateno = 3000)||(stateno = 3020)||(stateno = 3030)||(stateno = 3060)
+trigger2 = (stateno = 3010)||(stateno = 3040)||(stateno = 3050)||(stateno = 3100)||(stateno = 3110)||(stateno = 3120)
+v = 32
+value = var(31)
+
+[State -2, 部位ダメージ属性打撃投げ]
+type = null;Varset
+triggerall = NumTarget
+Triggerall = (target,stateno != [5000,5210])
+triggerall = var(27) = 0
+triggerall = var(31)
+Triggerall = target,time = 2
+trigger1 = stateno = 700&&(target,stateno = 705)
+trigger2 = stateno = 710&&(target,stateno = 715)
+v = 32
+value = var(31)
+
+[State -2, 部位ダメージ属性リセット]
+type = Varset
+trigger1 = var(31) = 0
+v = 32
+value = 0
+ignorehitpause = 1
+
+;@@@@@@@@@@@@@@@
+
+[State -2, 部位ダメージ蓄積打撃]
+type = Varadd
+triggerall = var(31) = var(32)
+triggerall = var(27) = 0
+triggerall = NumTarget
+Triggerall = (target,stateno = [5000,5210])
+Trigger1 = var(3)
+fv = 15
+value = 0.025
+ignorehitpause = 1
+
+[State -2, 部位ダメージ蓄積投げ]
+type = Varadd
+triggerall = var(27) = 0
+triggerall = var(31) = var(32)
+triggerall = NumTarget
+Triggerall = (target,stateno != [5000,5210])
+Triggerall = time = 2
+trigger1 = (stateno = 3000)||(stateno = 3020)||(stateno = 3030)||(stateno = 3060)
+trigger2 = (stateno = 3010)||(stateno = 3040)||(stateno = 3050)||(stateno = 3100)||(stateno = 3110)||(stateno = 3120)
+fv = 15
+value = 0.025
+ignorehitpause = 1
+
+[State -2, 部位ダメージ蓄積打撃投げ]
+type = null;Varadd
+triggerall = var(31) = var(32)
+triggerall = var(27) = 0
+triggerall = NumTarget
+Triggerall = (target,stateno != [5000,5210])
+Triggerall = target,time = 2
+trigger1 = stateno = 700&&(target,stateno = 705)
+trigger2 = stateno = 710&&(target,stateno = 715)
+fv = 15
+value = 0.025
+ignorehitpause = 1
+
+;******************部位ダメージ蓄積******************************************************
+;******************ベクトル補正******************************************************
+[State -2, ベクトル補正向き合っていない]
+type = Varset
+triggerall = stateno != [2900,3999];投げ中
+trigger1 = EnemyNear(Var(30)),Facing = facing
+trigger1 = p2bodydist X < 0
+trigger2 = var(29) != 0
+fv = 16
+value = 1
+ignorehitpause = 1
+
+[State -2, ベクトル補正向き合っている]
+type = Varset
+triggerall = stateno != [2900,3999];投げ中
+triggerall = var(29) = 0
+trigger1 = EnemyNear(Var(30)),Facing != facing
+trigger1 = p2bodydist X >= 0
+fv = 16
+value = ifelse((EnemyNear(Var(30)),Vel X = [-2,2]),1,ifelse((EnemyNear(Var(30)),Vel X = [3,9]),1.1,ifelse((EnemyNear(Var(30)),Vel X > 10),1.2,ifelse((EnemyNear(Var(30)),Vel X = [-9,-3]),0.8,0.9))))
+ignorehitpause = 1
+
+[State -2, ベクトル補正Y]
+type = Varset
+triggerall = stateno != [2900,3999];投げ中
+trigger1 = var(29)
+fv = 17
+value = 1
+ignorehitpause = 1
+
+[State -2, ベクトル補正Y]
+type = Varset
+triggerall = stateno != [2900,3999];投げ中
+trigger1 = var(29) = 0
+fv = 17
+value = ifelse((EnemyNear(Var(30)),Vel Y = [-3,3]),1,ifelse((EnemyNear(Var(30)),Vel Y = [3,9]),1.1,ifelse((EnemyNear(Var(30)),Vel Y >= 10),1.2,ifelse((EnemyNear(Var(30)),Vel Y = [-99,-4]),0.8,0.9))))
+ignorehitpause = 1
+;******************ベクトル補正******************************************************
+
+;******************体力差補正******************************************************
+
+[State -2, 通常]
+type = VarSet
+triggerall = roundstate = 2
+trigger1 = (100*life/const(data.life)) != 0&&(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) != 0
+trigger1 = (100*life/const(data.life))/(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) < 2
+trigger2 = var(24) != 0
+trigger3 = fvar(21) <= 0.9
+fv = 21
+value = 1
+
+[State -2, 体力差補正]
+type = VarSet
+triggerall = roundstate = 2
+triggerall = var(24) = 0
+triggerall = (100*life/const(data.life)) != 0&&(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) != 0
+trigger1 = (100*life/const(data.life))/(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) >= 2
+fv = 21
+value = 0.91 
+
+[State -2, 体力差補正]
+type = VarSet
+triggerall = roundstate = 2
+triggerall = var(24) = 0
+triggerall = (100*life/const(data.life)) != 0&&(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) != 0
+trigger1 = (100*life/const(data.life))/(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) < 2
+trigger1 = (100*life/const(data.life)) < 30
+fv = 21
+value = 1.09
+;******************根性値******************************************************
+
+;---------------------------------------------------------------------------
+; コンボ補正
+[State -2, ヒットカウント(コンボ補正用)]
+type = Varadd
+triggerall = roundstate = 2
+triggerall = EnemyNear(Var(30)),movetype = H
+triggerall = movehit = 1
+trigger1 = (stateno = [200,799])
+trigger2 = (stateno = [2900,2999])
+v = 14
+value = 1
+
+[State -2, 飛び道具・ヘルパーヒットカウント(コンボ補正用)]
+type = Varadd
+triggerall = roundstate = 2
+triggerall = EnemyNear(Var(30)),movetype = H
+trigger1 = ProjHit1010 = 1||ProjHit1020 = 1
+v = 14
+value = 1
+
+[State -2, ヒットカウントリセット(コンボ補正用)]
+type = Varset
+trigger1 = p2movetype != H
+trigger2 = EnemyNear(Var(30)),GethitVar(hitcount) = 0
+v = 14
+value = 0
+
+[State -2, 補正]
+type = VarSet
+triggerall = roundstate = 2
+triggerall = EnemyNear(Var(30)),movetype = H
+triggerall = stateno != [800,899]
+trigger1 = EnemyNear(Var(30)),GethitVar(hitcount) >= 1
+fv = 11
+value = 1.0 - (Var(14) * 0.15)
+ignorehitpause = 1
+
+[State -2, 補正リセット]
+type = VarSet
+trigger1 = p2movetype != H
+trigger2 = EnemyNear(Var(30)),GethitVar(hitcount) = 0
+fv = 11
+value = 1
+
+[State -2, 補正限度(現0.1)]
+type = VarSet
+trigger1 = fVar(11) < 0
+fv = 11
+value = 0.1
+ignorehitpause = 1
+;******************コンボ補正******************************************************
+
+;******************我慢補正******************************************************
+;----------------------我慢補正(暫定版)-----------------------------------------
+[State -2, 我慢補正カウント]
+type = Varadd
+triggerall = roundstate = 2
+trigger1 = EnemyNear,movetype != H
+trigger1 = !movehit
+v = 21
+value = ifelse((Gametime %60) = 0,1,0)
+ignorehitpause = 1
+
+[State -2, 我慢補正リセット]
+type = VarSet
+triggerall = roundstate = 2
+trigger1 =(stateno = [200,799])&&movehit
+trigger2 =(stateno = 1000)&&var(2) >= 2
+trigger3 =(anim = 2000)&&animelem = 3&&movehit
+trigger4 =(anim = 2001)&&animelem = 7&&movehit
+trigger5 =(anim = 2002)&&animelem = 6&&movehit
+trigger6 = (stateno = 3000)||(stateno = 3020)||(stateno = 3030)||(stateno = 3060)
+trigger6 = animtime = 0
+trigger7 = (stateno = 3011)||(stateno = 3041)||(stateno = 3051)||(stateno = 3101)
+trigger7 = animelem = 2
+v = 21
+value = 0
+ignorehitpause = 1
+
+[State -2, 我慢補正リセット]
+type = VarSet
+trigger1 = roundstate != 2
+v = 21
+value = 0
+ignorehitpause = 1
+
+[State -2, 体力差通常・不利]
+type = VarSet
+triggerall = roundstate = 2
+trigger1 =fVar(13)< 2
+fv = 12
+value = 0.06*Var(21)
+ignorehitpause = 1
+
+[State -2, 体力差やや有利]
+type = VarSet
+triggerall = roundstate = 2
+trigger1 = fVar(13) = 2
+fv = 12
+value = 0.03*Var(21)
+ignorehitpause = 1
+
+[State -2, 体力差有利]
+type = VarSet
+triggerall = roundstate = 2
+trigger1 = fVar(13) = 3
+fv = 12
+value = 0.015*Var(21)
+ignorehitpause = 1
+
+[State -2, 体力差超有利]
+type = VarSet
+triggerall = roundstate = 2
+trigger1 = fVar(13)> 4
+fv = 12
+value = 0
+ignorehitpause = 1
+
+[State -2, 我慢補正計算]
+type = VarSet
+triggerall = roundstate = 2
+triggerall = fVar(13)> 1&&fVar(13)< 4
+trigger1 = fVar(12) > 0.9/fVar(13)
+fv = 12
+value = 0.9/fVar(13)
+ignorehitpause = 1
+
+[State -2, 我慢補正上限(現0.9)]
+type = VarSet
+triggerall = roundstate = 2
+trigger1 = fVar(12) > 0.9
+fv = 12
+value = 0.9
+ignorehitpause = 1
+
+[State -2, ガードキャンセル時我慢補正制限]
+type = VarSet
+triggerall = roundstate = 2
+triggerall = fVar(12) > 0.5
+trigger1 =(stateno = [780,789])
+fv = 12
+value = 0.5
+ignorehitpause = 1
+
+[State -2, 体力差チェック]
+type = VarSet
+triggerall = roundstate = 2
+trigger1 = (100*life/const(data.life)) != 0&&(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) != 0
+fv = 13
+value = (100*life/const(data.life))/(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life))
+ignorehitpause = 1
+
+
+
+;******************我慢補正******************************************************
+
+;---------------------------------------------------------------------------
+; 根性値
+
+
+[State -2, 通常]
+type = VarSet
+triggerall = roundstate = 2
+trigger1 = (100*life/const(data.life)) != 0&&(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) != 0
+trigger1 = (100*life/const(data.life))/(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) < 2
+trigger1 = (100*life/const(data.life)) >= 25
+trigger2 = fvar(20) = 0
+trigger3 = var(23) != 0
+fv = 20
+value = 1
+ignorehitpause = 1
+
+[State -2, 逆根性値]
+type = VarSet
+triggerall = roundstate = 2
+triggerall = var(23) = 0
+triggerall = (100*life/const(data.life)) != 0&&(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) != 0
+trigger1 = (100*life/const(data.life))/(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) >= 2
+trigger1 = (100*life/const(data.life)) >= 25
+fv = 20
+value = 0.85
+ignorehitpause = 1
+
+[State -2, 根性値]
+type = VarSet
+triggerall = roundstate = 2
+triggerall = var(23) = 0
+triggerall = (100*life/const(data.life)) != 0&&(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) != 0
+trigger1 = (100*life/const(data.life))/(100*EnemyNear(Var(30)),life/EnemyNear(Var(30)),const(data.life)) < 2
+trigger1 = (100*life/const(data.life)) < 25
+fv = 20
+value = 1.15
+ignorehitpause = 1
+
+[State -2, 根性]
+type = PalFX
+triggerall = RoundState = 2
+trigger1 = fvar(20) = 1.15
+time =  1
+mul = 256,200,200
+sinadd = 20,0,0,20
+ignorehitpause = 1
+;******************我慢補正******************************************************
+
+;******************パレット・残像消去******************************************************
+
+[State -2, 残像]
+type = AfterImage
+trigger1 = StateNo = 0
+trigger2 = StateNo = 52
+trigger3 = StateNo = [5000,5210]
+trigger4 = MoveType = H
+Time = 0
+
+;******************パレット・残像消去******************************************************
+
+;******************ヘルパー******************************************************
+
+;################投げ###########################
+
+[State -2, 音を鳴らす]
+type = PlaySnd
+triggerall = NumTarget(800) >= 1
+trigger1 = target(800),anim = 815
+trigger1 = target(800),Vel Y > 0&&target(800),Pos Y >= 0
+value = 100, 1
+ignorehitpause = 1
+
+[State -2, 3]
+type = EnvShake
+triggerall = NumTarget(800) >= 1
+trigger1 = target(800),anim = 815
+trigger1 = target(800),Vel Y > 0&&target(800),Pos Y >= 0
+time = 20
+freq = 60
+ampl = -4
+phase = 90
+ignorehitpause = 1
+
+[State -2,ダウンエフェクト]
+type = Explod
+triggerall = NumTarget(800) >= 1
+trigger1 = target(800),anim = 815
+trigger1 = target(800),Vel Y > 0&&target(800),Pos Y >= 0
+anim = 30002
+id = 30002
+pos = 0,0
+postype = P2
+sprpriority = -1
+bindtime = 1
+ownpal = 1
+scale = 1.2,0.2
+ignorehitpause = 1
+
+[State -2,ダウンエフェクト]
+type = Explod
+triggerall = NumTarget(800) >= 1
+trigger1 = target(800),anim = 815
+trigger1 = target(800),Vel Y > 0&&target(800),Pos Y >= 0
+anim = 30040
+id = 30040
+pos = ceil(0*const(size.xscale)),ceil(0*const(size.yscale))
+postype = P2
+sprpriority = -5
+bindtime = 1
+ownpal = 1
+Facing = -1
+scale = 1,0.2
+
+[State -2,ダウンエフェクト]
+type = Explod
+triggerall = NumTarget(800) >= 1
+trigger1 = target(800),anim = 815
+trigger1 = target(800),Vel Y > 0&&target(800),Pos Y >= 0
+anim = 30040
+id = 30040
+pos = ceil(-30*const(size.xscale)),ceil(0*const(size.yscale))
+postype = P2
+sprpriority = 3
+bindtime = 1
+ownpal = 1
+Facing = -1
+scale = 0.5,0.5
+vel = -0.5,-1
+
+[State -2,ダウンエフェクト]
+type = Explod
+triggerall = NumTarget(800) >= 1
+trigger1 = target(800),anim = 815
+trigger1 = target(800),Vel Y > 0&&target(800),Pos Y >= 0
+anim = 30040
+id = 30040
+pos = ceil(30*const(size.xscale)),ceil(0*const(size.yscale))
+postype = P2
+sprpriority = 3
+bindtime = 1
+ownpal = 1
+Facing = -1
+scale = 0.5,0.5
+vel = 0.5,-1
+
+[State -2,ダウンエフェクト]
+type = Explod
+triggerall = NumTarget(800) >= 1
+trigger1 = target(800),anim = 815
+trigger1 = target(800),Vel Y > 0&&target(800),Pos Y >= 0
+anim = 30120
+id = 30120
+pos = ceil(0*const(size.xscale)),ceil(0*const(size.yscale))
+postype = P2
+sprpriority = 3
+bindtime = 1
+ownpal = 1
+Facing = 1
+scale = 0.1,0.3
+
+[State -2,ダウンエフェクト]
+type = Explod
+triggerall = NumTarget(800) >= 1
+trigger1 = target(800),anim = 815
+trigger1 = target(800),Vel Y > 0&&target(800),Pos Y >= 0
+anim = 30120
+id = 30120
+pos = ceil(0*const(size.xscale)),ceil(0*const(size.yscale))
+postype = P2
+sprpriority = 3
+bindtime = 1
+ownpal = 1
+Facing = -1
+scale = 0.1,0.3
+
+;##################################################
+;************************************************************************
+[State -2,壁飛ばし移行]
+type = TargetState
+triggerall = NumTarget(5600)
+trigger1 = Target(5600),BackEdgeBodyDist <= 10
+trigger1 = Target(5600),Vel X < 0
+trigger1 = Target(5600),GetHitVar(fall) = 1
+trigger1 = Target(5600),stateno < 5100
+value = 5601
+
+[state -2,右飛ばしエフェ]
+type=Helper
+triggerall=!ishelper
+triggerall=!numhelper(5603)
+triggerall = NumTarget
+triggerall = target,Pos X >= 0
+trigger1 = target,stateno = 5601
+trigger2 = target,stateno = 4006
+helpertype=normal
+name="right_edge"
+ID=5603
+pos=0,ceil(target,Pos Y)
+postype=right
+facing=1
+stateno=5603
+ownpal=1
+;*************************
+[state -2,左飛ばしエフェ]
+type=Helper
+triggerall=!ishelper
+triggerall=!numhelper(5603)
+triggerall = NumTarget
+triggerall = target,Pos X <= 0
+trigger1 = target,stateno = 5601
+trigger2 = target,stateno = 4006
+helpertype=normal
+name="right_edge"
+ID=5603
+pos=0,ceil(target,Pos Y)
+postype=left
+facing=1
+stateno=5604
+ownpal=1
+;************************************************************************
+
+;###############KO時の処理###########################
+
+;*************Varセット******************
+[State -2, Varセット]
+type = VarSet
+trigger1 = roundstate = 2
+var(10) = 0
+ignorehitpause = 1
+Persistent = 1
+
+[State -2, Varセット]
+type = VarSet
+trigger1 = var(10)
+var(10) = -1
+supermovetime = 99999
+pausemovetime = 99999
+ignorehitpause = 1
+Persistent = 1
+
+[state -2, Varセット]
+type = VarSet
+triggerall = var(10) = 0
+triggerall = winko
+trigger1 = movecontact
+trigger1 = (stateno = [200,799])
+var(10) = 1
+ignorehitpause = 1
+Persistent = 1
+
+[state -2, Varセット]
+type = VarSet
+triggerall = var(10) = 0
+triggerall = winko
+trigger1 = movecontact
+trigger1 = stateno = [1000,1999]
+trigger2 = stateno = [3000,3099]
+var(10) = 2
+ignorehitpause = 1
+Persistent = 1
+
+[state -2, Varセット]
+type = VarSet
+triggerall = var(10) = 0
+triggerall = winko
+trigger1 = movecontact
+trigger1 = stateno = [2000,2999]
+trigger2 = stateno = [3100,3199]
+var(10) = 3
+ignorehitpause = 1
+Persistent = 1
+
+;**************************************
+
+[State -2,***]
+type = PlaySnd
+trigger1 = var(10) = 2
+value = 800,0
+IgnoreHitPause = 1 
+
+[State -2,***]
+type = PlaySnd
+trigger1 = var(10) = 2
+value = 3000,1
+IgnoreHitPause = 1 
+
+[State 3000,00]
+type = ALLPalfx
+trigger1 = var(10) = 2
+add = 100,100,250
+sinadd = -100, -100, -200,40
+time = 23
+supermovetime = 99999
+pausemovetime = 99999
+IgnoreHitPause = 1 
+Persistent = 0
+
+;**************************************
+
+[State -2,***]
+type = PlaySnd
+trigger1 = var(10) = 3
+value = 3010,5
+IgnoreHitPause = 1 
+
+[State -2,***]
+type = PlaySnd
+trigger1 = var(10) = 3
+value = 3000,2
+IgnoreHitPause = 1 
+
+[State -2,***]
+type = PlaySnd
+trigger1 = var(10) = 3
+value = 800,0
+IgnoreHitPause = 1 
+
+[State 600,***]
+type = Explod
+triggerall = NumExplod(30100) = 0
+trigger1 = var(10) = 3
+anim = 30100
+id = 30100
+pos = 0,0
+postype = Left
+sprpriority = -5
+supermove = 1
+supermovetime = 32
+pausemovetime = 32
+ownpal = 1
+scale = 1.1,1.1
+removetime = 32
+IgnoreHitPause = 1 
+Persistent = 0
+
+[State 1000,***]
+type = Pause
+trigger1 = var(10) = 3
+time = 32
+movetime = 0
+IgnoreHitPause = 1 
+Persistent = 0
+
+
+;#################################################
+;========================
+[State -2, 音を鳴らす]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52
+value = 40, 0
+
+[State -2, ダメージボイス]
+type = PlaySnd
+triggerall = Time = 1
+triggerall = Alive && GameTime % 3 = 0
+trigger1 = stateno=5000 || stateno=5010 || stateno=5020
+trigger2 = stateno = 5070 || stateno = 5080 
+value = 10,random/250
+channel = 0

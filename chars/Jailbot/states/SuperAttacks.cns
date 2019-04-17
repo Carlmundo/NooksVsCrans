@@ -1,0 +1,3595 @@
+; Jailbot by altoiddealer
+;---------------------------------------------------------------------------
+;SUPER ATTACKS
+;---------------------------------------------------------------------------
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;SUPER1: TURBINES
+[StateDef 3200]
+type = S
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 3200
+poweradd = -2000
+sprpriority = 1
+
+[State 3200, NotHitBy]
+type = nothitby
+trigger1 = Time <= 5
+time = 1
+value = SCA
+
+[State 3200, 1]
+type = PlaySnd
+trigger1 = !Time
+value = 3200,0
+channel = 0
+
+[State 3200, 1]
+type = SuperPause
+trigger1 = Time = 5
+moveTime = 40
+Time = 40
+anim = -1
+darken = 1
+
+[State 3200,1] ;Hyper Portrait
+type = Explod
+trigger1 = Time = 5
+removeTime = 40
+supermoveTime = 40
+sprpriority = -5
+anim = 3207
+ownpal = 1
+removeongethit = 1
+postype = back
+pos = Floor(GameWidth/2),0
+scale = Cond(GameWidth/GameHeight >= 1.5,GameWidth/720,GameHeight/480),Cond(GameWidth/GameHeight >= 1.5,GameWidth/720,GameHeight/480) ;Proportionate, dynamic scaling!
+
+[State 3200, HitDef] ;When charging up
+type = HitDef
+trigger1 = anim = 3200
+trigger1 = AnimElem = 6 || AnimElem = 7
+trigger1 = Time > 45
+attr = S,HT
+damage = 20,4 ;some bonus dmg for close range
+hitflag = MAF
+guardflag = MA
+guard.pauseTime = 10,10
+priority = 4, Hit
+sparkno = -1
+guard.sparkno = -1
+hitsound = 3200,5
+guardsound = S200,340 ;6,0
+forcestand = 1
+fall.recover = 0
+p2facing = 1
+;p2StateNo = Cond(EnemyNear,statetype = A,(Cond((var(7) = 2 || var(7) = 3),3206,3205)),3204)
+;id = Cond(EnemyNear,statetype = A,(Cond((var(7) = 2 || var(7) = 3),3206,3205)),3204)
+id = 3200
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 3200, Hyper BG]
+type = Helper
+trigger1 = Time = 45
+supermovetime = 1
+sprpriority = -5
+stateno = 3209
+ownpal = 1
+ignorehitpause = 1
+postype = back
+pos = Floor(GameWidth/2),-Floor(GameHeight/2)
+
+[State 3200, Player change to attack]
+type = ChangeState
+triggerall = !AILevel
+trigger1 = numtarget(3200)
+trigger1 = Time <= 45
+trigger2 = Time > 45
+value = Cond(var(4) = 1,3201,Cond(var(4) = 2,3202,3203))
+
+[State 3200, AI change to attack] ;auto-changes to appropriate attack - ignores X/Y/Z input
+type = ChangeState
+triggerall = AILevel
+trigger1 = numtarget(3200)
+trigger1 = Time <= 45
+trigger2 = Time > 45
+value = Cond(p2statetype = A,(Cond((var(7) = [2,3]),3203,3202)),3201) ;var for custom "look" behavior to find opponent
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;SUPER1: GROUND
+[StateDef 3201]
+type = S
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 3201
+sprpriority = 2
+
+[State 3200,1] ;Tweak screen bahavior
+type = Screenbound
+trigger1 = movehit
+trigger1 = numtarget(3204)
+trigger1 = AnimElem = 5, >= 1
+
+[State 3200, 2] ;Turbine Stand Attack
+type = HitDef
+triggerall = anim = 3201
+trigger1 = !numtarget(3204)
+trigger2 = numtarget(3200) ;if hit during charge-up
+attr = S,HT
+damage = 10,1
+hitflag = MAF
+guardflag = MA
+;guard.pauseTime = 5,5
+;guard.hitTime = 0
+guard.slideTime = 2
+priority = 4, Hit
+sparkno = -1
+sparkxy = -10,-65
+hitsound = 3200,5
+guardsound = S200,340 ;6,0
+forcestand = 1
+fall.recover = 0
+p2facing = 1
+p2StateNo = 3204
+fall = 1
+id = 3204
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 3200, Stop turbine sound]
+type = StopSnd
+trigger1 = Time = 40
+trigger1 = !numtarget
+trigger2 = moveguarded ;if attack blocked
+channel = 0
+persistent = 0
+
+[State 3200, Fade turbine sound]
+type = PlaySnd
+trigger1 = Time = 40
+trigger1 = !numtarget
+trigger2 = moveguarded ;if attack blocked
+value = 3200,1
+persistent = 0
+
+[State 3200,1] ;Vibrate Jailbot
+type = OffSet
+trigger1 = movehit
+trigger1 = numtarget(3204)
+trigger1 = Time%3 = 0
+x = -2+Random%4
+y = -2+Random%4
+
+[State 3200,1]
+type = TargetlifeAdd
+trigger1 = movehit
+trigger1 = numtarget(3204)
+trigger1 = Time%5 = 0
+id = 3204
+value = -15
+
+[State 3200,1] ;Get opponent's ID
+type = varset
+trigger1 = numtarget(3204)
+var(4) = target,ID
+ignorehitpause = 1
+
+[State 1100,5] ;Blood Helper
+type = Helper
+triggerall = var(2) < 10
+trigger1 = movehit
+trigger1 = numtarget(3204)
+name = "blood"
+size.ground.front = 0
+size.ground.back = 0
+size.height = 0
+ID = 3205
+StateNo = 3205
+postype = p2
+persistent = 0
+
+[State 3200,1]
+type = PlaySnd
+trigger1 = movehit
+trigger1 = numtarget(3204)
+trigger1 = Time%5 = 0
+value = 200,240
+pan = Floor(Cond(((Screenpos X - target(3204),Screenpos x) < 0),(target(3204),Screenpos x - Screenpos x),(Screenpos X - target(3204),Screenpos x)))
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3204)
+trigger1 = AnimElem = 1, >= 0
+trigger1 = AnimElem = 2, < 0
+value = 32,30
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3204)
+trigger1 = AnimElem = 1, >= 0
+trigger1 = AnimElem = 2, < 0
+id = 3204
+pos = 32,-68
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3204)
+trigger1 = AnimElem = 2, >= 0
+trigger1 = AnimElem = 3, < 0
+value = 82,30
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3204)
+trigger1 = AnimElem = 2, >= 0
+trigger1 = AnimElem = 3, < 0
+id = 3204
+pos = 82,-58
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3204)
+trigger1 = AnimElem = 3, >= 0
+trigger1 = AnimElem = 4, < 0
+value = 138,30
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3204)
+trigger1 = AnimElem = 3, >= 0
+trigger1 = AnimElem = 4, < 0
+id = 3204
+pos = 138,-58
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3204)
+trigger1 = AnimElem = 4, >= 0
+trigger1 = AnimElem = 5, < 0
+value = 218,20
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3204)
+trigger1 = AnimElem = 4, >= 0
+trigger1 = AnimElem = 5, < 0
+id = 3204
+pos = 218,-58
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3204)
+trigger1 = AnimElem = 5, >= 0
+trigger1 = animTime <= 0
+value = Cond(GameWidth > 258,258,240),0 ;only use exact width on larger resolution
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3204)
+trigger1 = AnimElem = 5, >= 0
+trigger1 = animTime <= 0
+id = 3204
+pos = 258,-58
+
+[State 3200,1] ;Stand retract animation
+type = Changeanim
+trigger1 = Time >= 40
+trigger1 = !numtarget(3204)
+trigger2 = Time >= 80
+trigger2 = numtarget(3204)
+trigger3 = MoveGuarded
+value = 3204
+persistent = 0
+
+[State 3200, 3]
+type = TargetDrop
+trigger1 = Time >= 80
+trigger1 = numtarget(3204)
+trigger2 = moveguarded
+
+[State 3200, HitDef] ;Turbine Retract Ground
+type = HitDef
+trigger1 = anim = 3204 ;retracting anim
+trigger1 = !numtarget(3204)
+trigger1 = !movehit ;initial attack missed
+attr = S,HA
+damage = 15,1
+animtype = Heavy
+hitflag = MAF
+guardflag = MA
+priority = 4, Hit
+pauseTime = 5,5
+guard.pauseTime = 4,4
+sparkno = s8000
+;sparkno = 1;s8000
+sparkxy = -10,-65
+guard.sparkno = -1
+hitsound = S200,240 ;5,0
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 15
+ground.hitTime  = 1
+ground.velocity = -3,-3
+air.type = Low
+air.hitTime = 15
+air.velocity = -6,-5
+envshake.Time = 1
+envshake.ampl = 1
+fall = 1
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 3200, 17] ;Change to Stand
+type = Changestate
+trigger1 = anim = 3204
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;SUPER1: MED AIR
+[StateDef 3202]
+type = S
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 3202
+sprpriority = 1
+
+[State 3201,0] ;Tweak screen bahavior
+type = Screenbound
+trigger1 = movehit
+trigger1 = numtarget(3205)
+trigger1 = AnimElem = 5, >= 1
+
+[State 3200, 2] ;Turbine Med Attack
+type = HitDef
+triggerall = anim = 3202
+trigger1 = !numtarget(3205)
+;trigger2 = numtarget(3200) ;if hit during charge-up
+attr = S,HT
+damage = 10,1
+hitflag = MAF
+guardflag = MA
+priority = 4, Hit
+sparkno = -1
+sparkxy = -10,-65
+hitsound = S200,240 ;5,0
+guardsound = S200,340 ;6,0
+fall.recover = 0
+p2facing = 1
+p2StateNo = 3204
+fall = 1
+id = 3205
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 3200, Stop turbine sound]
+type = StopSnd
+trigger1 = Time = 40
+trigger1 = !numtarget
+trigger2 = moveguarded ;if attack blocked
+channel = 0
+persistent = 0
+
+[State 3200, Fade turbine sound]
+type = PlaySnd
+trigger1 = Time = 40
+trigger1 = !numtarget
+trigger2 = moveguarded ;if attack blocked
+value = 3200,1
+persistent = 0
+
+[State 3200,1] ;Vibrate Jailbot
+type = OffSet
+trigger1 = movehit
+trigger1 = numtarget(3205)
+trigger1 = Time%3 = 0
+x = -2+Random%4
+y = -2+Random%4
+
+[State 3200,1]
+type = TargetlifeAdd
+trigger1 = movehit
+trigger1 = numtarget(3205)
+trigger1 = Time%5 = 0
+id = 3205
+value = -15
+
+[State 3200,1] ;Get opponent's ID
+type = varset
+trigger1 = numtarget(3205)
+var(4) = target,ID
+ignorehitpause = 1
+
+[State 1100,5] ;Blood Helper
+type = Helper
+triggerall = var(2) < 10
+trigger1 = movehit
+trigger1 = numtarget(3205)
+name = "blood"
+size.ground.front = 0
+size.ground.back = 0
+size.height = 0
+ID = 3205
+StateNo = 3205
+postype = p2
+persistent = 0
+
+[State 3200,1]
+type = PlaySnd
+trigger1 = movehit
+trigger1 = numtarget(3205)
+trigger1 = Time%5 = 0
+value = 200,240
+pan = Floor(Cond(((Screenpos X - target(3205),Screenpos x) < 0),(target(3205),Screenpos x - Screenpos x),(Screenpos X - target(3205),Screenpos x)))
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3205)
+trigger1 = AnimElem = 1
+value = 22,30
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3205)
+trigger1 = AnimElem = 1
+id = 3205
+pos = 22,-84
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3205)
+trigger1 = AnimElem = 2
+value = 52,30
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3205)
+trigger1 = AnimElem = 2
+id = 3205
+pos = 52,-94
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3205)
+trigger1 = AnimElem = 3
+value = 114,30
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3205)
+trigger1 = AnimElem = 3
+id = 3205
+pos = 114,-114
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3205)
+trigger1 = AnimElem = 4
+value = 178,30
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3205)
+trigger1 = AnimElem = 4
+id = 3205
+pos = 178,-142
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3205)
+trigger1 = AnimElem = 5, >= 0
+value = Cond(GameWidth > 258,258,240),0 ;only use exact width on larger resolution
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3205)
+trigger1 = AnimElem = 5, >= 0
+id = 3205
+pos = 244,-170
+
+[State 3200,1] ;Med retract animation
+type = Changeanim
+trigger1 = Time >= 40
+trigger1 = !numtarget(3205)
+trigger2 = Time >= 80
+trigger2 = numtarget(3205)
+trigger3 = MoveGuarded
+value = 3205
+persistent = 0
+
+[State 3200, 3]
+type = TargetDrop
+trigger1 = Time >= 80
+trigger1 = numtarget(3205)
+trigger2 = moveguarded
+
+[State 3200, HitDef] ;Turbine Retract Med
+type = HitDef
+trigger1 = anim = 3205
+trigger1 = !numtarget(3205)
+;trigger1 = !numtarget(3200)
+trigger1 = !movehit ;only if initial attack missed
+attr = S,HA
+damage = 15,1
+animtype = Heavy
+hitflag = MAF
+guardflag = MA
+priority = 4, Hit
+pauseTime = 5,5
+guard.pauseTime = 4,4
+sparkno = s8000
+;sparkno = 1;s8000
+sparkxy = -10, -65
+guard.sparkno = -1
+hitsound = S200,240 ;5,0
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 15
+ground.hitTime  = 1
+ground.velocity = -3
+air.type = Low
+air.hitTime = 15
+air.velocity = -6,-5
+envshake.Time = 1
+envshake.ampl = 1
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 3200, 17] ;Change to Stand
+type = Changestate
+trigger1 = anim = 3205
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;SUPER1: HIGH AIR
+[StateDef 3203]
+type = S
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 3203
+sprpriority = 1
+
+[State 3200, 2] ;Turbine High Attack
+type = HitDef
+triggerall = anim = 3203
+trigger1 = !numtarget(3206)
+trigger2 = numtarget(3200) ;if hit during charge-up
+attr = S,HT
+damage = 10,1
+hitflag = MAF
+guardflag = MA
+priority = 4, Hit
+sparkno = -1
+sparkxy = -10,-65
+hitsound = S200,240 ;5,0
+guardsound = S200,340 ;6,0
+fall.recover = 0
+p2facing = 1
+p2StateNo = 3204
+fall = 1
+id = 3206
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 3200, Stop turbine sound]
+type = StopSnd
+trigger1 = Time = 40
+trigger1 = !numtarget
+trigger2 = moveguarded ;if attack blocked
+channel = 0
+persistent = 0
+
+[State 3200, Fade turbine sound]
+type = PlaySnd
+trigger1 = Time = 40
+trigger1 = !numtarget
+trigger2 = moveguarded ;if attack blocked
+value = 3200,1
+persistent = 0
+
+[State 3200,1] ;Vibrate Jailbot
+type = OffSet
+trigger1 = movehit
+trigger1 = numtarget(3206)
+trigger1 = Time%3 = 0
+x = -2+Random%4
+y = -2+Random%4
+
+[State 3200,1]
+type = TargetlifeAdd
+trigger1 = movehit
+trigger1 = numtarget(3206)
+trigger1 = Time%5 = 0
+id = 3206
+value = -15
+
+[State 3200,1] ;Get opponent's ID
+type = varset
+trigger1 = numtarget(3206)
+var(4) = target,ID
+ignorehitpause = 1
+
+[State 1100,5] ;Blood Helper
+type = Helper
+triggerall = var(2) < 10
+trigger1 = movehit
+trigger1 = numtarget(3206)
+name = "blood"
+size.ground.front = 0
+size.ground.back = 0
+size.height = 0
+ID = 3205
+StateNo = 3205
+postype = p2
+persistent = 0
+
+[State 3200,1]
+type = PlaySnd
+trigger1 = movehit
+trigger1 = numtarget(3206)
+trigger1 = Time%5 = 0
+value = 200,240
+pan = Floor(Cond(((Screenpos X - target(3206),Screenpos x) < 0),(target(3206),Screenpos x - Screenpos x),(Screenpos X - target(3206),Screenpos x)))
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3206)
+trigger1 = AnimElem = 1, >= 0
+trigger1 = AnimElem = 2, < 0
+value = 24,30
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3206)
+trigger1 = AnimElem = 1, >= 0
+trigger1 = AnimElem = 2, < 0
+id = 3206
+pos = 24,-94
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3206)
+trigger1 = AnimElem = 2, >= 0
+trigger1 = AnimElem = 3, < 0
+value = 54,30
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3206)
+trigger1 = AnimElem = 2, >= 0
+trigger1 = AnimElem = 3, < 0
+id = 3206
+pos = 54,-108
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3206)
+trigger1 = AnimElem = 3, >= 0
+trigger1 = AnimElem = 4, < 0
+value = 86,30
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3206)
+trigger1 = AnimElem = 3, >= 0
+trigger1 = AnimElem = 4, < 0
+id = 3206
+pos = 86,-140
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3206)
+trigger1 = AnimElem = 4, >= 0
+trigger1 = AnimElem = 5, < 0
+value = 122,30
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3206)
+trigger1 = AnimElem = 4, >= 0
+trigger1 = AnimElem = 5, < 0
+id = 3206
+pos = 122,-192
+
+[State 3200,1]
+type = Width
+trigger1 = numtarget(3206)
+trigger1 = AnimElem = 5, >= 0
+trigger1 = animTime <= 0
+value = 142,30
+
+[State 3200, 3]
+type = TargetBind
+trigger1 = movehit
+trigger1 = numtarget(3206)
+trigger1 = AnimElem = 5, >= 0
+trigger1 = animTime <= 0
+id = 3206
+pos = 142,-218
+
+[State 3200,1] ;High retract animation
+type = Changeanim
+trigger1 = Time >= 40
+trigger1 = !numtarget(3206)
+trigger2 = Time >= 80
+trigger2 = numtarget(3206)
+trigger3 = MoveGuarded
+value = 3206
+persistent = 0
+
+[State 3200, 3]
+type = TargetDrop
+trigger1 = Time >= 80
+trigger1 = numtarget(3206)
+trigger2 = moveguarded
+
+[State 3200, HitDef] ;Turbine Retract High
+type = HitDef
+trigger1 = anim = 3206
+trigger1 = !movehit ;only if initial attack missed
+attr = S,HA
+damage = 15,1
+animtype = Heavy
+hitflag = MAF
+guardflag = MA
+priority = 4, Hit
+pauseTime = 5,5
+guard.pauseTime = 4,4
+sparkno = s8000
+;sparkno = 1;s8000
+sparkxy = -10,-65
+guard.sparkno = -1
+hitsound = S200,240 ;5,0
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 15
+ground.hitTime  = 1
+ground.velocity = -3
+air.type = Low
+air.hitTime = 15
+air.velocity = -6,-5
+envshake.Time = 1
+envshake.ampl = 1
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 3200, 17] ;Change to Stand
+type = Changestate
+trigger1 = anim = 3206
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;---------------------------
+;SUPER1: P2 CHOP
+[Statedef 3204]
+type = A
+movetype = H
+physics = N
+velset = 0,0
+sprpriority = -1
+
+[State 3201,1]
+type = Width
+trigger1 = 1
+value = 0,0
+
+[State 3201,1] ;Ground-hit behavior
+type = Screenbound
+trigger1 = playerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),numtarget(3204) ;Ground hit
+value = 1
+movecamera = Cond((Abs(playerID(gethitvar(fall.envshake.ampl)),pos X - pos x) >= GameWidth),1,0),0
+
+[State 3201,1] ;Ground-hit behavior (fallback code)
+type = Screenbound
+trigger1 = !playerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = Enemy,numtarget(3204) ;Ground hit
+value = 1
+movecamera = Cond(p2dist x >= GameWidth,1,0),0
+
+[State 3201,1] ;Air-hit behavior
+type = Screenbound
+triggerall = playerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),numtarget(3205) ;Med air hit
+trigger2 = playerID(gethitvar(fall.envshake.ampl)),numtarget(3206) ;High air hit
+value = 1
+movecamera = Cond((Abs(playerID(gethitvar(fall.envshake.ampl)),pos X - pos x) >= GameWidth),1,0),1
+
+[State 3201,1] ;Air-hit behavior (fallback code)
+type = Screenbound
+triggerall = !playerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = Enemy,numtarget(3205) ;Med air hit
+trigger2 = Enemy,numtarget(3206) ;High air hit
+value = 1
+movecamera = Cond(p2dist x >= GameWidth,1,0),1
+
+[State 3201,2]
+type = AngleDraw
+trigger1 = playerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),numtarget(3205) ;Med air hit
+trigger2 = !playerIDExist(gethitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,numtarget(3205) ;fallback code
+value = -23
+
+[State 3201,2]
+type = AngleDraw
+trigger1 = playerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),numtarget(3206) ;High air hit
+trigger2 = !playerIDExist(gethitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,numtarget(3206) ;fallback code
+value = -47
+
+[State 1113,1] ;Get hit anim
+type = Changeanim2
+trigger1 = playerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),AnimElem = 1, >= 0
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),AnimElem = 2, < 0
+trigger2 = !playerIDExist(gethitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,AnimElem = 1, >= 0 ;fallback code
+trigger2 = Enemy,AnimElem = 2, < 0 ;fallback code
+value = 3208
+persistent = 0
+ignorehitpause = 1
+
+[State 1113,1] ;Get hit anim
+type = Changeanim2
+trigger1 = playerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),AnimElem = 2, >= 0
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),AnimElem = 3, < 0
+trigger2 = !playerIDExist(gethitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,AnimElem = 2, >= 0 ;fallback code
+trigger2 = Enemy,AnimElem = 3, < 0 ;fallback code
+value = 3208
+elem = 2
+persistent = 0
+ignorehitpause = 1
+
+[State 1113,1] ;Get hit anim
+type = Changeanim2
+trigger1 = playerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),AnimElem = 3, >= 0
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),AnimElem = 4, < 0
+trigger2 = !playerIDExist(gethitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,AnimElem = 3, >= 0 ;fallback code
+trigger2 = Enemy,AnimElem = 4, < 0 ;fallback code
+value = 3208
+elem = 3
+persistent = 0
+ignorehitpause = 1
+
+[State 1113,1] ;Get hit anim
+type = Changeanim2
+trigger1 = playerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),AnimElem = 4, >= 0
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),AnimElem = 5, < 0
+trigger2 = !playerIDExist(gethitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,AnimElem = 4, >= 0 ;fallback code
+trigger2 = Enemy,AnimElem = 5, < 0 ;fallback code
+value = 3208
+elem = 4
+persistent = 0
+ignorehitpause = 1
+
+[State 1113,1] ;Get hit anim
+type = Changeanim2
+trigger1 = playerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),AnimElem = 5, >= 0
+trigger1 = playerID(gethitvar(fall.envshake.ampl)),animTime <= 0
+trigger2 = !playerIDExist(gethitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,AnimElem = 5, >= 0 ;fallback code
+trigger2 = Enemy,animTime <= 0 ;fallback code
+value = 3208
+elem = 5
+persistent = 0
+ignorehitpause = 1
+
+;[State 3201, 2] ;Send to custom KO for special win poses
+;type = SelfState
+;triggerall = Time > 20
+;triggerall = !gethitvar(isbound)
+;triggerall = life <= 0
+;trigger1 = playerIDExist(gethitvar(fall.envshake.ampl))
+;trigger1 = playerID(gethitvar(fall.envshake.ampl)),var(59) = 2
+;trigger2 = !playerIDExist(gethitvar(fall.envshake.ampl)) ;fallback code
+;trigger2 = Enemy,var(59) = 2 ;fallback code
+;value = 5110
+;ignorehitpause = 1
+
+[State 3201, 2]
+type = SelfState
+trigger1 = Time > 20
+trigger1 = !gethitvar(isbound)
+value = 5050
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;SUPER1: BLOOD
+[StateDef 3205]
+type = A
+movetype = I
+physics = N
+sprpriority = 1
+anim = 9102
+
+[State 3205,1] ;Bind to enemy
+type = posSet
+trigger1 = playerIDexist(root,var(4))
+x = playerID(root,var(4)),pos x
+y = playerID(root,var(4)),pos y
+
+[State 3205, 1]
+type = Changeanim
+trigger1 = anim = 9102
+trigger1 = !animtime
+value = 9100
+
+[State 3205, Extra Sparks]
+type = Explod
+trigger1 = Time > 4
+trigger1 = Time%8 = 0
+anim = 8000+Random%2
+pos = -10+random%20,-15+random%30
+sprpriority = 2
+
+[State 3205,2]
+type = Turn
+trigger1 = anim = [9100,9102]
+trigger1 = !animtime
+
+[State 3201,2]
+type = AngleDraw
+trigger1 = parent,numtarget(3205) ;Med air hit
+value = -23
+
+[State 3201,2]
+type = AngleDraw
+trigger1 = parent,numtarget(3206) ;High air hit
+value = -47
+
+[State 1104,4]
+type = destroyself
+trigger1 = !parent,numtarget(3204)
+trigger1 = !parent,numtarget(3205)
+trigger1 = !parent,numtarget(3206)
+trigger2 = parent,MoveGuarded
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;SUPER1: SUPER BG
+[StateDef 3209]
+type = S
+movetype = I
+physics = N
+sprpriority = -5
+anim = 9999
+
+[State 3201,2]
+type = ChangeAnim
+trigger1 = parent,movehit
+value = 3209
+persistent = 0
+
+[State 3301, Lock Position]
+type = VelSet
+trigger1 = 1
+x = Floor(GameWidth/2)-BackEdgeDist
+y = Floor(GameHeight/2)-ScreenPos Y
+
+[State 3201,2]
+type = AngleDraw
+trigger1 = 1
+
+[State 3201,2]
+type = AngleSet
+trigger1 = parent,stateno = [3202,3203] ;High air hit
+value = Cond(parent,stateno = 3202,23,47)
+persistent = 0
+
+[State 1104,4]
+type = destroyself
+trigger1 = parent,StateNo != [3200,3203]
+trigger2 = parent,movehit
+trigger2 = !parent,numtarget(3204)
+trigger2 = !parent,numtarget(3205)
+trigger2 = !parent,numtarget(3206)
+trigger3 = parent,MoveGuarded
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HYPER1: P1 ARCADE
+[Statedef 3300] ;Some of Jailbot's character animations are drawn as Explods so that he cannot be pushed while in Arcade mode.
+type = S
+movetype = A
+physics = S
+velset = 0,0
+poweradd = -3000
+anim = 3300
+ctrl = 0
+sprpriority = -2
+
+[State 3312,0]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = noautoturn
+
+[State 181, 18] ;Can't hit me after opponent starts getting pulled into the screen
+type = NotHitBy
+trigger1 = Time <= 10
+trigger2 = numtarget(3300)
+trigger2 = target(3300),StateNo = 3304 && target(3300),Time > 40
+value = SCA
+Time = 1
+
+[State 3300, 4] ;posFreeze Helper
+type = Helper
+trigger1 = !time
+StateNo = 3312
+id = 3312
+name = "posFreeze Helper"
+
+[State 3312, 1] ;Lock Jailbot's position
+type = posSet
+trigger1 = NumHelper(3312)
+x = Helper(3312),pos x
+y = Helper(3312),pos y
+
+[State 3300,1] ;Plop down and glow sound
+type = PlaySnd
+trigger1 = !time
+value = 3300,0
+channel = 0
+
+[State 3300, 2] ;Dramatic pause
+type = SuperPause
+trigger1 = Time = 10
+anim = -1
+Time = 40
+moveTime = 10
+
+[State 3300,1] ;Hyper Portrait
+type = Explod
+trigger1 = Time = 10
+sprpriority = -5
+removeTime = 40
+anim = 3329
+ownpal = 1
+removeongethit = 1
+postype = back
+supermoveTime = 40
+pos = Floor(GameWidth/2),0
+scale = (Cond(GameWidth/GameHeight >= 1.5,GameWidth/720,GameHeight/480)),(Cond(GameWidth/GameHeight >= 1.5,GameWidth/720,GameHeight/480)) ;Proportionate, dynamic scaling!
+bindTime = -1
+
+[State 3300, 6] ;Plop shake
+type = EnvShake
+trigger1 = anim = 3300 && AnimElem = 8
+Time = 4
+ampl = 4
+freq = 80
+
+[State 3300, 3] ;Ground shockwave
+type = Explod
+trigger1 = anim = 3300 && AnimElem = 8
+anim = 8101
+sprpriority = -5
+supermoveTime = 70
+bindTime = -1
+
+[State 3300, 9]
+type = HitDef
+trigger1 = !time
+attr = S, HT
+damage = 0,10
+hitflag = MAF
+guardflag = MA
+priority = 4,Miss
+guard.pauseTime = 0,0
+sparkxy = 0,0
+sparkno = -1
+fall.damage = 1
+guard.sparkno = -1
+hitsound = -1
+guardsound = -1
+ground.type = High
+guard.hitTime = 10
+air.velocity = 0,0
+numhits = 0
+p2StateNo = 3304 ;Custom State
+id = 3300
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+hitonce = 1 ;just one opponent
+fall = 1
+
+[State 3300, 12]
+type = StateTypeSet
+trigger1 = MoveGuarded
+movetype = I
+
+[State 3300, 10] ;Background FX - Attempt
+type = BgPalFX
+trigger1 = anim = 3300 && AnimElem = 10
+Time = 100
+add = 0,0,50
+sinadd = 0,0,10,40
+color = 0
+
+[State 3300, 10] ;Background FX - Success
+type = BgPalFX
+trigger1 = numtarget(3300)
+trigger1 = target(3300),StateNo = 3304
+Time = 150
+add = 0,0,50
+sinadd = 0,0,60,4
+color = 0
+persistent = 0
+
+[State 3300, 4] ;Crowd Control Helper
+type = Helper
+trigger1 = numtarget(3300)
+trigger1 = target(3300),StateNo = 3304 && target(3300),Time > 40
+StateNo = 3315
+pos = Floor(GameWidth/2),Floor(GameHeight/2)
+id = 3315
+name = "Crowd Control"
+persistent = 0
+
+[State 3300, 7] ;Screen spark
+type = Explod
+trigger1 = anim = 3301 && AnimElemTime(1) = 150 ;after attack succeeds
+anim = 8010
+pos = 0,-76
+scale = .5,.5
+sprpriority = 0
+persistent = 0
+bindTime = -1
+
+[State 3300, 12] ;Change to Arcade End if attack misses
+type = Changeanim
+triggerall = !numtarget
+trigger1 = anim = 3300 && !animtime
+value = 3302
+persistent = 0
+
+[State -3, Transform sound]
+type = PlaySnd
+triggerall = !numtarget
+trigger1 = anim = 3302
+value = 5040,0
+channel = 0
+persistent = 0
+
+[State 3300, 11] ;Change to stand if attack misses
+type = ChangeState
+triggerall = !numtarget
+trigger1 = anim = 3302 && !animtime
+value = 0
+ctrl = 1
+
+[State 3300, 12] ;Change to Pac-Bot if attack succeeds
+type = AssertSpecial
+trigger1 = MoveHit
+flag = TimerFreeze
+
+[State 3300, 12] ;Change to Pac-Bot if attack succeeds
+type = Changeanim
+trigger1 = MoveHit
+value = 3301
+persistent = 0
+
+[State 3300,13] ;Trapped enemy sound
+type = PlaySnd
+trigger1 = MoveHit
+value = 3300,1
+persistent = 0
+channel = 0
+
+[State 3300, 14] ;Lock camera
+type = Screenbound
+trigger1 = MoveHit
+
+[State 3302, GameWidth] ;reduce constant math operations
+type = Null
+triggerall = anim = 3301 && !animtime
+trigger1 = var(4) := Floor(Gamewidth/2)
+trigger1 = var(10) := Floor(Gameheight/2)
+
+[State 3300, 15] ;It's arcade Time!
+type = ChangeState
+trigger1 = anim = 3301 && !animtime
+value = 3301
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HYPER1: P1 PAC
+[Statedef 3301]
+type = A
+movetype = A
+physics = N
+velset = 0,0
+anim = 9999
+ctrl = 0
+sprpriority = 3
+
+[State 3310, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+Time = 1
+[State 3301, Lock camera]
+type = Screenbound
+trigger1 = 1
+[State 3301, Special 1]
+type = AssertSpecial
+trigger1 = 1
+flag = NoFG
+flag2 = NoMusic
+flag3 = NoAutoTurn
+[State 3301, Special 2]
+type = AssertSpecial
+trigger1 = 1
+flag = NoBG
+flag2 = TimerFreeze
+flag3 = globalnoshadow
+[State 3303, No Bar Display]
+type = AssertSpecial
+trigger1 = 1
+flag = nobardisplay
+
+[State 3301, 10] ;Blackout loading screen
+type = Explod
+trigger1 = !time
+id = 3305
+;removeTime = 100
+persistent = 0
+postype = back
+sprpriority = -5
+scale = GameWidth,GameHeight
+anim = 3333
+
+[State 3301, Face border left]
+type = Explod
+trigger1 = !time
+anim = Cond(GameHeight >= 240 * Const240p(1),3305,3306) ;4:3 or 16:9
+id = 3305
+postype = left
+ontop = 1
+scale = 1,Floor(GameHeight/Cond(GameHeight >= 240 * Const240p(1),240,180))
+
+[State 3301, Face border right]
+type = Explod
+trigger1 = !time
+anim = Cond(GameHeight >= 240 * Const240p(1),3305,3306) ;4:3 or 16:9
+id = 3305
+postype = right
+ontop = 1
+facing = -1
+scale = 1,Floor(GameHeight/Cond(GameHeight >= 240 * Const240p(1),240,180))
+
+[State 3301, Pac-Man theme song]
+type = PlaySnd
+trigger1 = !time
+value = 3300,2
+
+[State 3301, PacBot logo]
+type = Explod
+trigger1 = Time = 20
+anim = 3307
+postype = left
+pos = var(4),var(10) ;centered
+ontop = 1
+
+[State 3301, Pac-Man level]
+type = Explod
+trigger1 = Time = 100
+anim = 3308
+id = 3301
+postype = back
+pos = var(4),var(10) ;centered
+sprpriority = 0
+
+[State 3301, Dots disappearing anim]
+type = Explod
+trigger1 = Time = 100
+anim = 3309
+postype = back
+pos = var(4),var(10) ;centered
+sprpriority = 1
+
+[State 3301, Jailbot's life Bar]
+type = Explod
+trigger1 = Time = 100
+removeTime = -1
+anim = 3315
+id = 3301
+postype = left
+pos = Cond(TeamSide = 1,(var(4)-129),(var(4)+129)),var(10)+50
+scale = 1,((life*1.0)/(lifeMax*1.0))*100.0
+sprpriority = 1
+
+[State 3301, Enemy life Bar]
+type = Explod
+trigger1 = Time = 100
+trigger2 = Time = 310
+removeTime = 210
+anim = 3315
+id = 3301
+postype = left
+pos = Cond(TeamSide = 1,(var(4)+129),(var(4)-129)),var(10)+50
+scale = 1,((target(3300),life*1.0)/(target(3300),lifeMax*1.0))*100.0
+sprpriority = 1
+
+[State 3301, Ghost-Bot stand]
+type = Explod
+trigger1 = Time = 120
+anim = 3310
+postype = back
+removeTime = 73
+pos = var(4),var(10)-28
+sprpriority = 3
+
+[State 3301, Ghost-Bot Move Back 1]
+type = Explod
+trigger1 = Time = 193
+anim = 3311
+postype = back
+removeTime = 18
+pos = var(4),var(10)-28
+vel = -2,0
+sprpriority = 3
+
+[State 3301, Ghost-Bot Move Down 1]
+type = Explod
+trigger1 = Time = 211
+anim = 3312
+postype = back
+removeTime = 10
+pos = var(4)-36,var(10)-28
+vel = 0,2
+sprpriority = 3
+
+[State 3301, Ghost-Bot Move Back 2]
+type = Explod
+trigger1 = Time = 221
+anim = 3311
+postype = back
+removeTime = 12
+pos = var(4)-36,var(10)-8
+vel = -2,0
+sprpriority = 3
+
+[State 3301, Ghost-Bot Move Down 2]
+type = Explod
+trigger1 = Time = 233
+anim = 3312
+postype = back
+removeTime = 22
+pos = var(4)-60,var(10)-8
+vel = 0,2
+sprpriority = 3
+
+[State 3301, Ghost-Bot Move Back 3]
+type = Explod
+trigger1 = Time = 255
+anim = 3311
+postype = back
+removeTime = 20
+pos = var(4)-60,var(10)+36
+vel = -2,0
+sprpriority = 3
+
+[State 3301, Ghost-Bot Move Down 3]
+type = Explod
+trigger1 = Time = 275
+anim = 3312
+postype = back
+removeTime = 12
+pos = var(4)-100,var(10)+36
+vel = 0,2
+sprpriority = 3
+
+[State 3301, Ghost-Bot Move Forward 4]
+type = Explod
+trigger1 = Time = 287
+anim = 3310
+postype = back
+removeTime = 22
+pos = var(4)-100,var(10)+60
+vel = 2,0
+sprpriority = 3
+
+[State 3301, Ghost-Bot Stop]
+type = Explod
+trigger1 = Time = 309
+anim = 3310
+postype = back
+removeTime = 161 ;Time = 470
+pos = var(4)-54,var(10)+60
+sprpriority = 3
+
+[State 3301, Siren sound]
+type = PlaySnd
+trigger1 = Time = 193
+value = 3300,3
+
+[State 3301, Enemy eat dots sound]
+type = PlaySnd
+trigger1 = Time = [194,294]
+trigger1 = Time%14 = 0 ;loop every 14 ticks
+value = 3300,4
+
+[State 3301, Enemy death sound]
+type = PlaySnd
+trigger1 = Time = 336
+value = 3300,5
+
+[State 3301, Enemy death poof]
+type = Explod
+trigger1 = Time = 390
+anim = 3314
+sprpriority = 4
+postype = back
+pos = var(4)-44,var(10)+61
+
+[State 3302, Cell Door sound]
+type = PlaySnd
+trigger1 = Time = 400
+;trigger1 = var(13)
+Value = 3300,15
+
+[State 3301, Cell Door Transition]
+type = Explod
+trigger1 = Time = 410
+anim = 3325
+;anim = Cond(var(13),3325,3316)
+id = 3301
+postype = left
+pos = var(4),var(10)-Cond(GameHeight >= 240 * Const240p(1),120,90)
+vel = 0,Cond(GameHeight >= 240 * Const240p(1),4,3)
+sprpriority = 4
+
+[State 3301, Clear Pac-Man level]
+type = RemoveExplod
+trigger1 = Time = 470
+id = 3301
+
+[State 3301, Go to Pong sequence]
+type = ChangeState
+trigger1 = Time = 470
+value = Cond(var(13),3302,3308)
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HYPER1: P1 PONG
+[Statedef 3302]
+type = A
+movetype = A
+physics = N
+velset = 0,0
+anim = 9999
+ctrl = 0
+sprpriority = 3
+
+[State 3302, Don't hit me]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+Time = 1
+[State 3302, Lock camera]
+type = Screenbound
+trigger1 = 1
+[State 3302, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = NoFG
+flag2 = NoMusic
+flag3 = NoAutoTurn
+[State 3302, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = NoBG
+flag2 = TimerFreeze
+flag3 = globalnoshadow
+[State 3303, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = nobardisplay
+
+[State 3302, JailPong Bars]
+type = Explod
+trigger1 = !time
+removetime = 60
+anim = 3325
+id = 3302
+postype = left
+pos = var(4),var(10)+Cond(GameHeight >= 240 * Const240p(1),120,90) ;pos Y accounts for if 4:3 or if Widescreen
+sprpriority = 4
+
+[State 3301, JailPong logo]
+type = Explod
+trigger1 = !Time
+anim = 3326
+postype = left
+pos = var(4),var(10) ;centered
+sprpriority = 5
+
+[State 3302, JailPong Bars Go Up]
+type = Explod
+trigger1 = time = 60
+removetime = 30
+anim = 3325
+id = 3302
+postype = left
+pos = var(4),var(10)+Cond(GameHeight >= 240 * Const240p(1),120,90) ;pos Y accounts for if 4:3 or if Widescreen
+vel = 0,-Cond(GameHeight >= 240 * Const240p(1),8,6)
+sprpriority = 4
+
+[State 3301, Get Ready!]
+type = Explod
+trigger1 = Time = 90
+anim = 3335
+removetime = 45
+postype = left
+pos = var(4),var(10) ;centered
+sprpriority = 5
+
+[State 3302, Pong level]
+type = Explod
+trigger1 = !time
+anim = Cond(GameHeight >= 240 * Const240p(1),3316,3327) ;anim accounts for if 4:3 or if Widescreen
+id = 3302
+postype = left
+pos = var(4),var(10)+Cond(GameHeight >= 240 * Const240p(1),120,90) ;pos Y accounts for if 4:3 or if Widescreen
+sprpriority = 0
+
+[State 3301, Jailbot life Bar]
+type = Explod
+trigger1 = !time
+removeTime = -1
+anim = 3317
+id = 3302
+postype = left
+facing = Cond(TeamSide = 1,1,-1)
+pos = var(4)+Cond(TeamSide = 1,-23,23),var(10)-Cond(GameHeight >= 240 * Const240p(1),110,80)
+scale = ((life*1.0)/(lifeMax*1.0))*100.0,1
+sprpriority = 1
+
+[State 3301, Enemy life Bar]
+type = Explod
+trigger1 = 1 ;Constantly refreshing
+anim = 3317
+id = 3302
+postype = left
+facing = Cond(TeamSide = 1,-1,1)
+pos = var(4)+Cond(TeamSide = 1,23,-23),var(10)-Cond(GameHeight >= 240 * Const240p(1),110,80)
+scale = ((target(3300),life*1.0)/(target(3300),lifeMax*1.0))*100.0,1
+sprpriority = 1
+
+[State 3302, Pong Set Initial Control Value]
+type = Null
+trigger1 = !time
+trigger1 = var(11) := Floor(GameHeight/2) ;P1 Start Y value
+trigger1 = var(12) := Floor(GameHeight/2) ;P2 Start Y value
+
+[State 3302, P1 Player Control]
+type = Null
+triggerall = !AILevel
+triggerall = Time > 175
+;triggerall = Time > 40
+triggerall = abs(target(3300),Pos X) < 105 ;enemy is in-bounds
+;Up
+trigger1 = var(11) > 22
+trigger1 = command = "holdup" || command = "up"
+trigger1 = command != "holddown" && command != "down"
+trigger1 = var(11) := var(11) - (2+Floor((Time-90)*0.004))
+;Down
+trigger2 = var(11) < Floor(GameHeight-22)
+trigger2 = command = "holddown" || command = "down"
+trigger2 = command != "holdup" || command != "up"
+trigger2 = var(11) := var(11) + (2+Floor((Time-90)*0.004))
+
+[State 3302, P1 AI Control - Enemy Approaching]
+type = Null
+triggerall = AILevel
+triggerall = abs(target(3300),Pos X) < 89 + (AILevel*2) ;enemy on the way
+triggerall = Cond(Teamside = 1,target(3300),facing = -1,target(3300),facing = 1)
+trigger1 = Cond(AILevel = 8,1,Random < 40)
+trigger1 = var(11) - target(3300),ScreenPos Y > 4
+trigger1 = var(11) := var(11) - 4
+trigger2 = Cond(AILevel > 6,1,Random < 80)
+trigger2 = var(11) - target(3300),ScreenPos Y > 3
+trigger2 = var(11) := var(11) - 3
+trigger3 = Cond(AILevel > 3,1,Random < 160)
+trigger3 = var(11) - target(3300),ScreenPos Y > 2
+trigger3 = var(11) := var(11) - 2
+trigger4 = AILevel < 4
+trigger4 = var(11) - target(3300),ScreenPos Y > 1
+trigger4 = var(11) := var(11) - 1
+trigger5 = Cond(AILevel = 8,1,Random < 40)
+trigger5 = target(3300),ScreenPos Y - var(11) > 4
+trigger5 = var(11) := var(11) + 4
+trigger6 = Cond(AILevel > 6,1,Random < 80)
+trigger6 = target(3300),ScreenPos Y - var(11) > 3
+trigger6 = var(11) := var(11) + 3
+trigger7 = Cond(AILevel > 3,1,Random < 160)
+trigger7 = target(3300),ScreenPos Y - var(11) > 2
+trigger7 = var(11) := var(11) + 2
+trigger8 = AILevel < 4
+trigger8 = target(3300),ScreenPos Y - var(11) > 1
+trigger8 = var(11) := var(11) + 1
+
+[State 3302, P1 AI Control - Enemy Going Away]
+type = Null
+triggerall = AILevel > 3
+triggerall = abs(target(3300),Pos X) < 105 ;enemy is in-bounds
+triggerall = Cond(Teamside = 1,target(3300),facing = 1,target(3300),facing = -1)
+trigger1 = var(11) > var(10)
+trigger1 = var(11) := var(11) - 1
+trigger2 = var(11) < var(10)
+trigger2 = var(11) := var(11) + 1
+
+[State 3302, P2 Player Control]
+type = Null
+triggerall = !target(3300),AILevel
+triggerall = Time > 90
+triggerall = abs(target(3300),Pos X) < 105 ;enemy is in-bounds
+;Up
+trigger1 = var(12) > 22
+trigger1 = target(3300),command = "holdup" || target(3300),command = "up"
+trigger1 = target(3300),command != "holddown" || target(3300),command != "down"
+trigger1 = var(12) := var(12) - (2+Floor((Time-90)*0.004))
+;Down
+trigger2 = var(12) < Floor(GameHeight-22)
+trigger2 = target(3300),command = "holddown" || target(3300),command = "down"
+trigger2 = target(3300),command != "holdup" || target(3300),command != "up"
+trigger2 = var(12) := var(12) + (2+Floor((Time-90)*0.004))
+
+[State 3302, P2 AI Control - Enemy Approaching]
+type = Null
+triggerall = target(3300),AILevel
+triggerall = abs(target(3300),Pos X) < 89 + (target(3300),AILevel*2) ;enemy on the way
+triggerall = Cond(Teamside = 1,target(3300),facing = 1,target(3300),facing = -1)
+trigger1 = Random < Cond(target(3300),AILevel = 8,900,30)
+trigger1 = var(12) - target(3300),ScreenPos Y > 4
+trigger1 = var(12) := var(12) - 4
+trigger2 = Random < Cond(target(3300),AILevel > 6,900,70)
+trigger2 = var(12) - target(3300),ScreenPos Y > 3
+trigger2 = var(12) := var(12) - 3
+trigger3 = Random < Cond(target(3300),AILevel > 3,900,150)
+trigger3 = var(12) - target(3300),ScreenPos Y > 2
+trigger3 = var(12) := var(12) - 2
+trigger4 = target(3300),AILevel < 4
+trigger4 = var(12) - target(3300),ScreenPos Y > 1
+trigger4 = var(12) := var(12) - 1
+trigger5 = Random < Cond(target(3300),AILevel = 8,900,30)
+trigger5 = target(3300),ScreenPos Y - var(12) > 4
+trigger5 = var(12) := var(12) + 4
+trigger6 = Random < Cond(target(3300),AILevel > 6,900,70)
+trigger6 = target(3300),ScreenPos Y - var(12) > 3
+trigger6 = var(12) := var(12) + 3
+trigger7 = Random < Cond(target(3300),AILevel > 3,900,150)
+trigger7 = target(3300),ScreenPos Y - var(12) > 2
+trigger7 = var(12) := var(12) + 2
+trigger8 = target(3300),AILevel < 4
+trigger8 = target(3300),ScreenPos Y - var(12) > 1
+trigger8 = var(12) := var(12) + 1
+
+[State 3302, P2 AI Control - Enemy Going Away]
+type = Null
+triggerall = target(3300),AILevel > 3
+triggerall = abs(target(3300),Pos X) < 105 ;enemy is in-bounds
+triggerall = target(3300),facing != facing
+trigger1 = var(12) > var(10)
+trigger1 = var(12) := var(12) - 1
+trigger2 = var(12) < var(10)
+trigger2 = var(12) := var(12) + 1
+
+[State 3302, P1 Paddle]
+type = Explod
+trigger1 = 1
+anim = 3318
+postype = left
+facing = Cond(TeamSide = 1,1,-1)
+sprpriority = 3
+pos = var(4),var(11)
+
+[State 3302, P2 Paddle]
+type = Explod
+trigger1 = 1
+anim = 3319
+postype = left
+facing = Cond(TeamSide = 1,-1,1)
+sprpriority = 3
+pos = var(4),var(12)
+
+[State 3302, Hit paddle sound]
+type = PlaySnd
+trigger1 = target(3300),anim = 3321
+trigger1 = abs(target(3300),Pos X) = 105
+Value = 3300,6
+persistent = 10 ;reload
+
+[State 3302, hit wall sound]
+type = PlaySnd
+triggerall = abs(target(3300),Pos X) < 105 ;in-bounds
+trigger1 = target(3300),ScreenPos Y < abs(target(3300),Vel Y * 1.5)
+trigger2 = target(3300),ScreenPos Y > GameHeight - abs(target(3300),Vel Y * 1.5)
+Value = 3300,7
+persistent = 10 ;reload
+
+[State 3302, Enemy lose sound]
+type = PlaySnd
+trigger1 = target(3300),anim = 3304
+Value = 3300,14
+persistent = 0
+
+[State 3302, Set Custom Win Pose]
+type = Null
+triggerall = !AILevel ;Not for AI
+trigger1 = target(3300),Life <= 1
+trigger1 = var(59) := 5
+trigger1 = var(5) := 0
+
+[State 3302, TILT Sound]
+type = PlaySnd
+triggerall = var(59) != 5 ;Not custom win pose
+trigger1 = target(3300),anim = 3304 ;P2 Lost game
+trigger1 = abs(target(3300),Pos X) >= 125
+trigger2 = target(3300),anim = 3322 ;P2 Won Game
+trigger2 = abs(target(3300),Pos X) >= Floor(Gamewidth/2)
+value = 3300,8
+persistent = 0
+
+[State 3301, TILT BG]
+type = Explod
+triggerall = var(59) != 5 ;Not custom win pose
+trigger1 = target(3300),anim = 3304 ;P2 Lost game
+trigger1 = abs(target(3300),Pos X) >= 125
+trigger2 = target(3300),anim = 3322 ;P2 Won Game
+trigger2 = abs(target(3300),Pos X) >= Floor(Gamewidth/2)
+removetime = -1
+postype = back
+sprpriority = 5
+scale = GameWidth,GameHeight
+anim = 3334
+id = 3302
+persistent = 0
+
+[State 3302, Clear Pong level]
+type = RemoveExplod
+trigger1 = target(3300),anim = 3304 ;P2 Lost game
+trigger1 = abs(target(3300),Pos X) >= 130
+trigger2 = target(3300),anim = 3322 ;P2 Won Game
+trigger2 = abs(target(3300),Pos X) >= Floor((Gamewidth/2)+60)
+id = 3302
+
+[State 3302, Back to fighting]
+type = ChangeState
+trigger1 = target(3300),StateNo = 3307
+value = 3303
+
+[State 3301, Set BG for Custom Win Pose]
+type = Explod
+triggerall = var(59) = 5 ;Custom win pose
+trigger1 = !NumExplod(3302) ;The level was cleared
+removeTime = -1
+postype = back
+ontop = 1
+scale = GameWidth,GameHeight
+anim = 3333
+id = 5555
+persistent = 0
+[State 3301, Game Over Text]
+type = Explod
+trigger1 = numexplod(5555)
+removeTime = -1
+postype = left
+pos = var(4),var(10)
+ontop = 1
+scale = 1.5,1.5
+anim = 3336
+id = 3336
+persistent = 0
+[State 3301, Game Over Sound]
+type = PlaySnd
+trigger1 = numexplod(5555)
+value = 3300,10
+persistent = 0
+[State 3302, Go to Custom Win Pose]
+type = ChangeState
+trigger1 = numexplod(5555)
+value = 0 ;Must return to State 0 to end the match
+;ctrl = 1 ;Must have control to end the match
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HYPER1: P1 END
+[Statedef 3303]
+type = S
+movetype = A
+physics = N
+velset = 0,0
+poweradd = 0
+ctrl = 0
+anim = 3301
+sprpriority = -2
+
+[State 3300, 12] ;Change to Pac-Bot if attack succeeds
+type = AssertSpecial
+trigger1 = Time < 140
+flag = TimerFreeze
+
+[State 3303, 7] ;anim
+type = Explod
+trigger1 = !time
+anim = 3331
+id = 3331
+shadow = -1
+removeTime = -1
+removeongethit = 1 ;remove if hit
+sprpriority = -2
+bindTime = -1
+
+[State 3301, 18] ;Don't hit me
+type = NotHitBy
+trigger1 = 1
+value = SCA
+Time = 1
+
+[State 3303, 1] ;Lock camera
+type = ScreenBound
+trigger1 = 1
+value = 0
+
+[State 3303, 30] ;Remove Face Borders
+type = RemoveExplod
+trigger1 = !time
+id = 3305
+
+[State 3303, 3]
+type = PlayerPush
+trigger1 = Time < 140
+value = 0
+
+[State 3300, 10] ;Background FX - Pre-Eject enemy
+type = BgPalFX
+trigger1 = !time
+Time = 20
+add = 0,0,50
+color = 0
+persistent = 0
+
+[State 3300, 10] ;Background FX - Eject enemy
+type = BgPalFX
+trigger1 = Time = 20
+Time = 120
+add = 0,0,50
+sinadd = 0,0,60,4
+color = 0
+persistent = 0
+
+[State 3303,2]
+type = VarAdd
+trigger1 = var(57) = 12 && Time%2 = 0 ;Rainbow glow anim speed
+trigger2 = var(57) = 30 && Time%3 = 0 ;USA glow anim speed
+var(4) = 1
+
+[State 3303,2]
+type = VarSet
+trigger1 = !time
+trigger2 = var(57) = 12 && var(4) = 9 ;Rainbow glow anim reset
+trigger3 = var(57) = 30 && var(4) = 5 ;USA glow anim reset
+var(4) = 1
+
+[State 3300,3] ;Rainbow glow
+type = RemapPal
+trigger1 = var(57) = 12
+source = 3303,1
+dest = 3333,0+var(4)
+;dest = 3333,1+random%8
+
+[State 3300,3] ;USA glow
+type = RemapPal
+trigger1 = var(57) = 30
+source = 3303,1
+dest = 3334,0+var(4)
+
+[State 3303, 7] ;Screen glow blast (additive transparency)
+type = Explod
+trigger1 = !time
+trigger1 = var(57) != 10 && var(57) != 16 && var(57) != 23 && var(57) != 33
+anim = 3303
+id = 3303
+removeTime = 140
+removeongethit = 1 ;remove if hit
+sprpriority = -1
+persistent = 0
+bindTime = -1
+
+[State 3303, 7] ;Screen glow blast (subtractive transparency)
+type = Explod
+trigger1 = !time
+trigger1 = var(57) = 10 || var(57) = 16 || var(57) = 23 || var(57) = 33
+anim = 3303
+id = 3303
+removeTime = 140
+removeongethit = 1 ;remove if hit
+sprpriority = -1
+persistent = 0
+bindTime = -1
+trans = sub
+
+[State 3300, Screen Glow Sound]
+type = PlaySnd
+trigger1 = numexplod(3303)
+value = 3300,16
+channel = 20
+persistent = 0
+
+[State 3300, Screen Glow Sound]
+type = StopSnd
+trigger1 = !numexplod(3303)
+channel = 20
+
+[State 3303, 31] ;Remove Jailbot anim
+type = RemoveExplod
+trigger1 = Time = 140
+id = 3331
+
+[State 3303, 31] ;Change to Arcade End
+type = Changeanim
+trigger1 = Time = 140
+value = 3302
+
+[State 3303, 31] ;Change to Arcade End anim
+type = Explod
+trigger1 = Time = 140
+;removeongethit = 1
+anim = 3332
+shadow = -1
+bindTime = -1
+sprpriority = -2
+
+[State 3302, 8] ;Transform sound
+type = PlaySnd
+triggerall = Time = 140
+trigger1 = !numtarget
+trigger2 = numtarget && target,Life > 0
+value = 3300,9
+
+[State 3302, 8] ;Game Over sound
+type = PlaySnd
+trigger1 = Time = 140
+trigger1 = numtarget && target,Life <= 0
+value = 3300,10
+persistent = 0
+
+[State 3303, 1] ;Change to stand
+type = ChangeState
+trigger1 = anim = 3302 && !animtime
+ctrl = 1
+value = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HYPER1: P2 ARCADE
+[Statedef 3304]
+type = A
+movetype = H
+physics = N
+velset = 0,0
+ctrl = 0
+sprpriority = 3 ;Above glow
+
+[State 3304, 1] ;Lock camera
+type = ScreenBound
+trigger1 = 1
+
+[State 3304, 2] ;No auto-turn
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+
+[State 3304, 3] ;Caught & sucked-in anim (normal)
+type = Changeanim2
+trigger1 = !time
+value = 3304
+
+[State 3304, 4] ;Guessed offset position
+type = posAdd
+trigger1 = !time
+y = Const(size.mid.pos.y)
+
+[State 3304, 5] ;Freeze for a sec
+type = posFreeze
+Trigger1 = Time < 40
+
+[State 3304, 6] ;Vel set
+type = VelSet
+trigger1 = Time = 40
+trigger1 = playerIDExist(gethitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+x = Cond(playerID(gethitvar(fall.envshake.ampl)),facing = facing,-(Abs(playerID(gethitvar(fall.envshake.ampl)),pos X - pos X) / 60),(Abs(playerID(gethitvar(fall.envshake.ampl)),pos X - pos X) / 60)) ;60-tick duration
+y = ((Abs(playerID(gethitvar(fall.envshake.ampl)),pos Y - pos Y)*1.0)-76.0)/60.0 ;60-tick duration
+
+[State 3304, 6] ;Vel set (fallback code)
+type = VelSet
+trigger1 = Time = 40
+trigger1 = !playerIDExist(gethitvar(fall.envshake.ampl))
+x = Cond(Enemy,facing = facing,-(P2Dist X / 60),(P2Dist X / 60)) ;60-tick duration
+y = ((P2Dist Y*1.0)-76.0)/60.0 ;60-tick duration
+
+[State 3304, 8] ;Vel stop
+type = VelSet
+trigger1 = Time = 100
+x = 0
+y = 0
+
+[State 3304, 9] ;Scale
+type = AngleSet
+trigger1 = 1
+Value = 0
+
+[State 3304, 9] ;Shrink
+type = AngleDraw
+trigger1 = Time = [40,100] ;60 tick duration
+Scale = 1-(((Time*1.0)-40.0)*.017),1-(((Time*1.0)-40.0)*.017) ;from 100% to ~0%
+
+[State 3304,2]
+type = Trans
+trigger1 = Time >= 40
+trigger1 = Time%4 = 0
+trans = add1
+alpha = Floor(256-(Time*8)),256
+
+[State 810, 1] ;Digitization Pal effect
+type = AfterImage
+trigger1 = Time > 40
+Time = 200
+length = 50
+palcontrast = 48,48,48 ;128,256,0
+palpostbright = -32,0,0
+palbright = 0,0,0 ;128,256,0
+paladd = 0,0,0
+palmul = 1.0,1.0,1.0
+;palcolor = 256
+persistent = 0
+
+[State 3304, 11] ;Change to blank anim
+type = Changeanim2
+trigger1 = Time = 100
+value = 9999
+
+[State 3304, 12] ;Go to Pac-Bot state
+type = Changestate
+trigger1 = PlayerIDExist(gethitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo = 3301
+trigger2 = !PlayerIDExist(gethitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,StateNo = 3301 ;fallback code
+value = 3305
+
+[State 3304, 12] ;Go to Pac-Bot state (If widescreen)
+type = Changestate
+trigger1 = PlayerIDExist(gethitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo = 3310
+trigger2 = !PlayerIDExist(gethitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,StateNo = 3310 ;fallback code
+value = 3311
+
+[State 3201, 2] ;Get dropped if Jailbot is hit out of attack state
+type = SelfState
+trigger1 = PlayerIDExist(gethitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo != [3300,3301]
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo != 3310
+trigger2 = !PlayerIDExist(gethitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,StateNo != [3300,3301] ;fallback code
+trigger2 = Enemy,StateNo != 3310 ;fallback code
+value = 5050
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HYPER1: P2 PAC
+[Statedef 3305]
+type = A
+movetype = H
+physics = N
+velset = 0,0
+ctrl = 0
+sprpriority = 2
+
+[State 3305, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+Time = 1
+
+[State 3305, Lock camera]
+type = ScreenBound
+trigger1 = 1
+value = 0
+
+[State 3305, No auto-turn]
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+
+[State 3305, Scale - Enemy is more tall than wide]
+type = AngleDraw
+triggerall = !selfanimexist(17210) ;Enemy does not have custom animation
+trigger1 = (Const(size.mid.pos.y)*-2.0) > ((Const(size.ground.back) + Const(size.ground.front)))
+trigger1 = Time < 330
+Scale = (18.0/(Const(size.mid.pos.y)*-2.0)),(18.0/(Const(size.mid.pos.y)*-2.0))
+
+[State 3305, Scale - Enemy is more wide than tall]
+type = AngleDraw
+triggerall = !selfanimexist(17210) ;Enemy does not have custom animation
+trigger1 = (Const(size.mid.pos.y)*-2.0) < ((Const(size.ground.back) + Const(size.ground.front)))
+trigger1 = Time < 330
+Scale = (18.0/(Const(size.ground.back) + Const(size.ground.front))),(18.0/(Const(size.ground.back) + Const(size.ground.front)))
+
+[State 3305, Adjust facing] ;if facing the same direction as Jailbot
+type = Turn
+triggerall = !time
+trigger1 = PlayerIDExist(gethitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),facing = facing
+trigger2 = !PlayerIDExist(gethitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,facing = facing ;fallback code
+
+;[State 3301, Hide enemy]
+;type = ChangeAnim2
+;trigger1 = !time
+;value = 9999
+
+[State 3301, Enemy starting position x]
+type = PosSet
+trigger1 = !time
+x = 0
+
+[State 3301, Enemy starting position y] ;for reasons unknown, this code is not working as "posSet"...
+type = PosAdd
+trigger1 = !time
+y = Cond(selfanimexist(17210),Floor(-ScreenPos Y+((GameHeight/2)+12)),Floor(-ScreenPos Y+((GameHeight/2)+20)))
+
+[State 3301, Enemy stand] ;lock y position
+type = VelSet
+trigger1 = Time < 193
+y = Cond(selfanimexist(17210),((GameHeight/2)+12),((GameHeight/2)+20))-ScreenPos Y ;lock y position
+
+[State 3301, Enemy standing anim]
+type = ChangeAnim
+trigger1 = Time = [100,192] ;lock on first anim frame
+value = Cond(selfanimexist(17210),17210,0)
+
+[State 3305, Turn]
+type = Turn
+trigger1 = Time = 120 || Time = 140 || Time = 160 || Time = 180 || Time = 193
+
+[State 3301, Enemy walking anim]
+type = ChangeAnim
+trigger1 = Time = 193
+value = Cond(selfanimexist(17210),17210,20)
+
+[State 3301, Enemy walk fwd 1]
+type = VelSet
+trigger1 = Time = [193,204]
+x = 1
+y = Cond(selfanimexist(17210),((GameHeight/2)+12),((GameHeight/2)+20))-ScreenPos Y ;lock y position
+
+[State 3301, 14] ;Enemy walk down anim
+type = ChangeAnim
+triggerall = selfanimexist(17211) ;if custom walk down anim exists
+trigger1 = Time = 205
+value = 17211
+
+[State 3301, Enemy walk down 1]
+type = VelSet
+trigger1 = Time = [205,252]
+x = 0
+y = 1
+
+[State 3305, Turn]
+type = Turn
+trigger1 = Time = 253
+
+[State 3301, 14] ;Enemy walk left/right anim
+type = ChangeAnim
+triggerall = selfanimexist(17211) ;only necessary if there was custom walk down
+trigger1 = Time = 253
+value = 17210
+
+[State 3301, Enemy walk fwd 2]
+type = VelSet
+trigger1 = Time = [253,308]
+x = 1
+y = Cond(selfanimexist(17210),((GameHeight/2)+60),((GameHeight/2)+68))-ScreenPos Y ;lock y position
+
+[State 3301, Enemy stop] ;lock y position
+type = VelSet
+trigger1 = Time > 309
+x = 0
+y = ((GameHeight/2)+61)-ScreenPos Y ;lock y position
+
+[State 3301, Set pos Y to get pac'd] ;for reasons unknown, this code is not working as "posSet"...
+type = posAdd
+trigger1 = Time = 309
+y = Floor((-Screenpos Y)+((GameHeight/2)+61))
+
+[State 3305, Hurt enemy]
+type = lifeAdd
+trigger1 = Time = 309
+value = -200
+kill = 0 ;don't kill
+
+[State 3305, Pac-death anim]
+type = Changeanim2
+trigger1 = !selfanimexist(17210) ;does not have custom anim
+trigger1 = Time = 309
+value = 3313
+
+[State 3305, Custom Pac-death anim]
+type = Changeanim
+triggerall = selfanimexist(17210) ;has custom anim
+trigger1 = Time = [309,329] ;freeze on animelem 1
+value = 17210
+
+[State 3305, Spin around]
+type = AngleAdd
+trigger1 = Time = [330,390] ;duration
+trigger1 = Time%6 = 0 ;Every 6 ticks
+Value = 90
+
+[State 3305, Shrink - Enemy is more tall than wide]
+type = AngleDraw
+triggerall = !selfanimexist(17210) ;Enemy does not have custom animation
+trigger1 = Time = [330,390]
+trigger1 = (Const(size.mid.pos.y)*-2.0) >= ((Const(size.ground.back) + Const(size.ground.front)))
+Scale = ((18.0-(((Time*1.0)-330.0)*0.15))/(Const(size.mid.pos.y)*-2.0)),((18.0-(((Time*1.0)-330.0)*0.15))/(Const(size.mid.pos.y)*-2.0))
+
+[State 3305, Shrink - Enemy is more wide than tall]
+type = AngleDraw
+triggerall = !selfanimexist(17210) ;Enemy does not have custom animation
+trigger1 = Time = [330,390]
+trigger1 = (Const(size.mid.pos.y)*-2.0) < ((Const(size.ground.back) + Const(size.ground.front)))
+Scale = ((18.0-(((Time*1.0)-330.0)*0.15))/(18.0/(Const(size.ground.back) + Const(size.ground.front)))),((18.0-(((Time*1.0)-330.0)*0.15))/(18.0/(Const(size.ground.back) + Const(size.ground.front))))
+
+[State 3305, Shrink - Enemy has custom pac-man anim!]
+type = AngleDraw
+triggerall = selfanimexist(17210) ;Enemy does not have custom animation
+trigger1 = Time = [330,390]
+trigger1 = (Const(size.mid.pos.y)*-2.0) >= ((Const(size.ground.back) + Const(size.ground.front)))
+Scale = 1-(((Time*1.0)-330.0)*.015),1-(((Time*1.0)-330.0)*.015) ;from 100% to ~0%
+
+[State 3305, Hide enemy]
+type = Changeanim2
+trigger1 = Time = 390
+value = 9999
+
+[State 3305, Send to Pong]
+type = Changestate
+trigger1 = Time = 470
+value = Cond(PlayerID(gethitvar(fall.envshake.ampl)),var(13),3306,3309)
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HYPER1: P2 PONG
+[Statedef 3306]
+type = A
+movetype = H
+physics = N
+ctrl = 0
+sprpriority = 2
+
+[State 3306, No hits]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+Time = 1
+[State 3306, Lock camera]
+type = ScreenBound
+trigger1 = 1
+[State 3306, No auto-turn]
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+[State 3306, Invisible at Start]
+type = AssertSpecial
+trigger1 = Time < 135
+flag = invisible
+
+[State 3302, Correct Facing at Start]
+type = Turn
+triggerall = !time
+trigger1 = TeamSide = 1 && facing = -1
+trigger2 = TeamSide = 2 && facing = 1
+
+[State 3306, Scale - if more tall than wide]
+type = AngleDraw
+trigger1 = (Const(size.mid.pos.y)*-2.0) > ((Const(size.ground.back) + Const(size.ground.front)))
+Scale = (30.0/(Const(size.mid.pos.y)*-2.0)),(30.0/(Const(size.mid.pos.y)*-2.0))
+[State 3306, Scale - if more wide than tall]
+type = AngleDraw
+trigger1 = (Const(size.mid.pos.y)*-2.0) < ((Const(size.ground.back) + Const(size.ground.front)))
+Scale = (30.0/(Const(size.ground.back) + Const(size.ground.front))),(30.0/(Const(size.ground.back) + Const(size.ground.front)))
+
+[State 3306, Change to Pong Start anim]
+type = Changeanim2
+trigger1 = Time <= 135
+;trigger1 = !time
+value = 3320
+
+[State 3306, Start position]
+type = posSet
+trigger1 = !time
+x = 0
+y = Floor((GameHeight/2)-Screenpos Y)
+
+[State 3301, Start Vel]
+type = VelSet
+trigger1 = Time < 135
+x = 0
+y = (GameHeight/2)-ScreenPos Y ;lock y position
+
+[State 3301, Start flying]
+type = VelSet
+trigger1 = Time >= 135
+trigger1 = anim = 3320
+x = 3
+y = (GameHeight/2)-ScreenPos Y ;lock y position
+
+[State 3306, Change to Hit Wall Anim]
+type = Changeanim2
+triggerall = abs(Pos X) > 105-(Vel X*1.5) ;approaching paddles
+triggerall = abs(Pos X) < 105
+trigger1 = Cond(TeamSide = 1,Pos X > 0,Pos X < 0)
+trigger1 = ScreenPos Y > PlayerID(GetHitvar(fall.envshake.ampl)),var(11)-(20-abs(Vel Y))
+trigger1 = ScreenPos Y < PlayerID(GetHitvar(fall.envshake.ampl)),var(11)+(20+abs(Vel Y))
+trigger2 = Cond(TeamSide = 2,Pos X > 0,Pos X < 0)
+trigger2 = ScreenPos Y > PlayerID(GetHitvar(fall.envshake.ampl)),var(12)-(20-abs(Vel Y))
+trigger2 = ScreenPos Y < PlayerID(GetHitvar(fall.envshake.ampl)),var(12)+(20+abs(Vel Y))
+value = 3321
+persistent = 10 ;reload time
+
+[State 3306, Hit paddles angle]
+type = AngleSet
+trigger1 = anim = 3321
+Value = 0
+
+[State 3306, Hits paddles]
+type = Turn
+trigger1 = anim = 3321 && animelem = 1
+trigger2 = anim = 3304
+trigger2 = Cond(pos X > 0,facing = -1,facing = 1) ;prevent possible glitch
+
+[State 3306, Freeze Pos]
+type = VelSet
+trigger1 = anim = 3321 && animelem = 1
+x = 0
+
+[State 3306, Freze Pos]
+type = PosSet
+trigger1 = anim = 3321 && animtime
+x = Cond(Pos X > 0,105,-105)
+y = Pos Y
+
+[State 3306, Freze Pos]
+type = OffSet
+trigger1 = anim = 3321 && animtime
+x = 30/Cond(Pos X > 0,Const(size.ground.back),-Const(size.ground.back))
+
+[State 3306, Enemy gets hurt]
+type = lifeAdd
+trigger1 = anim = 3321 && animelem = 1
+value = -4
+kill = 0 ;don't kill
+
+[State 3306, Bounce Off Paddles]
+type = VelSet
+trigger1 = anim = 3321 && !animtime
+x = 3+((Time-135)*0.006)
+y = Vel Y+Cond(Random<500,((Time-135)*0.003),-((Time-135)*0.003))
+
+[State 3306, Bounce Off First Paddle]
+type = VelSet
+trigger1 = anim = 3321 && !animtime
+x = 3+((Time-135)*0.006)
+;x = 3+(Time*0.007)
+y = Cond(Random<500,1,-1)
+persistent = 0
+
+[State 3306, Change to Spin Anim]
+type = Changeanim2
+trigger1 = anim = 3321 && !animtime
+value = 3322
+
+[State 3306, Spin forward]
+type = AngleAdd
+trigger1 = anim = 3322
+value = -15
+
+[State 3306, Bounce Off Bottom/Top]
+type = VelSet
+triggerall = abs(Pos X) < 105 ;in-bounds
+trigger1 = ScreenPos Y < abs(Vel Y*1.5) ;top edge
+trigger2 = ScreenPos Y > GameHeight-abs(Vel Y*1.5) ;bottom edge
+y = -Vel Y ;deflect
+persistent = 10 ;cooldown time
+
+[State 3306, Bounce Off Screen Top]
+type = AngleSet
+trigger1 = ScreenPos Y < abs(Vel Y*1.5)
+Value = -90
+
+[State 3306, Bounce Off Screen Bottom]
+type = AngleSet
+trigger1 = ScreenPos Y > GameHeight-abs(Vel Y*1.5) 
+Value = 90
+
+[State 3306, Win Game Velset]
+type = VelSet
+trigger1 = anim = 3322
+trigger1 = abs(Pos X) >= Floor(Gamewidth/2) ;exit screen
+x = 1
+
+[State 3306, Change to Lose Game Anim]
+type = Changeanim2
+triggerall = anim = 3322
+trigger1 = TeamSide = 1
+trigger1 = Pos X <= (-115 + Vel X)
+trigger2 = Teamside = 2
+trigger2 = Pos X >= (115 - Vel X)
+value = 3304
+persistent = 0
+
+[State 3306, Lose Game PosSet]
+type = PosSet
+trigger1 = Anim = 3304
+x = Cond(TeamSide = 1,-120,120)
+persistent = 0
+
+[State 3306, Lose Game Velset]
+type = VelSet
+trigger1 = anim = 3304
+y = (-1+Random%3)/8
+x = 0.1
+
+[State 3306, Lose Pong Game Drain Life]
+type = lifeAdd
+trigger1 = anim = 3304
+trigger1 = abs(Pos X) < 125
+value = -5
+kill = 0 ;don't kill
+
+[State 3306, Killed by Arcade]
+type = StateTypeSet
+triggerall = Life <= 1
+triggerall = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+triggerall = PlayerID(GetHitvar(fall.envshake.ampl)),var(59) = 5 ;Custom win pose flagged
+trigger1 = anim = 3304 ;Lost game
+trigger1 = abs(Pos X) >= 130
+trigger2 = anim = 3322 ;Won game, but pong paddles killed me
+trigger2 = abs(Pos X) >= Floor((Gamewidth/2)+60)
+statetype = L
+movetype = H
+physics = S
+[State 3306, Killed by Arcade]
+type = PosSet
+trigger1 = StateType = L
+x = 0
+y = 0
+[State 3306, Killed by Arcade]
+type = Changestate
+trigger1 = StateType = L
+value = 5150
+
+[State 3306, Send to End]
+type = Changestate
+trigger1 = anim = 3304 ;Lost game
+trigger1 = abs(Pos X) >= 130
+trigger2 = anim = 3322 ;Won game
+trigger2 = abs(Pos X) >= Floor((Gamewidth/2)+60)
+trigger3 = Time > 135
+trigger3 = abs(Pos X) <= 100 ;If glitched out (?)
+trigger3 = (ScreenPos Y < -10) || (ScreenPos Y > Gameheight+10) ;If glitched out (?)
+value = 3307
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HYPER1: P2 END
+[Statedef 3307]
+type = A
+movetype = H
+physics = N
+velset = 0,0
+ctrl = 0
+sprpriority = 3
+
+[State 3308, No hits]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+Time = 1
+
+[State 3307, Lock camera]
+type = ScreenBound
+trigger1 = 1
+value = 0
+
+[State 3307, No auto-turn]
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+
+[State 3307, Face same direction as Jailbot]
+type = Turn
+triggerall = !time
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),facing != facing
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger2 = Enemy,facing != facing
+
+[State 3307, Reposition to center of Jailbot's face]
+type = posSet
+trigger1 = !time
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+x = PlayerId(GetHitvar(fall.envshake.ampl)),pos X
+y = -76
+
+[State 3307, Reposition to center of Jailbot's face] ;fallback code
+type = posSet
+trigger1 = !time
+trigger1 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+x = Enemy,pos X ;fallback code
+y = -76
+
+[State 3307, Set Angle]
+type = AngleSet
+trigger1 = !time
+value = 0
+
+[State 3307, Invisible] ;for 20 ticks
+type = Changeanim2
+trigger1 = !time
+value = 9999
+
+[State 3307, Falling anim]
+type = Changeanim
+trigger1 = Time = 40
+value = 5090
+
+[State 3307, 7]
+type = PalFX
+trigger1 = Time = 40
+Time = 120
+sinadd = 128,128,128,4
+
+[State 3307, 2]
+type = VelSet
+trigger1 = Time = 40
+x = 2.5
+y = .5
+
+[State 3307, 2]
+type = VelSet
+trigger1 = Time = 100
+x = 0
+y = 0
+
+[State 3307, Scale enemy]
+type = AngleDraw
+trigger1 = Time = [40,100] ;60 tick duration
+Scale = ((Time*1.0)-40.0)*.017,((Time*1.0)-40.0)*.017 ;from 0% to ~100%
+
+[State 3307, 1] ;Digitization Pal effect
+type = AfterImage
+trigger1 = Time = 40
+Time = 60
+length = 60
+palcontrast = 48,48,48 ;128,256,0
+palpostbright = -32,0,0
+palbright = 0,0,0 ;128,256,0
+paladd = 0,0,0
+palmul = 1.0,1.0,1.0
+
+[State 3307, Kill enemy if life depleted]
+type = lifeSet
+trigger1 = Time = 160
+trigger1 = life <= 1
+value = 0
+
+[State 3307,3]
+type = SelfState
+trigger1 = Time = 160
+value = 5050
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HYPER1: P1 AUTO-PONG
+[Statedef 3308]
+type = A
+movetype = A
+physics = N
+velset = 0,0
+anim = 9999
+ctrl = 0
+sprpriority = 3
+
+[State 3302, 18] ;Don't hit me
+type = NotHitBy
+trigger1 = 1
+value = SCA
+Time = 1
+
+[State 3302, 1] ;Lock camera
+type = Screenbound
+trigger1 = 1
+
+[State 3302, 2] ;No FG, no music, no auto-turn
+type = AssertSpecial
+trigger1 = 1
+flag = NoFG
+flag2 = NoMusic
+flag3 = NoAutoTurn
+
+[State 3302, 3] ;No BG, freeze Timer, prevent all shadows
+type = AssertSpecial
+trigger1 = 1
+flag = NoBG
+flag2 = TimerFreeze
+flag3 = globalnoshadow
+
+[State 3303, No Bar Display]
+type = AssertSpecial
+trigger1 = 1
+flag = nobardisplay
+
+[State 3302, JailPong Bars]
+type = Explod
+trigger1 = !time
+removetime = 60
+anim = 3325
+id = 3302
+postype = left
+pos = var(4),var(10)+Cond(GameHeight >= 240 * Const240p(1),120,90) ;pos Y accounts for if 4:3 or if Widescreen
+sprpriority = 4
+
+[State 3301, JailPong logo]
+type = Explod
+trigger1 = !Time
+anim = 3326
+postype = left
+pos = var(4),var(10) ;centered
+sprpriority = 5
+
+[State 3302, JailPong Bars Go Up]
+type = Explod
+trigger1 = time = 60
+removetime = 30
+anim = 3325
+id = 3302
+postype = left
+pos = var(4),var(10)+Cond(GameHeight >= 240 * Const240p(1),120,90) ;pos Y accounts for if 4:3 or if Widescreen
+vel = 0,-Cond(GameHeight >= 240 * Const240p(1),8,6)
+sprpriority = 4
+
+[State 3302, 4] ;Pong level
+type = Explod
+trigger1 = !time
+anim = Cond(GameHeight >= 240 * Const240p(1),3316,3327) ;anim accounts for if 4:3 or if Widescreen
+id = 3302
+postype = left
+pos = var(4),var(10)+Cond(GameHeight >= 240 * Const240p(1),120,90) ;pos Y accounts for if 4:3 or if Widescreen
+sprpriority = 0
+
+[State 3301, Jailbot life Bar]
+type = Explod
+trigger1 = !time
+removeTime = -1
+anim = 3317
+id = 3302
+postype = left
+facing = Cond(TeamSide = 1,1,-1)
+pos = var(4)+Cond(TeamSide = 1,-23,23),var(10)-Cond(GameHeight >= 240 * Const240p(1),110,80)
+scale = ((life*1.0)/(lifeMax*1.0))*100.0,1
+sprpriority = 1
+
+[State 3301, Enemy life Bar]
+type = Explod
+trigger1 = 1
+anim = 3317
+id = 3302
+postype = left
+facing = Cond(TeamSide = 1,-1,1)
+pos = var(4)+Cond(TeamSide = 1,23,-23),var(10)-Cond(GameHeight >= 240 * Const240p(1),110,80)
+scale = ((target(3300),life*1.0)/(target(3300),lifeMax*1.0))*100.0,1
+sprpriority = 1
+
+[State 3302, 5] ;Pong Paddle 1
+type = Explod
+trigger1 = !time
+anim = 3318
+id = 3308
+postype = back
+facing = -1
+pos = var(4),var(10)
+sprpriority = 3
+removeTime = 530
+vel = 0,0
+
+[State 3302, 5] ;Pong Paddle 1
+type = ModifyExplod
+trigger1 = Time = 120
+anim = 3318
+id = 3308
+postype = back
+facing = -1
+pos = var(4),var(10)
+sprpriority = 3
+vel = 0,-.5
+[State 3302, 5] ;Pong Paddle 1
+type = ModifyExplod
+trigger1 = Time = 180
+anim = 3318
+id = 3308
+postype = back
+facing = -1
+pos = var(4),var(10)-30
+sprpriority = 3
+vel = 0,-.5
+[State 3302, 5] ;Pong Paddle 1
+type = ModifyExplod
+trigger1 = Time = 240
+anim = 3318
+id = 3308
+postype = back
+facing = -1
+pos = var(4),var(10)-60
+sprpriority = 3
+vel = 0,.75
+[State 3302, 5] ;Pong Paddle 1
+type = ModifyExplod
+trigger1 = Time = 300
+anim = 3318
+id = 3308
+postype = back
+facing = -1
+pos = var(4),var(10)-15
+sprpriority = 3
+vel = 0,1
+[State 3302, 5] ;Pong Paddle 1
+type = ModifyExplod
+trigger1 = Time = 360
+anim = 3318
+id = 3308
+postype = back
+facing = -1
+pos = var(4),var(10)+45
+sprpriority = 3
+vel = 0,-1.5
+[State 3302, 5] ;Pong Paddle 1
+type = ModifyExplod
+trigger1 = Time = 420
+anim = 3318
+id = 3308
+postype = back
+facing = -1
+pos = var(4),var(10)-45
+sprpriority = 3
+vel = 0,.5
+[State 3302, 5] ;Pong Paddle 1
+type = ModifyExplod
+trigger1 = Time = 490
+anim = 3318
+id = 3308
+postype = back
+facing = -1
+pos = var(4),var(10)-10
+sprpriority = 3
+vel = 0,0
+
+[State 3302, 5] ;Pong Paddle 2
+type = Explod
+trigger1 = !time
+anim = 3318
+id = 3309
+postype = back
+facing = 1
+pos = var(4),var(10)
+sprpriority = 3
+removeTime = 530
+vel = 0,0
+
+[State 3302, 5] ;Pong Paddle 2
+type = ModifyExplod
+trigger1 = Time = 120
+anim = 3318
+id = 3309
+postype = back
+facing = 1
+pos = var(4),var(10)
+sprpriority = 3
+vel = 0,-.25
+[State 3302, 5] ;Pong Paddle 2
+type = ModifyExplod
+trigger1 = Time = 180
+anim = 3318
+id = 3309
+postype = back
+facing = 1
+pos = var(4),var(10)-15
+sprpriority = 3
+vel = 0,-1.25
+[State 3302, 5] ;Pong Paddle 2
+type = ModifyExplod
+trigger1 = Time = 240
+anim = 3318
+id = 3309
+postype = back
+facing = 1
+pos = var(4),var(10)-90
+sprpriority = 3
+vel = 0,1
+[State 3302, 5] ;Pong Paddle 2
+type = ModifyExplod
+trigger1 = Time = 300
+anim = 3318
+id = 3309
+postype = back
+facing = 1
+pos = var(4),var(10)-30
+sprpriority = 3
+vel = 0,2
+[State 3302, 5] ;Pong Paddle 2
+type = ModifyExplod
+trigger1 = Time = 370
+anim = 3318
+id = 3309
+postype = back
+facing = 1
+pos = var(4),var(10)+110
+sprpriority = 3
+vel = 0,-2.5
+[State 3302, 5] ;Pong Paddle 2
+type = ModifyExplod
+trigger1 = Time = 450
+anim = 3318
+id = 3309
+postype = back
+facing = 1
+pos = var(4),var(10)-90
+sprpriority = 3
+vel = 0,2.5
+[State 3302, 5] ;Pong Paddle 2
+type = ModifyExplod
+trigger1 = Time = 490
+anim = 3318
+id = 3309
+postype = back
+facing = 1
+pos = var(4),var(10)+10
+sprpriority = 3
+vel = 0,0
+
+[State 3302, 7] ;Enemy hit paddle sound FX
+type = PlaySnd
+trigger1 = Time = 120 || Time = 180 || Time = 240 || Time = 300 || Time = 360 || Time = 420
+Value = 3300,6
+
+[State 3302, 7] ;Enemy hit walls sound FX
+type = PlaySnd
+trigger1 = Time = 255 || Time = 347 || Time = 440
+Value = 3300,7
+
+[State 3302, Set Custom Win Pose]
+type = Null
+triggerall = !AILevel ;Not for AI
+triggerall = Time = 490
+triggerall = target(3300),Life <= 1
+trigger1 = var(59) := 5
+trigger1 = var(5) := 0
+
+[State 3302, 8] ;TILT
+type = PlaySnd
+trigger1 = Time = 510
+trigger1 = var(59) != 5 ;Not custom win pose
+value = 3300,8
+
+[State 3301, 10] ;TILT
+type = Explod
+trigger1 = Time >= 510
+trigger1 = var(59) != 5 ;Not custom win pose
+removetime = -1
+postype = back
+sprpriority = 5
+scale = GameWidth,GameHeight
+anim = 3334
+id = 3302
+
+[State 3302, 30] ;Clear Pong level
+type = RemoveExplod
+trigger1 = Time = 550
+id = 3302
+
+[State 3302, 31] ;Back to fighting!
+type = ChangeState
+trigger1 = Time = 550
+trigger1 = var(59) != 5 ;Not custom win pose
+value = 3303
+
+[State 3301, Set BG for Custom Win Pose]
+type = Explod
+trigger1 = Time = 550
+trigger1 = var(59) = 5 ;Custom win pose
+removeTime = -1
+postype = back
+ontop = 1
+scale = GameWidth,GameHeight
+anim = 3333
+[State 3301, Game Over Text]
+type = Explod
+trigger1 = Time = 550
+trigger1 = var(59) = 5 ;Custom win pose
+removeTime = -1
+postype = left
+pos = var(4),var(10)
+ontop = 1
+scale = 1.5,1.5
+anim = 3336
+id = 3336
+[State 3301, Game Over Sound]
+type = PlaySnd
+trigger1 = Time = 550
+trigger1 = var(59) = 5 ;Custom win pose
+value = 3300,10
+[State 3302, Go to Custom Win Pose]
+type = ChangeState
+trigger1 = Time = 550
+trigger1 = var(59) = 5 ;Custom win pose
+value = 0 ;Must return to State 0 to end the match
+ctrl = 1 ;Must have control to end the match
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HYPER1: P2 AUTO-PONG
+[Statedef 3309]
+type = A
+movetype = H
+physics = N
+ctrl = 0
+sprpriority = 2
+
+[State 3306, No hits]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+Time = 1
+
+[State 3306, Lock camera]
+type = ScreenBound
+trigger1 = 1
+value = 0
+
+[State 3306, No auto-turn]
+type = AssertSpecial
+trigger1 = 1
+flag = noautoturn
+
+[State 3306, Scale - if more tall than wide]
+type = AngleDraw
+trigger1 = (Const(size.mid.pos.y)*-2.0) > ((Const(size.ground.back) + Const(size.ground.front)))
+Scale = (30.0/(Const(size.mid.pos.y)*-2.0)),(30.0/(Const(size.mid.pos.y)*-2.0))
+
+[State 3306, Scale - if more wide than tall]
+type = AngleDraw
+trigger1 = (Const(size.mid.pos.y)*-2.0) < ((Const(size.ground.back) + Const(size.ground.front)))
+Scale = (30.0/(Const(size.ground.back) + Const(size.ground.front))),(30.0/(Const(size.ground.back) + Const(size.ground.front)))
+
+[State 3306, Start position Y]
+type = posAdd
+trigger1 = !time
+y = Floor((-Screenpos Y)+(GameHeight/2))
+
+[State 3306, Start position X]
+type = posSet
+trigger1 = !time
+x = 0
+
+[State 3301, Lock y position]
+type = VelSet
+trigger1 = Time < 120
+y = (GameHeight/2)-ScreenPos Y ;lock y position
+
+[State 3306, Change to Pong anim]
+type = Changeanim2
+trigger1 = Time < 90
+value = 3323
+
+[State 3306, Enemy gets hurt]
+type = lifeAdd
+trigger1 = Time = 119 || Time = 179 || Time = 239 || Time = 299 || Time = 359 || Time = 419
+value = -25
+kill = 0 ;don't kill
+
+[State 3306, Hits paddles]
+type = Turn
+trigger1 = Time = 119 || Time = 179 || Time = 239 || Time = 299 || Time = 359 || Time = 419
+
+[State 3306, Start flying]
+type = VelSet
+trigger1 = Time = 90
+x = 3.5
+[State 3306, Paddle Hit 1]
+type = VelSet
+trigger1 = Time = 120
+x = 3.5
+y = -.5
+[State 3306, Paddle Hit 2]
+type = VelSet
+trigger1 = Time = 180
+x = 3.5
+y = -1
+[State 3306, Paddle Hit 3]
+type = VelSet
+trigger1 = Time = 240
+x = 3.5
+y = -2
+[State 3306, Ceiling Hit 1]
+type = VelSet
+trigger1 = Time = 255
+y = 2
+[State 3306, Paddle Hit 4]
+type = VelSet
+trigger1 = Time = 300
+x = 3.5
+y = 3
+[State 3306, Floor Hit 1]
+type = VelSet
+trigger1 = Time = 347
+y = -3
+[State 3306, Paddle Hit 5]
+type = VelSet
+trigger1 = Time = 360
+x = 3.5
+y = -2
+[State 3306, Paddle Hit 6]
+type = VelSet
+trigger1 = Time = 420
+x = 3.5
+y = -4
+[State 3306, Ceiling Hit 2]
+type = VelSet
+trigger1 = Time = 440
+y = 4
+
+[State 3306, Spin forward]
+type = AngleAdd
+trigger1 = Time = [122,178]
+trigger2 = Time = [182,238]
+trigger3 = Time = [242,253]
+trigger4 = Time = [302,345]
+trigger5 = Time = [362,418]
+trigger6 = Time = [421,438]
+Value = -15
+
+[State 3306, Spin backward]
+type = AngleAdd
+trigger1 = Time = [257,298]
+trigger2 = Time = [341,358]
+trigger3 = Time > 441
+Value = 15
+
+[State 3306, Slam paddles angle]
+type = AngleSet
+trigger1 = Time = 119 || Time = 179 || Time = 239 || Time = 299 || Time = 359
+Value = 0
+
+[State 3306, Slam cieling angle]
+type = AngleSet
+trigger1 = Time = 254 || Time = 439
+Value = -90
+
+[State 3306, Slam floor angle]
+type = AngleSet
+trigger1 = Time = 346
+Value = 90
+
+[State 3306, Killed by Arcade]
+type = PosSet
+triggerall = Time = 550
+triggerall = Life <= 1
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),var(59) = 5 ;Custom win pose flagged
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,var(59) = 5 ;Custom win pose flagged
+x = 0
+y = 0
+
+[State 3306, Killed by Arcade]
+type = StateTypeSet
+triggerall = Time = 550
+triggerall = Life <= 1
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),var(59) = 5 ;Custom win pose flagged
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,var(59) = 5 ;Custom win pose flagged
+statetype = L
+movetype = H
+physics = S
+
+[State 3306, Killed by Arcade]
+type = Changestate
+triggerall = Time = 550
+triggerall = Life <= 1
+trigger1 = PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;Jailbot's ID confirmed
+trigger1 = PlayerID(GetHitvar(fall.envshake.ampl)),var(59) = 5 ;Custom win pose flagged
+trigger2 = !PlayerIDExist(GetHitvar(fall.envshake.ampl)) ;fallback code
+trigger2 = Enemy,var(59) = 5 ;Custom win pose flagged
+value = 5150
+
+[State 3306, Send to End]
+type = Changestate
+trigger1 = Time = 570
+value = 3307
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HYPER1: ARCADE HELPER
+[Statedef 3312]
+type = S
+movetype = I
+physics = S
+ctrl = 0
+anim = 9999
+
+[State 3312, 0]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = noautoturn
+
+[State 3312, 1]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 3312, 2]
+type = ScreenBound
+trigger1 = 1
+value = 1
+
+[State 3312, 3]
+type = posSet
+trigger1 = !time
+y = 0
+
+[State 3300, Jailbot transform into Arcade anim]
+type = Explod
+trigger1 = !time
+anim = 3330
+id = 3330
+shadow = -1
+supermoveTime = 20
+removeTime = 24
+;removeongethit = 1 ;this is being handled in State -3
+sprpriority = -2
+bindTime = -1
+
+[State 3300, Jailbot attacking anim]
+type = Explod
+trigger1 = parent,anim = 3300 && parent,AnimElem = 10
+anim = 3331
+id = 3331
+shadow = -1
+removeTime = 220
+;removeongethit = 1 ;this is being handled in State -3
+sprpriority = -2
+persistent = 0
+bindTime = -1
+
+[State 3303, Set custom glow speed]
+type = VarAdd
+trigger1 = parent,var(57) = 12 && Time%2 = 0 ;Rainbow glow anim speed
+trigger2 = parent,var(57) = 30 && Time%3 = 0 ;USA glow anim speed
+var(4) = 1
+
+[State 3303, Set custom glow pal]
+type = VarSet
+trigger1 = !time
+trigger2 = parent,var(57) = 12 && var(4) = 9 ;Rainbow glow anim reset
+trigger3 = parent,var(57) = 30 && var(4) = 5 ;USA glow anim reset
+var(4) = 1
+
+[State 3300, Custom rainbow glow]
+type = RemapPal
+trigger1 = parent,var(57) = 12
+source = 3303,1
+dest = 3333,0+var(4)
+
+[State 3300, Custom USA glow]
+type = RemapPal
+trigger1 = parent,var(57) = 30
+source = 3303,1
+dest = 3334,0+var(4)
+
+[State 3300, Screen glow blast (additive transparency)]
+type = Explod
+trigger1 = parent,anim = 3300 && parent,AnimElem = 10
+trigger1 = parent,var(57) != 10 && parent,var(57) != 16 && parent,var(57) != 23 && parent,var(57) != 33
+anim = 3303
+id = 3303
+removeTime = -1
+removeongethit = 1 ;remove if hit
+sprpriority = -1
+persistent = 0
+bindTime = -1
+
+[State 3300, Screen glow blast (subtractive transparency)]
+type = Explod
+trigger1 = parent,anim = 3300 && parent,AnimElem = 10
+trigger1 = parent,var(57) = 10 || parent,var(57) = 16 || parent,var(57) = 23 || parent,var(57) = 33
+anim = 3303
+id = 3303
+removeTime = -1
+removeongethit = 1 ;remove if hit
+sprpriority = -1
+persistent = 0
+bindTime = -1
+trans = sub
+
+[State 3300, Screen Glow Sound]
+type = PlaySnd
+trigger1 = numexplod(3303)
+value = 3300,16
+channel = 20
+persistent = 0
+
+[State 3303, 31] ;Guarded sound
+type = PlaySnd
+trigger1 = parent,moveguarded
+value = 3300,13
+channel = 0
+persistent = 0
+
+[State 3303, 31] ;Remove Jailbot anim
+type = RemoveExplod
+trigger1 = parent,moveguarded
+id = 3303
+persistent = 0
+
+[State 3303, 7] ;Screen glow fade (additive transparency)
+type = Explod
+triggerall = parent,moveguarded
+trigger1 = parent,var(57) != 10 && parent,var(57) != 16 && parent,var(57) != 23 && parent,var(57) != 33
+anim = 3328
+id = 3303
+removeTime = -1
+removeongethit = 1 ;remove if hit
+sprpriority = -1
+persistent = 0
+bindTime = -1
+
+[State 3303, 7] ;Screen glow fade (subtractive transparency)
+type = Explod
+triggerall = parent,moveguarded
+trigger1 = parent,var(57) = 10 || parent,var(57) = 16 || parent,var(57) = 23 || parent,var(57) = 33
+anim = 3328
+id = 3303
+removeTime = -1
+removeongethit = 1 ;remove if hit
+sprpriority = -1
+persistent = 0
+bindTime = -1
+trans = sub
+
+[State 3300, Change to Arcade End anim if attack misses]
+type = Explod
+trigger1 = parent,anim = 3302
+;removeongethit = 1 ;this is being handled in State -3
+anim = 3332
+shadow = -1
+persistent = 0
+bindTime = -1
+sprpriority = -2
+
+[State 3300, Change to Pac-Bot anim if attack succeeds]
+type = Explod
+trigger1 = parent,MoveHit
+;removeongethit = 1 ;this is being handled in State -3
+anim = 3331
+shadow = -1
+persistent = 0
+bindTime = -1
+sprpriority = -2
+
+[State 3300, Remove glow]
+type = RemoveExplod
+trigger1 = parent,StateNo != 3300
+trigger1 = parent,StateNo != 3303
+trigger2 = parent,anim = 3302 ;if attack misses
+trigger3 = parent,anim = 3301 && parent,AnimElemTime(1) = 150 ;after attack succeeds
+id = 3303
+
+[State 3300, Stop Screen Glow Sound]
+type = StopSnd
+trigger1 = !numexplod(3303)
+channel = 20
+
+[State -3, Remove Jailbot Explod]
+type = RemoveExplod
+trigger1 = parent,StateNo != 3300
+trigger1 = parent,StateNo != 3303
+trigger2 = parent,anim = 3300 && parent,AnimElem = 10
+id = 3330
+
+[State -3, Remove Jailbot Explod]
+type = RemoveExplod
+trigger1 = parent,StateNo != 3300
+trigger1 = parent,StateNo != 3303
+trigger2 = parent,anim = 3302
+trigger3 = parent,movehit
+id = 3331
+
+[State -3, Remove Jailbot Explod]
+type = RemoveExplod
+trigger1 = parent,StateNo != 3300
+trigger1 = parent,StateNo != 3303
+trigger2 = parent,anim != 3302
+id = 3332
+
+[State 3312, Destroy Self]
+type = DestroySelf
+trigger1 = parent,StateNo != 3300
+trigger1 = parent,StateNo != 3303
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HYPER1: WIN POSE
+[Statedef 3313]
+type = S
+physics = S
+ctrl = 0
+anim = 9999
+velset = 0,0
+sprpriority = 0
+
+[State 3313, 1]
+type = AssertSpecial  
+trigger1 = Time < 3660
+flag = roundnotover
+
+[State 3313, 2]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 3313, Remove Game Over Text]
+type = RemoveExplod
+trigger1 = Time = 40
+id = 3336
+
+[State 3313, Play Music]
+type = PlaySnd
+trigger1 = Time%600 = 60
+value = 181,Floor(7+((Time+60)/600))
+channel = 0
+
+[State 3301, CREDITS]
+type = Explod
+trigger1 = Time = 60
+anim = 3337
+postype = left
+pos = Floor(Gamewidth/2),Floor(Gameheight)
+vel = 0,-1
+scale = 0.5,0.5
+ontop = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;CROWD CONTROL
+[StateDef 3315]
+type = S
+movetype = A
+physics = N
+anim = 9998 ;full-screen clsn1
+velset = 0,0
+ctrl = 0
+
+[State 3315, Unguardable]
+type = AssertSpecial
+trigger1 = 1
+flag = Unguardable
+
+[State 3315, HitDef]
+type = HitDef
+trigger1 = 1
+attr = SCA, SA
+damage = 0,0
+hitflag = MA-
+priority = 7
+pauseTime = 0,0
+sparkno = -1
+guard.sparkno = -1
+hitsound = -1
+guardsound = -1
+ground.velocity = 0
+air.velocity = 0,0
+id = 3316
+fall.envshake.freq = parent,TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = parent,ID ;provide Jailbot's PlayerID
+numhits = 0
+p2StateNo = 3316
+affectteam = B ;E-V-E-R-Y-O-N-E
+
+[State 3315, DestroySelf]
+type = DestroySelf
+trigger1 = parent,StateNo != [3300,3307]
+trigger2 = Parent,StateNo = 3303
+trigger2 = Parent,anim = 3302 
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;TAKE A BREAK
+[Statedef 3316]
+type = U ;use last type
+movetype = H
+physics = U ;use last physics
+ctrl = 0
+
+[State 3316, No auto-turn]
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 3316, Set Physics]
+type = StateTypeSet
+trigger1 = !Time
+trigger1 = StateType = A ;in the air
+physics = A
+
+[State 3316, Set Physics]
+type = StateTypeSet
+trigger1 = !time
+trigger1 = StateType = S || StateType = C ;on the ground
+trigger2 = StateType = L
+trigger2 = (anim = [5111,5130]) && !animtime
+physics = S
+
+[State 5120, 1a] ;Get up anim (normal)
+type = ChangeAnim
+triggerall = !time
+triggerall = StateType = L
+trigger1 = anim != [5111,5119]
+trigger2 = !SelfAnimExist(5120 + (anim % 10))
+value = 5120
+
+[State 5120, 1b] ;Get up anim (for hit up/diag-up)
+type = ChangeAnim
+triggerall = !time
+triggerall = StateType = L
+trigger1 = anim = [5111,5119]
+trigger1 = SelfAnimExist(5120 + (anim % 10))
+value = 5120 + (anim % 10)
+
+[State 3316, Change to stand]
+type = Changeanim
+trigger1 = !time
+trigger1 = StateType = S || StateType = C ;on the ground
+trigger2 = StateType = L
+trigger2 = (anim = [5111,5130]) && !animtime
+value = 0
+
+[State 3316, Face Jailbot]
+type = Changeanim
+triggerall = !anim
+triggerall = PlayerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = facing = 1
+trigger1 = Pos X > PlayerID(gethitvar(fall.envshake.ampl)),Pos X
+trigger2 = facing = -1
+trigger2 = Pos X < PlayerID(gethitvar(fall.envshake.ampl)),Pos X
+value = 5
+persistent = 0
+
+[State 3316, Change to stand]
+type = Turn
+trigger1 = Time
+trigger1 = anim = 5 && !animtime
+persistent = 0
+
+[State 3316, Change to stand]
+type = Changeanim
+trigger1 = Time
+trigger1 = anim = 5 && !animtime
+value = 0
+persistent = 0
+
+[State 3316, Come down from jump]
+type = Changeanim
+triggerall = !time
+trigger1 = StateType = A ;in the air
+trigger1 = Vel X = 0 ;neutral jump
+value = Cond(SelfAnimExist(44),44,47)
+
+[State 3316, Come down from jump FWD]
+type = Changeanim
+triggerall = !time
+trigger1 = StateType = A ;in the air
+trigger1 = Vel X > 0 ;jumping forwards
+value = Cond(SelfAnimExist(45),45,47)
+
+[State 3316, Come down from jump BACK]
+type = Changeanim
+triggerall = !time
+triggerall = StateType = A ;in the air
+trigger1 = Vel X < 0 ;jumping backwards
+value = Cond(SelfAnimExist(46),46,47)
+
+[State 3316, Stop Pushing]
+type = PlayerPush
+trigger1 = PlayerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = (PlayerID(gethitvar(fall.envshake.ampl)),StateNo = [3301,3302]) || PlayerID(gethitvar(fall.envshake.ampl)),StateNo = 3310
+value = 0
+
+[State 3316, Dissappear]
+type = ChangeAnim2
+trigger1 = PlayerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo = 3301 || PlayerID(gethitvar(fall.envshake.ampl)),StateNo = 3310
+value = 9999
+persistent = 0
+
+[State 3316, Get behind scene] ;overkill
+type = SprPriority
+trigger1 = PlayerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = (PlayerID(gethitvar(fall.envshake.ampl)),StateNo = [3301,3302]) || PlayerID(gethitvar(fall.envshake.ampl)),StateNo = 3310
+value = -5
+persistent = 0
+
+[State 3316, Reappear]
+type = ChangeAnim
+triggerall = PlayerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo != [3300,3307]
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo != 3310
+trigger2 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo = 3303
+value = 0
+persistent = 0
+
+[State 3316, Revert to normal sprpriority]
+type = SprPriority
+triggerall = PlayerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo != [3300,3307]
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo != 3310
+trigger2 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo = 3303
+value = 0
+persistent = 0
+ 
+[State 3316, Selfstate]
+type = SelfState
+triggerall = PlayerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo != [3300,3307]
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo != 3310
+trigger2 = PlayerID(gethitvar(fall.envshake.ampl)),StateNo = 3303
+trigger2 = PlayerID(gethitvar(fall.envshake.ampl)),Anim = 3302
+value = 0
+ctrl = 1

@@ -1,0 +1,1602 @@
+;==========================
+; lol magikarp
+;==========================
+
+; Player information
+[Info]
+name = "Magikarp"				;Name of character
+displayname = "Lv100 Koiking"		;Name of character to display
+versiondate = 06,29,2007		;Version date of character (MM-DD-YYYY)
+mugenversion = 06,14,2003		;Version of M.U.G.E.N character works on
+author = "Passer-by";"Kamek"				;Character author name
+pal.defaults = 1,2,4,5			;Default palettes in order of preference
+
+; Files for the player
+[Files]
+cmd			= Magikarp.def		;command set
+cns			= Magikarp.def		;Constants
+stcommon	= Magikarp.def		;Common states
+sprite		= Magikarp.sff		;Sprites
+anim		= Magikarp.air		;Animations
+sound		= Magikarp.snd		;Sounds
+st			= Magikarp.def		;State definition
+
+pal1		= Magikarp.act
+pal2		= Female.act
+pal3		= Shiny.act
+pal4		= Magikarp.act
+pal5		= Female.act
+pal6		= Shiny.act
+pal7		= ShinyFemale.act
+pal8		= ShinyFemale.act
+pal9		= ShinyFemale.act
+pal10		= ShinyFemale.act
+pal11		= ShinyFemale.act
+pal12		= ShinyFemale.act
+
+; /////////////////////////////////////////////////////////////////////////////
+; /////////////////////////////////////////////////////////////////////////////
+; CONSTANTS
+; The Stupid Little Drill Tank doesn't use most of these values, but let's
+; add them anyway so MUGEN won't get confused.
+; /////////////////////////////////////////////////////////////////////////////
+; /////////////////////////////////////////////////////////////////////////////
+
+[Data]
+life = 2					;Amount of life to start with
+attack = 100					;attack power (more is stronger)
+defence = 100				;defensive power (more is stronger)
+fall.defence_up = 0			;Percentage to increase defense everytime player is knocked down
+liedown.time = 60			;Time which player lies down for, before getting up
+airjuggle = 30				;Number of points for juggling
+sparkno = 2					;Default hit spark number for HitDefs
+guard.sparkno = 40			;Default guard spark number
+KO.echo = 0					;1 to enable echo on KO
+volume = 255				;Volume offset (negative for softer)
+power = 3000				;Maximum super power
+
+;Variables with this index and above will not have their values
+;reset to 0 between rounds or matches. There are 60 int variables,
+;indexed from 0 to 59, and 40 float variables, indexed from 0 to 39.
+;If omitted, then it defaults to 60 and 40 for integer and float
+;variables repectively, meaning that none are persistent, i.e. all
+;are reset. If you want your variables to persist between matches,
+;you need to override state 5900 from common1.cns.
+IntPersistIndex = 59
+FloatPersistIndex = 38
+
+[Size]
+xscale = 1					;Horizontal scaling factor.
+yscale = 1					;Vertical scaling factor.
+ground.back = 20			;Player width (back, ground)
+ground.front = 20			;Player width (front, ground)
+air.back = 20				;Player width (back, air)
+air.front = 20				;Player width (front, air)
+height = 40					;Height of player (for opponent to jump over)
+attack.dist = 160			;Default attack distance
+proj.attack.dist = 90		;Default attack distance for projectiles
+proj.doscale = 0			;Set to 1 to scale projectiles too
+head.pos = -5, -90			;Approximate position of head
+mid.pos = -5, -60			;Approximate position of midsection
+shadowoffset = 0			;Number of pixels to vertically offset the shadow
+draw.offset = 0,0			;Player drawing offset in pixels (x, y)
+
+[Velocity]
+walk.fwd  = 2				;Walk forward
+walk.back = -2				;Walk backward
+run.fwd  = 0, 0				;Run forward (x, y)
+run.back = 0, 0				;Hop backward (x, y)
+jump.neu = 0, 0				;Neutral jumping velocity (x, y)
+jump.back = 0, 0				;Jump back Speed (x, y)
+jump.fwd = 0, 0				;Jump forward Speed (x, y)
+runjump.back = 0, 0      	;Running jump speeds (opt)
+runjump.fwd = 0, 0 			;.
+airjump.neu = 0, 0  		;.
+airjump.back = 0    		;Air jump speeds (opt)
+airjump.fwd = 0   			;.
+
+[Movement]
+airjump.num = 0				;Number of air jumps allowed (opt)
+airjump.height = 35			;Minimum distance from ground before you can air jump (opt)
+yaccel = .44				;Vertical acceleration
+stand.friction = .85		;Friction coefficient when standing
+crouch.friction = .82		;Friction coefficient when crouching
+
+; /////////////////////////////////////////////////////////////////////////////
+; /////////////////////////////////////////////////////////////////////////////
+; COMMANDS
+; MUGEN chokes if there isn't at least one command, so here it is.
+; /////////////////////////////////////////////////////////////////////////////
+; /////////////////////////////////////////////////////////////////////////////
+[Command]
+name = "holdfwd";Required (do not remove)
+command = /$F
+time = 1
+
+[Command]
+name = "holdback";Required (do not remove)
+command = /$B
+time = 1
+
+[Command]
+name = "holdup";Required (do not remove)
+command = /$U
+time = 1
+
+[Command]
+name = "holddown";Required (do not remove)
+command = /$D
+time = 1
+
+[Command]
+name = "recovery";Required (do not remove)
+command = z
+time = 1
+
+
+[Command]
+name = "a"
+command = a
+time = 1
+
+[Command]
+name = "b"
+command = b
+time = 1
+
+[Command]
+name = "c"
+command = c
+time = 1
+
+[Command]
+name = "AI0"
+command = a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a
+time = 0
+[Command]
+name = "AI1"
+command = b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b
+time = 0
+[Command]
+name = "AI2"
+command = c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c
+time = 0
+[Command]
+name = "AI3"
+command = x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x
+time = 0
+[Command]
+name = "AI4"
+command = y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y
+time = 0
+[Command]
+name = "AI5"
+command = z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z
+time = 0
+[Command]
+name = "AI6"
+command = s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s
+time = 0
+[Command]
+name = "AI7"
+command = F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F
+time = 0
+[Command]
+name = "AI8"
+command = D,D,D,D,D,D,D,D,D,D,D,D,D,D,D,D,D,D,D
+time = 0
+[Command]
+name = "AI9"
+command = B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B
+time = 0
+[Command]
+name = "AI10"
+command = U,U,U,U,U,U,U,U,U,U,U,U,U,U,U,U,U,U,U
+time = 0
+[Command]
+name = "AI11"
+command = a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a
+time = 0
+[Command]
+name = "AI12"
+command = c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c
+time = 0
+[Command]
+name = "AI13"
+command = x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x
+time = 0
+[Command]
+name = "AI14"
+command = y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y
+time = 0
+[Command]
+name = "AI15"
+command = z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z
+time = 0
+[Command]
+name = "AI16"
+command = s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s
+time = 0
+[Command]
+name = "AI17"
+command = a,B,c,x,y,z,s,B,D,F,U,a,b,c,x,y,z,s,s
+time = 0
+[Command]
+name = "AI18"
+command = a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a
+time = 0
+[Command]
+name = "AI19"
+command = b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b
+time = 0
+[Command]
+name = "AI20"
+command = c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c
+time = 0
+[Command]
+name = "AI21"
+command = x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x
+time = 0
+[Command]
+name = "AI22"
+command = y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y
+time = 0
+[Command]
+name = "AI23"
+command = z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z
+time = 0
+[Command]
+name = "AI24"
+command = s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s
+time = 0
+[Command]
+name = "AI25"
+command = F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F
+time = 0
+[Command]
+name = "AI26"
+command = D,D,D,D,D,D,D,D,D,D,D,D,D,D,D,D,D,D,D
+time = 0
+[Command]
+name = "AI27"
+command = B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B
+time = 0
+[Command]
+name = "AI28"
+command = U,U,U,U,U,U,U,U,U,U,U,U,U,U,U,U,U,U,U
+time = 0
+[Command]
+name = "AI29"
+command = a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a
+time = 0
+[Command]
+name = "AI30"
+command = c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c
+time = 0
+[Command]
+name = "AI31"
+command = x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x
+time = 0
+[Command]
+name = "AI32"
+command = y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y,y
+time = 0
+[Command]
+name = "AI33"
+command = z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z
+time = 0
+[Command]
+name = "AI34"
+command = s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s
+time = 0
+[Command]
+name = "AI35"
+command = z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z
+time = 0
+[Command]
+name = "AI36"
+command = z,z,z,z,z,z,a,a,a,z,z,z,z,z,z,z,z,z,z
+time = 0
+[Command]
+name = "AI37"
+command = z,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,z,z,z
+time = 0
+[Command]
+name = "AI38"
+command = z,z,z,z,z,a,a,a,z,z,z,z,z,a,a,a,z,z,z
+time = 0
+[Command]
+name = "AI39"
+command = z,z,z,z,z,a,a,a,z,z,z,z,z,z,a,a,z,z,z
+time = 0
+[Command]
+name = "AI40"
+command = z,z,z,z,a,a,a,z,z,z,z,a,z,z,a,a,z,z,z
+time = 0
+[Command]
+name = "AI41"
+command = z,z,z,a,z,z,z,z,z,z,z,z,z,a,a,z,z,z,z
+time = 0
+[Command]
+name = "AI42"
+command = z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z
+time = 0
+[Command]
+name = "AI43"
+command = z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,a,a,z
+time = 0
+[Command]
+name = "AI44"
+command = z,z,a,a,a,a,z,z,z,z,z,z,z,z,z,a,a,a,z
+time = 0
+[Command]
+name = "AI45"
+command = z,z,z,z,z,z,a,a,z,z,z,z,z,a,a,a,a,z,z
+time = 0
+[Command]
+name = "AI46"
+command = z,z,z,z,z,z,z,z,a,a,a,a,a,a,z,z,z,z,z
+time = 0
+[Command]
+name = "AI47"
+command = z,z,z,a,a,a,a,z,z,z,z,z,z,z,z,z,z,z,z
+time = 0
+[Command]
+name = "AI48"
+command = z,z,z,z,z,a,a,a,z,z,z,a,a,a,z,z,a,z,a
+time = 0
+[Command]
+name = "AI49"
+command = z,z,z,z,a,a,a,z,z,z,z,z,a,a,a,z,z,z,z
+time = 0
+[Command]
+name = "AI50"
+command = z,z,z,a,a,z,z,z,z,z,z,z,z,z,a,a,z,z,z
+time = 0
+
+
+[Statedef -1]
+
+[State -1, ai]
+type = varset
+triggerall = var(59) = 0
+trigger1 = Command = "AI0"
+trigger2 = Command = "AI1"
+trigger3 = Command = "AI2"
+trigger4 = Command = "AI3"
+trigger5 = Command = "AI4"
+trigger6 = Command = "AI5"
+trigger7 = Command = "AI6"
+trigger8 = Command = "AI7"
+trigger9 = Command = "AI8"
+trigger10 = Command = "AI9"
+trigger11 = Command = "AI10"
+trigger12 = Command = "AI11"
+trigger13 = Command = "AI12"
+trigger14 = Command = "AI13"
+trigger15 = Command = "AI14"
+trigger16 = Command = "AI15"
+trigger17 = Command = "AI16"
+trigger18 = Command = "AI17"
+trigger19 = Command = "AI18"
+trigger20 = Command = "AI19"
+trigger21 = Command = "AI20"
+trigger22 = Command = "AI21"
+trigger23 = Command = "AI22"
+trigger24 = Command = "AI23"
+trigger25 = Command = "AI24"
+trigger26 = Command = "AI25"
+trigger27 = Command = "AI26"
+trigger28 = Command = "AI27"
+trigger29 = Command = "AI28"
+trigger30 = Command = "AI29"
+trigger31 = Command = "AI30"
+trigger32 = Command = "AI31"
+trigger33 = Command = "AI32"
+trigger34 = Command = "AI33"
+trigger35 = Command = "AI34"
+trigger36 = Command = "AI35"
+trigger37 = Command = "AI36"
+trigger38 = Command = "AI37"
+trigger39 = Command = "AI38"
+trigger40 = Command = "AI39"
+trigger41 = Command = "AI40"
+trigger42 = Command = "AI41"
+trigger43 = Command = "AI42"
+trigger44 = Command = "AI43"
+trigger45 = Command = "AI44"
+trigger46 = Command = "AI45"
+trigger47 = Command = "AI46"
+trigger48 = Command = "AI47"
+trigger49 = Command = "AI48"
+trigger50 = Command = "AI49"
+trigger51 = Command = "AI50"
+;trigger52 = 1
+var(59) = 1
+
+[State -1, J]
+type = ChangeState
+value = 1000
+triggerall = var(59) = 0
+triggerall = command = "a"
+trigger1 = ctrl
+
+[State -1, J]
+type = ChangeState
+value = 1200
+triggerall = var(59) = 0
+triggerall = NumProjId(1100) = 0
+triggerall = command = "b"
+trigger1 = ctrl
+
+[State -1, J]
+type = ChangeState
+value = 850
+triggerall = var(59) = 0
+triggerall = command = "c"
+trigger1 = ctrl
+
+
+; /////////////////////////////////////////////////////////////////////////////
+; /////////////////////////////////////////////////////////////////////////////
+; VARIABLE LIST
+; /////////////////////////////////////////////////////////////////////////////
+; /////////////////////////////////////////////////////////////////////////////
+; var(1): AngleDraw temp var
+; var(10): Time when battle started
+
+; /////////////////////////////////////////////////////////////////////////////
+; /////////////////////////////////////////////////////////////////////////////
+; STATE DEFINITIONS
+; /////////////////////////////////////////////////////////////////////////////
+; /////////////////////////////////////////////////////////////////////////////
+
+; /////////////////////////////////////////////////////////////////////////////
+; State 5900: Initialize
+; /////////////////////////////////////////////////////////////////////////////
+
+; /////////////////////////////////////////////////////////////////////////////
+; State 0: Sit There
+; /////////////////////////////////////////////////////////////////////////////
+
+[Statedef -2]
+
+;[State 0: Flop Around]
+;type = AngleAdd
+;trigger1 = 1
+;value = Var(1)
+
+[State 0: Flopping]
+type = AngleDraw
+trigger1 = stateno != [1000,1010]
+trigger1 = stateno != [3100,3101]
+
+[State 0: Flop Around]
+type = varadd
+trigger1 = 1
+v = 2
+value = var(1)
+
+[State 0: Flop Around]
+type = varset
+trigger1 = var(2) != [-5,40]
+v = 2
+value = 20
+
+[State 0: Flop Around]
+type = AngleSet
+trigger1 = 1;var(2) = 0
+value = var(2)
+
+[Statedef -3]
+
+[State 0: Struggle?]
+type = ChangeState
+triggerall = var(59) = 1 && !InGuardDist
+triggerall = stateno != [850,860]
+triggerall = NumProjId(1100) = 0
+trigger1 = Ctrl && stateno != [1000,1200]
+trigger1 = p2movetype != A && P2BodyDist X != [-40,120]
+trigger1 = random%10 <= 10
+value = 1200
+
+
+[State 0: Struggle?]
+type = ChangeState
+triggerall = var(59) = 1
+triggerall = p2movetype = I
+trigger1 = Ctrl && stateno != [1000,1200]
+trigger1 = stateno != [850,860]
+trigger1 = P2BodyDist X = [-30,30]
+trigger1 = random%10 < 3
+value = 850
+
+[State 0: Struggle?]
+type = ChangeState
+triggerall = var(59) = 1
+triggerall = stateno != [850,860]
+triggerall = Ctrl && stateno != [1000,1200]
+trigger1 = InGuardDist || (p2movetype = A && P2BodyDist X > -60) 
+trigger2 = (p2movetype != H || p2statetype = L) && P2BodyDist X = [-120,120]
+trigger3 = random%10 < 3
+value = 1000
+;-------------------------------------------------
+;Warp
+[Statedef 1000]
+type = S
+movetype = I
+physicd = S
+anim = 1000
+velset = 0,0
+ctrl = 0
+juggle = 1
+
+[State 1000, 1]
+type = VarRandom
+trigger1 = Time = 0
+v = 20
+range = 0,319
+
+[State 1000, 2]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 1000, 3]
+type = PlaySnd
+trigger1 = AnimElem = 7
+value = s1000, 0
+
+[State 1000, 9]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 1010
+
+;----------
+[Statedef 1010]
+type = S
+movetype = I
+physics = S
+anim = 1010
+
+[State 1010, 1]
+type = PosSet
+trigger1 = Time = 0
+X = Var(20)-160
+
+[State 1010, 2]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 1010, 9]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;******************************
+;3Way
+[Statedef 1200]
+type = S
+movetype = A
+physics = S
+velset = 0,0
+ctrl = 0
+juggle = 1
+sprpriority = 1
+facep2 = 1
+
+[State 1200, 5]
+type = Projectile
+trigger1 = Time = 6
+attr = A, SP
+damage = 131,33
+animtype = Heavy
+getpower = 0
+givepower = 0
+guardflag = M
+hitflag = MA
+pausetime = 0,23
+sparkno = -1
+guard.sparkno = -1
+sprpriority = 7
+sparkxy = 0,0
+hitsound = s1100,1
+guardsound = s1100,2
+ground.type = High
+ground.slidetime = 28
+ground.hittime = 28 
+ground.velocity = -10
+air.velocity = -4,-6.6
+projanim = 1220
+velocity = 6
+air.fall = 1
+fall.recover = 0
+offset = 0,0
+projid = 1100
+projremove = 0
+yaccel = 0.4
+
+[State 1200, 5]
+type = Projectile
+trigger1 = Time = 6
+attr = A, SP
+damage = 131,33
+animtype = Heavy
+getpower = 0
+givepower = 0
+guardflag = M
+hitflag = MA
+pausetime = 0,23
+sparkno = -1
+guard.sparkno = -1
+sprpriority = 5
+sparkxy = 0,0
+hitsound = s1100,1
+guardsound = s1100,2
+ground.type = High
+ground.slidetime = 28
+ground.hittime = 28 
+ground.velocity = -10
+air.velocity = -4,-6.6
+projanim = 1230
+velocity = 4,-4
+air.fall = 1
+fall.recover = 0
+offset = 0,0
+projid = 1100
+projremove = 0
+yaccel = 0.4
+
+[State 1100, 5]
+type = Projectile
+trigger1 = Time = 6
+attr = A, SP
+damage = 131,33
+animtype = Heavy
+getpower = 0
+givepower = 0
+guardflag = M
+hitflag = MA
+pausetime = 0,23
+sparkno = -1
+guard.sparkno = -1
+sprpriority = 3
+sparkxy = 0,0
+hitsound = s1100,1
+guardsound = s1100,2
+ground.type = High
+ground.slidetime = 28
+ground.hittime = 28 
+ground.velocity = -10
+air.velocity = -4,-6.6
+projanim = 1240
+velocity = 0,-6
+air.fall = 1
+fall.recover = 0
+offset = 0,0
+projid = 1100
+projremove = 0
+yaccel = 0.4
+
+[State 1200, 6]
+type = PlaySnd
+trigger1 = Time = 6
+value = s1100,0
+
+[State 1200, 9]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;*****************************************
+;K Throw
+;Check
+[Statedef 850]
+type = S
+movetype = A
+physics = S
+velset = 0,0
+ctrl = 0
+poweradd = 0
+facep2 = 1
+
+[State 850, 1]
+type = ChangeAnim
+trigger1 = Time = 0
+value = 800
+
+[State 850, 2]
+type = Hitdef
+triggerall = P2BodyDist X < 30
+trigger1 = Time = 0
+attr = S, NT
+givepower = 0
+getpower = 0
+guardflag = 
+hitflag = M-
+sparkno = -1
+hitsound = -1
+pausetime = 0,0
+p1stateno = 860
+p2facing = 1
+p2stateno = 870
+fall.recover = 0
+fall = 1
+fall.recover = 0
+
+[State 800, 9]
+type = ChangeState
+trigger1 = Time >= 2
+value = 1200
+
+;==============================
+[Statedef 860]
+type = S
+movetype = A
+physics = S
+Anim = 860
+velset = 0,0
+ctrl = 0
+
+[State 860, 0]
+type = SprPriority
+trigger1 = 1
+value = 5
+
+[State 860, 1]
+type = Width
+trigger1 = 1
+edge = 40,40
+
+[State 860, 2]
+type = TargetBind
+trigger1 = AnimElem = 1
+pos = 57,0
+
+[State 860, 3]
+type = TargetLifeAdd
+trigger1 = AnimElem = 5
+trigger2 = AnimElem = 9
+trigger3 = AnimElem = 13
+value = -61
+
+[State 860, 4]
+type = Explod
+trigger1 = AnimElem = 5
+trigger2 = AnimElem = 9
+trigger3 = AnimElem = 13
+postype = p1
+pos = 82,-25
+anim = 8030
+sprpriority = 7
+
+[State 860, 5]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = s850,0
+
+[State 860, 5]
+type = PlaySnd
+trigger1 = AnimElem = 5
+trigger2 = AnimElem = 9
+trigger3 = AnimElem = 13
+value = s850,1
+
+[State 860, 9]
+type = ChangeState
+trigger1 = AnimTime = 0 && var(59) = 1
+value = 1000
+ctrl = 0
+
+[State 860, 9]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;-----------------------------------
+[Statedef 870]
+type = A
+movetype = H
+physics = N
+velset = 0,0
+
+[State 870, 0]
+type = SprPriority
+trigger1 = 1
+value = 3
+
+[State 870, 1]
+type = ChangeAnim2
+trigger1 = Time = 0
+value = 870
+
+[State 870, 2]
+type = VelSet
+trigger1 = AnimTime = 0
+Y = -6
+
+[State 870, 9]
+type = SelfState
+trigger1 = AnimTime = 0
+value = 5100
+
+
+; /////////////////////////////////////////////////////////////////////////////
+; State 3000: STRUGGLE!
+; /////////////////////////////////////////////////////////////////////////////
+[Statedef 3000]
+type = S
+movetype = A
+physics = N
+velset = 6, -1
+anim = 3000
+ctrl = 0
+facep2 = 1
+
+[State 3000: Recoil]
+type = ChangeState
+trigger1 = Time = 0 && palno = [7,12]
+value = 3100
+
+[State 5030: No Slow KOs]
+type = AssertSpecial
+trigger1 = 1
+flag = noKOslow
+
+[State 3000: KILL!]
+type = HitDef
+trigger1 = 1
+attr = S, HA
+hitflag = MAFD
+animtype = back
+priority = 7, hit
+damage = 99999, 99999
+sparkno = 3
+hitsound = 5, 4
+ground.velocity = -12, -4
+air.velocity = -12, -4
+fall = 1
+fall.recover = 0
+getpower = 1000, 1000
+givepower = 3000, 3000
+
+[State 3000: Recoil]
+type = ChangeState
+trigger1 = MoveHit
+trigger2 = Time > 60
+value = 3001
+
+; /////////////////////////////////////////////////////////////////////////////
+; State 3001: Recoil
+; /////////////////////////////////////////////////////////////////////////////
+[Statedef 3001]
+type = A
+movetype = H
+physics = N
+ctrl = 0
+anim = 5000
+
+[State 5030: No Slow KOs]
+type = AssertSpecial
+trigger1 = 1
+flag = noKOslow
+
+[State 5030: Go Flying]
+type = VelSet
+trigger1 = Time = 0
+x = -12
+y = -4
+
+[State 5030: No Screenbound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0, 0
+
+[State 5030: Die]
+type = LifeSet
+trigger1 = !Time
+value = 0
+
+[State 5030: Death State]
+type = ChangeState
+trigger1 = Time > 120
+value = 5150
+
+[Statedef 3100]
+type = A
+movetype = A
+physics = N
+ctrl = 0
+anim = 1035
+velset = 0,0
+
+[State 0: Init Var 10]
+type = VarSet
+trigger1 = time = 0
+var(9) = 1
+
+[State 1201, 1]
+type = Explod
+trigger1 = time = 0
+anim = 1030
+pos = -150, 0
+postype = back
+facing = 1
+bindtime = 1
+vel = 10, 0
+accel = -0.4,0
+removetime = -2
+sprpriority = 0
+ontop = 0
+removeongethit = 1
+scale = 0.75,0.75
+supermovetime  = 9999
+pausemovetime  = 9999
+
+[State 1201, 1]
+type = Explod
+trigger1 = time = 0
+anim = 1040
+pos = 0, 0
+postype = p1
+facing = 1
+bindtime = 1
+removetime = -2
+sprpriority = 7
+ontop = 0
+removeongethit = 1
+scale = 1,1
+supermovetime  = 9999
+pausemovetime  = 9999
+
+[State 3500, 1]
+type = SuperPause
+trigger1 = time = 0
+time = 40
+movetime = 0
+pos = 0,0
+ownpal = 1
+anim = s1031
+sound = S220,0
+darken = 0
+
+[State 3500, 1]
+type = SuperPause
+trigger1 = time = 40
+time = 48
+movetime = 40
+pos = 0,0
+ownpal = 1
+anim = -1
+sound = -1
+darken = 0
+
+[state 0,0]
+type = assertspecial
+trigger1 = 1
+flag = nomusic
+
+[State 0, 0]
+type = PlaySnd
+trigger1 = time = 40
+value = 300,0
+
+
+[state 0,0]
+type = BGpalfx
+trigger1 = time >= 0
+time = 5
+add = 100,-20,-40
+mul = 150,150,150
+;invertall = 1
+ignorehitpause = 1
+
+[State 1200, 5]
+type = Projectile
+trigger1 = Time = 40
+attr = A, HP
+damage = 9999,9999
+animtype = Heavy
+getpower = 0
+givepower = 0
+guardflag = 
+hitflag = MAFD
+pausetime = 0,23
+sparkno = -1
+guard.sparkno = -1
+sprpriority = 5
+sparkxy = 0,0
+hitsound = s1100,1
+guardsound = s1100,2
+ground.type = High
+ground.slidetime = 28
+ground.hittime = 28 
+ground.velocity = -10
+air.velocity = -4,-6.6
+projanim = 1032
+velocity = 0,0
+air.fall = 1
+fall.recover = 0
+offset = 0,0
+projremove = 0
+projremovetime = 30
+yaccel = 0.4
+p2stateno = 3102
+p1stateno = 3101
+supermovetime  = 9999
+pausemovetime  = 9999
+
+
+[State 5030: Death State]
+type = ChangeState
+trigger1 = Time > 120
+value = 0
+ctrl = 1
+
+[Statedef 3101]
+type = A
+movetype = A
+physics = N
+ctrl = 0
+anim = 1035
+
+[State 701, Effect]
+type = Explod
+trigger1 = time = 5
+anim = 1034
+postype = left
+pos = 10,30
+sprpriority = 99
+ownpal = 0
+bindtime = -1
+ignorehitpause = 1
+scale = 2,2
+
+;[State 3500, 1]
+;type = SuperPause
+;trigger1 = time = 0
+;time = 240
+;movetime = 240
+;pos = -14,-9
+;ownpal = 1
+;anim = -1
+;sound = -1
+;darken = 0
+
+[state 0,0]
+type = assertspecial
+trigger1 = 1
+flag = nomusic
+
+[State 0, 0]
+type = PlaySnd
+trigger1 = time = 0
+value = 1000,1
+channel = 9
+
+[state 0,0]
+type = BGpalfx
+trigger1 = time >= 0
+time = 5
+add = 100,-20,-40
+mul = 150,150,150
+;invertall = 1
+ignorehitpause = 1
+
+[State 0, 0]
+type = PlaySnd
+trigger1 = time = 120
+value = 1100,0
+
+[State pal]
+type = StopSnd
+trigger1 = roundstate = 2
+trigger1 = Time > 200
+channel = 9
+
+[State 1200, 5]
+type = Projectile
+trigger1 = Time = 120
+attr = A, HP
+damage = 9999,9999
+animtype = Heavy
+getpower = 0
+givepower = 0
+guardflag = 
+hitflag = MAFD
+pausetime = 0,23
+sparkno = s1041
+sprpriority = 5
+sparkxy = 180,-70
+hitsound = s60,0
+guardsound = s1100,2
+ground.type = High
+ground.slidetime = 28
+ground.hittime = 28 
+ground.velocity = -10
+air.velocity = -4,-6.6
+projanim = 1033
+velocity = 7,0
+fall = 1
+fall.recover = 0
+offset = -70,0
+projremove = 0
+yaccel = 0.4
+supermovetime  = 9999
+pausemovetime  = 9999
+
+[State 5030: Death State]
+type = ChangeState
+trigger1 = Time > 240
+value = 0
+ctrl = 1
+
+[Statedef 3102]
+type = A
+movetype = H
+physics = N
+ctrl = 0
+anim = 5000
+velset = 0,0
+
+[State 3000, –³“G]
+type = NotHitBy
+trigger1 = 1
+value = ,AA,AT,NP,SP
+time = 12
+
+[State 5030: No Screenbound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0, 0
+
+[State 5030: Die]
+type = changeanim
+trigger1 = time = 0
+value = 5000
+
+[State 5030: Die]
+type = LifeSet
+trigger1 = time = 140
+value = 0
+
+[state 0,0]
+type = selfstate
+trigger1 = Time > 140
+value = 5050
+
+
+[Statedef 0]
+type = S
+movetype = I
+physics = N
+facep2 = 1
+
+[State 0: Init Angling]
+type = VarSet
+trigger1 = !Var(10)
+var(1) = -2
+
+[State 0: Init Var 10]
+type = VarSet
+trigger1 = Ctrl && !Var(10)
+var(10) = GameTime
+
+[State 0: Struggle?]
+type = ChangeState
+trigger1 = Ctrl && stateno = 0
+triggerall = var(9) = 0
+trigger1 = GameTime - var(10) > 2400
+value = 3000
+
+[State 0: Set Anim]
+type = ChangeAnim
+trigger1 = Anim != 0
+value = 0
+
+[State 0: No Vertical Scrolling]
+type = ScreenBound
+trigger1 = 1
+value = 1
+movecamera = 1, 0
+
+;[State 0: Random Flopping]
+;type = VarSet
+;trigger1 = Pos Y >= 0
+;fvar(2) = -5.0 + (Random/500.0)
+
+;[State 0: Random Flopping]
+;type = VarSet
+;trigger1 = Pos Y >= 0
+;fvar(3) = ifelse(Vel X > 0, -1.0, 1.0) * (Random / 500.0 + 1.0)
+
+[State 0: Flop Around]
+type = VelSet
+trigger1 = Pos Y >= 0
+Y = -4
+X = -Vel X
+;Y = fvar(2)
+;X = fvar(3)
+
+[State 0: Land on Ground]
+type = PosSet
+trigger1 = Pos Y > 0
+Y = 0
+
+[State 0: Reverse Angling]
+type = VarSet
+trigger1 = Pos Y >= 0
+var(1) = -Var(1)
+
+[State 0: Gravity]
+type = Gravity
+trigger1 = 1
+
+[State 20, 1]
+type = VelSet
+trigger1 = command = "holdfwd"
+x = const(velocity.walk.fwd.x)
+
+[State 20, 2]
+type = VelSet
+trigger1 = command = "holdback"
+x = const(velocity.walk.back.x)
+
+; /////////////////////////////////////////////////////////////////////////////
+; State 5000: Get Hit and DIE
+; /////////////////////////////////////////////////////////////////////////////
+[Statedef 5000]
+type = S
+movetype = H
+physics = N
+velset = 0, 0
+anim = 5000
+
+[State 5030: No Slow KOs]
+type = AssertSpecial
+trigger1 = 1
+flag = noKOslow
+
+[State 5000, 4] ;Freeze anim
+type = ChangeAnim
+trigger1 = Time > 0
+value = anim
+
+[State 5000, 7]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 5030
+
+; /////////////////////////////////////////////////////////////////////////////
+; State 5030: Go Flying
+; /////////////////////////////////////////////////////////////////////////////
+[Statedef 5030]
+type = A
+movetype = H
+physics = N
+ctrl = 0
+anim = 5000
+
+[State 5030: No Slow KOs]
+type = AssertSpecial
+trigger1 = 1
+flag = noKOslow
+
+[State 5030: Go Flying]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+y = 1
+
+[State 5030: No Screenbound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0, 0
+
+[State 5030: Die]
+type = LifeSet
+trigger1 = !Time
+value = 0
+
+[State 5030: Death State]
+type = ChangeState
+trigger1 = Time > 120
+value = 5150
+
+; /////////////////////////////////////////////////////////////////////////////
+; State 5150: Dead
+; /////////////////////////////////////////////////////////////////////////////
+[Statedef 5150]
+movetype = H
+anim = 5000
+
+[State 5030: No Screenbound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0, 0
+
+[State 5150: Blah]
+type = Null
+trigger1 = 1
+
+; /////////////////////////////////////////////////////////////////////////////
+; /////////////////////////////////////////////////////////////////////////////
+; OVERRIDE COMMON STATES
+; OK, I'm not really overriding anything since stcommon is defined as
+; Magikarp.def. But, some of these states are used internally by the engine
+; and I don't want that happening. Sooo....
+; /////////////////////////////////////////////////////////////////////////////
+; /////////////////////////////////////////////////////////////////////////////
+[Statedef 10] ;Stand to Crouch
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 11] ;Crouching
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 12] ;Crouch to Stand
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 20] ;Walk
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 40] ;Jump Start
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 45] ;Airjump Start
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 50] ;Jump Up
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 51] ;Jump Down
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 52] ;Jump Land
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 100] ;Run Forward
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 105] ;Run Back
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 110] ;Run Up
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 115] ;Run Down
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 120] ;Guard Start
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 130] ;Stand Guard Guarding
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 131] ;Crouch Guard Guarding
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 132] ;Air Guard Guarding
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 140] ;Guard End
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 150] ;Stand Guard Hit Shaking
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 151] ;Stand Guard Hit Knocked Back
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 152] ;Crouch Guard Hit Shaking
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 153] ;Crouch Guard Hit Knocked Back
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 154] ;Air Guard Hit Shaking
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 155] ;Air Guard Hit Knocked Back
+[State Go Home]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+[Statedef 5001] ;HITG_Slide
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5010] ;HITC_Shake
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5051] ;HITC_Slide
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5020] ;HITA_Shake
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5035] ;HITA_UP_T
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5040] ;HITA_Recov
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5050] ;HITA_Fall
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5070] ;HIT_Trip
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5071] ;HIT_Trip2
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5080] ;HITL_Shake
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5081] ;HITL_Slide
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5100] ;HIT_Bounce
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5101] ;HIT_Bounce
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5110] ;HIT_Liedown
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5120] ;HIT_Getup
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5200] ;HIT_Fallrecover
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5201] ;HIT_Fallrecover
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5210] ;HIT_Airfallrecover
+[State Get Hurt]
+type = ChangeState
+trigger1 = 1
+value = 5000
+
+[Statedef 5900]
+
+[State 5900, 1] ;Clear all int variables
+type = VarRangeSet
+trigger1 = 1
+value = 0
+
+[State 5900, 2] ;Clear all float variables
+type = VarRangeSet
+trigger1 = 1
+fvalue = 0
+
+

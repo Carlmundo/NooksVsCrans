@@ -1,0 +1,1074 @@
+;var1 对手判定出现后经过的时间
+;var2 取得对手stateno
+;var3 取得对手判定出现时间
+;var4 对手是否ai判断
+;var5-6 记录用
+;var8 修正判定判断用
+;var9,var10 记录对手所用power
+;var11 取得对手破防技性质
+;var12 空缺
+;var13 本体挨打前动作记录，测试用
+;var14 连段招式记录
+;var15 本体判定出现时间记录，测试用
+;var16 对手身高记录（粗略）
+;var17 连段时对手受身不能时间记录
+;var18 对手起身后投技无效时间
+;var19 对手helper增量记录
+;var20-43 对手破防招式记录
+;fvar0-39 对手招式发生记录
+[Statedef 33000]
+Ctrl = 0
+
+[State 33000]
+type=selfstate
+trigger1=!ishelper
+value=0
+
+[State 33000]
+Type = AssertSpecial
+Trigger1 = IsHelper
+flag = invisible
+
+[State 33000]
+type = nothitby
+trigger1 = 1
+value = sca
+
+[STATE 超必殺判定]
+type = VarSet
+triggerall = Time
+trigger1 = var(10)>enemy,power
+var(9) = (var(10)-enemy,power)
+
+[STATE 超必殺判定(リセット)]
+type = VarSet
+triggerall = Time
+trigger1 = enemynear,movetype=H
+trigger2 = enemynear,stateno=[0,105]
+trigger3 = enemynear,stateno=[120,155]
+trigger4 = enemynear,stateno=[5000,5210]
+var(9) = 0
+
+[STATE ENEMY,POWER]
+type = VarSet
+trigger1 = Time
+var(10) = enemynear,power
+
+;めくりガード対応ヘルパー
+[State 4444]
+Type = PosSet
+Trigger1 = 1
+X = Ceil(EnemyNear,Pos X)-10*Facing
+Y = Ceil(EnemyNear,Pos Y)
+IgnoreHitPause = 1
+SuperMoveTime = 9999
+PauseMoveTime = 9999
+
+[State 4444]
+Type = Turn
+Trigger1 = Facing = EnemyNear,Facing
+IgnoreHitPause = 1
+SuperMoveTime = 9999
+PauseMoveTime = 9999
+
+;相手がAIか判別
+
+[state -2,ai]
+type = varset
+trigger1 = roundstate < 2
+var(4) = 0
+
+[state -2,ai]
+type = varset
+trigger1 = abs(var(4)) > 10
+var(4) = ifelse(var(4) > 0,10,-10)
+
+[state -2,ai]
+type = varadd
+trigger1 = (enemynear,stateno=[120,132])&&(enemynear,prevstateno!=[120,155])
+trigger1 = enemynear,time <= 1
+trigger1 = enemynear,command!="holdback"
+var(4) = 1
+
+[state -2,ai]
+type = varadd
+trigger1 = (enemynear,stateno=[120,132])&&(enemynear,prevstateno!=[120,155])
+trigger1 = enemynear,time <= 1
+trigger1 = enemynear,command="holdback"
+var(4) = -1
+
+[State -1, 直前行動]
+type = VarSet
+trigger1 = root,movetype = H
+trigger1 = root,prevstateno != [5000,5799]
+trigger1 = root,stateno != [120,159]
+var(13) = root,prevstateno
+
+[State -1, 直前行動]
+type = VarSet
+trigger1 = root,movetype = A 
+var(14) = root,stateno
+
+[State -1, Preview State]
+type = VarSet
+trigger1 = var(14) != 0
+trigger1 = enemynear,movetype != H || enemynear,stateno = [150,159]
+var(14) = 0
+
+[State 32000]
+type = varset
+trigger1 = var(15) != 0
+trigger1 = enemynear,movetype != H && root,movetype != A
+var(15) = 0
+
+[State 32000]
+type = varset
+trigger1 = var(15) = 0
+trigger1 = enemynear,movetype = H || root,hitdefattr = sca,at
+var(15) = root,time
+
+[State 32000]
+type = varset
+trigger1 = enemynear,statetype = S || enemynear,statetype = L
+var(16) = enemynear,const(size.head.pos.y)
+
+[State 32000]
+type = varset
+trigger1 = enemynear,statetype = C
+var(16) = enemynear,const(size.mid.pos.y)
+
+[State 32000]
+type = varset
+trigger1 = enemynear,statetype = A
+var(16) = -99
+
+[State -2,recover]
+type=varadd
+trigger1=var(17)>0
+var(17)=-1
+ignorehitpause=1
+
+[State -2,recover]
+type=varset
+triggerall=var(17)>0
+trigger1=enemynear,movetype!=H
+var(17)=0
+
+[State -2,ガード硬直]
+type=varset
+triggerall=enemynear,movetype=H
+triggerall=enemynear,stateno<200
+triggerall=enemynear,statetype=A
+trigger1=!enemynear,gethitvar(fall)
+trigger1=!(enemynear,hitshakeover)
+trigger1=enemynear,time=1||var(17)=0
+var(17)=enemynear,gethitvar(ctrltime)+enemynear,gethitvar(hitshaketime)+1
+ignorehitpause=1
+
+[State -2,ガード硬直]
+type=varset
+triggerall=enemynear,movetype=H
+triggerall=enemynear,stateno<200
+triggerall=enemynear,statetype!=A
+trigger1=!enemynear,gethitvar(fall)
+trigger1=!(enemynear,hitshakeover)
+trigger1=enemynear,time=1||var(17)=0
+var(17)=ifelse(enemynear,gethitvar(ctrltime)<enemynear,gethitvar(hittime),enemynear,gethitvar(ctrltime),enemynear,gethitvar(hittime))+enemynear,gethitvar(hitshaketime)+1
+ignorehitpause=1
+
+[State -2,のけぞり時間]
+type=varset
+triggerall=enemynear,movetype=H
+triggerall=enemynear,stateno>199
+trigger1=!enemynear,gethitvar(fall)
+trigger1=!(enemynear,hitshakeover)
+trigger1=enemynear,time=1
+var(17)=enemynear,gethitvar(hittime)+enemynear,gethitvar(hitshaketime)+1
+ignorehitpause=1
+
+[State -2,受身不能時間]
+type=varset
+triggerall=enemynear,stateno>199
+triggerall=enemynear,movetype=H
+triggerall=enemynear,statetype!=L
+trigger1=enemynear,gethitvar(fall)
+trigger1=!(enemynear,hitshakeover)
+trigger1=enemynear,time=1
+var(17)=enemynear,gethitvar(fall.recovertime)-1
+ignorehitpause=1
+
+[State -2,受身不能時間]
+type=varset
+triggerall=numenemy>=2
+triggerall=enemynear,stateno>199
+triggerall=enemynear,movetype=H
+triggerall=enemynear,statetype!=L
+trigger1=enemynear,gethitvar(fall)
+trigger1=var(17)<enemynear,gethitvar(fall.recovertime)-100
+var(17)=enemynear,gethitvar(fall.recovertime)-100
+ignorehitpause=1
+
+[State -2,受身不能時間]
+type=varset
+triggerall=enemynear,stateno>199
+triggerall=enemynear,movetype=H
+triggerall=enemynear,statetype!=L
+trigger1=!enemynear,gethitvar(fall.recover)
+trigger1=enemynear,gethitvar(fall)
+trigger2=enemynear,stateno=5070
+var(17)=999
+ignorehitpause=1
+
+[State -3,up]
+type = varset
+trigger1 = var(18) <= 0
+trigger1 = enemynear,statetype = L
+var(18) = 15
+
+[State -3,up]
+type = varset
+trigger1 = var(18) = 0
+trigger1 = root,statetype = L
+var(18) = -15
+
+[State -3,up]
+type = varadd
+triggerall = var(18) != 0
+trigger1 = var(18) > 0
+trigger1 = enemynear,statetype != L
+trigger2 = var(18) < 0
+trigger2 = root,statetype != L
+var(18) = ifelse(var(18) > 0,-1,1)
+
+;相手のヘルパー数調べ
+[state -1];ヘルパー数調べの準備
+type=varset
+trigger1 = roundstate!=2
+var(19)=9999
+supermove = 1
+ignorehitpause = 1
+pausemovetime = 99999
+supermovetime = 99999
+
+
+[state -1];ヘルパー数を調べる
+type=varset
+var(19)=enemynear,numhelper
+trigger1 = roundstate=2
+trigger1 = enemynear,ctrl=1
+trigger1 = var(19)>=enemynear,numhelper
+trigger2 = enemynear,movetype != A
+trigger2 = root,inguarddist = 0
+trigger2 = (enemynear,stateno =[5000,5999]) || enemynear,stateno = [50,200)
+trigger2 = root,stateno != [120,162]
+trigger2 = root,stateno != [5000,5300]
+trigger2 = root,movetype != H
+trigger2 = root,hitpausetime = 0 && enemynear,hitpausetime = 0
+ignorehitpause = 1
+
+[state -1]
+type=varset
+triggerall = var(20) != 0
+trigger1 = root,movetype = A
+trigger2 = root,movetype = H && root,stateno != [120,159]
+var(20)=0
+ignorehitpause = 1
+
+[state -1]
+type=varadd
+trigger1 = root,movetype = H && !root,ctrl && root,stateno = [150,159]
+var(20)=1
+ignorehitpause = 1
+
+[state -1]
+type=varadd
+trigger1 = var(20) > 0
+trigger1 = root,movetype != H
+var(20)=-1
+ignorehitpause = 1
+
+[state -1]
+type=varset
+trigger1 = root,movehit = 1
+var(21)=ceil(root,p2bodydist y)
+ignorehitpause = 1
+
+[State -3]
+Type = VarSet
+Trigger1 = enemynear,movetype = A
+Trigger1 = enemynear,time <= 1
+trigger2 = enemynear,movetype != A
+var(0) = 0
+IgnoreHitPause = 1
+
+[State -2,time]
+Type = VarSet
+Trigger1 = enemynear,movetype = A
+Trigger1 = enemynear,hitdefattr = sca,aa,ap,at
+trigger1 = var(0) = 0
+var(0) = enemynear,time
+IgnoreHitPause = 1
+
+[State -3]
+Type = VarSet
+Trigger1 = enemynear,movetype = A
+Trigger1 = enemynear,time <= 1
+trigger2 = enemynear,movetype != A
+var(8) = 0
+IgnoreHitPause = 1
+
+[State -3]
+Type = VarSet
+Trigger1 = enemynear,movetype = A
+Trigger1 = root,movetype = H
+trigger1 = root,time <= 1
+trigger1 = var(8) = 0
+var(8) = enemynear,time
+IgnoreHitPause = 1
+
+[State 7777,shield]
+Type = VarSet
+triggerall = var(1) != 0
+Trigger1 = EnemyNear,time < 1
+trigger2 = enemynear,movetype != A
+trigger3 = var(7) = 1
+var(1)=0
+IgnoreHitPause=1
+
+[State 7777,shield]
+Type = VarAdd
+Trigger1 = EnemyNear,MoveType=A
+Trigger1 = EnemyNear,HitDefAttr = SCA,AA,AP,AT
+var(1)=1
+IgnoreHitPause=1
+
+[State 7777,shield]
+Type = Varset
+triggerall = var(7) != 1
+Trigger1 = EnemyNear,time <= 1
+Trigger1 = EnemyNear,HitDefAttr = SCA,AA,AP
+var(7)=1
+IgnoreHitPause=1
+
+[State 7777,shield]
+Type = Varset
+triggerall = var(7) != 0
+Trigger1 = EnemyNear,HitDefAttr = SCA,AA,AP,AT
+trigger1 = root,movetype = H || enemynear,movecontact || enemynear,movereversed
+trigger2 = enemynear,movetype != A
+trigger3 = !enemynear,hitdefattr = sca,aa,ap
+var(7)=0
+IgnoreHitPause=1
+
+[State -2,stateno1]
+Type = Varset
+TriggerAll = Enemy,TeamMode = Single || Enemy,TeamMode = Turns
+Trigger1 = enemynear,movetype != A
+V = 2
+value = 0
+IgnoreHitPause = 1
+
+[State -2,time]
+Type = VarSet
+TriggerAll = Enemy,TeamMode = Single || Enemy,TeamMode = Turns
+Trigger1 = enemynear,movetype != A
+V = 3
+value = 0
+IgnoreHitPause = 1
+
+[State 33000,time]
+Type = Null
+TriggerAll = Enemy,TeamMode = Single || Enemy,TeamMode = Turns
+TriggerAll = Var(2) != Enemynear,Stateno
+Trigger1 = floor(fvar(0)) = Enemynear,Stateno
+trigger1 = var(2) := floor(fvar(0)) || 1
+trigger1 = var(3) := floor(1000*(fvar(0)-floor(fvar(0))))
+Trigger2 = floor(fvar(1)) = Enemynear,Stateno
+trigger2 = var(2) := floor(fvar(1)) || 1
+trigger2 = var(3) := floor(1000*(fvar(1)-floor(fvar(1))))
+Trigger3 = floor(fvar(2)) = Enemynear,Stateno
+trigger3 = var(2) := floor(fvar(2)) || 1
+trigger3 = var(3) := floor(1000*(fvar(2)-floor(fvar(2))))
+Trigger4 = floor(fvar(3)) = Enemynear,Stateno
+trigger4 = var(2) := floor(fvar(3)) || 1
+trigger4 = var(3) := floor(1000*(fvar(3)-floor(fvar(3))))
+Trigger5 = floor(fvar(4)) = Enemynear,Stateno
+trigger5 = var(2) := floor(fvar(4)) || 1
+trigger5 = var(3) := floor(1000*(fvar(4)-floor(fvar(4))))
+Trigger6 = floor(fvar(5)) = Enemynear,Stateno
+trigger6 = var(2) := floor(fvar(5)) || 1
+trigger6 = var(3) := floor(1000*(fvar(5)-floor(fvar(5))))
+Trigger7 = floor(fvar(6)) = Enemynear,Stateno
+trigger7 = var(2) := floor(fvar(6)) || 1
+trigger7 = var(3) := floor(1000*(fvar(6)-floor(fvar(6))))
+Trigger8 = floor(fvar(7)) = Enemynear,Stateno
+trigger8 = var(2) := floor(fvar(7)) || 1
+trigger8 = var(3) := floor(1000*(fvar(7)-floor(fvar(7))))
+Trigger9 = floor(fvar(8)) = Enemynear,Stateno
+trigger9 = var(2) := floor(fvar(8)) || 1
+trigger9 = var(3) := floor(1000*(fvar(8)-floor(fvar(8))))
+Trigger10 = floor(fvar(9)) = Enemynear,Stateno
+trigger10 = var(2) := floor(fvar(9)) || 1
+trigger10 = var(3) := floor(1000*(fvar(9)-floor(fvar(9))))
+Trigger11 = floor(fvar(10)) = Enemynear,Stateno
+trigger11 = var(2) := floor(fvar(10)) || 1
+trigger11 = var(3) := floor(1000*(fvar(10)-floor(fvar(10))))
+Trigger12 = floor(fvar(11)) = Enemynear,Stateno
+trigger12 = var(2) := floor(fvar(11)) || 1
+trigger12 = var(3) := floor(1000*(fvar(11)-floor(fvar(11))))
+Trigger13 = floor(fvar(12)) = Enemynear,Stateno
+trigger13 = var(2) := floor(fvar(12)) || 1
+trigger13 = var(3) := floor(1000*(fvar(12)-floor(fvar(12))))
+Trigger14 = floor(fvar(13)) = Enemynear,Stateno
+trigger14 = var(2) := floor(fvar(13)) || 1
+trigger14 = var(3) := floor(1000*(fvar(13)-floor(fvar(13))))
+Trigger15 = floor(fvar(14)) = Enemynear,Stateno
+trigger15 = var(2) := floor(fvar(14)) || 1
+trigger15 = var(3) := floor(1000*(fvar(14)-floor(fvar(14))))
+Trigger16 = floor(fvar(15)) = Enemynear,Stateno
+trigger16 = var(2) := floor(fvar(15)) || 1
+trigger16 = var(3) := floor(1000*(fvar(15)-floor(fvar(15))))
+Trigger17 = floor(fvar(16)) = Enemynear,Stateno
+trigger17 = var(2) := floor(fvar(16)) || 1
+trigger17 = var(3) := floor(1000*(fvar(16)-floor(fvar(16))))
+Trigger18 = floor(fvar(17)) = Enemynear,Stateno
+trigger18 = var(2) := floor(fvar(17)) || 1
+trigger18 = var(3) := floor(1000*(fvar(17)-floor(fvar(17))))
+Trigger19 = floor(fvar(18)) = Enemynear,Stateno
+trigger19 = var(2) := floor(fvar(18)) || 1
+trigger19 = var(3) := floor(1000*(fvar(18)-floor(fvar(18))))
+Trigger20 = floor(fvar(19)) = Enemynear,Stateno
+trigger20 = var(2) := floor(fvar(19)) || 1
+trigger20 = var(3) := floor(1000*(fvar(19)-floor(fvar(19))))
+Trigger21 = floor(fvar(20)) = Enemynear,Stateno
+trigger21 = var(2) := floor(fvar(20)) || 1
+trigger21 = var(3) := floor(1000*(fvar(20)-floor(fvar(20))))
+Trigger22 = floor(fvar(21)) = Enemynear,Stateno
+trigger22 = var(2) := floor(fvar(21)) || 1
+trigger22 = var(3) := floor(1000*(fvar(21)-floor(fvar(21))))
+Trigger23 = floor(fvar(22)) = Enemynear,Stateno
+trigger23 = var(2) := floor(fvar(22)) || 1
+trigger23 = var(3) := floor(1000*(fvar(22)-floor(fvar(22))))
+Trigger24 = floor(fvar(23)) = Enemynear,Stateno
+trigger24 = var(2) := floor(fvar(23)) || 1
+trigger24 = var(3) := floor(1000*(fvar(23)-floor(fvar(23))))
+Trigger25 = floor(fvar(24)) = Enemynear,Stateno
+trigger25 = var(2) := floor(fvar(24)) || 1
+trigger25 = var(3) := floor(1000*(fvar(24)-floor(fvar(24))))
+Trigger26 = floor(fvar(25)) = Enemynear,Stateno
+trigger26 = var(2) := floor(fvar(25)) || 1
+trigger26 = var(3) := floor(1000*(fvar(25)-floor(fvar(25))))
+Trigger27 = floor(fvar(26)) = Enemynear,Stateno
+trigger27 = var(2) := floor(fvar(26)) || 1
+trigger27 = var(3) := floor(1000*(fvar(26)-floor(fvar(26))))
+Trigger28 = floor(fvar(27)) = Enemynear,Stateno
+trigger28 = var(2) := floor(fvar(27)) || 1
+trigger28 = var(3) := floor(1000*(fvar(27)-floor(fvar(27))))
+Trigger29 = floor(fvar(28)) = Enemynear,Stateno
+trigger29 = var(2) := floor(fvar(28)) || 1
+trigger29 = var(3) := floor(1000*(fvar(28)-floor(fvar(28))))
+Trigger30 = floor(fvar(29)) = Enemynear,Stateno
+trigger30 = var(2) := floor(fvar(29)) || 1
+trigger30 = var(3) := floor(1000*(fvar(29)-floor(fvar(29))))
+Trigger31 = floor(fvar(30)) = Enemynear,Stateno
+trigger31 = var(2) := floor(fvar(30)) || 1
+trigger31 = var(3) := floor(1000*(fvar(30)-floor(fvar(30))))
+Trigger32 = floor(fvar(31)) = Enemynear,Stateno
+trigger32 = var(2) := floor(fvar(31)) || 1
+trigger32 = var(3) := floor(1000*(fvar(31)-floor(fvar(31))))
+Trigger33 = floor(fvar(32)) = Enemynear,Stateno
+trigger33 = var(2) := floor(fvar(32)) || 1
+trigger33 = var(3) := floor(1000*(fvar(32)-floor(fvar(32))))
+Trigger34 = floor(fvar(33)) = Enemynear,Stateno
+trigger34 = var(2) := floor(fvar(33)) || 1
+trigger34 = var(3) := floor(1000*(fvar(33)-floor(fvar(33))))
+Trigger35 = floor(fvar(34)) = Enemynear,Stateno
+trigger35 = var(2) := floor(fvar(34)) || 1
+trigger35 = var(3) := floor(1000*(fvar(34)-floor(fvar(34))))
+Trigger36 = floor(fvar(35)) = Enemynear,Stateno
+trigger36 = var(2) := floor(fvar(35)) || 1
+trigger36 = var(3) := floor(1000*(fvar(35)-floor(fvar(35))))
+Trigger37 = floor(fvar(36)) = Enemynear,Stateno
+trigger37 = var(2) := floor(fvar(36)) || 1
+trigger37 = var(3) := floor(1000*(fvar(36)-floor(fvar(36))))
+Trigger38 = floor(fvar(37)) = Enemynear,Stateno
+trigger38 = var(2) := floor(fvar(37)) || 1
+trigger38 = var(3) := floor(1000*(fvar(37)-floor(fvar(37))))
+Trigger39 = floor(fvar(38)) = Enemynear,Stateno
+trigger39 = var(2) := floor(fvar(38)) || 1
+trigger39 = var(3) := floor(1000*(fvar(38)-floor(fvar(38))))
+Trigger40 = floor(fvar(39)) = Enemynear,Stateno
+trigger40 = var(2) := floor(fvar(39)) || 1
+trigger40 = var(3) := floor(1000*(fvar(39)-floor(fvar(39))))
+IgnoreHitPause = 1
+
+
+[State -2,pointer]
+Type = VarAdd
+TriggerAll = Enemy,TeamMode = Single || Enemy,TeamMode = Turns
+Trigger1 = var(5) > 0 && var(0) != 0
+var(6) = 1
+IgnoreHitPause = 1
+
+[State -2,reset]
+Type = VarSet
+;TriggerAll = Root,var(59) > 0
+Trigger1 = Var(5) > 0 && var(0) != 0
+var(5) = 0
+IgnoreHitPause = 1
+
+[State -2,stateno3]
+Type = VarSet
+TriggerAll = Enemy,TeamMode = Single || Enemy,TeamMode = Turns
+TriggerAll = enemynear,movetype = A
+TriggerAll = Var(2) != enemynear,stateno
+Trigger1 = var(0) != 0
+var(2) = enemynear,stateno
+IgnoreHitPause = 1
+
+[State -2,time]
+Type = VarSet
+TriggerAll = Enemy,TeamMode = Single || Enemy,TeamMode = Turns
+TriggerAll = enemynear,movetype = A
+TriggerAll = Var(2) = enemynear,stateno
+Trigger1 = var(0) != 0
+var(3) = var(0)
+IgnoreHitPause = 1
+
+[State -2,max]
+Type = Varset
+Trigger1 = var(3) > 999
+var(3) = 999
+IgnoreHitPause = 1
+
+[State -2,pointer]
+Type = VarSet
+TriggerAll = Enemy,TeamMode = Single || Enemy,TeamMode = Turns
+TriggerAll = enemynear,movetype = A && var(0) != 0
+TriggerAll = Var(6) <= 39
+TriggerAll = floor(fvar(0)) != var(2)
+TriggerAll = floor(fvar(1)) != var(2)
+TriggerAll = floor(fvar(2)) != var(2)
+TriggerAll = floor(fvar(3)) != var(2)
+TriggerAll = floor(fvar(4)) != var(2)
+TriggerAll = floor(fvar(5)) != var(2)
+TriggerAll = floor(fvar(6)) != var(2)
+TriggerAll = floor(fvar(7)) != var(2)
+TriggerAll = floor(fvar(8)) != var(2)
+TriggerAll = floor(fvar(9)) != var(2)
+TriggerAll = floor(fvar(10)) != var(2)
+TriggerAll = floor(fvar(11)) != var(2)
+TriggerAll = floor(fvar(12)) != var(2)
+TriggerAll = floor(fvar(13)) != var(2)
+TriggerAll = floor(fvar(14)) != var(2)
+TriggerAll = floor(fvar(15)) != var(2)
+TriggerAll = floor(fvar(16)) != var(2)
+TriggerAll = floor(fvar(17)) != var(2)
+TriggerAll = floor(fvar(18)) != var(2)
+TriggerAll = floor(fvar(19)) != var(2)
+TriggerAll = floor(fvar(20)) != var(2)
+TriggerAll = floor(fvar(21)) != var(2)
+TriggerAll = floor(fvar(22)) != var(2)
+TriggerAll = floor(fvar(23)) != var(2)
+TriggerAll = floor(fvar(24)) != var(2)
+TriggerAll = floor(fvar(25)) != var(2)
+TriggerAll = floor(fvar(26)) != var(2)
+TriggerAll = floor(fvar(27)) != var(2)
+TriggerAll = floor(fvar(28)) != var(2)
+TriggerAll = floor(fvar(29)) != var(2)
+TriggerAll = floor(fvar(30)) != var(2)
+TriggerAll = floor(fvar(31)) != var(2)
+TriggerAll = floor(fvar(32)) != var(2)
+TriggerAll = floor(fvar(33)) != var(2)
+TriggerAll = floor(fvar(34)) != var(2)
+TriggerAll = floor(fvar(35)) != var(2)
+TriggerAll = floor(fvar(36)) != var(2)
+TriggerAll = floor(fvar(37)) != var(2)
+TriggerAll = floor(fvar(38)) != var(2)
+TriggerAll = floor(fvar(39)) != var(2)
+TriggerAll = var(5) = 0
+Triggerall = Enemynear,Prevstateno != Enemynear,Stateno
+trigger1 = enemynear,hitdefattr = sca,na,sa,np,sp,nt,st
+var(5) = 1
+IgnoreHitPause = 1
+
+[State -2,record]
+Type = VarSet
+TriggerAll = Enemy,TeamMode = Single || Enemy,TeamMode = Turns
+Trigger1 = var(5) = 1
+FV = Var(6)
+Value = Var(2)+0.001*Var(3)
+IgnoreHitPause = 1
+
+
+[State -2, 判定用Varのリセット]
+Type = VarSet
+TriggerAll = Enemy,TeamMode = Single || Enemy,TeamMode = Turns
+triggerall = var(22)
+triggerall = Root,StateNo != [120,155]
+triggerall = Root,MoveType != H
+trigger1 = Root,Ctrl || Root,StateNo < 200
+trigger2 = Root,MoveType = A
+V = 22
+Value = 0
+IgnoreHitPause = 1
+
+[State -2, 下段(立ちガード不可攻撃)判定]
+Type = VarSet
+TriggerAll = RoundState = 2 && Var(22) = 0
+TriggerAll = root,StateNo != [120,155]
+TriggerAll = root,prevStateNo != [5000,5099]
+TriggerAll = enemynear,movetype = A
+TriggerAll = EnemyNear,StateType = S
+TriggerAll = root,movetype = H
+triggerall = !enemynear,hitdefattr = sca,at
+Trigger1 = root,PrevStateNo = 130
+Trigger2 = root,PrevStateNo = [150,151]
+V = 22
+Value = 1
+IgnoreHitPause = 1
+
+[State -2, 中段(屈みガード不可攻撃)判定]
+Type = VarSet
+TriggerAll = RoundState = 2 && Var(22) = 0
+TriggerAll = root,StateNo != [120,155]
+TriggerAll = root,prevStateNo != [5000,5099]
+TriggerAll = enemynear,movetype = A
+TriggerAll = EnemyNear,StateType = S
+TriggerAll = root,movetype = H
+triggerall = !enemynear,hitdefattr = sca,at
+Trigger1 = root,PrevStateNo = 131
+Trigger2 = root,PrevStateNo = [152,153]
+V = 22
+Value = 2
+IgnoreHitPause = 1
+
+[State 60000,Reset]
+type = VarSet
+triggerall = var(11) != 0
+trigger1 = enemynear,stateno != var(30)
+trigger1 = enemynear,stateno != var(31)
+trigger1 = enemynear,stateno != var(32)
+trigger1 = enemynear,stateno != var(33)
+trigger1 = enemynear,stateno != var(34)
+trigger1 = enemynear,stateno != var(35)
+trigger1 = enemynear,stateno != var(36)
+trigger1 = enemynear,stateno != var(37)
+trigger1 = enemynear,stateno != var(38)
+trigger1 = enemynear,stateno != var(39)
+trigger1 = enemynear,stateno != var(40)
+trigger1 = enemynear,stateno != var(41)
+trigger1 = enemynear,stateno != var(42)
+trigger1 = enemynear,stateno != var(43)
+trigger2 = enemynear,movetype != A
+var(11) = 0
+ignorehitpause = 1
+
+[State 60000,下段]
+type = VarSet
+triggerall = var(11) != 1
+trigger1 = var(30) > 0
+trigger1 = enemynear,stateno = var(30)
+trigger2 = var(31) > 0
+trigger2 = enemynear,stateno = var(31)
+trigger3 = var(32) > 0
+trigger3 = enemynear,stateno = var(32)
+var(11) = 1
+ignorehitpause = 1
+
+[State 60000,中段]
+type = VarSet
+triggerall = var(11) != 2
+trigger1 = var(33) > 0
+trigger1 = enemynear,stateno = var(33)
+trigger2 = var(34) > 0
+trigger2 = enemynear,stateno = var(34)
+trigger3 = var(35) > 0
+trigger3 = enemynear,stateno = var(35)
+var(11) = 2
+ignorehitpause = 1
+
+[State 60000,投]
+type = VarSet
+triggerall = var(11) != 3
+trigger1 = var(36) > 0
+trigger1 = enemynear,stateno = var(36)
+trigger2 = var(37) > 0
+trigger2 = enemynear,stateno = var(37)
+trigger3 = var(38) > 0
+trigger3 = enemynear,stateno = var(38)
+trigger4 = var(39) > 0
+trigger4 = enemynear,stateno = var(39)
+trigger5 = var(40) > 0
+trigger5 = enemynear,stateno = var(40)
+trigger6 = var(41) > 0
+trigger6 = enemynear,stateno = var(41)
+var(11) = 3
+ignorehitpause = 1
+
+[State 60000,不可防]
+type = VarSet
+triggerall = var(11) != 4
+trigger1 = var(42) > 0
+trigger1 = enemynear,stateno = var(42)
+trigger2 = var(43) > 0
+trigger2 = enemynear,stateno = var(43)
+var(11) = 4
+ignorehitpause = 1
+
+[State 60000,下段学習]
+type = VarSet
+trigger1 = enemynear,movetype = A
+trigger1 = var(22) = 1
+trigger1 = Enemy,TeamMode = Single || Enemy,TeamMode = Turns || Enemy,TeamMode = Simul && (Enemy(0),Alive && !Enemy(NumEnemy=2),Alive || !Enemy(0),Alive && Enemy(NumEnemy=2),Alive)
+trigger1 = !var(30)
+trigger1 = !var(42)||var(42)&&var(42)!=EnemyNear,StateNo
+trigger1 = !var(43)||var(43)&&var(43)!=EnemyNear,StateNo
+var(30) = EnemyNear,StateNo
+ignorehitpause = 1
+
+[State 60000,下段学習2]
+type = VarSet
+trigger1 = enemynear,movetype = A
+trigger1 = var(22) = 1
+trigger1 = Enemy,TeamMode = Single || Enemy,TeamMode = Turns || Enemy,TeamMode = Simul && (Enemy(0),Alive && !Enemy(NumEnemy=2),Alive || !Enemy(0),Alive && Enemy(NumEnemy=2),Alive)
+trigger1 = var(30)
+trigger1 = !var(31)
+trigger1 = !var(42)||var(42)&&var(42)!=EnemyNear,StateNo
+trigger1 = !var(43)||var(43)&&var(43)!=EnemyNear,StateNo
+trigger1 = enemynear,stateno != var(30)
+var(31) = EnemyNear,StateNo
+ignorehitpause = 1
+
+[State 60000,下段学習3]
+type = VarSet
+trigger1 = enemynear,movetype = A
+trigger1 = var(22) = 1
+trigger1 = Enemy,TeamMode = Single || Enemy,TeamMode = Turns || Enemy,TeamMode = Simul && (Enemy(0),Alive && !Enemy(NumEnemy=2),Alive || !Enemy(0),Alive && Enemy(NumEnemy=2),Alive)
+trigger1 = var(31)
+trigger1 = !var(32)
+trigger1 = !var(42)||var(42)&&var(42)!=EnemyNear,StateNo
+trigger1 = !var(43)||var(43)&&var(43)!=EnemyNear,StateNo
+trigger1 = enemynear,stateno != var(30)
+trigger1 = enemynear,stateno != var(31)
+var(32) = EnemyNear,StateNo
+ignorehitpause = 1
+
+[State 60000,中段学習]
+type = VarSet
+trigger1 = enemynear,movetype = A
+trigger1 = var(22) = 2
+trigger1 = Enemy,TeamMode = Single || Enemy,TeamMode = Turns || Enemy,TeamMode = Simul && (Enemy(0),Alive && !Enemy(NumEnemy=2),Alive || !Enemy(0),Alive && Enemy(NumEnemy=2),Alive)
+trigger1 = !var(33)
+trigger1 = !var(42)||var(42)&&var(42)!=EnemyNear,StateNo
+trigger1 = !var(43)||var(43)&&var(43)!=EnemyNear,StateNo
+var(33) = EnemyNear,StateNo
+ignorehitpause = 1
+
+[State 60000,中段学習2]
+type = VarSet
+trigger1 = enemynear,movetype = A
+trigger1 = var(22) = 2
+trigger1 = Enemy,TeamMode = Single || Enemy,TeamMode = Turns || Enemy,TeamMode = Simul && (Enemy(0),Alive && !Enemy(NumEnemy=2),Alive || !Enemy(0),Alive && Enemy(NumEnemy=2),Alive)
+trigger1 = var(33)
+trigger1 = !var(34)
+trigger1 = !var(42)||var(42)&&var(42)!=EnemyNear,StateNo
+trigger1 = !var(43)||var(43)&&var(43)!=EnemyNear,StateNo
+trigger1 = enemynear,stateno != var(33)
+var(34) = EnemyNear,StateNo
+ignorehitpause = 1
+
+[State 60000,中段学習3]
+type = VarSet
+trigger1 = enemynear,movetype = A
+trigger1 = var(22) = 2
+trigger1 = Enemy,TeamMode = Single || Enemy,TeamMode = Turns || Enemy,TeamMode = Simul && (Enemy(0),Alive && !Enemy(NumEnemy=2),Alive || !Enemy(0),Alive && Enemy(NumEnemy=2),Alive)
+trigger1 = var(34)
+trigger1 = !var(35)
+trigger1 = !var(42)||var(42)&&var(42)!=EnemyNear,StateNo
+trigger1 = !var(43)||var(43)&&var(43)!=EnemyNear,StateNo
+trigger1 = enemynear,stateno != var(33)
+trigger1 = enemynear,stateno != var(34)
+var(35) = EnemyNear,StateNo
+ignorehitpause = 1
+
+[State 60000,投]
+type = VarSet
+trigger1 = enemynear,movetype = A
+trigger1 = Enemy,TeamMode = Single || Enemy,TeamMode = Turns || Enemy,TeamMode = Simul && (Enemy(0),Alive && !Enemy(NumEnemy=2),Alive || !Enemy(0),Alive && Enemy(NumEnemy=2),Alive)
+trigger1 = enemynear,hitdefattr = sc,nt,st,ht,at
+trigger1 = !var(36)
+var(36) = enemynear,stateno
+ignorehitpause = 1
+
+[State 60000,投2]
+type = VarSet
+trigger1 = enemynear,movetype = A
+trigger1 = Enemy,TeamMode = Single || Enemy,TeamMode = Turns || Enemy,TeamMode = Simul && (Enemy(0),Alive && !Enemy(NumEnemy=2),Alive || !Enemy(0),Alive && Enemy(NumEnemy=2),Alive)
+trigger1 = enemynear,hitdefattr = sc,nt,st,ht,at
+trigger1 = !var(37) && var(36)
+trigger1 = enemynear,stateno != var(36)
+var(37) = enemynear,stateno
+ignorehitpause = 1
+
+[State 60000,投3]
+type = VarSet
+trigger1 = enemynear,movetype = A
+trigger1 = Enemy,TeamMode = Single || Enemy,TeamMode = Turns || Enemy,TeamMode = Simul && (Enemy(0),Alive && !Enemy(NumEnemy=2),Alive || !Enemy(0),Alive && Enemy(NumEnemy=2),Alive)
+trigger1 = enemynear,hitdefattr = sc,nt,st,ht,at
+trigger1 = !var(38) && var(37)
+trigger1 = enemynear,stateno != var(36)
+trigger1 = enemynear,stateno != var(37)
+var(38) = enemynear,stateno
+
+[State 60000,投4]
+type = VarSet
+trigger1 = enemynear,movetype = A
+trigger1 = Enemy,TeamMode = Single || Enemy,TeamMode = Turns || Enemy,TeamMode = Simul && (Enemy(0),Alive && !Enemy(NumEnemy=2),Alive || !Enemy(0),Alive && Enemy(NumEnemy=2),Alive)
+trigger1 = enemynear,hitdefattr = sca,nt,st,ht,at
+trigger1 = !var(39) && var(38)
+trigger1 = enemynear,stateno != var(36)
+trigger1 = enemynear,stateno != var(37)
+trigger1 = enemynear,stateno != var(38)
+var(39) = enemynear,stateno
+
+[State 60000,投5]
+type = VarSet
+trigger1 = enemynear,movetype = A
+trigger1 = Enemy,TeamMode = Single || Enemy,TeamMode = Turns || Enemy,TeamMode = Simul && (Enemy(0),Alive && !Enemy(NumEnemy=2),Alive || !Enemy(0),Alive && Enemy(NumEnemy=2),Alive)
+trigger1 = enemynear,hitdefattr = sca,nt,st,ht,at
+trigger1 = !var(40) && var(39)
+trigger1 = enemynear,stateno != var(36)
+trigger1 = enemynear,stateno != var(37)
+trigger1 = enemynear,stateno != var(38)
+trigger1 = enemynear,stateno != var(39)
+var(40) = enemynear,stateno
+
+[State 60000,投6]
+type = VarSet
+trigger1 = enemynear,movetype = A
+trigger1 = Enemy,TeamMode = Single || Enemy,TeamMode = Turns || Enemy,TeamMode = Simul && (Enemy(0),Alive && !Enemy(NumEnemy=2),Alive || !Enemy(0),Alive && Enemy(NumEnemy=2),Alive)
+trigger1 = enemynear,hitdefattr = sca,nt,st,ht,at
+trigger1 = !var(41) && var(40)
+trigger1 = enemynear,stateno != var(36)
+trigger1 = enemynear,stateno != var(37)
+trigger1 = enemynear,stateno != var(38)
+trigger1 = enemynear,stateno != var(39)
+trigger1 = enemynear,stateno != var(40)
+var(41) = enemynear,stateno
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = !var(42)
+trigger1 = var(30)>0
+trigger1 = var(30) = var(33) || var(30) = var(34) || var(30) = var(35)
+var(42) = var(10)
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = !var(42)
+trigger1 = var(31)>0
+trigger1 = var(31) = var(33) || var(31) = var(34) || var(31) = var(35)
+var(42) = var(31)
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = !var(42)
+trigger1 = var(32)>0
+trigger1 = var(32) = var(33) || var(32) = var(34) || var(32) = var(35)
+var(42) = var(32)
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = var(30)
+trigger1 = var(42) = var(30)
+var(30) = 0
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = var(31)
+trigger1 = var(42) = var(31)
+var(31) = 0
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = var(32)
+trigger1 = var(42) = var(32)
+var(32) = 0
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = var(33)
+trigger1 = var(42) = var(33)
+var(33) = 0
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = var(34)
+trigger1 = var(42) = var(34)
+var(34) = 0
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = var(35)
+trigger1 = var(42) = var(35)
+var(35) = 0
+ignorehitpause = 1
+
+[State 60000,ガード不能学習2]
+type = VarSet
+triggerall = !var(43)
+triggerall = var(42)
+trigger1 = var(30)>0
+trigger1 = var(30) = var(33) || var(30) = var(34) || var(30) = var(35)
+var(43) = ifelse(var(30)!=var(42),var(30),0)
+ignorehitpause = 1
+
+[State 60000,ガード不能学習2]
+type = VarSet
+triggerall = !var(43)
+triggerall = var(42)
+trigger1 = var(31)>0
+trigger1 = var(31) = var(33) || var(31) = var(34) || var(31) = var(35)
+var(43) = ifelse(var(30)!=var(42),var(31),0)
+ignorehitpause = 1
+
+[State 60000,ガード不能学習2]
+type = VarSet
+triggerall = !var(43)
+triggerall = var(42)
+trigger1 = var(32)>0
+trigger1 = var(32) = var(33) || var(32) = var(34) || var(32) = var(35)
+var(43) = ifelse(var(30)!=var(42),var(32),0)
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = var(30)
+trigger1 = var(43) = var(30)
+var(30) = 0
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = var(31)
+trigger1 = var(43) = var(31)
+var(31) = 0
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = var(32)
+trigger1 = var(43) = var(32)
+var(32) = 0
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = var(33)
+trigger1 = var(43) = var(33)
+var(33) = 0
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = var(34)
+trigger1 = var(43) = var(34)
+var(34) = 0
+ignorehitpause = 1
+
+[State 60000,ガード不能学習]
+type = VarSet
+triggerall = var(35)
+trigger1 = var(43) = var(35)
+var(35) = 0
+ignorehitpause = 1
+
+
+[Statedef 11990]
+ctrl = 0
+
+[State 10000,間違いで本体が来たら立ちへ移行]
+type = selfstate
+trigger1 = !ishelper
+value = 0
+
+[State 33002]
+Type = AssertSpecial
+Trigger1 = IsHelper
+flag = invisible
+
+[state 33002]
+type = nothitby
+trigger1 = 1
+value = sca
+
+[State 10000,プレイヤー判定]
+type = varset   ;"ヘルパー"のvar(59)に-1を入れる
+trigger1 = command = "a" && root,command = "a"
+trigger2 = command = "b" && root,command = "b"
+trigger3 = command = "c" && root,command = "c"
+trigger4 = command = "x" && root,command = "x"
+trigger5 = command = "y" && root,command = "y"
+trigger6 = command = "z" && root,command = "z"
+trigger7 = command = "start" && root,command = "start"
+trigger8 = command = "fwd" && root,command = "fwd"
+trigger9 = command = "back" && root,command = "back"
+trigger10 = command = "up" && root,command = "up"
+trigger11 = command = "down" && root,command = "down"
+var(59) = -1
+
+[State 10000,プレイヤー判定]
+type = parentvarset
+trigger1 = command = "a" && root,command = "a"
+trigger2 = command = "b" && root,command = "b"
+trigger3 = command = "c" && root,command = "c"
+trigger4 = command = "x" && root,command = "x"
+trigger5 = command = "y" && root,command = "y"
+trigger6 = command = "z" && root,command = "z"
+trigger7 = command = "start" && root,command = "start"
+trigger8 = command = "fwd" && root,command = "fwd"
+trigger9 = command = "back" && root,command = "back"
+trigger10 = command = "up" && root,command = "up"
+trigger11 = command = "down" && root,command = "down"
+var(59) = -1
+
+[State 10000,立ったら消失]
+Type = DestroySelf
+triggerAll = isHelper
+trigger1 = root,var(59) != 0 || var(59) = -1
+trigger2 = command = "a" && root,command = "a"
+trigger3 = command = "b" && root,command = "b"
+trigger4 = command = "c" && root,command = "c"
+trigger5 = command = "x" && root,command = "x"
+trigger6 = command = "y" && root,command = "y"
+trigger7 = command = "z" && root,command = "z"
+trigger8 = command = "start" && root,command = "start"
+trigger9 = command = "fwd" && root,command = "fwd"
+trigger10 = command = "back" && root,command = "back"
+trigger11 = command = "up" && root,command = "up"
+trigger12 = command = "down" && root,command = "down"
+
+[State 10000,ON]
+type = varset
+triggerall = var(59) != -1
+trigger1 = root,command = "a"
+trigger2 = root,command = "b"
+trigger3 = root,command = "c"
+trigger4 = root,command = "x"
+trigger5 = root,command = "y"
+trigger6 = root,command = "z"
+trigger7 = root,command = "start" && (roundstate = 2 && root,ctrl)
+trigger8 = root,command = "fwd" && (roundstate = 2 && root,ctrl)
+trigger9 = root,command = "back" && (roundstate = 2 && root,ctrl)
+trigger10 = root,command = "up" && (roundstate = 2 && root,ctrl)
+trigger11 = root,command = "down" && (roundstate = 2 && root,ctrl)
+var(59) = 1

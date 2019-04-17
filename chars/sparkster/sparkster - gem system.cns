@@ -1,0 +1,341 @@
+;Disable Supers
+[Statedef 8000]
+type    = A
+physics = N
+anim = 56503
+
+[State 8000, Explod];Roulette#1, P1
+type = Explod
+triggerall = teamside = 1
+trigger1 = time = 0
+ID = 8060
+anim = 8060
+pos = 40, 35 + (parent,fvar(36))
+postype = left
+facing =  1
+vfacing = 1
+ownpal = 1
+scale = 0.85,0.85
+sprpriority = -4
+pausemovetime = -1
+supermovetime = -1
+bindtime = -1
+removetime = -1
+ignorehitpause = 1
+
+[State 8000, Explod];Roulette#1, P2
+type = Explod
+triggerall = teamside = 2
+trigger1 = time = 0
+ID = 8060
+anim = 8061
+pos = -40, 35 + (parent,fvar(36))
+postype = right
+facing =  1
+vfacing = 1
+ownpal = 1
+scale = 0.85,0.85
+sprpriority = -4
+pausemovetime = -1
+supermovetime = -1
+bindtime = -1
+removetime = -1
+ignorehitpause = 1
+
+[State 8000, Explod];Roulette#2, P1
+type = Explod
+triggerall = teamside = 1
+trigger1 = time = 30
+ID = 8060
+anim = 8060
+pos = 55, 35 + (parent,fvar(36))
+postype = left
+facing =  1
+vfacing = 1
+ownpal = 1
+scale = 0.85,0.85
+sprpriority = -4
+pausemovetime = -1
+supermovetime = -1
+bindtime = -1
+removetime = -1
+ignorehitpause = 1
+
+[State 8000, Explod];Roulette#2, P2
+type = Explod
+triggerall = teamside = 2
+trigger1 = time = 30
+ID = 8060
+anim = 8061
+pos = -55, 35 + (parent,fvar(36))
+postype = right
+facing =  1
+vfacing = 1
+ownpal = 1
+scale = 0.85,0.85
+sprpriority = -4
+pausemovetime = -1
+supermovetime = -1
+bindtime = -1
+removetime = -1
+ignorehitpause = 1
+
+[State 8000, Explod];Roulette#3, P1
+type = Explod
+triggerall = teamside = 1
+trigger1 = time = 60
+ID = 8060
+anim = 8060
+pos = 70, 35 + (parent,fvar(36))
+postype = left
+facing =  1
+vfacing = 1
+ownpal = 1
+scale = 0.85,0.85
+sprpriority = -4
+pausemovetime = -1
+supermovetime = -1
+bindtime = -1
+removetime = -1
+ignorehitpause = 1
+
+[State 8000, Explod];Roulette#3, P2
+type = Explod
+triggerall = teamside = 2
+trigger1 = time = 60
+ID = 8060
+anim = 8061
+pos = -70, 35 + (parent,fvar(36))
+postype = right
+facing =  1
+vfacing = 1
+ownpal = 1
+scale = 0.85,0.85
+sprpriority = -4
+pausemovetime = -1
+supermovetime = -1
+bindtime = -1
+removetime = -1
+ignorehitpause = 1
+
+[State 8000, RemoveExplod]
+type = RemoveExplod
+trigger1 = NumHelper(9000) = 0
+trigger1 = palno != 12
+id = 8060
+
+[State 8000, DestroySelf]
+type = DestroySelf
+trigger1 = NumHelper(9000) = 0
+trigger1 = palno != 12
+
+;---------------------------------------------------------------------------
+;Apple
+[Statedef 8010]
+type    = A
+physics = N
+anim = 8019
+velset = 4 -(random%4), -10 +(random%4)
+
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = 1
+value = 8019
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = TIME = 0
+value = S5,5
+
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = vel y < 15
+y = 0.4
+
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = pos y > 0
+value = 8011
+
+;---------------------------------------------------------------------------
+;Apple Land
+[Statedef 8011]
+type    = A
+movetype = A
+physics = N
+anim = 8019
+sprpriority = 4
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = time = 0
+y = 0
+
+[State 0, PosSet]
+type = VelSet
+trigger1 = time = 0
+y = -4
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = vel y < 15
+y = 0.4
+
+[State 0, PosSet]
+type = velSet
+trigger1 = time > 1
+trigger1 = pos y > 2
+y = 0
+x = 0
+
+[State 0, HitDef]
+type = HitDef
+trigger1 = time > 1
+trigger1 = !movecontact
+trigger1 = pos y > 2
+attr = A,NA
+pausetime = -1,-1
+numhits = 0
+hitsound = S0,6
+guard.dist = -1000
+palfx.time = 60
+palfx.add = 0,255,0
+palfx.sinadd = 0,255,0,10
+sparkno = -1
+getpower = 0
+givepower = 0
+affectteam = B
+
+[State 0, TargetLifeAdd]
+type = TargetLifeAdd
+trigger1 = movecontact
+value = 115
+kill = 0
+absolute = 1
+
+[State 0, TargetPowerAdd]
+type = TargetPowerAdd
+trigger1 = movecontact
+value = 500
+
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = movecontact = 1
+trigger2 = time >= 900
+
+;---------------------------------------------------------------------------
+;BoneMeat
+[Statedef 8020]
+type    = A
+physics = N
+anim = 8020
+velset = ifelse(random > 549,3,-2), -10
+
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = TIME = 0
+value = S5,5
+
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = vel y < 15
+y = 0.4
+
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = pos y > 0
+value = 8021
+
+;---------------------------------------------------------------------------
+;BoneMeat Land
+[Statedef 8021]
+type    = A
+movetype = A
+physics = N
+anim = 8020
+sprpriority = 4
+
+[State 0, PalFX]
+type = PalFX
+trigger1 = time%60 = 30
+trigger2 = time%60 = 40
+time = 5
+add = 255,255,255
+mul = 255,255,255
+invertall = 0
+
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = time = 0
+y = 0
+
+[State 0, PosSet]
+type = VelSet
+trigger1 = time = 0
+y = -4
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = vel y < 15
+y = 0.4
+
+[State 0, PosSet]
+type = velSet
+trigger1 = time > 1
+trigger1 = pos y > 2
+y = 0
+x = 0
+
+[State 0, HitDef]
+type = HitDef
+trigger1 = time > 1
+trigger1 = !movecontact
+trigger1 = pos y > 2
+attr = A,NA
+pausetime = -1,-1
+numhits = 0
+hitsound = S40,9
+guard.dist = -1000
+palfx.time = 120
+palfx.add = 0,255,0
+palfx.sinadd = 0,255,0,10
+sparkno = -1
+getpower = 0
+givepower = 0
+affectteam = B
+
+[State 0, TargetLifeAdd]
+type = TargetLifeAdd
+trigger1 = movecontact
+value = 10000
+kill = 0
+absolute = 1
+
+[State 0, TargetPowerAdd]
+type = TargetPowerAdd
+trigger1 = movecontact
+value = 50000
+
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = movecontact = 1
+trigger2 = time >= 1800
+
+
+
+
+
+
+
+
+
+
+

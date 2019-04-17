@@ -1,0 +1,144 @@
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------
+[Statedef -3]
+
+;This controller plays a sound everytime the player lands from a jump, or
+;from a back-dash.
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52 ;Jump land
+trigger2 = stateno = 106 ;Run-back land
+value = 40, 0
+
+[State -3]
+type = PlaySnd
+triggerall = Time = 1
+triggerall = Life
+trigger1 = stateno = 5000
+trigger2 = stateno = 5010
+trigger3 = stateno = 5020
+value = 5000,random%4
+
+[State -3, Helper]
+type = Helper
+triggerall = (WinKO) && (NumHelper(8420) = 0)
+trigger1 = (hitdefattr = SCA, SA,NP,SP)
+trigger2 = numhelper(1101)
+trigger3 = numhelper(1201)
+trigger4 = numhelper(1401)
+trigger5 = numhelper(1403)
+trigger6 = numhelper(1405)
+trigger7 = numhelper(1407)
+trigger8 = numhelper(2001)
+trigger9 = numhelper(2101)
+trigger10 = numhelper(2201)
+trigger11 = Stateno = 1000
+trigger12 = Stateno = 1100
+trigger13 = Stateno = 1200
+trigger14 = Stateno = 1300
+trigger15 = Stateno = 1400
+helpertype = Normal
+name = "Super WinKO"
+id = 8420
+pos = 0,0
+postype = p1
+facing = 0
+stateno = 8420
+keyctrl = 0
+ownpal = 1
+supermovetime = 1000
+pausemovetime = 1000
+ignorehitpause = 1
+
+[State -3, Helper]
+type = Helper
+triggerall = (WinKO) && (NumHelper(8400) = 0)
+trigger1 =  (hitdefattr = SCA, HA,HP)
+trigger2 = stateno = 3000
+trigger3 = stateno = 3102
+trigger4 = stateno = [3200,3213]
+helpertype = Normal
+name = "Hyper WinKO"
+id = 8400
+pos = 0,0
+postype = p1
+facing = 0
+stateno = 8400
+keyctrl = 0
+ownpal = 1
+supermovetime = 9999
+pausemovetime = 9999
+ignorehitpause = 1
+
+[State - 3, VarAdd]
+type = VarAdd
+trigger1 = (HitPauseTime = 1) && (P2MoveType = H) && (MoveHit = 1) && (StateNo < 3000)
+trigger2 = ProjHitTime(0) = 1
+v = 21
+value = 1
+ignorehitpause = 1
+
+[State - 3, VarReset]
+type = VarSet
+trigger1 = P2MoveType != H
+v = 21
+value = 0
+
+[State - 3, AttackMulSet]
+type = AttackMulSet
+trigger1 = StateNo >= 3000
+value = 1
+
+[State - 3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) <= 1
+value = 1
+
+[State - 3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) = 2
+value = 0.8
+
+[State - 3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) = 3
+value = 0.6
+
+[State - 3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) = 4
+value = 0.4
+
+[State - 3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) >= 5
+value = .2
+
+[State - 3, Super Jump]
+type = VarSet
+trigger1 = Stateno = 0
+v = 12
+value = 0
+
+[State - 3, ctrl set]
+type = ctrlset
+trigger1 = roundstate = 4
+value = 0
+
+[State - 3, 1]
+type = RemoveExplod
+trigger1 = RoundState = 4
+ID = 8420
+
+[State - 3, 1]
+type = VarSet
+trigger1 = (StateNo != 5050) && (StateNo != 5071)
+v = 30
+value = 0

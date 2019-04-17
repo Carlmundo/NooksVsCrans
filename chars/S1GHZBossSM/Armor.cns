@@ -1,0 +1,461 @@
+;-----------------------------------
+;CNS
+;-----------------------------------
+;Armor
+[StateDef 44304]
+ctrl = 0
+physics = N
+velset = 0
+sprpriority = -5
+
+[State 44304, Follow]
+type = BindToRoot
+trigger1 = 1
+time = -1
+facing = 1
+pos = 0,0
+
+[State 44304, NHB]
+type = NotHitBy
+trigger1 = Root,stateno = 5150
+trigger2 = Root,life = 0
+value = SCA
+time = -1
+
+[State 44304, Mimic]
+type = ChangeAnim
+trigger1 = SelfAnimExist(Root,Anim)
+value = Root,Anim
+elem = Root,AnimElemNo(0)
+
+[State 44304, STSS]
+type = StateTypeSet
+trigger1 = Root,StateType = S
+StateType = S
+
+[State 44304, STSC]
+type = StateTypeSet
+trigger1 = Root,StateType = C
+StateType = C
+
+[State 44304, STSA]
+type = StateTypeSet
+trigger1 = Root,StateType = A
+StateType = A
+
+[State 44304, STSL]
+type = StateTypeSet
+trigger1 = Root,StateType = L
+StateType = L
+
+[State 44304, MTSA]
+type = StateTypeSet
+trigger1 = Root,MoveType = A
+MoveType = A
+
+[State 44304, MTSI]
+type = StateTypeSet
+trigger1 = Root,MoveType = I
+MoveType = I
+
+[State 44304, MTSH]
+type = StateTypeSet
+trigger1 = Root,MoveType = H
+MoveType = H
+
+[State 44304, Hide]
+type = AssertSpecial
+trigger1 = 1
+flag = invisible
+flag2 = NoShadow
+
+[State 44304, NHB]
+type = NotHitBy
+trigger1 = 1
+value = , AT
+time = -1
+
+[State 44304, HO]
+type = HitOverride
+trigger1 = 1
+attr = SCA, AA,AP,AT
+time = -1
+stateno = 44305
+
+;---------------------------------------------------
+[StateDef 44305]
+ctrl = 0
+physics = N
+velset = 0
+sprpriority = -5
+
+[State 44304, NHB]
+type = NotHitBy
+trigger1 = Root,stateno = 5150
+trigger2 = Root,life = 0
+value = SCA
+time = -1
+
+[State 44305, PVS]
+type = ParentVarSet
+trigger1 = 1
+var(20) = GetHitVar(damage)
+
+[State 44305, ArmorHelper]
+type = Helper
+trigger1 = !NumHelper(870)
+name = "sounds"
+ID = 870
+StateNo = 870
+KeyCtrl = 1
+PauseMoveTime = 2147483647
+SuperMoveTime = 2147483647
+
+[State 44305, Revert]
+type = ChangeState
+trigger1 = 1
+value = 44304
+
+;-------------------------------------------------------
+;---------------------------------------------------
+;I got to tell Robotnik hes hurt
+[StateDef 870]
+ctrl = 0
+physics = N
+velset = 0
+sprpriority = -5
+anim = 640
+
+[State -2, Snd 1]
+type = playsnd
+trigger1 = time = 0
+value = 0,3
+
+[State 870, Revert]
+type = Destroyself
+trigger1 = time = 10
+trigger2 = NumHelper(870) > 1
+trigger3 = life = 0
+
+;---------------------------------------------------------------------------
+; Override common states (use same number to override) :
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+; Stand
+[Statedef 0]
+type = S
+physics = N
+sprpriority = 0
+;velset = 0,0
+ctrl = 0
+
+;var(25) and var(26): Used for the floating effect.
+[State 1000: Null]
+type = Null
+trigger1 = (!Time)
+trigger1 = (Var(25) := 0) ;&& (Var(0) := 1)
+trigger2 = (Var(25) = -10) || (Var(25) = 10)
+trigger2 = (Var(26) := IfElse(Var(25) = -10,0,1))
+
+[State 1000: varAdd]
+type = VarAdd
+trigger1 = 1
+var(25) = IfElse(Var(26) = 0,1,-1)
+
+[State 1000: VelAdd]
+type = VelAdd
+trigger1 = 1
+y = IfElse(Var(26) = 1,0.02,-0.02)
+
+[State 0, CS]
+type = CtrlSet
+trigger1 = win
+value = 1
+
+[State 0, 1]
+type = ChangeAnim
+triggerall = anim != 200 && animtime != 0
+triggerall = anim != 195
+trigger1 = Anim != 0 ;&& Anim != 5 ;&& anim != 200
+value = 0
+
+[State 0, 4] ;Are you dead?
+type = ChangeState
+trigger1 = !alive
+value = 5050
+
+[State 0, 5]
+type = VelSet
+trigger1 = time = 0
+x = 1.4
+
+[State 52, 4]
+type = ChangeState
+trigger1 = Facing = -1 && time = 180
+trigger2 = Facing = 1 && time = 180
+value = 199
+
+;---------------------------------------------------------------------------
+; Turn
+[Statedef 199]
+type = S
+ctrl = 0
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 0
+
+;var(25) and var(26): Used for the floating effect.
+[State 1000: Null]
+type = Null
+trigger1 = (!Time)
+trigger1 = (Var(25) := 0) ;&& (Var(0) := 1)
+trigger2 = (Var(25) = -10) || (Var(25) = 10)
+trigger2 = (Var(26) := IfElse(Var(25) = -10,0,1))
+
+[State 1000: varAdd]
+type = VarAdd
+trigger1 = 1
+var(25) = IfElse(Var(26) = 0,1,-1)
+
+[State 1000: VelAdd]
+type = VelAdd
+trigger1 = 1
+y = IfElse(Var(26) = 1,0.02,-0.02)
+
+[State 0, TURN]
+type = turn
+trigger1 = !(GameTime%2)
+persistent=0
+
+[State 199, 2]
+type = ChangeState
+trigger1 = Time = 80
+value = 0
+ctrl = 0
+
+;---------------------------------------------------------------------------
+; Jump Land
+[Statedef 52]
+type    = S
+physics = S
+ctrl = 0
+;anim = 0
+
+[State 52, 4]
+type = ChangeState
+trigger1 = 1
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Walk
+[Statedef 20]
+type    = S
+physics = S
+sprpriority = 0
+anim = 0
+
+[State 20, 1]
+type = VelSet
+trigger1 = command = "holdfwd"
+x = const(velocity.walk.fwd.x)
+
+[State 20, 2]
+type = VelSet
+trigger1 = command = "holdback"
+x = const(velocity.walk.back.x)
+
+;---------------------------------------------------------------------------
+; Jump Start
+[Statedef 40]
+type    = S
+physics = S
+ctrl = 0
+sprpriority = 1
+
+[State 40, 6]
+type = ChangeState
+trigger1 = 1
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouching
+[Statedef 10]
+type    = C
+physics = C
+sprpriority = 0
+
+[State 11, 1]
+type = ChangeState
+trigger1 = 1
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouching
+[Statedef 11]
+type    = C
+physics = C
+sprpriority = 0
+
+[State 11, 1]
+type = ChangeState
+trigger1 = 1
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouching
+[Statedef 12]
+type    = C
+physics = C
+sprpriority = 0
+
+[State 11, 1]
+type = ChangeState
+trigger1 = 1
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; HITA_FALL (knocked up, falling)
+[Statedef 5050]
+type    = A
+movetype= H
+physics = N
+anim = 0
+
+[State 5050, 6]
+type = ChangeState
+trigger1 = 1
+value = 5100
+
+;---------------------------------------------------------------------------
+; HIT_BOUNCE (hit ground)
+[Statedef 5100]
+type    = L
+movetype= H
+physics = N
+
+[State 5100, 7]
+type = ChangeState
+triggerall = alive
+trigger1 = 1
+value = 0 
+
+[State 5100, 7]
+type = ChangeState
+triggerall = !alive
+trigger1 = 1
+value = 5110 
+
+;---------------------------------------------------------------------------
+; HIT_LIEDOWN
+[Statedef 5110]
+type    = L
+movetype= H
+physics = N
+
+[State 5110, 11]
+type = ChangeState
+trigger1 = 1
+value = 5150
+
+;---------------------------------------------------------------------------
+; HIT_LIEDEAD (Explod)
+[Statedef 5150]
+type    = L
+movetype= H
+physics = N
+sprpriority = 1
+velset = 0,0
+anim = 210 ;Anim During Explosion
+
+
+[State 5150, 8]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5150, Fires]
+type = Explod
+trigger1 = time < 180
+trigger1 = GameTime%10 = 0
+anim = 230
+sprpriority = 4
+postype = p1
+supermove = 1
+removetime = 25
+random = 50, 50
+facing = 1
+ownpal = 1
+pos = 0,-140
+
+[State 191, Snd 1]
+type = PlaySnd
+trigger1 = time < 180
+trigger1 = GameTime%10 = 0
+value = 0,1
+
+[State 5150, Go down]
+type = velset
+trigger1 = Time = 150
+x = 0
+y = 2
+
+[State 5150, 1] ;Change Anim Just After Explosion
+type = ChangeAnim
+trigger1 = Time = 150
+value = 211
+
+[State 5150, STP]
+type = velset
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 50
+x = 0
+y = 0
+
+[State 5150, Go Back Up]
+type = velset
+trigger1 = Time = 200
+x = 0
+y = -1.5
+;---------------------------------------
+
+[State 5150, 1] ;Change Anim Again
+type = ChangeAnim
+trigger1 = Time = 220
+value = 0
+
+[State 5150, Go Back Up]
+type = varset
+trigger1 = Time = 220
+var(16) = 1
+
+[State 5150, Go FWD]
+type = velset
+trigger1 = Time = 220
+x = 5
+y = -.8
+
+[State 5150, No scroll]
+type = ScreenBound
+trigger1 = time >= 150
+value = 0
+movecamera = 0,0
+;----------------------------------------
+
+[State 5150, No Shadows]
+type = AssertSpecial
+trigger1 = 1
+flag = NoShadow
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = time = [0,500]
+flag = roundnotover
+
+;--------------------------------------------

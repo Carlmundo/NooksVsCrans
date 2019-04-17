@@ -1,0 +1,502 @@
+;==========================================================================================
+[Statedef -2]
+;=============================◆Type変更◆=================================================
+[state -2]
+type = varset
+trigger1 = 1
+v = 58
+value = 2
+
+;↑の"value = *"の数字を変えて下さい。(def=2)
+;"0" = "A type"  (ジャンプ・レバー操作)
+;"1" = "B type"  (ジャンプ・ボタン操作)
+;"2" = "AvsP type" 
+
+;===================◆AvsPタイプでのアレンジ技の使用可・不可◆==============================
+[state -2]
+type = varset
+trigger1 = 1
+v = 57
+value = 1
+
+;↑の"value = *"の数字を変えて下さい。(def=1)
+;"0" = 「使用不可」
+;"1" = 「使用可」
+
+;==========================================================================================
+;==========================================================================================
+;==========================================================================================
+;クローキング
+[State -2]
+type = varset
+trigger1 = var(21) = 0
+trigger1 = stateno = 1030 && numexplod(1031) >= 1
+var(21) = 1
+ignorehitpause = 1
+
+[State -2]
+type = varset
+trigger1 = var(21) = 1
+trigger1 = stateno = 1032
+trigger2 = stateno = 1035
+var(21) = 0
+ignorehitpause = 1
+
+[State -2, assertspecial]
+type = AssertSpecial
+trigger1 = var(21) = 1
+flag = noshadow
+ignorehitpause = 1
+
+[state -2]
+type = varadd
+triggerall = roundstate = 2
+trigger1 = var(21) = 1
+trigger1 = time >= 0
+trigger1 = var(14) > 0
+trigger1 = gametime%3 = 0
+v = 14
+value = -3
+ignorehitpause = 1
+
+[State -2, Trans];半透明処理
+type = Trans
+trigger1 = var(21) = 1
+trans = addalpha
+alpha = 40,250
+ignorehitpause = 1
+
+[State -2, Palfx]
+type = PalFx
+trigger1 = var(21) = 1
+time = 1
+Add = 120,120,120
+mul = 120,120,120
+invertall = -1
+ignorehitpause = 1
+
+;------------------------------------------------------------
+;キャノン連射
+[State -2];開始
+type = varset
+trigger1 = NumExplod(960) = 1
+v = 8
+value = 1
+ignorehitpause = 1
+
+[State -2];終了
+type = varset
+trigger1 = NumExplod(960) = 0
+trigger1 = var(8) = 1
+v = 8
+value = 2
+ignorehitpause = 1
+
+[State -2]
+type = varset
+trigger1 = var(8) = 1
+v = 14
+value = 128
+ignorehitpause = 1
+
+[State -2]
+type = varset
+trigger1 = var(8) = 2
+v = 14
+value = 0
+ignorehitpause = 1
+
+[State -2]
+type = palfx
+triggerall = var(21) = 0
+triggerall = numexplod(960) = 1
+trigger1 = !(gametime%3)
+time = 1
+add = 100,100,200
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+;自爆
+[state -2]
+type = Palfx
+trigger1 = var(2) = 3
+trigger1 = time = 0
+sinadd = 200,200,250,80
+time = 40
+
+[state -2]
+type = Explod
+trigger1 = var(2) = 3
+trigger1 = numexplod(3950) = 0
+anim = 3950
+id = 3950
+pos = 0,0
+postype = p1
+sprpriority = 5
+facing = 1
+bindtime = -1
+removetime = 400
+ownpal = 1
+pausetime = 999
+superpausetime = 999
+
+[state -2]
+type = Explod
+trigger1 = var(2) = 3
+trigger1 = numexplod(3440) = 0
+anim = 3440
+id = 3440
+pos = 0,0
+postype = p1
+sprpriority = 5
+facing = 1
+bindtime = -1
+removetime = 400
+ownpal = 1
+pausetime = 999
+superpausetime = 999
+
+[state -2]
+type = removeexplod
+trigger1 = RoundState != 2
+trigger2 = life = 0
+trigger3 = NumHelper(3910) = 0
+ID = 3900
+
+[state -2]
+type = removeexplod
+trigger1 = RoundState != 2
+trigger2 = life = 0
+ID = 3440
+
+[state -2]
+type = removeexplod
+trigger1 = RoundState != 2
+trigger2 = life = 0
+ID = 3950
+
+[state -2]
+type = AssertSpecial
+trigger1 = var(2) = 4
+flag = invisible
+flag2 = noshadow
+
+[state -2]
+type = Lifeset
+trigger1 = var(2) = 4
+value = 0
+
+[state -2]
+type = nothitby
+trigger1 = var(2) = 4
+value = SCA
+
+[State -2]
+type = ScreenBound
+trigger1 = var(2) = 4
+value = 0
+movecamera = 0,0
+
+;---------------------------------------------------------------
+;スピアー落とす
+[state -2]
+type = Helper
+triggerall = var(2) != 3 && life > 0
+triggerall = var(3) = 0
+trigger1 = stateno = 5100 && time = 1
+trigger2 = stateno = 5110 && time = 1
+id = 3110
+name = "spear1"
+sprpriority = 4
+pos = 0,-73
+postype = p1
+stateno = ifelse(FrontEdgeBodyDist <= 80, 3131, 3130)
+helpertype = normal
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+;ディスク落とす
+[state -2]
+type = Helper
+triggerall = var(2) != 3 && life > 0
+triggerall = var(3) = 2
+triggerall = numhelper(820) = 0
+trigger1 = stateno = 5000 && time = 1
+trigger2 = stateno = 5010 && time = 1
+trigger3 = stateno = 5020 && time = 1
+trigger4 = stateno = 5070 && time = 1
+trigger5 = stateno = 5100 && time = 1
+trigger6 = stateno = 5110 && time = 1
+id = 820
+name = "disc1"
+sprpriority = 3
+pos = 0,-60
+postype = p1
+stateno = ifelse(FrontEdgeBodyDist >= 80, 1020, 1019)
+helpertype = normal
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+;--------------------------------------------------------------------
+;ガンゲージ
+[State -2];同キャラタッグ区別用
+type = VarSet
+trigger1 = var(31) = 0
+trigger1 = numpartner
+trigger1 = partner,Name = "PREDATOR WARRIOR"
+trigger1 = partner,AuthorName = "HSR"
+v= 31
+value = ifelse(p2dist x >= partner,p2dist x, 2, 1)
+
+[state -2, 4500];バー
+type = explod
+triggerall = numexplod(4520) = 1
+trigger1 = numexplod(4510) = 0
+trigger1 = numexplod(4500) = 0
+anim = 4500
+postype = left
+pos = ifelse(teamside = 2, 248, 32), ifelse(var(31)=2, 58, 50) 
+sprpriority = 9998
+bindtime = -1
+removetime = -1
+supermove = 1
+ownpal = 1
+ignorehitpause = 1
+removeongethit = 0
+ID = 4500
+scale = var(14)/128.0,1
+
+[state -2, 4520];外枠
+type = explod
+triggerall = RoundState = 2
+trigger1 = numexplod(4520) = 0
+anim = 4520
+postype = left
+pos = ifelse(teamside = 2, 248, 32), ifelse(var(31)=2, 58, 50) 
+sprpriority = 9997
+bindtime = -1
+removetime = -1
+supermove = 1
+ownpal = 1
+ignorehitpause = 1
+removeongethit = 0
+ID = 4520
+
+;ゲージ伸縮
+[state -2]
+type = modifyexplod
+trigger1 = var(14) <= 128
+ID = 4500
+scale = var(14)/128.0,1
+ignorehitpause = 1
+
+;リロードゲージ伸縮
+[state -2]
+type = modifyexplod
+trigger1 = var(14) < 128
+ID = 4510
+scale = var(14)/128.0,1
+ignorehitpause = 1
+
+;ゲージ回復
+[state -2]
+type = varadd
+triggerall = var(8) = 0
+trigger1 = numexplod(4530) = 0 && numexplod(4510) = 0
+trigger1 = var(14) <= 128
+trigger1 = gametime%3 = 0
+v = 14
+value = 2
+ignorehitpause = 1
+
+;リロードゲージ回復
+[state -2]
+type = varadd
+trigger1 = numexplod(4510) = 1
+trigger1 = var(14) < 128
+trigger1 = gametime%6 = 0
+v = 14
+value = 2
+ignorehitpause = 1
+
+;ゲージ上限
+[state -2]
+type = varset
+trigger1 = var(14) > 128
+v = 14
+value = 128
+ignorehitpause = 1
+
+;ゲージ下限
+[state -2]
+type = varset
+trigger1 = var(14) <= 0
+v = 14
+value = 0
+ignorehitpause = 1
+
+;-----------------------------
+[state -2, 4510];リロードバー
+type = explod
+triggerall = numexplod(4520) = 1
+trigger1 = var(14) = 0 && stateno != 191
+trigger1 = numexplod(4510) = 0
+anim = 4510
+postype = left
+pos = ifelse(teamside = 2, 248, 32), ifelse(var(31)=2, 58, 50) 
+sprpriority = 9998
+bindtime = -1
+removetime = -1
+supermove = 1
+ownpal = 1
+ignorehitpause = 1
+removeongethit = 0
+ID = 4510
+scale = var(14)/128.0,1
+
+[state -2, 4540];オーバーヒート文字
+type = explod
+trigger1 = numexplod(4540) = 0
+trigger1 = numexplod(4510) = 1
+anim = 4540
+postype = left
+pos = ifelse(teamside = 2, 248, 32), ifelse(var(31)=2, 58, 50) 
+sprpriority = 9999
+bindtime = -1
+removetime = -1
+supermove = 1
+ownpal = 1
+ignorehitpause = 1
+removeongethit = 0
+ID = 4540
+
+[State -2]
+type = RemoveExplod
+trigger1 = numexplod(4510) = 1
+id = 4500
+ignorehitpause = 1
+
+[State -2]
+type = RemoveExplod
+trigger1 = var(14) = 128
+id = 4510
+ignorehitpause = 1
+
+[State -2]
+type = RemoveExplod
+trigger1 = numexplod(4510) = 0
+id = 4540
+ignorehitpause = 1
+
+;------------------------------------------------------------
+[state -2, var(18)]
+type = varset
+trigger1 = var(18) = 0
+trigger1 = palno >= 7
+v = 18
+value = 1
+
+[state -2, var(20)turn]
+type = varset
+triggerall = var(20) = 1 || var(20) = -1
+trigger1 = movetype = H
+trigger2 = ctrl || stateno = 20
+trigger3 = stateno = 53 && time > 0
+v = 20
+value = 0
+
+[State -2]
+type = assertspecial
+trigger1 = var(58) != 0
+trigger1 = stateno = 53 || stateno = [4010,4020]
+flag = nostandguard
+flag2 = nocrouchguard
+flag3 = noairguard
+
+[State -2, var(19)];ボタンジャンプ判定解除
+type = varset
+triggerall = var(19) = 1
+trigger1 = stateno = 52 || stateno = 53
+trigger2 = movetype = H
+trigger3 = pos y >= 0 && vel y > 0
+v= 19
+value = 2
+
+[State -2];掴み解除
+type = TargetState
+triggerall = NumTarget
+triggerall = target,stateno = [1350,1360]
+trigger1 = (stateno != [1300,1330]) && stateno != 1340 && stateno != 1390
+value = 1370
+
+[State -2];掴み不能時間解除
+type = varset
+triggerall = var(58) = 2
+trigger1 = var(24) = 1
+trigger1 = gametime%60 = 0
+v= 24
+value = 0
+ignorehitpause = 1
+
+[State -2];連打コンボ入力時間
+type = varadd
+trigger1 = var(26) != 0
+trigger1 = gametime%1 = 0
+v= 26
+value = 1
+ignorehitpause = 1
+
+[State -2];連打コンボ入力時間reset
+type = varset
+trigger1 = var(26) >= 26
+trigger1 = var(18) = 0 && var(12) = 0
+trigger2 = var(26) >= 26
+trigger2 = var(18) = 1 && var(13) = 0
+trigger3 = (stateno = [200,230]) || (stateno = [500,530])
+v= 26
+value = 0
+ignorehitpause = 1
+
+[State -2, AvsP]
+type = AssertSpecial
+trigger1 = var(58) = 2
+Flag = nostandguard
+Flag2 = nocrouchguard
+Flag3 = noairguard
+ignorehitpause = 1
+
+[State -2, AvsP]
+type = PlayerPush
+trigger1 = var(58) = 2
+value = 0
+ignorehitpause = 1
+
+[State -2, AvsP]
+type = varset
+trigger1 = var(58) = 2
+trigger1 = var(25) = 1
+trigger1 = gametime%2 = 0
+v= 25
+value = 0
+
+[State -2, AvsP]
+type = AttackDist
+trigger1 = var(58) = 2
+trigger1 = stateno = 20
+value = 0
+ignorehitpause = 1
+
+[State -2, AvsP]
+type = NotHitBy
+triggerall = var(58) = 2
+trigger1 = stateno = [5200,5210]
+value = SCA
+ignorehitpause = 1
+
+[State -2, AvsP]
+type = AssertSpecial
+trigger1 = var(58) = 2
+Flag = noautoturn
+ignorehitpause = 1

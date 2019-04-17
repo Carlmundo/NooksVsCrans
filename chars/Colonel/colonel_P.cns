@@ -1,0 +1,410 @@
+;---------------------------------------------------------------------------
+;回り込み
+;---------------------------------------------------------------------------
+
+[Statedef 700]
+type     = S
+movetype = I
+physics  = S
+poweradd = 0
+ctrl     = 0
+anim     = 700
+velset   = 0,0
+facep2 = 1
+
+[State 700, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = ,AA,AP
+time = 1
+
+[State 700, 押し判定]
+type = PlayerPush
+trigger1 = 1
+value = 0
+IgnoreHitPause = 1
+Persistent = 1
+
+[State 700, 残像]
+type = AfterImage
+triggerall = var(35) = 0
+trigger1 = Time = 0
+Time = 29
+PalContrast = 120,120,120
+Trans = Add1
+TimeGap  = 4
+FrameGap = 1
+length = 3
+
+[State 700, 埃]
+type = MakeDust
+trigger1 = Time = 20
+pos = 0,0
+spacing = 1
+
+[State 700, 軸位置]
+type = PosSet
+trigger1 = 1
+y = 0
+
+[State 700, 移動速度]
+type = VelSet
+trigger1 = 1
+y = 0
+
+[State 700, 移動速度]
+type = VelSet
+trigger1 = Time = 4
+x = 12
+
+[State 700, 移動速度]
+type = VelSet
+trigger1 = Time = 24
+x = 0
+
+[State 700, 音を鳴らす]
+type = PlaySnd
+trigger1 = Time = 4
+value = 0,17
+
+[State 700, ステート変更]
+type = ChangeState
+trigger1 = (Time > 25)
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+後退ステップ
+;---------------------------------------------------------------------------
+
+[Statedef 710]
+type     = S
+movetype = I
+physics  = N
+poweradd = 0
+ctrl     = 0
+anim     = 710
+velset   = 0,0
+
+[State 700, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = ,AA,AP
+time = 1
+
+[State 710, 押し判定]
+type = PlayerPush
+trigger1 = (Time = [0,20])
+value = 0
+IgnoreHitPause = 1
+Persistent = 1
+
+[State 710, 残像]
+type = AfterImage
+triggerall = var(35) = 0
+trigger1 = Time = 0
+Time = 29
+PalContrast = 120,120,120
+Trans = Add1
+TimeGap  = 4
+FrameGap = 1
+length = 3
+
+[State 710, 埃]
+type = MakeDust
+trigger1 = Time = 20
+pos = 0,0
+spacing = 1
+
+[State 710, 軸位置]
+type = PosSet
+trigger1 = 1
+y = 0
+
+[State 710, 移動速度]
+type = VelSet
+trigger1 = 1
+y = 0
+
+[State 710, 移動速度]
+type = VelSet
+trigger1 = Time = 4
+x = -8
+
+[State 710, 移動速度]
+type = VelSet
+trigger1 = Time = 15
+x = 0
+
+[State 710, 音を鳴らす]
+type = PlaySnd
+trigger1 = Time = 4
+value = 0,17
+
+[State 710, ステート変更]
+type = ChangeState
+trigger1 = (Time > 20)
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;投げ
+;---------------------------------------------------------------------------
+
+[Statedef 800]
+type    = S
+movetype= A
+physics = S
+juggle  = 0
+velset = 0,0
+ctrl = 0
+anim = 800
+sprpriority = 2
+
+[State 800, 1]
+type = HitDef
+Trigger1 = Time = 0
+attr = S, NT          ;Attributes: Standing, Normal Throw
+hitflag = M-          ;Affect only ground people who are not being hit
+priority = 1, Miss    ;Throw has low priority, must be miss or dodge type.
+sparkno = -1          ;No spark
+p1sprpriority = 1     ;Draw p1's sprite in front of p2
+                      ;p2's sprite priority is set to 0 by default
+p1facing = 1
+p2facing = 1          ;Force p2 to face KFM
+p1stateno = 810       ;On success, KFM changes to state 810
+p2stateno = 820       ;If hit, p2 changes to state 820 in KFM's cns
+guard.dist = 0        ;This prevents p2 from going into a guard state if close
+fall = 1              ;Force p2 into falling down
+
+[State 800, 2]
+type = ChangeState
+Trigger1 = AnimTime = 0
+ctrl = 1
+value = 0
+
+;---------------------------------------------------------------------------
+;投げる
+
+[Statedef 810]
+type    = S
+movetype= A
+physics = N
+anim = 810
+SprPriority = 3
+
+[State 810, Holding fwd?]
+type = VarSet
+trigger1 = Time = 0
+var(2) = command = "holdfwd"
+
+[State 810, holdfwd - Turn 6] ;If was holding fwd before, turn now
+type = Turn
+trigger1 = var(2)
+trigger1 = AnimElem = 1
+
+[State 810, holdfwd - Turn Target 6] ;If was holding fwd before, turn target too
+type = TargetFacing
+trigger1 = var(2)
+trigger1 = AnimElem = 1
+value = -1
+
+[State 1200, 9]
+type = Width
+trigger1 = animelemtime(8) < 0
+edge = 0,40
+
+[State 1200, 9]
+type = Width
+trigger1 = animelemtime(8) >= 0
+edge = 120,40
+
+[State 810, Playerpush]
+type = Playerpush
+trigger1 = 1
+value = 0
+
+[State 810, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 5
+value = 810,0
+channel = 0
+
+[State 810]
+type = playsnd
+trigger1 = animelem = 2
+value = 800,0
+
+[State 810]
+type = TargetBind
+trigger1 = AnimElem = 1
+pos = ceil(-75*const(size.xscale)), ceil(-52*const(size.xscale))
+
+[State 810]
+type = TargetBind
+trigger1 = AnimElem = 2
+pos = ceil(-74*const(size.xscale)), ceil(-60*const(size.xscale))
+
+[State 810]
+type = TargetBind
+trigger1 = AnimElem = 3
+pos = ceil(-72*const(size.xscale)), ceil(-100*const(size.yscale))
+
+[State 810]
+type = TargetBind
+trigger1 = AnimElem = 4
+pos = ceil(60*const(size.xscale)), ceil(-8*const(size.yscale))
+
+[State 810]
+type = TargetBind
+trigger1 = AnimElem = 5
+pos = ceil(60*const(size.xscale)), ceil(-7*const(size.yscale))
+
+[State 810]
+type = Hitadd
+trigger1 = animelem = 5
+value = 1
+
+[State 810]
+type = Poweradd
+trigger1 = animelem = 5
+value = 90
+
+[State 810]
+type = TargetPoweradd
+trigger1 = animelem = 5
+value = 60
+
+[State 810]
+type = TargetLifeadd
+trigger1 = animelem = 5
+value = -70
+
+[State 810]
+type = SprPriority
+trigger1 = animelem = 6
+value = 0
+
+[State 810]
+type = Envshake
+trigger1 = animelem = 5
+time = 15
+freq = 80
+ampl = -8
+
+[State 810]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S1,9
+
+[State 810]
+type = PlaySnd
+trigger1 = animelem = 4
+value = S6,0
+
+[State 810]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;相手
+
+[Statedef 820]
+type    = S
+movetype= H
+physics = N
+velset = 0,0
+ctrl = 0
+facep2 = -1
+SprPriority = 1
+
+[State 820]
+type = ScreenBound
+trigger1 = 1
+value = 1
+movecamera = 1,0
+
+[State 820]
+type = ChangeAnim2
+Trigger1 = Time = 0
+value = 820
+
+[State 820]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 825
+
+;---------------------------------------------------------------------------
+;相手バウンド
+
+[Statedef 825]
+type    = A
+movetype= H
+physics = N
+SprPriority = 1
+
+[State 825]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = floor(vel y)
+
+[State 825]
+type = ChangeAnim
+trigger1 = time = 0
+value = 5100
+
+[State 5100, 4]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 825]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+y = 0
+
+[State 825]
+type = PosFreeze
+trigger1 = 1
+
+[State 825]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 826
+
+;---------------------------------------------------------------------------
+;相手バウンド2
+[Statedef 826]
+type    = A
+movetype= H
+physics = N
+
+[State 826]
+type = ChangeAnim
+trigger1 = time = 0
+value = 5160
+
+[State 826]
+type = VelSet
+trigger1 = Time = 0
+x = 1.0
+y = -8.0
+
+[State 826]
+type = PosSet
+trigger1 = Time = 0
+y = 20
+
+[State 826]
+type = VelAdd
+trigger1 = 1
+y = .60
+
+[State 826]
+type = SelfState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 12
+value = 5110

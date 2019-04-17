@@ -1,0 +1,1623 @@
+;Yamato Perde
+[Statedef 824]
+Type = S
+Movetype = I
+physics = N
+anim = 924
+sprpriority = 4
+
+[State 824,Perde]
+Type = Playsnd
+trigger1 = animelem = 2
+value = 13,4
+
+;Yamato Ganha
+;Win 1
+[Statedef 825]
+Type = S
+Movetype = I
+physics = N
+sprpriority = 4
+
+[State 825,Win]
+Type = Changeanim
+trigger1 = Time = 1
+value = 925
+
+;Win 2
+[Statedef 826]
+Type = S
+Movetype = I
+physics = N
+sprpriority = 4
+
+[State 826,Win]
+Type = Changeanim
+trigger1 = parent,animelem = 9
+value = 926
+
+;Win 3
+[Statedef 827]
+Type = S
+Movetype = I
+physics = N
+sprpriority = 4
+anim = 927
+
+[State 827, AfterImage]
+type = AfterImage
+trigger1 = AnimElem = 3
+palcontrast = 100,100,100
+palbright = 100,100,100
+trans = add1
+framegap = 4
+timegap = 2
+time = 30
+
+;Intro 1
+[Statedef 828]
+Type = S
+Movetype = I
+physics = N
+sprpriority = 4
+anim = 911
+velset = 10,0
+
+[State 828,Pos]
+Type = Posadd
+trigger1 = time = 0
+x = -300
+
+[State 828, AfterImage]
+type = AfterImage
+trigger1 = time = 2
+palbright = 100,100,100
+trans = add1
+framegap = 1
+timegap = 1
+time = 25
+
+[State 828,Change]
+Type = Changestate
+trigger1 = parentdist x = 40
+value = 900
+
+;Intro 2
+[Statedef 829]
+Type = S
+Movetype = I
+physics = N
+sprpriority = 4
+anim = 912
+;velset = 0,5
+
+[State 829,Pos]
+Type = Posadd
+trigger1 = time = 0
+y = -200
+
+[State 829,Gravidade]
+Type = Veladd
+trigger1 = time = 0
+y = 10
+
+[State 829,End]
+Type = PlaySnd
+trigger1 = floor(pos y) = 0
+value = S11,1
+
+[State 829,Muda State]
+Type = ChangeState
+trigger1 = floor(pos y) = 0
+value = 830
+
+;Intro 2 Pt 2
+[Statedef 830]
+Type = S
+Movetype = I
+physics = N
+sprpriority = 4
+anim = 913
+velset = 0,0
+
+[State 831,SND]
+Type = PlaySnd
+trigger1 = Animelem = 3
+value = S13,2
+
+[State 831,Explod]
+type = Explod
+trigger1 = Animelem = 1
+anim = 8010
+ID = 8010
+pos = 0,0
+postype = p1
+facing = 1
+scale = .8,.8
+ownpal = 1
+
+[State 831,Muda state]
+Type = ChangeState
+trigger1 = Animtime = 0
+value = 900
+
+;Alternate Win 1
+[Statedef 831]
+Type = S
+Movetype = I
+physics = N
+sprpriority = 4
+anim = 928
+velset = 0,0
+
+[State 831, velocity]
+type = VelSet
+trigger1 = time = 0
+x = const(velocity.walk.fwd.x)
+
+[State 831,Change]
+Type = ChangeState
+trigger1 = Time = 95
+value = 832
+
+;Alternate Win 1 Pt 2
+[Statedef 832]
+Type = S
+Movetype = I
+physics = N
+sprpriority = 4
+anim = 929
+velset = 0,0
+
+[State 832, SND]
+type = Playsnd
+trigger1 = Animelem = 4
+value = 13,2
+
+;Stand
+[Statedef 900]
+Type = S
+Movetype = I
+physics = N
+velset = 0,0
+anim = 915
+ctrl = 0
+sprpriority = 4
+
+[State 900,Display]
+type = DisplayToClipboard
+trigger1 = 1
+text = "Vel(%f,%f), ParentDist(%f,%f)"
+params = Vel X,Vel Y, ParentDist X,ParentDist Y
+
+[State 900,Muda o Stand]
+Type = ChangeAnim
+trigger1 = Time = 800
+value = 914
+
+;Wins e Lose
+[State 900,Perde]
+Type = ChangeState
+trigger1 = parent,stateno = 5150
+trigger2 = parent,stateno = 170
+value = 824
+
+;Win 1
+[State 900,Ganha]
+Type = ChangeState
+trigger1 = Random <= 250
+trigger1 = parent,stateno = 181
+trigger1 = win = 1
+value = 831
+
+[State 900,Ganha]
+Type = ChangeState
+trigger1 = Random <= 250
+trigger1 = parent,stateno = 181
+trigger1 = win = 1
+value = 825
+
+;Win 2
+[State 900,Ganha]
+Type = ChangeState
+trigger1 = parent,stateno = 182 && win = 1
+value = 826
+
+;Win 3
+[State 900,Ganha]
+Type = ChangeState
+trigger1 = parent,stateno = 183 && win = 1
+value = 827
+
+[State 900,Late]
+Type = ChangeState
+trigger1 = Parent,movetype =H
+value = 908
+
+;Golpeado
+[State 912,HitBy]
+type = HitOverride
+trigger1 = time = 1
+attr = SCA, AA, AT, AP
+slot = 0
+stateno = 916
+time = -1
+
+;Movements
+[State 900,Agacha]
+Type = ChangeState
+trigger1 = parent,statetype = C
+value = 907
+
+[State 900,WalkFWD]
+Type = ChangeState
+trigger1 = ParentDist x = (50, 150)
+trigger1 = Parent,movetype !=A
+value = 901
+
+[State 900,WalkBack]
+Type = ChangeState
+trigger1 = ParentDist x = (-150, -15)
+trigger1 = BackEdgeDist > 0
+value = 902
+
+[State 900, go to hop back state]
+type = ChangeState
+trigger1 = Parent, StateNo = 105
+trigger1 = ParentDist x = [-15, 50]
+trigger1 = BackEdgeBodyDist > 0
+value = 909
+
+[State 900,run forward state]
+type = ChangeState
+trigger1 = ParentDist x = [-15, 50]
+trigger1 = Parent, StateNo = 100
+trigger2 = ParentDist x >= 150
+value = 904
+
+[State 900, go to teleport state]
+type = ChangeState
+trigger1 = parent,stateno = 710
+trigger2 = parent,stateno = 721
+value = 905
+
+[State 900, Teleport]
+type = ChangeState
+trigger1 = parent,stateno = 750
+trigger2 = parent,stateno = 760
+value = 906
+
+[State 900, go to turn state]
+type = ChangeState
+trigger1 = facing != parent, facing
+trigger2 = parentdist x <= -150
+value = 903
+
+[State 900, go to Attack 1]
+type = ChangeState
+trigger1 = parent,stateno = 300
+trigger1 = parent,animelem = 2
+value = 912
+
+[State 900, go to Attack 2]
+type = ChangeState
+trigger1 = parent,stateno = 301
+trigger1 = parent,animelem = 2
+value = 913
+
+[State 900, go to Hyper 1]
+type = ChangeState
+trigger1 = parent,stateno = 302
+trigger1 = parent,animelem = 2
+value = 918
+
+[State 900, go to Hyper 2]
+type = ChangeState
+trigger1 = parent,stateno = 303
+trigger1 = parent,animelem = 2
+value = 921
+
+;Walk FWD
+[Statedef 901]
+Type = S
+MoveType = I
+Physics = N
+sprpriority = 4
+ctrl = 0
+
+[State 901, animation]
+type = ChangeAnim
+trigger1 = time  = 0
+value = 916
+
+[State 901, velocity when far]
+type = VelSet
+trigger1 = time = 0
+x = const(velocity.walk.fwd.x)
+
+[State 901, go to turn state]
+type = ChangeState
+trigger1 = facing != parent,facing
+trigger2 = parentdist x <= -150
+trigger3 = frontedgedist < 0
+value = 903
+
+[State 900,Agacha]
+Type = ChangeState
+trigger1 = parent,statetype = C
+value = 907
+
+[State 901,WalkBack]
+Type = ChangeState
+trigger1 = ParentDist x = (-150, -15)
+trigger1 = BackEdgeDist > 0
+value = 902
+
+[State 901,Corre]
+Type = ChangeState
+trigger1 = Parent, StateNo = 100
+value = 904
+
+[State 901, go to standing state]
+type = ChangeState
+trigger1 = parent, vel x = 0
+trigger1 = ParentDist x = (15, 40)
+trigger2 = parent, MoveType = A
+value = 900
+
+[State 901, go to hop back state]
+type = ChangeState
+trigger1 = Parent, StateNo = 105
+trigger1 = ParentDist x = [-15, 50]
+trigger1 = BackEdgeBodyDist > 0
+value = 909
+
+[State 901,Late]
+Type = ChangeState
+trigger1 = Parent,movetype =H
+value = 908
+
+[State 901, go to teleport state]
+type = ChangeState
+trigger1 = parent,stateno = 710
+trigger2 = parent,stateno = 721
+value = 905
+
+[State 901, Teleport]
+type = ChangeState
+trigger1 = parent,stateno = 750
+trigger2 = parent,stateno = 760
+value = 906
+
+[State 901, go to Attack 1]
+type = ChangeState
+trigger1 = parent,stateno = 300
+trigger1 = parent,animelem = 2
+value = 912
+
+[State 901, go to Attack 2]
+type = ChangeState
+trigger1 = parent,stateno = 301
+trigger1 = parent,animelem = 2
+value = 913
+
+[State 901, go to Hyper 1]
+type = ChangeState
+trigger1 = parent,stateno = 302
+trigger1 = parent,animelem = 2
+value = 918
+
+[State 901, go to Hyper 2]
+type = ChangeState
+trigger1 = parent,stateno = 303
+trigger1 = parent,animelem = 2
+value = 921
+
+;Walk Back
+[Statedef 902]
+Type = S
+MoveType = I
+Physics = N
+anim = 917
+SprPriority = 4
+ctrl = 0
+
+[State 902, velocity 1]
+type = VelSet
+trigger1 = time = 1
+x = -1.8
+
+[State 900,Agacha]
+Type = ChangeState
+trigger1 = parent,statetype = C
+value = 907
+
+[State 902, go to standing state]
+type = ChangeState
+trigger1 = ParentDist x = (15, 50)
+trigger2 = BackEdgeDist <= 0
+trigger3 = parent, stateno = 90
+value = 900
+
+[State 902, go to walk fwd state]
+type = ChangeState
+trigger1 = ParentDist x = (50, 150)
+trigger1 = FrontEdgeDist > 0			
+value = 901
+
+[State 902, go to hop back state]
+type = ChangeState
+trigger1 = Parent, StateNo = 105
+trigger1 = ParentDist x = [-15, 50]
+trigger1 = BackEdgeBodyDist > 0
+value = 909
+
+[State 902,Late]
+Type = ChangeState
+trigger1 = Parent,movetype =H
+value = 908
+
+[State 902, go to turn state]
+type = ChangeState
+trigger1 = facing != parent, facing
+trigger2 = parentdist x <= -150
+trigger3 = backedgedist < 0
+value = 903
+
+[State 902, go to teleport state]
+type = ChangeState
+trigger1 = parent,stateno = 710
+trigger2 = parent,stateno = 721
+value = 905
+
+[State 902, Teleport]
+type = ChangeState
+trigger1 = parent,stateno = 750
+trigger2 = parent,stateno = 760
+value = 906
+
+[State 902, go to Attack 1]
+type = ChangeState
+trigger1 = parent,stateno = 300
+trigger1 = parent,animelem = 2
+value = 912
+
+[State 902, go to Attack 2]
+type = ChangeState
+trigger1 = parent,stateno = 301
+trigger1 = parent,animelem = 2
+value = 913
+
+[State 902, go to Hyper 1]
+type = ChangeState
+trigger1 = parent,stateno = 302
+trigger1 = parent,animelem = 2
+value = 918
+
+[State 902, go to Hyper 2]
+type = ChangeState
+trigger1 = parent,stateno = 303
+trigger1 = parent,animelem = 2
+value = 921
+
+;Turn
+[Statedef 903]
+Type = S
+MoveType = I
+Physics = N
+anim = 919
+sprpriority = 4
+velset = 0
+ctrl = 0
+
+[State 903, turn]
+type = turn
+trigger1 = time = 1
+
+[State 903, go to standing state]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 900
+
+[State 903, go to teleport state]
+type = ChangeState
+trigger1 = parent,stateno = 710
+trigger2 = parent,stateno = 721
+value = 905
+
+[State 903, Teleport]
+type = ChangeState
+trigger1 = parent,stateno = 750
+trigger2 = parent,stateno = 760
+value = 906
+
+;Run
+[Statedef 904]
+Type = S
+MoveType = I
+Physics = N
+anim = 918
+sprpriority = 4
+ctrl = 0
+
+[State 904, velocity]
+type = VelSet
+trigger1 = 1
+x = const(velocity.run.fwd.x) + (parent, var(0)=20)
+
+[State 904, Walk]
+type = ChangeState
+triggerall = (AnimElem = 3 >= 0)
+triggerall = (facing != parent, facing)
+trigger1 = (ParentDist x <= 50)
+value = 901
+
+[State 904, brake]
+type = ChangeState
+triggerall = (AnimElem = 3 >= 0)
+triggerall = (facing = parent, facing)
+trigger1 = (ParentDist x <= 150) && (parent, StateNo != 100) && (parent, StateNo != [40,52])
+trigger2 = (ParentDist x < -150)
+trigger3 =  frontedgedist < 0
+value = 900
+
+[State 904, go to hop back state]
+type = ChangeState
+trigger1 = Parent, StateNo = 105
+trigger1 = ParentDist x = [-15, 50]
+trigger1 = BackEdgeBodyDist > 0
+value = 909
+
+[State 904, go to teleport state]
+type = ChangeState
+trigger1 = parent,stateno = 710
+trigger2 = parent,stateno = 721
+value = 905
+
+[State 904, Teleport]
+type = ChangeState
+trigger1 = parent,stateno = 750
+trigger2 = parent,stateno = 760
+value = 906
+
+;Teleport
+[statedef 905]
+type = S
+Movetype = I
+physics = S
+Anim = 921
+ctrl = 0
+poweradd = 150
+
+[state 905, 2]
+type = posset
+trigger1 = animelem = 4
+x = parent,pos x
+
+[State 900,Agacha]
+Type = ChangeState
+trigger1 = parent,statetype = C
+value = 907
+
+[State 905, AfterImage]
+type = AfterImage
+trigger1 = AnimElem = 1
+PalBright = 10,10,10
+PalContrast = 225,255,255
+PalAdd = 0,0,0
+PalMul = 1,1,1
+trans = add1
+framegap = 4
+timegap = 2
+time = 5
+
+[State 905,Explod Efeito]
+type = Explod
+trigger1 = Animelem = 1
+anim =  8007
+ID =  8007
+pos = 0,0
+postype = p1
+facing = 1
+scale = .8,.8
+ownpal = 1
+sprpriority = 5
+flag = noshadow
+
+[State 905, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = 12,4
+
+[State 905, turn]
+type = turn
+trigger1 = animelem = 4
+
+[state 905 ,5]
+type = changestate
+trigger1 = animtime = 0
+value = 900
+
+;Quando Shinobi Teleporta no Ar
+[statedef 906]
+type = S
+Movetype = I
+physics = S
+Anim = 920
+ctrl = 1
+poweradd = 150
+
+[state 906, 2]
+type = posadd
+trigger1 = animelem = 4
+x = 250
+
+[State 900,Agacha]
+Type = ChangeState
+trigger1 = parent,statetype = C
+value = 907
+
+[State 906, AfterImage]
+type = AfterImage
+trigger1 = AnimElem = 1
+palcontrast = 100,100,100
+palbright = 100,100,100
+trans = add1
+framegap = 4
+timegap = 2
+time = 5
+
+[State 906,Explod Efeito]
+type = Explod
+trigger1 = Animelem = 1
+anim =  8007
+ID =  8007
+pos = 0,0
+postype = p1
+facing = 1
+scale = .8,.8
+ownpal = 1
+sprpriority = 5
+flag = noshadow
+
+[State 906, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = 12,4
+
+[State 906, turn]
+type = turn
+trigger1 = animelem = 4
+
+[State 906,Ctrl]
+Type = Ctrlset
+trigger1 = Time = 1
+value = 1
+
+[state 906 ,5]
+type = changestate
+trigger1 = animtime = 0
+value = 900
+ctrl = 1
+
+;Agacha quando Shinobi Agacha
+[Statedef 907]
+Type = C
+movetype = I
+physics = N
+anim = 922
+velset = 0,0
+
+[State 907,end]
+Type = ChangeState
+trigger1 = parent,statetype != C
+value = 900
+
+[State 907,end]
+Type = ChangeState
+trigger1 = parent,movetype = H
+value = 908
+
+;Late Quando Shinobi é Atacado
+[Statedef 908]
+Type = S
+Movetype = I
+physics = N
+velset = 0,0
+anim = 923
+ctrl = 0
+sprpriority = 4
+
+[State 908,Late]
+Type = Playsnd
+trigger1 = animelem = 2
+value = 13,2
+
+[State 908,Late]
+Type = ChangeState
+trigger1 = Parent,movetype != H
+value = 900
+
+[State 908,Perde]
+Type = ChangeState
+trigger1 = parent,stateno = 5150
+value = 824
+
+;Defensive Attacks
+[State 908, go to Attack 1]
+type = ChangeState
+triggerall = Random <=5
+trigger1 = parent,movetype = H
+value = 912
+
+[State 908, go to Attack 1]
+type = ChangeState
+triggerall = Random <=5
+trigger1 = parent,movetype = H
+value = 913
+
+[State 908, go to Hyper 1]
+type = ChangeState
+triggerall = Random <=1 && parent,power >=1000
+trigger1 = parent,movetype = H
+value = 918
+
+[State 908, go to Hyper 2]
+type = ChangeState
+triggerall = Random <=1 && parent,power >=2000
+trigger1 = parent,movetype = H
+value = 921
+
+;Hop Back
+[Statedef 909]
+Type = S
+MoveType = I
+Physics = S
+anim = 931
+sprpriority = 4
+ctrl = 0
+
+[State 909 end state]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 910
+
+;Pulo
+[Statedef 910]
+Type = A
+MoveType = I
+Physics = N
+anim = 932
+sprpriority = 4
+ctrl = 0
+
+[State 910, gravity]
+type = gravity
+trigger1 = 1
+
+[State 910, end state]
+type = ChangeState
+trigger1 = Time = 18
+value = 911
+
+[State 910, velocity]
+type = VelSet
+trigger1 = time = 0
+x = -4
+y = -4
+
+[State 910, vel add]
+type = VelAdd
+trigger1 = Time = 0
+y = -0.3
+
+;Pulo Pos Hyper
+[Statedef 920]
+Type = A
+MoveType = I
+Physics = N
+anim = 932
+sprpriority = 4
+ctrl = 0
+
+[State 910, gravity]
+type = gravity
+trigger1 = 1
+
+[State 910, end state]
+type = ChangeState
+trigger1 = Time = 25
+value = 911
+
+[State 910, velocity]
+type = VelSet
+trigger1 = time = 0
+x = -4
+y = -7
+
+[State 910, vel add]
+type = VelAdd
+trigger1 = Time = 0
+y = -0.3
+
+;Aterrisagem
+[Statedef 911]
+Type = S
+MoveType = I
+Physics = S
+anim = 933
+sprpriority = 4
+ctrl = 0
+
+[State 911,Vel]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+y = 0
+
+[State 911,Pos]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 911,Land]
+type = PlaySnd
+trigger1 = Time = 1
+value = S11,1
+
+[State 911,Landing Effect]
+type = Explod
+trigger1 = Time = 1
+anim = 8010
+ID = 8010
+pos = 0,0
+postype = p1
+facing = 1
+scale = .8,.8
+ownpal = 1
+
+[State 911,End]
+Type = Changestate
+trigger1 = AnimTime = 0
+value = 900
+
+;Yamato Attacks Charge
+[Statedef 912]
+Type = S
+movetype = A
+physics = N
+poweradd = 50
+anim = 930
+
+[State 912,Turn]
+Type = Turn
+trigger1 = facing = enemy,facing
+
+[State 912,Latido]
+Type = PlaySnd
+trigger1 = time = 1
+value = S13,2
+
+[State 912,Vel]
+Type = Veladd
+trigger1 = animelem = 1
+x = 12
+
+[State 912,AfterImage]
+type = afterimage
+trigger1 = AnimElem = 1
+time = 10
+length = 10
+PalBright = 0,0,0
+PalContrast = 225,255,255
+PalAdd = 0,0,0
+PalMul = 1,1,1
+alpostbright = 0,0,0
+timegap = 2
+flamegap = 4
+trans = add
+
+[State 912,Explod Efeito]
+type = Explod
+trigger1 = Animelem = 1
+anim =  8018
+ID =  8018
+pos = 5,0
+postype = p1
+facing = 1
+scale = .8,.8
+ownpal = 1
+flag = noshadow
+
+[State 912, HitDef]
+type = HitDef
+trigger1 = AnimElem = 1
+trigger2 = Animelem = 2
+trigger3 = Animelem = 3
+attr = SC, HA
+damage = 150
+animtype = Hard
+hitflag = MFD
+guardflag = MFD
+priority = 3, Hit
+pausetime = 0,3
+sparkno = 3
+sparkxy = -10, -0
+hitsound = S13,1
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = -2,-3
+airguard.velocity = -1.9,-.8
+air.type = High
+;air.velocity = 0,-17
+yaccel = .4
+air.hittime = 12
+fall.recover = 0
+fall = 1
+
+[State 912,Change]
+Type = ChangeState
+trigger1 = frontedgedist < 0
+value = 903
+
+;Yamato Attack 2 Segura o Inimigo
+[Statedef 913]
+Type = S
+movetype = A
+physics = N
+poweradd = 50
+anim = 930
+sprpriority = 4
+
+[State 918,Turn]
+Type = Turn
+trigger1 = facing = enemy,facing
+
+[State 913,Vel]
+Type = Velset
+trigger1 = time = 1
+x = 15
+
+[State 913,Latido]
+Type = PlaySnd
+trigger1 = time = 1
+value = S13,2
+
+[State 913,Explod Efeito]
+type = Explod
+trigger1 = Animelem = 1
+anim =  8018
+ID =  8018
+pos = 5,0
+postype = p1
+facing = 1
+scale = .8,.8
+ownpal = 1
+flag = noshadow
+
+[State 913,AfterImage]
+type = afterimage
+trigger1 = AnimElem = 1
+time = 10
+length = 10
+PalBright = 0,0,0
+PalContrast = 225,255,255
+PalAdd = 0,0,0
+PalMul = 1,1,1
+palpostbright = 0,0,0
+timegap = 2
+framegap = 4
+trans = add
+
+[State 913,Hit]
+type = HitDef
+trigger1 = AnimElem = 1
+trigger2 = Animelem = 2
+trigger3 = Animelem = 3
+attr = SC, HA
+damage = 150
+animtype = Hard
+hitflag = MFD
+guardflag = MFD
+priority = 3, Hit
+pausetime = 0,0
+sparkno = 3
+sparkxy = -10, -0
+hitsound = S13,1
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = 0,0
+airguard.velocity = -1.9,-.8
+air.type = High
+;air.velocity = 0,-17
+air.hittime = 12
+fall.recover = 0
+p2stateno = 915
+p1stateno = 914
+
+[State 913,Change]
+Type = Changestate
+trigger1 = moveguarded
+trigger2 = frontedgedist < 0
+value = 903
+
+;Yamato Mordendo
+[Statedef 914]
+Type = S
+movetype = A
+physics = S
+poweradd = 50
+sprpriority = 4
+velset = 0,0
+anim = 936
+
+[State 914,Yamato Mordendo]
+type = Explod
+trigger1 = Time = 1
+anim =  934
+ID =  934
+pos = -30,0
+postype = p2
+ownpal = 1
+scale = .8,.8
+sprpriority = 2
+flag = noshadow
+bind = p2
+bindtime = -1
+removetime = 300
+
+[State 914,Yamato Mordendo]
+type = Explod
+trigger1 = Time = 1
+anim =  8014
+ID =  8014
+pos = -10,-65
+postype = p2
+ownpal = 1
+scale = .8,.8
+sprpriority = 2
+flag = noshadow
+bind = p2
+bindtime = -1
+removetime = 300
+
+[State 914,Remove]
+Type = RemoveExplod
+trigger1 = Parent,movecontact
+trigger2 = Parent,numproj = 1
+trigger3 = Parent,stateno = 691
+
+[State 914,Remove]
+Type = RemoveExplod
+triggerall = numpartner = 1
+trigger1 = partner,movecontact
+trigger2 = partner,numproj = 1
+
+[State 914,Segura]
+Type = TargetBind
+Trigger1 = time = 1
+bindtime = 300
+pos = 0,0
+
+[State 914,Turn]
+Type = Turn
+trigger1 = facing != parent,facing
+
+[State 914,End 1]
+Type = ChangeState
+trigger1 = Parent,movecontact
+trigger2 = Parent,numproj = 1
+trigger3 = Parent,stateno = 691
+value = 909
+
+[State 914,End 2]
+type = Changestate
+triggerall = numpartner = 1
+trigger1 = partner,movecontact
+trigger2 = partner,numproj = 1
+value = 909
+
+[State 914,End 2]
+Type = ChangeState
+trigger1 = Time = 300
+value = 909
+
+;P2 Sendo Segurado
+[Statedef 915]
+Type = S
+movetype = H
+physics = N
+
+[State 915]
+Type = ChangeAnim2
+trigger1 = time = 1
+value = 935
+
+[State 915,Volta]
+Type = SelfState
+trigger1 = time = 300
+value = 5000
+
+;Yamato Golpeado
+[Statedef 916]
+Type = A
+MoveType = I
+Physics = N
+anim = 937
+sprpriority = 4
+ctrl = 0
+
+[State 916,SND]
+Type = PlaySND
+trigger1 = time = 1
+value = 13,4
+
+[State 916, gravity]
+type = gravity
+trigger1 = 1
+
+[State 916, end state]
+type = ChangeState
+trigger1 = Time = 18
+value = 917
+
+[State 916, velocity]
+type = VelSet
+trigger1 = time = 0
+x = -4
+y = -4
+
+[State 916, vel add]
+type = VelAdd
+trigger1 = Time = 0
+y = -0.3
+
+;No chão
+[Statedef 917]
+Type = S
+Movetype = H
+physics = N
+anim = 938
+velset = 0,0
+
+[State 917,Vel]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+y = 0
+
+[State 917,Pos]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 917,Land]
+type = PlaySnd
+trigger1 = Time = 1
+value = S11,1
+
+[State 917,Landing Effect]
+type = Explod
+trigger1 = Time = 1
+anim = 8010
+ID = 8010
+pos = 0,0
+postype = p1
+facing = 1
+scale = .8,.8
+ownpal = 1
+
+[State 917,Change]
+Type = ChangeState
+Trigger1 = animtime = 0
+value = 900
+
+;Yamato Hyper 1
+[Statedef 918]
+Type = S
+movetype = A
+physics = N
+poweradd = 50
+anim = 939
+velset = 0,0
+
+[State 918,Turn]
+Type = Turn
+trigger1 = facing = enemy,facing
+
+[State 918, SuperPause]
+type = SuperPause
+trigger1 = AnimElem = 1
+time = 30
+anim = S8008
+sound = S12,2
+pos = 0,-15
+movetime = 30
+darken = 1
+poweradd = -1000
+unhittable = 1
+
+[State 919, PalFXWiz]
+type = PalFX
+trigger1 = Time = 20
+time = 40
+add = 0,50,240
+mul = 255,255,255
+sinadd = 85,55,110,10
+invertall = 0
+color = 0
+
+[State 918,Change]
+Type = ChangeState
+Trigger1 = Animtime = 0
+value = 919
+
+;Hyper 1 Pt 2
+[Statedef 919]
+Type = S
+movetype = A
+physics = N
+poweradd = 50
+anim = 930
+
+[State 919,Latido]
+Type = PlaySnd
+trigger1 = time = 1
+value = S13,2
+
+[State 919,Latido]
+Type = PlaySnd
+trigger1  = !time
+value = S12,5
+
+[State 919,Vel]
+Type = Veladd
+trigger1 = animelem = 1
+x = 12
+
+[State 919,AfterImage]
+type = AfterImage
+trigger1 = Animelem = 1
+time = 50
+length = 20
+palbright = 0,0,0
+palcontrast = 0,0,255
+palpostbright = 0,0,0
+timegap = 1
+framegap = 4
+trans = add1;"add" ;"none","add1","sub"
+
+[State 919,Explod Efeito]
+type = Explod
+trigger1 = Animelem = 2
+anim =  698
+ID =  698
+pos = 46,-20
+bind = p1
+bindtime = - 1
+postype = p1
+facing = 1
+scale = .8,.8
+ownpal = 1
+flag = noshadow
+sprpriority = 5
+
+[State 919, RemoveExplod]
+type = RemoveExplod
+trigger1 = movecontact
+trigger2 = frontedgedist < 0
+id = 698
+
+[State 919,Explod Efeito]
+type = Explod
+triggerall = numexplod(685) = 0 && numexplod(698) = 0
+trigger1 = movecontact
+anim =  685
+ID =  685
+pos = 14,-10
+postype = p2
+facing = 1
+scale = .8,.8
+ownpal = 1
+flag = noshadow
+sprpriority = 5
+
+[State 919,Explod Efeito]
+type = Explod
+trigger1 = Animelem = 1
+anim =  8004
+ID =  8004
+pos = 5,0
+postype = p1
+facing = 1
+scale = .8,.8
+ownpal = 1
+flag = noshadow
+
+[State 919, PalFXWiz]
+type = PalFX
+trigger1 = AnimElem = 1
+time = 40
+add = 0,50,240
+mul = 255,255,255
+sinadd = 85,55,110,10
+invertall = 0
+color = 0
+
+[State 919, HitDef]
+type = HitDef
+trigger1 = AnimElem = 1
+trigger2 = Animelem = 2
+trigger3 = Animelem = 3
+attr = SC, HA
+damage = 300
+animtype = Up
+hitflag = MFD
+guardflag = MFD
+priority = 3, Hit
+pausetime = 0,5
+guard.sparkno = S8002
+sparkno = -1
+sparkxy = -10, -0
+hitsound = S12,3
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = -10,-5
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = 0,-17
+yaccel = .4
+air.hittime = 12
+fall.recover = 0
+fall = 1
+movecamera = 1
+palfx.time = 50
+palfx.add = 0,50,240
+palfx.mul = 255,255,255
+palfx.sinadd = 85,55,110,10
+
+[State 919, EnvShake]
+type = EnvShake
+trigger1 = movecontact
+time = 40
+freq = 60
+ampl = -4
+phase = -7
+
+[State 919,Change]
+Type = ChangeState
+trigger1 = frontedgedist < 0
+value = 909
+
+[State 919,Change]
+Type = ChangeState
+trigger1 = movecontact
+value = 920
+
+;Yamato Hyper 2
+[Statedef 921]
+Type = S
+movetype = A
+physics = N
+poweradd = 50
+anim = 939
+
+[State 918,Turn]
+Type = Turn
+trigger1 = facing = enemy,facing
+
+[State 921, SuperPause]
+type = SuperPause
+trigger1 = AnimElem = 1
+time = 30
+anim = S8008
+sound = S12,2
+pos = 0,-15
+movetime = 30
+darken = 1
+poweradd = -2000
+unhittable = 1
+
+[State 921, PalFXWiz]
+type = PalFX
+trigger1 = Time = 10
+time = 50
+add = 7,-200,-200
+mul = 256,256,256
+sinadd = 50,0,0,10
+invertall = 0
+color = 0
+
+[State 921,Change]
+Type = ChangeState
+Trigger1 = Animtime = 0
+value = 922
+
+[Statedef 922]
+Type = S
+movetype = A
+physics = N
+poweradd = 50
+anim = 930
+sprpriority = 4
+
+[State 922,Vel]
+Type = Velset
+trigger1 = time = 1
+x = 15
+
+[State 922,Latido]
+Type = PlaySnd
+trigger1 = time = 1
+value = S13,2
+
+[State 922,Latido]
+Type = PlaySnd
+trigger1 = time = 1
+value = S13,2
+
+[State 922,Explod Efeito]
+type = Explod
+trigger1 = Animelem = 1
+anim =  8004
+ID =  8004
+pos = 5,0
+postype = p1
+facing = 1
+scale = .8,.8
+ownpal = 1
+flag = noshadow
+
+[State 922,AfterImage]
+type = Afterimage
+trigger1 = AnimElem = 1
+time = 10
+length = 20
+palbright = 0,0,0
+palcontrast = 255,0,0
+palpostbright = 0,0,0
+timegap = 1
+framegap = 1
+trans = add1
+
+[State 922,Hit]
+type = HitDef
+trigger1 = AnimElem = 1
+trigger2 = Animelem = 2
+trigger3 = Animelem = 3
+attr = SC, HA
+;damage = 400
+animtype = Hard
+hitflag = MFD
+guardflag = MFD
+priority = 3, Hit
+pausetime = 0,200
+sparkno = 3
+sparkxy = -10, -0
+hitsound = S13,1
+guardsound = 6, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = 0,0
+airguard.velocity = -1.9,-.8
+air.type = High
+;air.velocity = 0,-17
+air.hittime = 12
+fall.recover = 0
+fall = 1
+
+[State 922,Change]
+Type = Changestate
+trigger1 = movehit
+value = 923
+
+[State 922,Change]
+Type = Changestate
+trigger1 = moveguarded
+trigger2 = frontedgedist < 0
+value = 903
+
+;Yamato Hyper 2 Pt 2
+[Statedef 923]
+Type = S
+movetype = A
+physics = S
+poweradd = 50
+sprpriority = 4
+velset = 0,0
+anim = 940
+
+[State 923, PalFXWiz]
+type = BgPalFX
+trigger1 = AnimElem = 2
+time = 15
+add = 0,-200,-200
+mul = 256,256,256
+sinadd = 40,80,40,10
+invertall = 0
+color = 0
+
+[State 923,SND]
+Type = PlaySND
+trigger1 = Time = 1
+trigger2 = Time = 10
+value = 10,1
+
+[State 923,SND]
+Type = PlaySND
+trigger1 = Time = 1
+trigger2 = Time = 10
+trigger3 = Time = 20
+value = 11,2
+
+[State 923,SND]
+Type = TargetLifeadd
+triggerall = target,life >1
+trigger1 = Time = 1
+trigger2 = Time = 10
+trigger3 = Time = 20
+trigger4 = Time = 30
+value = -80
+
+[State 923,Sangue 1]
+type = Explod
+trigger1 = Time = 1
+trigger2 = Time = 10
+trigger3 = Time = 20
+anim =  8015
+ID =  8015
+pos = -10,-75
+postype = p2
+ownpal = 1
+scale = .8,.8
+sprpriority = 2
+flag = noshadow
+removetime = 190
+
+[State 923,Sangue 1]
+type = Explod
+trigger1 = Time = 1
+trigger2 = Time = 10
+trigger3 = Time = 20
+anim =  8015
+ID =  8015
+pos = 50,-75
+postype = p1
+ownpal = 1
+scale = .8,.8
+sprpriority = 2
+flag = noshadow
+removetime = 190
+
+[State 923,Remove]
+Type = RemoveExplod
+trigger1 = Parent,movecontact
+trigger2 = Parent,numproj = 1
+
+[State 923,Remove]
+Type = RemoveExplod
+triggerall = numpartner = 1
+trigger1 = partner,movecontact
+trigger2 = partner,numproj = 1
+
+[State 923,End 1]
+Type = ChangeState
+trigger1 = Parent,movecontact
+trigger2 = Parent,numproj = 1
+value = 909
+
+[State 923,Turn]
+Type = Turn
+trigger1 = facing != parent,facing
+
+[State 923,End]
+Type = ChangeState
+trigger1 = Time = 200
+value = 909

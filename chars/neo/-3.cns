@@ -1,0 +1,313 @@
+[Statedef -3]
+
+
+[State 5101, 3]
+type = StopSnd
+trigger1 = stateno != 3034
+channel = 2
+
+;--------------------------------------------------------
+[state -3,]
+type = PowerAdd
+trigger1 = 0;var(14) = 1
+value = 1000
+
+[state -3,]
+type = PowerAdd
+triggerall = 0
+triggerall = gametime%50 = 0
+triggerall = Power < 3000
+trigger1 = var(14) = 2
+trigger1 = var(3) = 0
+value = 5
+
+
+;--------------------------------------------------------
+;電話
+[State 1200,]
+type = helper
+triggerAll = NumHelper(192) = 0
+trigger1 = RoundState = 2
+trigger2 = RoundNo >= 2
+name = "192"
+id = 192
+pos = 40,0
+postype = p1
+stateno = 192
+helpertype = normal
+ownpal = 1
+keyctrl = 0
+sprpriority = -2
+Persistent = 0
+
+
+[State 1200,]
+type = StopSnd
+trigger1 = RoundState = 2
+trigger1 = NumHelper(192) = 1
+channel = 1
+
+;--------------------------------------------------------
+
+
+
+;var---
+;var(1)ハイジャンプ
+;var(2)マシンガン追加攻撃
+;var(3)バレットタイム
+;var(4)浮き補正
+;var(5)浮き補正（ヒット数）
+
+;var(9)マト避けb
+;var(11)マト避けb（バレット）
+;var(12)AI時の超必分岐
+
+;var(15)ヘリ・ミニガンのトリガー
+
+;var(16)	カウンター
+;var(17)	カウンター タイマー
+
+;
+;var(58)アップデートフラグ
+;
+;var(59)AI
+;
+;----fvar
+
+;
+;ゲーム中に常にいつでも開始したいステート、ここでは「着地音」に使用しています
+;下の条件は「52か106のステートに移動して１フレーム目に」と言う事です。
+;52と106はバックステップとジャンプの着地のステートです。
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52 
+trigger2 = stateno = 106 
+value = 40, 0
+
+[State -3,マシンガン追加] 
+type = varset 
+trigger1 = stateno != [1030,1042] 
+var(2) = 0 
+
+;[State -3,2] 
+;type = varset 
+;trigger1 = stateno != 1050 
+;var(3) = 0 
+
+[state -3,バレットT1] 
+type = poweradd 
+trigger1 = var(3) = 1 
+trigger1 = gametime%2 = 0 
+value = -20 
+ignorehitpause = 1
+SuperMoveTime = 9999
+PauseMoveTime = 9999
+
+[state -3,バレットT2] 
+type = pause 
+trigger1 = var(3) = 1 
+trigger1 = gametime%4 = 0 
+time = 2 
+movetime = 2
+
+[state -3,バレットT3] 
+type = varset 
+triggerall = var(3) = 1 
+trigger1 = power = 0
+trigger2 = (stateno = [5000,5110])
+;trigger2 = movetype = H
+trigger3 = roundstate != 2
+var(3) = 0
+
+[State -3,浮き補正1] 
+type = varset 
+trigger1 = stateno = [1060,1062]
+trigger1 = movehit
+trigger1 = p2BodyDist Y < 0
+var(4) = 1
+
+[State -3,浮き補正2] 
+type = varset 
+trigger1 = stateno != [1060,1062]
+var(4) = 0
+
+[State -3,浮き補正2] 
+type = varset 
+trigger1=numtarget
+var(5) = target,gethitvar(hitcount)
+
+[State -3,浮き補正3] 
+type = varset 
+trigger1 = p2statetype != A
+var(5) = 0
+
+[State -3, マト避けb] 
+type = HitOverride
+trigger1 = var(9)
+trigger1 = (stateno != [120,152]) && (statetype != A)
+;hitsound = s0,21
+;sparkxy = 10,-50
+;pausetime = 10,0
+;attr = SA, NA, SA, HA, NP, SP, HP
+attr = SA, NP, SP, HP
+stateno = 1081
+time = 1
+ignorehitpause = 1
+priority = 7, hit
+
+[state -3,マト避けb スローフラグ] 
+type = varset 
+triggerall = 0
+triggerall = stateno = [1081,1082]
+trigger1 = command = "/c"
+trigger2 = var(59) = 1
+;trigger2 = enemy,movetype = A;相手が攻撃状態の時
+var(11) = 1
+
+[state -3,マト避けb スローフラグ] 
+type = varset 
+triggerall = 0
+triggerall = stateno = [1081,1082]
+trigger1 = command = "~c"
+trigger2 = command != "/c"
+trigger3 = power = 0
+trigger4 = var(59) = 1
+Trigger4 = Enemy,NumHelper > 0 || Enemy,NumProj > 0
+;trigger4 = enemy,movetype != A;相手が攻撃状態の時
+var(11) = 0
+
+[state -3,バレットT1] 
+type = poweradd 
+trigger1 = var(11) = 1 
+trigger1 = gametime%2 = 0 
+value = -50
+
+[state -3,マト避けa] 
+type = pause 
+trigger1 = var(11) = 1 
+trigger1 = gametime%5 = [0,1] 
+time = 6
+;movetime = 2
+
+[State 1000, 0]
+type = VarSet
+trigger1 = stateno != [3030,3035]
+var(15) = 0
+
+;※※※※※※※※※※※※※※※※※※※※
+[State -3, debag]
+type = DisplayToClipboard
+trigger1 = 1
+text = "v0 = %d "
+params = (helper(192),var(0))
+
+;※※※※※※※※※※※※※※※※※※※※ハイジャンプ
+;理論は簡単
+;ハイジャンプコマンドを入れた「瞬間」、varスイッチを１にする
+;でハイジャンプのコマンドは最後がU、つまりジャンプする
+;そしてジャンプステート５０の時にvarスイッチが１ならveladdで加速します
+;varスイッチを０にするトリガーは「ステート５０の２フレーム目」です。
+
+[State 841, 1] ;←コマンドを入れたらVarをON
+type = varset
+trigger1 = command = "h_jump"
+trigger1 = ctrl = 1
+trigger1 = statetype != A
+trigger2 = stateno = 3030
+trigger3 = stateno = 3040
+trigger4 = stateno = 840
+var(1) = 1
+;v = 1
+;value = 1
+
+[State 841, 1] ;←varをOFFにするステート
+type = varset
+triggerall = time = 2
+trigger1 = stateno = 50
+trigger2 = stateno = 3031
+var(1) = 0
+;v = 1
+;value = 0
+
+[State 841, 1] ;←ジャンプ力にveladdを使って加速
+type = veladd
+triggerall = var(1) = 1
+trigger1 = stateno = 50
+trigger2 = stateno = 3031
+y = -6
+
+[state 841,1] 
+type = veladd 
+trigger1 = stateno = 50
+trigger1 = (command = "holdback") || (command = "holdfwd") 
+x = ifelse(command = "holdback",-.2,.2) 
+
+;[State 841, 1] ;←前にボタンを押してたら前にも加速
+;type = veladd
+;trigger1 = var(1) = 1
+;trigger1 = stateno = 50
+;trigger1 = command = "holdfwd"
+;x = 4
+
+;[State 841, 1] ;←後ろなら後ろに加速
+;type = veladd
+;trigger1 = var(1) = 1
+;trigger1 = stateno = 50
+;trigger1 = command = "holdback"
+;x = -4
+
+[State 50, 4];←成功したときの残像
+type = AfterImage
+trigger1 = var(1) = 1
+trigger1 = stateno = 50
+time = 20
+trans = add1
+timegap = 1
+framegap = 2
+length = 8
+palbright = 50,90,50
+palcontrast = 225,225,225
+palpostbright = 0,0,0
+paladd = 0,0,0
+palmul = 1,1,1
+
+;※※※※※※※※※※※※※※※※※※※※カウンター
+;理論を解説
+;立ちガードのステートは分けると「ガードする動作」「攻撃をガードした動作」「ガードを解く動作」となります
+;ちょうどステートが分割されてるなら「攻撃をガードした動作」の時にコマンドを入れたらそのステートに飛ぶことに
+;すればカウンターの完成です
+;ただそれだとちょっと簡単なので成功したら一瞬光ってとまり、技ゲージをちょっと減らすようにします。
+;今回はカンフー突き手の弱・強に対応させてます
+
+[State 10000, 1];←成功したとき一瞬無敵になる
+type = NotHitBy
+triggerall = stateno = [150,159]
+trigger1 = var(16) != 0
+value = SCA, NA, SA, HA, NP, SP, HP
+time = 10
+
+[State 4000,Spark];←成功したとき一瞬止まる
+type = Pause
+triggerall = stateno = [150,159]
+trigger1 = var(16) != 0
+time = 7
+pausemovetime = 7
+poweradd = -100
+
+[State 1300, 5];←成功したとき一瞬止まる、小さいけど効果的です
+type = Envcolor
+triggerall = stateno = [150,159]
+trigger1 = var(16) != 0
+persistent = 0
+ignorehitpause = 1
+value = 255, 255, 255
+time = 1
+under = 1
+supermove = 1
+
+[State -1, Kung Fu Throw];←強・突き手をガード中に入力したら。
+type = ChangeState
+value = var(16)
+triggerall = stateno = [150,159]
+trigger1 = var(16) != 0

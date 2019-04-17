@@ -1,0 +1,620 @@
+
+;---------------------------------------------------------------------------
+; Override common states (use same number to override) :
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+[StateDef -2]
+[State 0, PowerSet]
+type = PowerSet
+triggerall = enemynear, name ="Trainingroom"
+trigger1 = power != 3000
+value = 3000
+
+; **IMPORTANT NOTE**
+; YOU WON'T HAVE TO WORRY FOR THE AI ACTIVATION OR VARIABLE.
+; IT IS ALREADY CODED HERE, ALL YOU HAVE TO DO, IS MAKE AI CODES
+; IN THE COMMAND FILE
+
+;==================================================================================
+;======| RELACIONADO À AI - AI RELATED |===========================================
+;==================================================================================
+[State 0, PowerAdd]
+type = PowerAdd
+trigger1 = timemod = 20,0
+value = 2
+; Within StateDef -2, none of your own AI-related code should be placed
+; above these next two controllers.
+
+[State -2, StopAI]
+type = VarSet
+triggerall = (var(59) > 0)
+trigger1 = (RoundState != 2)
+trigger2 = !Alive
+var(59) = -2
+IgnoreHitPause = 1
+
+; This controller is optional.  It allows you treat the AI flag as a boolean
+; value rather than an integer value, letting you trigger your AI directives
+; with "var(0)" instead of "var(59)>0", and letting you make moves usable only
+; by humans by using "!var(0)" instead of "var(59)<1", thus slightly improving
+; the size and efficiency of your code.
+; Another benefit is that it makes it much easier for users to disable your AI,
+; if they so choose.
+[State -2, Simplifier]
+type = VarSet
+trigger1 = (var(59) = 1)
+trigger2 = (var(0):=0)
+var(0) = 1	; Another option is to replace 1 with something like MatchNo, if
+		; you want to design your AI to have varying levels of difficulty.
+IgnoreHitPause = 1
+
+[State -2, varKOsnd]
+type=varset
+trigger1=alive&&var(18)>0
+trigger2=!alive&&var(18)<2
+var(18)=ifelse(alive,0,var(18)+1)
+ignorehitpause=1
+
+[State -3, GetHit Snd]
+type=playsnd
+triggerall=alive&&time=1
+triggerall=stateno=5000||stateno=5010
+trigger1=gethitvar(animtype)>=2&&random<500
+trigger2=gethitvar(animtype)=1&&random<375
+trigger3=gethitvar(animtype)=0&&random<250
+value=s5000,(0+(random%4));*10,ceil(random/200)
+channel=5
+ignorehitpause=1
+
+[State -3, GetHit Snd]
+type=playsnd
+triggerall=alive&&time=1
+trigger1=(stateno=5000||stateno=5010)&&numenemy
+trigger1=gethitvar(fall)||(enemynear,hitdefattr=SCA,SA,HA)
+trigger2=(stateno=5020||stateno=5070||stateno=5080)
+trigger3=(stateno=5050||stateno=5100)&&(prevstateno!=[5000,5199])
+value=s5000,(0+(random%3));*10,ceil(random/200)
+channel=5
+ignorehitpause=1
+
+[State -2, KOsnd]
+type=playsnd
+trigger1=!alive&&var(18)=1
+trigger1=var(18):=2
+value=5500,0;ifelse((var(1)=2),2,1)+2*(stateno=5130)
+channel = -1
+ignorehitpause=1
+persistent=0
+
+;---------------------------------------------------
+
+
+;[State -2, AssertSpecial]
+;type = AssertSpecial
+;triggerall = roundno = 1
+;trigger1 = roundstate < 2
+;flag = nomusic
+
+;[State -2, AssertSpecial]
+;type = AssertSpecial
+;trigger1 = roundstate != 2
+;flag = nobardisplay
+
+[State -2, Clipboard]
+type = DisplayToClipboard
+trigger1 = 1
+text = "damage = %f || AI? = %d || p2bdy = %f"
+params = fVar(10), Var(59), p2bodydist Y
+
+[State -2, Damage based on hits]
+type=varset
+trigger1= numenemy
+fvar(12)=enemynear,gethitvar(hitcount)
+ignorehitpause=1
+
+[State -2, Reset var when the opponent recovers]
+type=varset
+trigger1= numenemy
+trigger1= (enemynear,movetype!=H)
+trigger2= !numenemy
+fvar(12)=1
+
+[State -2, Dampener]
+type=varset
+trigger1=stateno!= [3000,3999]
+fvar(10)= ifelse(fvar(12)=0, 1, ifelse(fvar(12)=1, 1, .85**fvar(12)))
+ignorehitpause=1
+
+[State -2, Dampener]
+type=varset
+trigger1=stateno = [3000,3999]
+fvar(10)= ifelse(fvar(12)=0, 1, ifelse(fvar(12)=1, 1, .95**fvar(12)))
+ignorehitpause=1
+
+[State -2, Dampener itself]
+type=attackmulset
+trigger1= 1
+value=fvar(10)
+ignorehitpause=1
+
+;==================================================================================
+;==================================================================================
+;==================================================================================
+
+
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------
+
+[Statedef -3]
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != 120
+trigger1 = stateno != 121
+trigger1 = stateno != 122
+trigger1 = stateno != 130
+trigger1 = stateno != 131
+trigger1 = stateno != 132
+trigger1 = stateno != 140
+trigger1 = stateno != 141
+trigger1 = stateno != 142
+trigger1 = stateno != 150
+trigger1 = stateno != 151
+trigger1 = stateno != 152
+trigger1 = stateno != 155
+trigger1 = stateno != 156
+trigger1 = stateno != 157
+id = 120
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != 200
+trigger1 = stateno != 210
+trigger1 = stateno != 220
+id = 200
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != 400
+trigger1 = stateno != 410
+trigger1 = stateno != 420
+trigger1 = stateno != 440
+id = 400
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != 600
+trigger1 = stateno != 610
+trigger1 = stateno != 620
+id = 600
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != [1000,1050]
+trigger1 = stateno != [1100,1150]
+id = 1000
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != [1200,1250]
+id = 1290
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != 1306
+id = 1390
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != 3000
+id = 3090
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != 3001
+id = 3000
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != [3100,3111]
+id = 3100
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != [3200,3209]
+id = 3200
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != [3300,3311]
+id = 3300
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != [3400,3404]
+id = 3400
+ignorehitpause = 1
+
+[State -3, RemoveExplod]
+type = RemoveExplod
+trigger1 = stateno != [3500,3505]
+id = 3550
+ignorehitpause = 1
+
+;==================================================================================
+;======| RELACIONADO À AI - AI RELATED |===========================================
+;==================================================================================
+
+
+; Kamek and Luchini appear to have been the first ones to use the IsHomeTeam AI activation concept.
+; Feel free to move this controller to your character's intro state for slightly better efficiency.
+[State -3, SetAI]
+type = VarSet
+triggerall = !RoundState
+triggerall = IsHomeTeam
+trigger1 = (TeamSide = 2)
+trigger2 = (MatchNo > 1)
+var(59) = 1
+
+; Feel free to move this controller to your character's intro state for slightly better efficiency.
+; Note that it may give P2 a slight unfair advantage in simul team vs mode, so you
+; may want to disable it.  But then, since when has Mugen been about fairness? =P
+[State -3, Unfair]; Is this reliable?
+type = VarSet
+trigger1 = !RoundState
+trigger1 = (var(59) != 1)
+trigger1 = NumPartner
+trigger1 = (ID > Partner,ID)
+trigger1 = (TeamSide = 2)
+var(59) = 1
+
+[State -3, AI Helper (Compatibly Partnered Version)]
+type = Helper
+trigger1 = !var(59)
+trigger1 = !NumHelper(9742)
+trigger1 = (RoundState = 2)
+trigger1 = Alive
+trigger1 = NumPartner
+trigger1 = Partner,SelfAnimExist(9741)
+HelperType = normal
+name = "AI Helper (Simul Version)"
+ID = 9742
+pos = 9999999,99999
+StateNo = 9742
+KeyCtrl = 1
+PauseMoveTime = 999999999
+SuperMoveTime = 999999999
+
+; If you want to use the Guard mode, Dummy mode, Distance, or Button jam dummy control
+; options in Training mode without activating the dummy's AI while working on your
+; character, then all you need to do is temporarily disable this controller.
+; Or, if you want to permanently disable this controller in Training mode,
+; then you could use the Training mode detection code available on my site
+; ( http://www.shinmugen.net/winane/ ), and then just add a "(var(59)&63)>30"
+; triggerall to this controller.
+[State -3, AI Helper]
+type = Helper
+triggerall = !var(59)
+triggerall = !NumHelper(9741)
+triggerall = (RoundState = 2)
+triggerall = Alive
+trigger1 = !NumPartner
+trigger2 = !(Partner,SelfAnimExist(9741))
+HelperType = normal
+name = "AI Helper"
+ID = 9741
+pos = 9999999,99999
+StateNo = 9741
+KeyCtrl = 1
+PauseMoveTime = 999999999
+SuperMoveTime = 999999999
+
+[State -3, TurnBackOnAI]
+type = VarSet
+trigger1 = (var(59) = -2)
+trigger1 = (RoundState = 2)
+trigger1 = Alive
+var(59) = 1
+
+[State -3, HitPauseTime Helper]
+type = Helper
+triggerall = var(59)!=1
+triggerall = !NumHelper(9743)
+triggerall = (RoundState = 2)
+triggerall = Alive
+trigger1 = (MatchNo = 1)
+trigger2 = NumPartner
+trigger2 = (ID > Partner,ID)
+HelperType = normal
+name = "HitPauseTime"
+ID = 9743
+pos = 9999999,99999
+StateNo = 9743
+PauseMoveTime = 999999999
+SuperMoveTime = 999999999
+
+; According to Roque, this method works in Linux Mugen version 2002.04.14,
+; whereas the old humanly-impossible commands method does not.
+; It is very important that this controller NOT be moved to State -2.
+; Note that this part won't work if AI.Cheat is turned off in mugen.cfg.
+;[State -3, XOR]
+;type = VarSet
+;triggerall = var(59)!=1
+;triggerall = (var(57) = GameTime-1)
+;triggerall = NumHelper(9743)
+;triggerall = !(Helper(9743),var(1))
+;trigger1 = (command = "a") ^^ (command = "a2")
+;trigger2 = (command = "b") ^^ (command = "b2")
+;trigger3 = (command = "c") ^^ (command = "c2")
+;trigger4 = (command = "x") ^^ (command = "x2")
+;trigger5 = (command = "y") ^^ (command = "y2")
+;trigger6 = (command = "z") ^^ (command = "z2")
+;trigger7 = (command = "start") ^^ (command = "start2")
+;trigger8 = (command = "holda") ^^ (command = "holda2")
+;trigger9 = (command = "holdb") ^^ (command = "holdb2")
+;trigger10 = (command = "holdc") ^^ (command = "holdc2")
+;trigger11 = (command = "holdx") ^^ (command = "holdx2")
+;trigger12 = (command = "holdy") ^^ (command = "holdy2")
+;trigger13 = (command = "holdz") ^^ (command = "holdz2")
+;trigger14 = (command = "holdstart") ^^ (command = "holdstart2")
+;trigger15 = (command = "holdfwd") ^^ (command = "holdfwd2")
+;trigger16 = (command = "holdback") ^^ (command = "holdback2")
+;trigger17 = (command = "holdup") ^^ (command = "holdup2")
+;trigger18 = (command = "holddown") ^^ (command = "holddown2")
+;trigger19 = (command = "recovery") ^^ (command = "recovery2")
+;Add more as desired. (See my notes in the CMD.)
+;var(59) = 1
+
+; It is very important that this controller NOT be moved to State -2, as putting
+; it there would defeat the entire purpose of the controller, allowing the
+; helper method or the XOR method to erroneously set the AI variable.
+; And within State -3, don't put any ChangeState controllers before this
+; controller, lest you unnecessarily delay your character's AI activation.
+[State -3, GameTimeVar]
+type = VarSet
+trigger1 = 1
+var(57) = GameTime
+IgnoreHitPause = 1
+
+; Within StateDef -3, none of your own AI-related code should come after the code
+; provided here (and putting it before the code is also generally a bad idea).
+; It's better to use State -1 (or, in special circumstances, State -2) instead.
+
+;==================================================================================
+;==================================================================================
+;==================================================================================
+
+;Ths controller plays a sound everytime the player lands from a jump, or
+;from a back-dash.
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52 ;Jump land
+trigger2 = stateno = 106 ;Run-back land
+trigger3 = stateno = 101
+trigger4 = stateno = 192
+trigger5 = stateno = [900,901]
+trigger6 = stateno = 1211
+trigger7 = stateno = 1410
+trigger8 = stateno = 3503
+trigger9 = stateno = 3504
+value = s100,0
+
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+;trigger1 = stateno = 100 ;Jump land
+trigger1 = stateno = 105 ;Run-back land
+value = s100,1
+
+[State -3, Landing Anim]
+type = Explod
+triggerall = Time = 1
+trigger1 = stateno = 52 ;Jump land
+trigger2 = stateno = 106
+trigger3 = stateno = 101
+trigger4 = stateno = 192
+trigger5 = stateno = 1211
+trigger6 = stateno = 1410
+trigger7 = stateno = 3503
+trigger8 = stateno = 3504
+anim = 7503
+ID = 8030
+pos = 0,0
+postype = p1  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = -2
+supermove = 9999
+pausemove = 9999
+scale = .6,.6
+sprpriority = -1
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+ignorehitpause =1
+persistent =0
+
+[State -3, AfterImagePersist]
+type=afterimagetime
+trigger1=stateno=[3000,3005] ;Royal Flush
+trigger2=stateno=[3100,3105] ;Cajun Explosion
+trigger3=stateno=[3200,3209] ;Cajun Strike X
+trigger4=stateno=[3300,3309] ;Card Destruction
+trigger5=stateno=[3400,3405] ;Cajun Slash X
+trigger6=stateno=[3500,3505] ;The Ace of Spades
+time=2
+
+[State -3, StopSnd]
+type = StopSnd
+trigger1 = movetype = H
+trigger2 = stateno != [3000,3999]
+channel = 15
+ignorehitpause = 1
+
+[State -3, AfterImageTime]
+type = AfterImageTime
+trigger1 = numhelper(7005)=1
+time = 0
+ignorehitpause = 1
+;persistent =  0
+
+;------------------------------------------------------------------------------------------------------
+;wall hit
+[state 5100,2]
+type = explod
+triggerall = numtarget
+triggerall = stateno!=0
+triggerall = stateno!=[1000,1200]
+triggerall = stateno!=[3000,3002]
+triggerall = stateno!=[3100,3102]
+;triggerall = stateno!=1005
+;triggerall = stateno!=1010
+triggerall = stateno!=50
+;triggerall = stateno!=[5000,5999]
+;triggerall = movetype ! =H
+triggerall = var(42)
+triggerall = enemynear,stateno != [120,159]
+trigger1 = enemynear,movetype = h
+trigger1 = enemynear,backedgedist <= 15
+trigger1 = enemynear,statetype = a
+trigger1 = enemynear,vel x < 0
+anim = 7024
+pos = (enemy,const(size.mid.pos.x))-20,(target,const(size.mid.pos.y))
+postype = p2
+scale = 0.6,0.52
+sprpriority = 3
+bindtime = 1
+facing = -1
+removetime = -2
+id = 7024
+shadow = 0,0,0
+ownpal = 1
+;removeongethit = 1
+;ignorehitpause = 1
+;vel = -2,0
+;accel = -0.1,0
+
+[state 5100,2]
+type = explod
+triggerall = numtarget
+triggerall = stateno!=0
+triggerall = stateno!=[1000,1200]
+triggerall = stateno!=[3000,3002]
+triggerall = stateno!=[3100,3102]
+;triggerall = stateno!=1005
+;triggerall = stateno!=1010
+triggerall = stateno!=50
+;triggerall = stateno!=[5000,5999]
+;triggerall = movetype ! =H
+triggerall = var(42)
+triggerall = enemynear,stateno != [120,159]
+trigger1 = enemynear,movetype = h
+trigger1 = enemynear,backedgedist <= 15
+trigger1 = enemynear,statetype = a
+trigger1 = enemynear,vel x < 0
+anim = 7024
+pos = (enemy,const(size.mid.pos.x))-20,(target,const(size.mid.pos.y))
+postype = p2
+sprpriority = -3
+bindtime = 1
+facing = -1
+scale = 0.6,0.52
+removetime = -2
+id = 7024
+shadow = -1
+ownpal = 1
+;removeongethit = 1
+;ignorehitpause = 1
+;vel = -2,0
+;accel = -0.1,0
+
+[state 5100,2]
+type = playsnd
+triggerall = stateno!=0
+triggerall = stateno!=[1000,1200]
+triggerall = stateno!=[3000,3002]
+triggerall = stateno!=[3100,3102]
+;triggerall = stateno!=1005
+;triggerall = stateno!=1010
+triggerall = stateno!=50
+;triggerall = stateno!=[5000,5999]
+;triggerall = movetype ! =H
+triggerall = var(42)
+triggerall = numenemy
+triggerall = enemynear,stateno != [120,159]
+trigger1 = stateno != 4003
+trigger1 = enemynear,movetype = h
+trigger1 = enemynear,backedgedist < 15
+trigger1 = enemynear,statetype = a
+trigger1 = enemynear,vel x < 0
+persistent = 0
+value = 7000,2
+channel = 4
+volume = 255
+
+[state 200, 3]
+type = varset
+;triggerall = stateno!=[5000,5999]
+;triggerall = movetype ! =H
+triggerall = var(42)
+triggerall = numenemy
+trigger1 = enemynear,movetype = h
+trigger1 = enemynear,backedgedist < 15
+trigger1 = enemynear,statetype = a
+trigger1 = enemynear,vel x < 0
+v = 42
+value = 0
+
+[state -3, 2];combo hosei
+type = varset
+trigger1 = 1
+v = 24
+value = var(22)
+
+[state -3, 2];combo hosei
+type = varset
+trigger1 = 1
+v = 22
+value = var(25)+hitcount
+
+[state -3, 2];combo hosei
+type = varset
+trigger1 = enemynear,movetype != H
+v = 25
+value = 0
+
+;***************
+[state -3, 2];combo
+type = varset
+trigger1 = var(22)>var(24)
+v = 42
+value = 1
+
+[State -3, VarSet]
+type = VarSet
+trigger1 = stateno != [3000,3999]
+;trigger1 = animtime = 0
+v = 45   ;fv = 10
+value = 0

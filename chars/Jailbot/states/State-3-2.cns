@@ -1,0 +1,539 @@
+; Jailbot by altoiddealer
+;---------------------------------------------------------------------------
+;STATE -3 / STATE -2
+;---------------------------------------------------------------------------
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+[Statedef -3]
+
+;--------------------------------------------------------
+;Jump Stuff
+
+[State -3, Remove Jump Flames]
+type = RemoveExplod
+triggerall = Time = 1
+trigger1 = StateNo != 50
+id = 61
+
+[State -3, Remove Super Jump Flames]
+type = RemoveExplod
+triggerall = Time = 1
+trigger1 = StateNo != 56
+id = 7001
+[State -3, Remove Super Jump Flames]
+type = RemoveExplod
+triggerall = Time = 1
+trigger1 = StateNo != 56
+id = 7002
+
+[State -3, Landing sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = StateNo = 52 ;Jump land
+trigger2 = StateNo = 106 ;Run-back land
+value = 50,0
+
+[State -3, Transform sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = StateNo = 5040 && anim = 5040 ;Air Recover
+trigger2 = StateNo = 5210 && anim = 5210 ;Mid-Air Recover
+value = 5040,0
+
+;--------------------------------------------------------
+;Arcade Stuff
+
+[State -3, Arcade GetHit Flash] ;during Arcade
+type = BgPalFX
+triggerall = Time = 1
+trigger1 = PrevStateNo = 3300
+trigger1 = Movetype = H
+Time = 48
+add = 20,20,0
+sinadd = 50,50,0,4
+ignorehitpause = 1
+
+[State -3, Arcade GetHit Sound] ;during Arcade
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = PrevStateNo = 3300
+trigger1 = Movetype = H
+value = 3300,12
+ignorehitpause = 1
+
+[State -3, Arcade GetHit Electricity] ;during Arcade
+type = Explod
+triggerall = Time = 1
+trigger1 = PrevStateNo = 3300
+trigger1 = Movetype = H
+sprpriority = 1
+anim = 8109
+id = 8109
+removeTime = 48
+bindTime = 48
+ignorehitpause = 1
+
+[State -3, Arcade Custom Win Stuff]
+type = AssertSpecial
+trigger1 = var(59) = 5
+flag = NoFG
+flag2 = NoBG
+flag3 = NoWalk
+
+[State -3, Arcade Custom Win Stuff]
+type = AssertSpecial
+trigger1 = var(59) = 5
+flag = NoMusic
+flag2 = Invisible
+flag3 = nobardisplay
+
+[State -3, Arcade Custom Win Stuff]
+type = AssertSpecial
+trigger1 = var(59) = 5
+flag = NoKOSlow
+flag2 = NoKOSnd
+
+;--------------------------------------------------------
+;Misc Stuff
+
+[State -3, Hover Sound]
+type = PlaySnd
+triggerall = anim < 40 || (anim = [100,106]) ;standing/walking anims
+trigger1 = !numexplod(9) ;Not when idle
+trigger1 = GameTime%50 = 10
+value = 1,3
+channel = 0
+
+;---------------------------------------------------------------------------
+;ENEMY BLOOD COLOR
+;---------------------------------------------------------------------------
+
+[State -3, Red Blood] ;Reset to default color
+type = varset
+triggerall = var(2) < 11
+trigger1 = StateNo = 0 && Time = 1
+var(2) = 0
+
+[State -3, Green Blood]
+type = varset
+triggerall = !var(2) ;just trigger once
+triggerall = numenemy
+trigger1 = enemynear,selfanimexist(8055031) ;Target has green blood flag
+trigger2 = enemynear,name = "Reptile"
+trigger3 = enemynear,name = "Reptile by Gary Fisher"
+trigger4 = enemynear,name = "Reptile by Gary Binho"
+trigger5 = enemynear,name = "ReptileMO"
+trigger6 = enemynear,name = "Fulgore"
+trigger7 = enemynear,name = "REPTILE MK1" ;OmegaPsycho
+var(2) = 2
+
+[State -3, Blue Blood]
+type = varset
+triggerall = !var(2) ;just trigger once
+triggerall = numenemy
+trigger1 = enemynear,selfanimexist(8055032) ;Target has blue blood flag
+trigger2 = enemynear,name = "Glacius"
+var(2) = 3
+
+[State -3, Yellow Blood]
+type = varset
+triggerall = !var(2) ;just trigger once
+triggerall = numenemy
+trigger1 = enemynear,selfanimexist(8055033) ;Target has yellow blood flag
+var(2) = 4
+
+[State -3, Purple Blood]
+type = varset
+triggerall = !var(2) ;just trigger once
+triggerall = numenemy
+trigger1 = enemynear,selfanimexist(8055034) ;Target has purple blood flag
+trigger2 = enemynear,name = "Riptor"
+var(2) = 5
+
+[State -3, Orange Blood]
+type = varset
+triggerall = !var(2) ;just trigger once
+triggerall = numenemy
+trigger1 = enemynear,selfanimexist(8055035) ;Target has orange blood flag
+var(2) = 6
+
+[State -3, Black Blood]
+type = varset
+triggerall = !var(2) ;just trigger once
+triggerall = numenemy
+trigger1 = enemynear,selfanimexist(8055036) ;Target has black blood flag
+trigger2 = enemynear,name = "Classic Cyrax"
+trigger3 = enemynear,name = "juano`s cyborg guy"
+trigger4 = enemynear,name = "sektor"
+var(2) = 7
+
+[State -3, White Blood]
+type = varset
+triggerall = !var(2) ;just trigger once
+triggerall = numenemy
+trigger1 = enemynear,selfanimexist(8055037) ;Target has white blood flag
+var(2) = 8
+
+[State -3, Grey Blood]
+type = varset
+triggerall = !var(2) ;just trigger once
+triggerall = numenemy
+trigger1 = enemynear,selfanimexist(8055038) ;Target has grey blood flag
+var(2) = 9
+
+[State -3, No Blood]
+type = varset
+triggerall = !var(2) ;just trigger once
+triggerall = numenemy
+trigger1 = enemynear,selfanimexist(8055039) ;Target has does not bleed flag
+var(2) = 10
+
+[State -3, Change blood color Pal]
+type = RemapPal
+trigger1 = RoundState = 2
+trigger1 = var(2)
+source = 2,1
+dest = 2,var(2)
+
+;---------------------------------------------------------------------------
+;DYNAMIC FACE
+;---------------------------------------------------------------------------
+
+[State -3, Face Type Changer] ;Clear ALL glitching effects
+type = Null
+triggerall = var(5) = 1 ;Dynamic face + glitching enabled
+trigger1 = life >= lifeMax/1.5 || alive = 0 || RoundState = 4 ;If healthy
+trigger1 = var(6) := 0
+trigger2 = life <= lifeMax/1.5 && life > lifeMax/2.5 ;66% health or less
+trigger2 = var(6) := 1
+trigger3 = life < lifeMax/10 ;10% health or less
+trigger3 = var(6) := 3
+
+;--------------------------------------------------------
+;Normal Faces
+
+[State -3, Normal Face Changer - Look Neutral]
+type = Null
+triggerall = var(5) ;Dynamic face enabled
+triggerall = var(9) < 7 ;Not a "Glitch" face
+triggerall = numenemy
+triggerall = EnemyNear,statetype != C && (EnemyNear,StateNo != [10,12])
+trigger1 = p2dist x < 120 && p2dist y > -20 ;NEAR
+trigger1 = var(7) := 0
+trigger2 = (p2dist x >= 120 && p2dist x < 200) && p2dist y > -30 ;R
+trigger2 = var(7) := 4
+trigger3 = p2dist x >= 200 && p2dist y > -40 ;RR
+trigger3 = var(7) := 8
+
+[State -3, Normal Face Changer - Looking Up]
+type = Null
+triggerall = var(5) ;Dynamic face enabled
+triggerall = var(9) < 7 ;Not a "Glitch" face
+triggerall = numenemy
+triggerall = p2dist x < 120
+trigger1 = p2dist y < -20 && p2dist y >= -40 ;U
+trigger1 = var(7) := 1
+trigger2 = p2dist y < -40 && p2dist y >= -60 ;UU
+trigger2 = var(7) := 2
+trigger3 = p2dist y < -60 ;UUU
+trigger3 = var(7) := 3
+
+[State -3, Normal Face Changer - Looking Up / Right]
+type = Null
+triggerall = var(5) ;Dynamic face enabled
+triggerall = var(9) < 7 ;Not a "Glitch" face
+triggerall = numenemy
+triggerall = p2dist x >= 120 && p2dist x < 200
+trigger1 = p2dist y < -30 && p2dist y >= -50 ;UR
+trigger1 = var(7) := 5
+trigger2 = p2dist y < -50 && p2dist y >= -70 ;UUR
+trigger2 = var(7) := 6
+trigger3 = p2dist y < -70 ;UUUR
+trigger3 = var(7) := 7
+
+[State -3, Normal Face Changer - Looking Up / Right Right]
+type = Null
+triggerall = var(5) ;Dynamic face enabled
+triggerall = var(9) < 7 ;Not a "Glitch" face
+triggerall = numenemy
+triggerall = p2dist x >= 200
+trigger1 = p2dist y < -40 && p2dist y >= -60 ;URR
+trigger1 = var(7) := 9
+trigger2 = p2dist y < -60 && p2dist y >= -80 ;UURR
+trigger2 = var(7) := 10
+trigger3 = p2dist y < -80 ;UURRR
+trigger3 = var(7) := 11
+
+[State -3, Normal Face Changer - Start Looking Down]
+type = Null
+triggerall = var(5) ;Dynamic face enabled
+triggerall = var(9) < 7 ;Not a "Glitch" face
+triggerall = numenemy
+triggerall = (EnemyNear,anim = 10 || EnemyNear,anim = 12) || p2dist y = [21,40] ;Starting to crouch, or low
+trigger1 = p2dist x < 120 ;NEAR
+trigger1 = var(7) := 12
+trigger2 = p2dist x >= 120 && p2dist x < 200 ;R
+trigger2 = var(7) := 14
+trigger3 = p2dist x >= 200 ;RR
+trigger3 = var(7) := 16
+
+[State -3, Normal Face Changer - Looking Down]
+type = Null
+triggerall = var(5) ;Dynamic face enabled
+triggerall = var(9) < 7 ;Not a "Glitch" face
+triggerall = numenemy
+triggerall = EnemyNear,anim = 11 || p2dist y > 40;Enemy is crouching, or very low
+trigger1 = p2dist x < 120 ;DD
+trigger1 = var(7) := 13
+trigger2 = (p2dist x >= 120 && p2dist x < 200) ;DDR
+trigger2 = var(7) := 15
+trigger3 = p2dist x >= 200 ;DDRR
+trigger3 = var(7) := 17
+
+[State -3, Normal Face Changer - No Enemy]
+type = varset
+triggerall = var(5) ;Dynamic face enabled
+triggerall = var(9) < 7 ;Not a "Glitch" face
+trigger1 = !numenemy
+var(7) = 0
+
+;---------------------------------------------------------------------------
+;DYNAMIC FACE GLITCHES
+;---------------------------------------------------------------------------
+
+;--------------------------------------------------------
+;Face Glitch-erizer
+
+[State -3, Glitch Reset]
+type = varset
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(7) = 2004 ;When static anim ends
+trigger2 = var(7) = 3003 ;When color bars anim ends
+trigger3 = var(7) = 4012 ;When vertical scrolling ends
+trigger4 = var(7) = 5017 ;When horizontal scrolling ends
+var(9) = 0
+
+[State -3, Glitch Frequency]
+type = varset
+triggerall = var(5) = 1 ;Glitching enabled
+triggerall = var(9) < 7 ;Currently a non-glitch face
+trigger1 = var(6) = 1 ;Hurt a bit
+trigger1 = GameTime%100 = 0 ;Low glitch rate
+trigger2 = var(6) = 2 ;Hurt a lot
+trigger2 = GameTime%50 = 0 ;Medium glitch rate
+trigger3 = var(6) = 3 ;Almost dead
+trigger3 = GameTime%20 = 0 ;Glitchfest!
+var(9) = random%10 ;RANDOMIZE
+
+;--------------------------------------------------------
+;Face Scanlines
+
+[State -3, Control Scanlines]
+type = varset
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(6) = 0 ;Healthy
+trigger2 = var(6) = 1 ;Hurt a bit
+trigger2 = GameTime%200 = 0 ;Slow Repeat
+trigger3 = var(6) = 2 ;Hurt a lot
+trigger3 = GameTime%100 = 0 ;Fast Repeat
+trigger4 = var(6) = 3 ;Almost dead
+trigger4 = GameTime%50 = 0 ;Fast Repeat
+var(8) = 0
+
+[State -3, Animate Scanlines]
+type = varadd
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(6) ;Face type is glitching
+trigger1 = var(8) < 6 ;Pause at AnimElem 6 for reset
+trigger1 = GameTime%6 = 0 ;anim speed
+var(8) = 1
+
+;--------------------------------------------------------
+;Face Glitch Static
+
+[State -3, Static Sound]
+type = PlaySnd
+triggerall = var(5) = 1 ;Glitching enabled
+triggerall = numexplod(1000) ;Dynamic face is active
+trigger1 = var(7) = 2001 ;Static anim
+trigger1 = GameTime%4 = 0 ;Only trigger once
+trigger2 = var(7) = 4001 ;V. static begin
+trigger2 = GameTime%6 = 0 ;Only trigger once
+trigger3 = var(7) = 4011 ;V. static end
+trigger3 = GameTime%6 = 0 ;Only trigger once
+trigger4 = var(7) = 5001 ;H. static begin
+trigger4 = GameTime%6 = 0 ;Only trigger once
+trigger5 = var(7) = 5016 ;H. static end
+trigger5 = GameTime%6 = 0 ;Only trigger once
+value = 2000,0
+
+[State -3, Control Static]
+type = varset
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(9) = 10 ;Glitch-erizer chose this
+trigger1 = var(7) != [2000,2003]
+var(7) = 2000
+
+[State -3, Animate Static]
+type = varadd
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(7) = [2000,2003]
+trigger1 = GameTime%4 = 0 ;anim speed
+var(7) = 1
+
+;--------------------------------------------------------
+;Face Glitch Color Bars
+
+[State -3, Control Color Bars]
+type = varset
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(9) = 9 ;Glitch-erizer chose this
+trigger1 = var(7) != [3000,3002]
+var(7) = 3000
+
+[State -3, Sound trigger workaround] ;to prevent multiple triggers
+type = varadd
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(7) = 3000 ;Need 3 varsets to get it to trigger once...
+trigger2 = var(7) = 3001 ;Sound triggers here
+trigger3 = var(7) = 3002 ;Pause for reset
+trigger3 = GameTime%30 = 0 ;Max duration
+var(7) = 1
+
+[State -3, Color Bars Sound]
+type = PlaySnd
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = numexplod(1000) ;Dynamic face is active
+trigger1 = numexplod(9) = 0 ;Not idle
+trigger1 = var(9) = 9
+trigger1 = var(7) = 3001 ;Just trigger once
+value = 2000,2
+channel = 9
+
+[State -3, Stop Color Bars Sound]
+type = StopSnd
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(9) != 9
+channel = 9
+
+;--------------------------------------------------------
+;Vertical Face Glitch Scrolling
+
+[State -3, Control V. Scrolling]
+type = varset
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(9) = 8 ;Glitch-erizer chose this
+trigger1 = var(8) = 1 ;Align with the scanlines glitch
+trigger1 = var(7) != [4000,4012] ;Prevent locking
+var(7) = 4000
+
+[State -3, Animate V. Scrolling]
+type = varadd
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(7) = [4000,4011]
+trigger1 = GameTime%6 = 0 ;anim speed
+var(7) = 1
+
+[State -3, Chance of Repeating]
+type = varset
+triggerall = var(5) = 1 ;Glitching enabled
+triggerall = var(7) = 4009 ;Vert scroll is ending
+trigger1 = var(6) = 2 ;If damaged badly
+trigger1 = GameTime%25 = 0 ;vert scroll effect might repeat
+trigger2 = var(6) = 3 ;If almost dead
+trigger2 = GameTime%10 = 0 ;vert scroll effect will likely repeat
+var(7) = 4003
+
+[State -3, Scroll Sound] ;for Horizontal & Vertical
+type = PlaySnd
+triggerall = var(5) = 1 ;Glitching enabled
+triggerall = numexplod(1000) ;Dynamic face is active
+triggerall = var(9) = [7,8]
+triggerall = GameTime%6 = 5
+trigger1 = var(7) = 4003 ;Just trigger once
+trigger2 = var(7) = 5003 ;Just trigger once
+value = 2000,1
+channel = 10
+
+[State -3, Stop Scroll Sound]
+type = StopSnd
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(7) != [4003,4009]
+trigger1 = var(7) != [5003,5014]
+channel = 10
+
+;--------------------------------------------------------
+;Horizontal Face Glitch Scrolling
+
+[State -3, Control H. Scrolling]
+type = varset
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(9) = 7 ;Glitch-erizer chose this
+trigger1 = var(7) != [5000,5017] ;Prevent locking
+var(7) = 5000
+
+[State -3, Animate H. Scrolling]
+type = varadd
+triggerall = var(5) = 1 ;Glitching enabled
+trigger1 = var(7) = [5000,5016]
+trigger1 = GameTime%6 = 0 ;anim speed
+var(7) = 1
+
+[State -3, Chance of Repeating]
+type = varset
+triggerall = var(5) = 1 ;Glitching enabled
+triggerall = var(7) = 5014 ;Horiz scroll is ending (b4 static)
+trigger1 = var(6) = 2 ;If damaged badly
+trigger1 = GameTime%40 = 0 ;horiz scroll effect might repeat
+trigger2 = var(6) = 3 ;If almost dead
+trigger2 = GameTime%20 = 0 ;horiz scroll effect will likely repeat
+var(7) = 5003
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+[Statedef -2]
+
+[State -2, Stand Hover]
+type = Offset
+trigger1 = !anim && !numexplod(9) ;Not idle
+y = 1*cos(GameTime/6.0)
+
+[State -2, Walk Hover]
+type = Offset
+trigger1 = anim = [19,22]
+Y = 1*cos(GameTime/8.0)
+
+[State -2, Remove Spear Arm]
+type = RemoveExplod
+trigger1 = anim != 1100 && anim != 1000 && anim != 1010
+id = 1001
+
+[State -2, Remove Idle Face]
+type = RemoveExplod
+trigger1 = StateNo != 0
+id = 9
+
+;--------------------------------------------------------
+;Custom winpose stuff
+
+[State -2, Log the current target's PlayerID]
+type = varSet
+trigger1 = numtarget
+trigger1 = target,IsHelper = 0 ;Do not trigger for Helpers
+var(58) = target,ID
+ignorehitpause = 1
+
+[State -2, Send Dying Target to Custom State 5150 for Custom Win pose]
+type = TargetState
+triggerall = numtarget = 1
+triggerall = target,life <= 0 ;if P2 is ready to die
+triggerall = var(59) = 2 ;if special win-pose is chosen
+triggerall = TeamMode != Simul ;Not for TeamMode
+trigger1 = target,StateNo = 5110
+value = 5150
+ignorehitpause = 1
+
+[State -2, Display to Clipboard]
+type = DisplayToClipboard
+trigger1 = 1
+text = "The value of var(59) is %d"
+params = var(59)

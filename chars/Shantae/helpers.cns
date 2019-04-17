@@ -1,0 +1,1020 @@
+;---------------------------------------------------------------------------
+;Assist Rottytops
+[StateDef 2000]
+type = S
+movetype = A
+physics = S
+juggle = 0
+anim = 2000
+poweradd = 25
+ctrl = 0
+velset = 0,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 4
+value = S37,11
+
+[State 2000, Helper]
+type = Helper
+trigger1 = animelem = 1
+ID = 2001
+pos = -55,0
+postype = back
+stateno = 2001
+helpertype = normal
+name = "Rottytops"
+keyctrl = 0
+ownpal = 1
+supermovetime = 1
+
+[State 2000, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Rottytops Appears
+[Statedef 2001]
+type    = S
+movetype= A
+physics = N
+ctrl = 0
+sprpriority = 2
+velset = 5,0
+anim = 2001
+
+[State 2001, PlaySnd]
+type = PlaySnd
+trigger1 = time = 10
+value = S2000,0
+
+[State 2001, 1]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2005
+time = -1
+
+[State 2001, 2]
+type = NotHitBy
+trigger1 = time = 0
+value = , NT, ST, HT
+time = -1
+
+[State 2001, 3]
+type = ChangeState
+trigger1 = p2dist x < 150
+value = 2002
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;Rottytops's Action
+[Statedef 2002]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+anim = 2002
+ctrl = 0
+
+[State 2002, 1]
+type = HitOverride
+trigger1 = Time > 30
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2005
+time = -1
+
+[State 2002, 2]
+type = NotHitBy
+trigger1 = time = 0
+value = , NT, ST, HT
+time = -1
+
+[State 2002, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 3
+value = S2001,0
+
+[State 2002, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 3
+value = S2001,1
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 4
+helpertype = normal ;player
+name = "Rotty's Head"
+id = 2010
+stateno = 2010
+pos = 30,-40
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 0
+;size.xscale = 2.15
+;size.yscale = 2.15
+
+[State 2002, end]
+type = ChangeState
+triggerall = numhelper(2010) = 1
+trigger1 = helper(2010), movecontact = 1
+value = 2004
+
+[State 2002, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 2003
+
+;---------------------------------------------------------------------------
+;Rottytops Leaves ->
+[Statedef 2003]
+type    = S
+movetype= I
+physics = N
+velset = 3,0
+anim = 2003
+sprpriority = 2
+
+[State 2003, Fade Out]
+type = trans
+trigger1 = time >= 85
+trans = addalpha
+alpha = ifelse(time>=93,32*(100-time),256),ifelse(time<=91,32*(time-85),256)
+
+[State 2003, 3]
+type = DestroySelf
+trigger1 = Time = 150
+
+;---------------------------------------------------------------------------
+;Rottytops Leaves <-
+[Statedef 2004]
+type    = S
+movetype= I
+physics = N
+velset = 0,0
+anim = 2004
+sprpriority = 2
+
+[State 2004, VelSet]
+type = VelSet
+trigger1 = animelem = 2
+x = -3
+y = 0
+
+[State 2004, Fade Out]
+type = trans
+trigger1 = time >= 85
+trans = addalpha
+alpha = ifelse(time>=93,32*(100-time),256),ifelse(time<=91,32*(time-85),256)
+
+[State 2004, 3]
+type = DestroySelf
+trigger1 = Time = 150
+
+;---------------------------------------------------------------------------
+;Rottytops Hit
+[Statedef 2005]
+type    = S
+movetype= A
+physics = S
+velset = -4,0
+ctrl = 0
+sprpriority = 2
+anim = 2005
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S2000,2
+
+[State 2005, 3]
+type = ChangeState
+trigger1 = animtime = 0
+value = 2006
+
+;---------------------------------------------------------------------------
+;Rottytops Leaves (Hurt)
+[Statedef 2006]
+type    = S
+movetype= I
+physics = N
+velset = -3,0
+anim = 2006
+sprpriority = 2
+
+[State 2006, Fade Out]
+type = trans
+trigger1 = time >= 85
+trans = addalpha
+alpha = ifelse(time>=93,32*(100-time),256),ifelse(time<=91,32*(time-85),256)
+
+[State 2006, 3]
+type = DestroySelf
+trigger1 = Time = 150
+
+;---------------------------------------------------------------------------
+;Rotty's Head
+[Statedef 2010]
+type    = A
+movetype= A
+physics = N
+juggle  = 0
+velset = 5,-13
+ctrl = 0
+anim = 2010
+poweradd = 0
+sprpriority = 4
+
+[State 2010, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S2000,1
+
+[State 2010, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2012
+time = -1
+
+[State 2010, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = 1.1
+
+[State 2010, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 2010, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = , NT, ST, HT
+time = -1
+
+[State 2010, HitDef]
+type = HitDef
+trigger1 = time = 0
+attr = A, SP
+damage = 25, 0
+animtype = light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 3, 5
+sparkno = s6000
+guard.sparkno = S6008
+sparkxy = 0, 0
+hitsound = S21,0
+guardsound = S6003,0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = -6
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = -1.4,-3
+air.hittime = 12
+
+[State 2010, 2]
+type = changestate
+trigger1 = movecontact
+value = 2011
+ignorehitpause = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = Pos Y >= 0 && Vel Y > 0
+value = S2002,1+random%4
+
+[State 2012, PosSet]
+type = PosSet
+trigger1 = Pos Y >= 0 && Vel Y > 0
+y = 0
+
+[State 2012, Changeanim]
+type = ChangeAnim
+trigger1 = Pos Y >= 0 && Vel Y > 0
+value = 2010
+elem = 0
+
+[State 2012, Velset]
+type = VelSet
+trigger1 = Pos Y >= 0 && Vel Y > 0
+y = -15
+
+[State 2011, AssertSpecial]
+type = AssertSpecial
+trigger1 = pos y > 0
+flag = noshadow
+
+[State 2011, 2]
+type = destroyself
+trigger1 = time = 100
+
+;---------------------------------------------------------------------------
+[Statedef 2011]
+type    = A
+movetype= A
+physics = N
+juggle  = 0
+velset = -10,-15
+ctrl = 0
+poweradd = 0
+anim = 2010
+sprpriority = 4
+
+[State 620, Angle Draw]
+type = Angledraw
+trigger1 = 1
+ignorehitpause = 1
+
+[State 620, Angle Add]
+type = AngleAdd
+trigger1 = 1
+value = 30
+ignorehitpause = 1
+
+[State 2011, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = 1.5
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = Pos Y >= 0 && Vel Y > 0
+value = S2002,1+random%4
+
+[State 2011, PosSet]
+type = PosSet
+trigger1 = Pos Y >= 0 && Vel Y > 0
+y = 0
+
+[State 2011, Changeanim]
+type = ChangeAnim
+trigger1 = Pos Y >= 0 && Vel Y > 0
+value = 2010
+elem = 0
+
+[State 2011, Velset]
+type = VelSet
+trigger1 = Pos Y >= 0 && Vel Y > 0
+y = -15
+
+[State 2011, 2]
+type = destroyself
+trigger1 = time = 100
+
+;---------------------------------------------------------------------------
+;Assist Sky
+[StateDef 2100]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2000
+poweradd = 45
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 5
+value = S37,12
+
+[State 2100, Helper]
+type = Helper
+trigger1 = animelem = 2
+helpertype = normal ;player
+name = "Sky"
+ID = 2001
+stateno = 2101
+pos = -200,-150
+postype = p1
+ownpal = 1
+
+[State 2100, end]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Sky Appears
+[StateDef 2101]
+type = A
+movetype= A
+physics = N
+juggle  = 1
+velset = 12,-5
+ctrl = 0
+anim = 2101
+
+[State 2101, PlaySnd]
+type = PlaySnd
+trigger1 = time = 10
+value = S2100,0
+
+[State 2101, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = 1
+
+[State 2102, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2102, end]
+type = ChangeState
+trigger1 = pos y >= 0 && vel y >= 0
+value = 2102
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;Sky Summons Wrench
+[StateDef 2102]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 2102
+facep2 = 1
+
+[State 2101, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2104
+time = -1
+
+[State 2101, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = ,NT, ST, HT
+time = -1
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 9
+helpertype = normal ;player
+name = "Wrench"
+id = 2110
+stateno = 2110
+pos = 0,0
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 0
+
+[State 2102, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2101,0
+
+[State 2102, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S40,0
+
+[State 2102, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State 2102, 3]
+type = ChangeState
+trigger1 = animtime = 0
+value = 2103
+
+;---------------------------------------------------------------------------
+;Sky Leaves
+[Statedef 2103]
+type    = S
+movetype= I
+physics = N
+velset = -3,0
+anim = 2103
+sprpriority = 2
+
+[State 2103, Fade Out]
+type = trans
+trigger1 = time >= 85
+trans = addalpha
+alpha = ifelse(time>=93,32*(100-time),256),ifelse(time<=91,32*(time-85),256)
+
+[State 2103, 3]
+type = DestroySelf
+trigger1 = Time = 150
+
+;---------------------------------------------------------------------------
+;Sky Hit
+[Statedef 2104]
+type    = S
+movetype= A
+physics = S
+velset = -4,0
+ctrl = 0
+sprpriority = 2
+anim = 2104
+
+[State 0, Helper]
+type = Helper
+triggerll = numhelper(2110) = 0
+trigger1 = animelem = 1
+helpertype = normal ;player
+name = "Wrench"
+stateno = 2110
+pos = 0,0
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S2100,1
+
+[State 2104, 3]
+type = ChangeState
+trigger1 = animtime = 0
+value = 2103
+
+;---------------------------------------------------------------------------
+;Wrench
+[Statedef 2110]
+type    = A
+movetype= A
+physics = N
+juggle  = 0
+velset = -10,-1
+ctrl = 0
+anim = 2105
+sprpriority = 4
+
+[State 2110, VelAdd]
+type = VelAdd
+trigger1 = 1
+x = .5
+y = .04
+
+[State 2110, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 2110, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = , NT, ST, HT
+time = -1
+
+[State 2110, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 2
+value = S2102,1+random%5
+
+[State 2110, HitDef]
+type = HitDef
+trigger1 = time = 10
+attr = A, SP
+damage = 25, 0
+animtype = light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 3, 5
+sparkno = s6000
+guard.sparkno = S6008
+sparkxy = -10, -50
+hitsound = S21,0
+guardsound = S6003,0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = -6
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = -1.4,-3
+air.hittime = 12
+
+[State 2110, 2]
+type = ChangeState
+trigger1 = time = 70
+value = 2111
+
+;---------------------------------------------------------------------------
+;Wrench
+[Statedef 2111]
+type    = A
+movetype= A
+physics = N
+juggle  = 0
+velset = -20,-1
+ctrl = 0
+anim = 2106
+sprpriority = 4
+
+[State 2111, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 2
+value = S2102,1+random%5
+
+[State 2111, HitDef]
+type = HitDef
+trigger1 = time = 0
+attr = A, SP
+damage = 25, 0
+animtype = light
+hitflag = MAF
+priority = 3, Hit
+pausetime = 3, 5
+sparkno = s6000
+guard.sparkno = S6008
+sparkxy = -10, -50
+hitsound = S21,0
+guardsound = S6003,0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = 6
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = 1.4,-3
+air.hittime = 12
+
+[State 2111, 2]
+type = DestroySelf
+trigger1 = time = 100
+
+;---------------------------------------------------------------------------
+;Assist Bolo
+[StateDef 2200]
+type = S
+movetype = A
+physics = S
+juggle = 0
+anim = 2200
+poweradd = 45
+ctrl = 0
+velset = 0,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 4
+value = S37,13
+
+[State 2200, Helper]
+type = Helper
+trigger1 = animelem = 1
+ID = 2001
+pos = -55,0
+postype = back
+stateno = 2201
+helpertype = normal
+name = "Bolo"
+keyctrl = 0
+ownpal = 1
+supermovetime = 1
+
+[State 2200, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Bolo Appears
+[Statedef 2201]
+type    = S
+movetype= A
+physics = N
+ctrl = 0
+sprpriority = 2
+velset = 5,0
+anim = 2201
+
+[State 2201, PlaySnd]
+type = PlaySnd
+trigger1 = time = 10
+value = S2200,0
+
+[State 2201, 1]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2204
+time = -1
+
+[State 2201, 2]
+type = NotHitBy
+trigger1 = time = 0
+value = , NT, ST, HT
+time = -1
+
+[State 2201, 3]
+type = ChangeState
+trigger1 = p2dist x < 100
+value = 2202
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;Bolo Attacks
+[Statedef 2202]
+type    = S
+movetype= A
+physics = S
+juggle  = 0
+velset = 0,0
+ctrl = 0
+anim = 2202
+sprpriority = 4
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 3
+value = S2200,1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 3
+value = S2201,0
+
+[State 2202, HitOverride]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 2204
+time = -1
+
+[State 2202, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = , NT, ST, HT
+time = -1
+
+[State 2102, HitDef]
+type = HitDef
+trigger1 = time = 0
+attr = S, SA
+damage = 45, 0
+animtype = medium
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 3, 5
+sparkno = s6001
+guard.sparkno = S6008
+sparkxy = -10, -45
+hitsound = S21,1
+guardsound = S6003,0
+ground.type = low
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = -6
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = -1.4,-3
+air.hittime = 12
+
+[State 2202, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 2203
+
+;---------------------------------------------------------------------------
+;Bolo Leaves <-
+[Statedef 2203]
+type    = S
+movetype= I
+physics = N
+velset = -5,0
+anim = 2203
+sprpriority = 2
+
+[State 2203, Fade Out]
+type = trans
+trigger1 = time >= 85
+trans = addalpha
+alpha = ifelse(time>=93,32*(100-time),256),ifelse(time<=91,32*(time-85),256)
+
+[State 2203, 3]
+type = DestroySelf
+trigger1 = Time = 150
+
+;---------------------------------------------------------------------------
+;Bolo Hit
+[Statedef 2204]
+type    = S
+movetype= A
+physics = S
+velset = -4,0
+ctrl = 0
+sprpriority = 2
+anim = 2204
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S2200,2
+
+[State 2204, 3]
+type = ChangeState
+trigger1 = animtime = 0
+value = 2203
+
+;---------------------------------------------------------------------------
+;Assist Risky Boots
+[StateDef 2300]
+type = S
+movetype = A
+physics = S
+juggle = 0
+anim = 2300
+ctrl = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 4
+value = S37,14
+
+[State 2300, Helper]
+type = Helper
+trigger1 = animelem = 2
+ID = 2001
+pos = 0,-500
+postype = p2
+stateno = 2301
+helpertype = normal
+name = "Risky Boots"
+keyctrl = 0
+ownpal = 1
+supermovetime = 1
+
+[State 2300, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+[Statedef 2301]
+type    = A
+movetype= A
+physics = N
+velset = 0,0
+sprpriority = 3
+anim = 2301
+
+[State 0, Explod]
+type = Explod
+trigger1 = time = 0
+anim = 25011
+ID = 25011
+pos = 0,-50
+sprpriority = 2
+postype = p2
+removetime = 65
+bindtime = 1
+
+[State 730, Modify]
+type = ModifyExplod
+trigger1 = time < 10
+ID = 25011
+scale = 20/(time-.10),20/(time-.10)
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = time = 0
+x = 0
+y = 0.2
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = time = 65
+x = 0
+y = 50
+
+[State 2301]
+type = Turn
+trigger1 = Facing = -1
+
+[State 2302]
+type = PlaySnd
+trigger1 = time = 65
+value = S2301,0
+volume = 255
+
+[State 2302]
+type = PlaySnd
+trigger1 = time = 65
+value = S2300,0
+volume = 255
+
+[State 2301]
+type = HitDef
+trigger1 = time = 0
+damage = 10,1
+attr = A, SA
+hitflag = A-
+numhits = 0
+sparkno = -1
+getpower = 0
+p2stateno = 1242
+
+[State 2301]
+type = TargetBind
+trigger1 = 1
+pos = 0,0
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = unguardable
+
+[State 2302, 1]
+type = ChangeState
+trigger1 = Pos Y >= 0
+value = 2302
+
+;---------------------------------------------------------------------------
+[Statedef 2302]
+type = S
+movetype = A
+physics = N
+sprpriority = 3
+anim = 2302
+velset = 0,0
+
+[State 2302, Explod]
+type = Explod
+trigger1 = time = 0
+anim = F62
+scale = 3,1
+sprpriority = 100
+
+[State 2302, PosSet]
+type = PosSet
+trigger1 = pos y > 0
+y = 0
+
+[State 2302]
+type = PlaySnd
+trigger1 = time = 0
+value = S2301,1
+volume = 255
+
+[State 2302, EnvShake]
+type = EnvShake
+trigger1 = Time = 0
+Time = 10
+ampl = 20
+
+[State 2302, HitDef]
+type = HitDef
+trigger1 = time = 0
+attr = S,SA
+hitflag = MAFD
+guardflag = MA
+priority = 7, hit
+animtype = hard
+damage = 65,1
+pausetime = 0,10
+sparkno = S11111
+guard.sparkno = S11111
+sparkxy = 0,0
+hitsound = -1
+guardsound = s6003, 0
+getpower = 0
+p2stateno = 1242
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = unguardable
+
+[State 2303, 1]
+type = ChangeState
+trigger1 = time = 15
+value = 2303
+
+;---------------------------------------------------------------------------
+[Statedef 2303]
+type = S
+movetype = I
+physics = N
+sprpriority = 3
+velset = 0,-5
+
+[State 2303, 3]
+type = DestroySelf
+trigger1 = time = 250

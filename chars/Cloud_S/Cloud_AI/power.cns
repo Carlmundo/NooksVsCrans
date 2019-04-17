@@ -1,0 +1,189 @@
+
+;===========================================================================
+; これは、パワー溜めのファイルです。
+;===========================================================================
+
+;---------------------------------------------------------------------------
+; パワー溜め
+;---------------------------------------------------------------------------
+[Statedef 2000]
+type = S
+movetype = I
+physics = N
+ctrl = 0
+anim = 2000
+velset = 0, 0
+sprpriority =-5
+
+[State 2000,01]
+type = PlaySnd
+trigger1 = Time = 1
+value = 2000,0
+channel = 0
+
+[State 2000,02]
+type = PowerAdd
+trigger1 = 1
+value = 8
+
+[State 2000,03]
+type = Helper
+trigger1 = Time = 0 && NumHelper(7900) = 0
+persistent = 0
+id = 7900
+name = "Power"
+pos = 0,-30
+postype = P1
+stateno = 7900
+helpertype = normal
+keyctrl = 0
+ownpal = 1
+
+[State 2000,04]
+type = Helper
+trigger1 = Time = 0 && NumHelper(8000) = 0
+persistent = 0
+id = 8000
+name = "Power"
+pos = 0,0
+postype = P1
+stateno = 8000
+helpertype = normal
+keyctrl = 0
+ownpal = 1
+
+[State 2000,05]
+type = ChangeState
+triggerall = var(59) = 0
+trigger1 = Command != "holdy" || Command != "holdb"
+trigger2 = power = 3000
+value = 9
+ctrl = 0
+
+[State 2000,05]
+type = ChangeState
+triggerall = var(59) >= 1
+trigger1 = p2bodydist X <= 90 || EnemyNear(var(51)),stateNo = 5120
+trigger2 = power >= PowerMax || EnemyNear(var(51)),MoveType = A || InGuardDist
+trigger4 = Roundstate != 2
+value = 9
+ctrl = 0
+
+;---------------------------------------------------------------------------
+; パワー溜め停止
+;---------------------------------------------------------------------------
+[Statedef 9]
+type = S
+movetype = I
+physics = N
+ctrl = 0
+anim = 9
+velset = 0, 0
+
+[State 9,01]
+type = Stopsnd
+trigger1 = Time = 0
+channel = 0
+persistent = 0
+
+[State 9,02]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; パワー溜めエフェクト
+;---------------------------------------------------------------------------
+[Statedef 7900]
+type = A
+movetype = I
+physics = N
+ctrl = 0
+anim = 20000
+velset = 0,0
+
+[State 7900,01]
+type = PlaySnd
+trigger1 = Time = 0
+value = 850,15
+channel = 1
+
+[State 7900,02]
+type = BindToParent
+trigger1 = 1
+pos = 0,0
+
+[State 7900,03]
+type = Explod
+trigger1 = Time = 0 && NumExplod(7900) = 0
+anim = 7900
+id = 7900
+pos = 0,0
+scale = .5,.5
+postype = P1
+sprpriority = -1
+bindtime = -1
+ownpal = 1
+removetime = -1
+facing = 1
+persistent = 0
+
+[State 7900,04]
+type = Stopsnd
+trigger1 = Root,StateNo != 9
+trigger1 = Root,StateNo != 2000
+channel = 1
+
+[State 7900,05]
+type = RemoveExplod
+trigger1 = Root,StateNo != 9
+trigger1 = Root,StateNo != 2000
+id = 7900
+
+[State 7900,06]
+type = DestroySelf
+trigger1 = Root,StateNo != 9
+trigger1 = Root,StateNo != 2000
+
+;---------------------------------------------------------------------------
+[Statedef 8000]
+type = A
+movetype = I
+physics = N
+ctrl = 0
+anim = 20000
+velset = 0,0
+
+[State 8000,01]
+type = BindToParent
+trigger1 = 1
+pos = 0,0
+
+[State 8000,02]
+type = Explod
+trigger1 = Time = 0 && NumExplod(8000) = 0
+anim = 8000
+id = 8000
+pos = 0,0
+scale = .5,.5
+postype = P1
+sprpriority = -1
+bindtime = -1
+ownpal = 1
+removetime = -1
+facing = 1
+persistent = 0
+
+[State 8000,03]
+type = RemoveExplod
+trigger1 = Root,StateNo != 9
+trigger1 = Root,StateNo != 2000
+id = 8000
+
+[State 8000,04]
+type = DestroySelf
+trigger1 = Root,StateNo != 9
+trigger1 = Root,StateNo != 2000
+
+

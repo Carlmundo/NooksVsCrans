@@ -1,0 +1,257 @@
+;---------------------------------------------------------------------------
+; Override common states (use same number to override) :
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+[Statedef -2]
+
+;----- Player Icon -----
+[State -2, Explod]
+type = Explod
+triggerall = Alive
+trigger1 = Pos Y >= 200
+trigger1 = Vel Y = 0
+anim = 30
+id = 30
+pos = 0,-150
+postype = p1
+sprpriority = 50
+ignorehitpause = 1
+pausemovetime = -1
+supermovetime = -1
+removetime = 1
+ontop = 1
+bindtime = -1
+
+[State -2, Explod]
+type = Explod
+triggerall = Alive
+trigger1 = Pos Y >= 200
+trigger1 = Vel Y = 0
+anim = 31
+id = 31
+pos = 0,-150
+postype = p1
+sprpriority = 50
+ignorehitpause = 1
+pausemovetime = -1
+supermovetime = -1
+removetime = 1
+ontop = 1
+bindtime = -1
+
+[State -2, ModifyExplod]
+type = ModifyExplod
+trigger1 = NumExplod(30)
+ID = 30
+facing = facing 
+postype = left
+sprpriority = 0
+pos = 160 + Ceil(Pos X), 20 + (ScreenPos Y > 0) * 25 ;50
+
+[State -2, ModifyExplod]
+type = ModifyExplod
+trigger1 = NumExplod(31)
+ID = 31
+facing = facing 
+postype = left
+sprpriority = 0
+pos = 160 + Ceil(Pos X), 20 + (ScreenPos Y > 0) * 25 ;50
+
+[State -2, RemoveExplod]
+type = RemoveExplod
+trigger1 = NumExplod(31) = 0
+trigger2 = NumExplod(30)
+trigger2 = NumExplod(31)
+trigger2 = Vel Y != 0
+trigger3 = Pos Y < 200
+ID = 30
+
+[State -2, RemoveExplod]
+type = RemoveExplod
+trigger1 = NumExplod(30) = 0
+trigger2 = NumExplod(30)
+trigger2 = NumExplod(31)
+trigger2 = Vel Y != 0
+trigger3 = Pos Y < 200
+ID = 31
+;-------------------------
+
+[State -2, Helper]
+type = Helper
+trigger1 = NumHelper(50) = 0
+helpertype = normal
+ignorehitpause = 1
+name = "Water"
+size.ground.back = 0
+size.ground.front = 0
+size.air.back = 0
+size.air.front = 0
+id = 50
+facing = 1
+pos = 0,-200
+postype = P1
+stateno = 50
+keyctrl = 0
+ownpal = 1
+
+;===== Armor Code =====
+;----- State Set -----
+[State -2, VarSet]
+type = VarSet
+trigger1 = MoveType != H
+var(10) = StateNo
+;--------------------
+
+;----- Ctrl Set -----
+[State -2, VarSet]
+type = VarSet
+triggerall = RoundState = 2
+trigger1 = MoveType = I
+var(11) = 1
+
+[State -2, VarSet]
+type = VarSet
+triggerall = RoundState = 2
+trigger1 = MoveType = A
+var(11) = 0
+;--------------------
+
+;----- AnimElemNo -----
+[State -2, VarSet]
+type = VarSet
+trigger1 = MoveType = I
+trigger1 = Ctrl = 1
+var(15) = 0
+
+[State -2, VarSet]
+type = VarSet
+trigger1 = MoveType = H
+var(15) = AnimElemNo(0)
+;--------------------
+
+;----- Time Add -----
+[State -2, VarSet]
+type = VarSet
+trigger1 = MoveType != A
+trigger1 = MoveType != H
+var(20) = 0
+
+[State -2, VarAdd]
+type = VarAdd
+trigger1 = MoveType = A
+var(20) = 1
+;--------------------
+;====================
+
+[State -2, Push]
+type = PlayerPush
+trigger1 = AnimElem = 2, >= 0
+trigger1 = AnimElem = 7, < 0
+ignorehitpause = 1
+value = 0
+
+[State -2, SprPriority]
+type = SprPriority
+trigger1 = 1
+ignorehitpause = 1
+value = -10
+
+[State -2, Power]
+type = PowerSet
+trigger1 = 1
+ignorehitpause = 1
+value = 0
+
+[State -2, Hit]
+type = HitOverride
+trigger1 = 1
+slot = 0
+stateno = 35
+attr = SCA, AA, AP, AT
+ignorehitpause = 1
+time = 1
+
+[State -2, NoGuard]
+type = AssertSpecial
+trigger1 = 1
+ignorehitpause = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State -2, 1]
+type = AssertSpecial
+trigger1 = 1
+ignorehitpause = 1
+flag = NoKOSlow
+flag2 = NoShadow
+
+[State -2, 1]
+type = AssertSpecial
+triggerall = Pos Y < 200
+trigger1 = NumHelper(1) > 0
+trigger1 = NumHelper(2) > 0
+ignorehitpause = 1
+flag = Invisible
+
+[State -2, PosSet] 
+type = PosSet
+triggerall = Win = 0
+triggerall = Alive = 1
+triggerall = !DrawGame
+triggerall = LoseTime = 0
+triggerall = StateNo != 190
+trigger1 = StateNo = 5900
+trigger2 = StateNo = 0
+y = 200
+
+[State -2, Anim]
+type = ChangeAnim
+trigger1 = MoveType != A
+trigger1 = MoveType != H
+value = 0
+
+[State -2, State]
+type = ChangeState
+triggerall = StateNo < 150
+triggerall = Life > 0
+trigger1 = Lose
+trigger2 = Ctrl
+trigger2 = DrawGame
+trigger3 = Ctrl
+trigger3 = Win
+trigger4 = MoveType = A
+trigger4 = NumTarget = 0
+trigger4 = Pos Y < -100
+trigger4 = Win
+value = 0
+ctrl = 1
+
+[State -2, State]
+type = ChangeState
+triggerall = Ctrl
+triggerall = Alive
+triggerall = !Lose
+trigger1 = StateNo = 0
+trigger2 = StateNo > 50
+trigger2 = StateNo < 100
+trigger3 = StateNo > 1000
+trigger3 = StateNo < 5900
+value = 30
+ctrl = 1
+
+[State -2, State]
+type = ChangeState
+triggerall = StateNo != 5150
+triggerall = MoveType = I
+trigger1 = !DrawGame
+trigger1 = Life = 0
+trigger1 = Lose
+value = 5150
+
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------

@@ -1,0 +1,58 @@
+;===========================================================================
+;=====[REWRITTEN COMMON STATES FOR KFM MASTER BY MIKE WEREWOLF]=============
+;===========================================================================
+
+
+;---------------------------------------------------------------------------
+; Jump Land
+[Statedef 52]
+type    = S
+physics = S
+ctrl = 0
+anim = 47
+
+[State 52, 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 52, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 52, 3-1] ;*NEW*
+type = VarSet
+trigger1 = var(51)
+trigger1 = Time = 0
+var(51) = 0
+
+	;--[Explications]--
+	; On réécrit le state 52 d'atterrissage afin d'insérer ce nouveau
+	; bloc. Il permet de réinitialiser la var(51) quand KFM atterrit.
+	; 
+	; La var(51) est associé au Kung Fu Kick hard : si le premier coup
+	; est sorti, alors var(51) = 1, ce qui autorise la sortie du
+	; second coup. Mais si KFM atterrit sans avoir sorti ce deuxième
+	; coup, il faut réinitialiser var(51), sinon, la prochaine fois
+	; qu'on voudra utiliser cette technique, var(51) valant toujours 1,
+	; c'est le deuxième coup qui sortirait au lieu du premier.
+	;
+	; Le trigger "trigger1 = var(51)" permet de n'actionner la 
+	; réinitialisation de la variable que si var(51) vaut 1, ce qui 
+	; évite de remettre la variable à 0 si elle vaut déjà 0 (saut normal,
+	; ou si le second coup est sorti, par exemple -- La prog du second 
+	; coup réinitialise la var(51) à 0). Ceci permet de gagner un tout 
+	; petit peu de mémoire.
+	;--[End]--
+
+[State 52, 3-2]
+type = CtrlSet
+trigger1 = Time = 3
+value = 1
+
+[State 52, 4]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1

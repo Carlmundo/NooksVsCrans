@@ -1,0 +1,791 @@
+; Green Hill Zone Boss constants and state file.
+; There are comments scattered through this file, so you may like to
+; take a look if would like to learn more about the cns.
+
+[Data]
+;Amount of life to start with
+;体力ゲージの初期値
+life = 1000
+;attack power (more is stronger)
+;攻撃ダメージ
+attack = 100
+;defensive power (more is stronger)
+;体力パワー
+defence = 100
+;Percentage to increase defense everytime player is knocked down
+fall.defence_up = 50
+;Time which player lies down for, before getting up
+liedown.time = 60
+;Number of points for juggling
+airjuggle = 15
+;Default hit spark number for HitDefs
+sparkno = 2
+;Default guard spark number
+guard.sparkno = 40
+;1 to enable echo on KO
+KO.echo = 0
+;Volume offset (negative for softer)
+volume = 0
+IntPersistIndex = 58	
+FloatPersistIndex = 40
+
+[Size]
+xscale = 1           ;Horizontal scaling factor.
+yscale = 1           ;Vertical scaling factor.
+ground.back = 15     ;Player width (back, ground)
+ground.front = 16    ;Player width (front, ground)
+air.back = 12        ;Player width (back, air)
+air.front = 12       ;Player width (front, air)
+height = 60          ;Height of player (for opponent to jump over)
+attack.dist = 160    ;Default attack distance
+proj.attack.dist = 90 ;Default attack distance for projectiles
+proj.doscale = 0     ;Set to 1 to scale projectiles too
+head.pos = -5, -90   ;Approximate position of head
+mid.pos = -5, -60    ;Approximate position of midsection
+shadowoffset = 0     ;Number of pixels to vertically offset the shadow
+draw.offset = 0,0    ;Player drawing offset in pixels (x, y)
+
+[Velocity]
+walk.fwd  = 2.4      ;Walk forward
+walk.back = -2.2     ;Walk backward
+run.fwd  = 4.6, 0    ;Run forward (x, y)
+run.back = -4.5,-3.8 ;Hop backward (x, y)
+jump.neu = 0,-8.4    ;Neutral jumping velocity (x, y)
+jump.back = -2.55    ;Jump back Speed (x, y)
+jump.fwd = 2.5       ;Jump forward Speed (x, y)
+runjump.back = -2.55,-8.1 ;Running jump speeds (opt)
+runjump.fwd = 4,-8.1      ;.
+airjump.neu = 0,-8.1      ;.
+airjump.back = -2.55      ;Air jump speeds (opt)
+airjump.fwd = 2.5         ;.
+
+[Movement]
+airjump.num = 1      ;Number of air jumps allowed (opt)
+airjump.height = 35  ;Minimum distance from ground before you can air jump (opt)
+yaccel = .44         ;Vertical acceleration
+stand.friction = .85  ;Friction coefficient when standing
+crouch.friction = .82 ;Friction coefficient when crouching
+
+;---------------------------------------------------------------------------
+; Variable usage:
+; This is a record of the variables that the Boss uses. Keeping a record of your
+; variable usage helps you avoid careless mistakes later.
+
+; var(20) - Damage
+; var(16) - KO data
+
+;---------------------------------------------------------------------------
+; Lose by Time Over
+; CNS difficulty: basic
+; CNS レベル: 基本
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win state decider
+; CNS difficulty: basic
+; CNS レベル: 基本
+[Statedef 180]
+type = S
+
+[State 180, 1]
+type = ChangeState
+trigger1 = Time = 0
+value = 181
+
+;---------------------------------------------------------------------------
+; Win pose 1 - Bow
+; CNS difficulty: basic
+; CNS レベル: 基本
+[Statedef 181]
+type = S
+ctrl = 0
+anim = 181
+velset = 0,0
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Introduction
+; CNS difficulty: basic
+; CNS レベル: 基本
+[Statedef 191]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,.8
+
+[State 191, 2] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = time <= 400
+flag = Intro
+
+[State 191, STP]
+type = Velset
+trigger1 = time > 1
+trigger1 = pos y >= 0
+y = 0
+
+[State 191, STP]
+type = Velset
+trigger1 = time = 50
+x = 1
+
+[State 191, 3]
+type = PosAdd
+trigger1 = time = 0
+y = -50
+x = -50
+
+[State 191, STP]
+type = Velset
+trigger1 = time >= 100
+x = 0
+
+[State 260, 3]
+type = ChangeAnim
+triggerall = anim != 195
+trigger1 = time >= 100
+value = 195
+
+[State 191, Lights]
+type = Explod
+trigger1 = numexplod(58) != 1
+trigger1 = time = 120
+anim = 410
+id = 58
+sprpriority = -2
+postype = p1
+removetime = -1
+bindtime = -1
+ownpal = 1
+pos = 0,0
+
+[State 191, Lights]
+type = Explod
+trigger1 = numexplod(59) != 1
+trigger1 = time = 125
+anim = 610
+id = 59
+sprpriority = -2
+postype = p1
+removetime = -1
+bindtime = -1
+ownpal = 1
+pos = 0,0
+
+[State 191, Rockets]
+type = Helper
+trigger1 = numhelper(90) = 0
+trigger1 = time = 120
+ID = 90
+pos = 0, 0
+sprpriority = -1
+postype = p1
+stateno = 196
+helpertype = normal
+name = "GHZbossball1"
+keyctrl = 0
+ownpal = 1
+
+[State 191, No scroll]
+type = ScreenBound
+trigger1 = time <= 400
+value = 0
+movecamera = 0,0
+
+;---------------------------------------------------------------------------
+; Ball fall
+[Statedef 196]
+type = A
+ctrl = 0
+anim = 611
+velset = 0,.8
+movetype = I
+physics = N
+sprpriority = -1
+
+[State 196, 3]
+type = PosAdd
+trigger1 = time = 0
+y = -100
+
+[State 1051, 3] ;Change state when KFM is close to ground
+type = ChangeState
+trigger1 = time > 0
+trigger1 = Vel Y > 0 && Pos Y >= 0
+value = 197
+
+;------------------
+; Ball - land
+[Statedef 197]
+type    = S
+movetype= I
+physics = S
+;sprpriority = 1
+velset = 0,0
+
+[State 197, 1] ;Reset y-position to ground level
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 197, 5]
+type = Destroyself
+trigger1 = parent,stateno = 0
+
+;---------------------------------------------------------------------------
+; Rockets
+[Statedef 260]
+type = S
+ctrl = 0
+anim = 640
+velset = 0,0
+movetype = I
+physics = N
+sprpriority = 3
+
+[State 260, Follow]
+type = BindToRoot
+trigger1 = GameTime%2
+;time = 1
+facing = 1
+pos = 0,0
+
+[State -1, Hide]
+type = AssertSpecial
+trigger1 = 1
+flag= NoShadow
+
+[State 260, Lights]
+type = Explod
+trigger1 = numexplod(51) != 1
+trigger1 = parent,stateno != 191
+anim = 410
+id = 51
+sprpriority = 2
+postype = p1
+removetime = -1
+bindtime = -1
+ownpal = 1
+pos = 0,0
+
+[State 260, End]
+type = Explod
+triggerall = parent,var(16) = 1
+trigger1 = numexplod(52) != 1
+anim = 440
+id = 52
+sprpriority = 2
+postype = p1
+;supermove = 1
+removetime = -1
+bindtime = -1
+ownpal = 1
+pos = 0,0
+
+[State 260, Rem projexp]
+type = RemoveExplod
+trigger1 = parent,stateno = 5150
+ID = 51
+
+[State 260, Explod]
+type = Explod
+trigger1 = numexplod(53) != 1
+trigger1 = parent,stateno = 5150
+anim = 230
+id = 53
+sprpriority = 3
+postype = p1
+removetime = -1
+bindtime = -1
+ownpal = 1
+pos = 2,-105
+
+
+[State 260, 3]
+type = ChangeAnim
+triggerall = parent,var(16) != 1
+triggerall = anim != 430
+trigger1 = parent,vel x != 0
+ignorehitpause = 1
+value = 430
+
+[State 260, 3]
+type = ChangeAnim
+triggerall = parent,var(16) != 1
+trigger1 = parent,vel x = 0
+ignorehitpause = 1
+value = 640
+
+[State 260, 3]
+type = ChangeAnim
+triggerall = anim != 431
+trigger1 = parent,var(16) = 1
+ignorehitpause = 1
+value = 431
+
+;---------------------------------------------------------------------------
+; Swinging Ball Rings
+[Statedef 1050]
+type    = A
+movetype= I
+physics = N
+poweradd= 110
+anim = 640
+ctrl = 0
+sprpriority = -2
+
+[State -1, Hide]
+type = AssertSpecial
+trigger1 = 1
+flag= NoShadow
+
+[State 1050, 5] ;Leave
+type = DestroySelf
+trigger1 = root,anim = 211
+
+[State 210, 3]
+type = ChangeAnim
+trigger1 = root,stateno != 5150
+trigger1 = anim != 351
+trigger1 = root,stateno != 191
+value = 351
+
+[State 210, 3]
+type = ChangeAnim
+trigger1 = root,stateno = 5150
+value = 640
+
+[State 0, BindToParent]
+type =BindToRoot
+trigger1 = root,stateno != 181
+trigger1 = parent,stateno != 5150
+trigger1 = ishelper(1001)
+pos = 10*sin(Time*Pi/80)*root,facing,9*abs(cos(Time*Pi/80))
+time = -1
+
+[State 0, BindToParent]
+type =BindToRoot
+trigger1 = root,stateno != 181
+trigger1 = parent,stateno != 5150
+trigger1 = ishelper(1002)
+pos = 24*sin(Time*Pi/80)*root,facing,24*abs(cos(Time*Pi/80))
+time = -1
+
+[State 0, BindToParent]
+type =BindToRoot
+trigger1 = root,stateno != 181
+trigger1 = parent,stateno != 5150
+trigger1 = ishelper(1003)
+pos = 38*sin(Time*Pi/80)*root,facing,38*abs(cos(Time*Pi/80))
+time = -1
+
+[State 0, BindToParent]
+type =BindToRoot
+trigger1 = root,stateno != 181
+trigger1 = parent,stateno != 5150
+trigger1 = ishelper(1004)
+pos = 52*sin(Time*Pi/80)*root,facing,52*abs(cos(Time*Pi/80))
+time = -1
+
+[State 1050, SPR]
+type = SprPriority
+trigger1 = ishelper(1002)
+value = -1
+
+[State 1050, SPR]
+type = SprPriority
+trigger1 = ishelper(1003)
+value = 0
+
+[State 1050, SPR]
+type = SprPriority
+trigger1 = ishelper(1004)
+value = 1
+
+[State 5150, Fires]
+type = Explod
+triggerall = numexplod(230) = 0 && root,anim != 211 && root,vel x = 0
+trigger1 = root,stateno = 5150
+trigger1 = ishelper(1001)
+anim = 230
+id = 230
+sprpriority = 4
+postype = p1
+supermove = 1
+removetime = -1
+facing = 1
+ownpal = 1
+pos = 0,-100
+
+[State 5150, Fires]
+type = Explod
+triggerall = numexplod(231) = 0 && root,anim != 211 && root,vel x = 0
+trigger1 = root,stateno = 5150
+trigger1 = ishelper(1002)
+anim = 230
+id = 231
+sprpriority = 4
+postype = p1
+supermove = 1
+removetime = -1
+facing = 1
+ownpal = 1
+pos = 0,-100
+
+
+[State 5150, Fires]
+type = Explod
+triggerall = numexplod(232) = 0 && root,anim != 211 && root,vel x = 0
+trigger1 = root,stateno = 5150
+trigger1 = ishelper(1003)
+anim = 230
+id = 232
+sprpriority = 4
+postype = p1
+supermove = 1
+removetime = -1
+facing = 1
+ownpal = 1
+pos = 0,-100
+
+[State 5150, Fires]
+type = Explod
+triggerall = numexplod(233) = 0 && root,anim != 211 && root,vel x = 0
+trigger1 = root,stateno = 5150
+trigger1 = ishelper(1004)
+anim = 230
+id = 233
+sprpriority = 4
+postype = p1
+supermove = 1
+removetime = -1
+facing = 1
+ownpal = 1
+pos = 0,-100
+
+[State 1050, 5];Freeze
+type = posfreeze
+trigger1 = root,stateno = 5150
+trigger2 = root,stateno = 181
+
+[State 1050, 5];Freeze
+type = DestroySelf
+trigger1 = root,anim = 211
+
+;---------------------------------------------------------------------------
+; Swinging Ball 2
+[Statedef 1051]
+type    = A
+movetype= A
+physics = N
+;juggle  = 1
+anim = 640
+ctrl = 0
+sprpriority = 2
+
+[State -1, Hide]
+type = AssertSpecial
+trigger1 = 1
+flag= NoShadow
+
+[State -1, PP]
+type = playerpush
+trigger1 = 1
+value = 0
+
+[State 0, BindToParent]
+type =BindToRoot
+trigger1 = root,stateno != 181
+trigger1 = root,stateno != 5150
+trigger1 = GameTime%2
+pos = 83*sin(Time*Pi/80)*root,facing,93*abs(cos(Time*Pi/80))
+;time=1
+;ignorehitpause = 1
+
+[State 210, 3]
+type = ChangeAnim
+trigger1 = anim != 608
+trigger1 = root,stateno != 5150
+trigger1 = root,stateno != 191
+value = 608
+
+[State 1050, 5]
+type = posfreeze
+trigger1 = root,stateno = 5150
+trigger2 = root,stateno = 181
+
+[State 210, 3]
+type = ChangeAnim
+trigger1 = root,anim = 211
+value = 640
+
+[State 5150, Fires]
+type = Explod
+trigger1 = root,stateno = 5150
+trigger1 = GameTime%15 = 0
+trigger1 = root,anim != 211 && root,vel x = 0
+anim = 230
+sprpriority = 4
+postype = p1
+supermove = 1
+removetime = 25
+random = 50, 50
+facing = 1
+ownpal = 1
+pos = 0,-120
+
+[State 1050, 4]
+type = HitDef
+trigger1 = root,stateno != 5150
+trigger1 = gametime%100 = 0
+attr = A, SA
+animtype  = Medium
+damage    = 100, 40
+priority  = 5
+guardflag = MA
+pausetime = 0,15
+sparkno = 3
+sparkxy = -10,-80
+hitsound   = 5,4
+guardsound = 6,0
+ground.type = Low
+ground.slidetime = 20
+ground.hittime  = 20
+ground.velocity = -9,-7
+guard.velocity = -7
+air.velocity = -5,-7
+fall = 1
+envshake.time = 30           ;Parameters for shaking the screen on hit
+envshake.ampl = 7
+envshake.freq = 176
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff = 0
+down.cornerpush.veloff = 0
+guard.cornerpush.veloff = 0
+
+[State 1050, 5]
+type = DestroySelf
+trigger1 = root,anim = 211
+
+;---------------------------------------------------
+
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+
+[StateDef -2]
+
+[State -2, DTC]
+type = DisplayToClipboard
+trigger1 = 1
+text = "by supermystery"
+;params = var(58), var(17)
+IgnoreHitPause = 1
+
+[State -2, HandsOff]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = -1
+IgnoreHitPause = 1
+
+
+;-----------------------------------------------------------
+;Taunt and Hit
+;-----------------------------------------------------------
+;Facial Expressions
+[State -2, PalFX]
+type = PalFX
+trigger1 = (NumHelper(870) = 1) && ((GameTime%3) = 0)
+time = 1
+color = 0
+invertall = 1
+IgnoreHitPause = 1
+
+[State -2, Ow Anim] 
+type = ChangeAnim
+trigger1 = anim != 210
+trigger1 = NumHelper(870) = 1
+value = 200
+IgnoreHitPause = 1
+
+[State -2, Laugh] 
+type = ChangeAnim
+triggerall = life != 0 && stateno != 5150
+trigger1 = anim != 195 && stateno != 271
+trigger1 = p2movetype = H
+value = 195
+
+[State -2, End Ow Anim]
+type = ChangeAnim
+triggerall = life != 0 && stateno != 5150
+trigger1 = anim = 200 & animtime = 0
+trigger2 = anim = 195 & animtime = 0 && stateno != 271
+value = 0
+IgnoreHitPause = 1
+
+[State -2, KOed]
+type = ChangeAnim
+triggerall = life = 0
+trigger1 = anim = 200 & animtime = 0
+trigger2 = anim = 195 & animtime = 0 && stateno != 271
+value = 210
+IgnoreHitPause = 1
+
+;------------------------------------
+;Accessories
+;------------------------------------
+
+[State -2, Rockets]
+type = Helper
+trigger1 = numhelper(55) = 0
+ID = 55
+pos = 0, 0
+sprpriority = 3
+postype = p1
+stateno = 260
+helpertype = normal
+name = "rcketsGHZ"
+keyctrl = 0
+ownpal = 1
+
+;----------------------------------
+;-----------------------------
+[State -2, Rem projexp]
+type = RemoveExplod
+trigger1 = stateno != 191
+ID = 58
+
+[State -2, Rem projexp]
+type = RemoveExplod
+trigger1 = stateno != 191
+ID = 59
+
+;--------------------------
+
+[State 1000, Hyper ball]
+type = Helper
+trigger1 = stateno != 5150 && stateno != 191 
+trigger1 = numhelper(101) = 0
+ID = 101
+pos = 0,0
+sprpriority = 1
+postype = p1
+stateno = 1051
+helpertype = normal
+name = "wrball"
+keyctrl = 0
+ownpal = 1
+
+
+[State -2, Chain 1]
+type = Helper
+trigger1 = numhelper(1001) = 0 && stateno != 191 && stateno != 5150
+ID = 1001
+pos = 0, 0
+sprpriority = -2
+postype = p1
+stateno = 1050
+helpertype = normal
+name = "Chain1"
+keyctrl = 0
+ownpal = 1
+
+[State -2, Chain 2]
+type = Helper
+trigger1 = numhelper(1002) = 0 && stateno != 191 && stateno != 5150
+ID = 1002
+pos = 0, 0
+sprpriority = -2
+postype = p1
+stateno = 1050
+helpertype = normal
+name = "Chain2"
+keyctrl = 0
+ownpal = 1
+
+[State -2, Chain 3]
+type = Helper
+trigger1 = numhelper(1003) = 0 && stateno != 191 && stateno != 5150
+ID = 1003
+pos = 0, 0
+sprpriority = -2
+postype = p1
+stateno = 1050
+helpertype = normal
+name = "Chain3"
+keyctrl = 0
+ownpal = 1
+
+[State -2, Chain 4]
+type = Helper
+trigger1 = numhelper(1004) = 0 && stateno != 191 && stateno != 5150
+ID = 1004
+pos = 0, 0
+sprpriority = -2
+postype = p1
+stateno = 1050
+helpertype = normal
+name = "Chain3"
+keyctrl = 0
+ownpal = 1
+
+;-----------------------------
+
+[State -2, Escape]
+type = SelfState
+trigger1 = var(57) != GameTime
+value = PrevStateNo ;0
+IgnoreHitPause = 1
+
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------
+
+[Statedef -3]
+;----------------------------------
+;Super Armor
+[State -3, GameTimeVar]
+type = VarSet
+trigger1 = 1
+var(57) = GameTime
+IgnoreHitPause = 1
+
+[State -3, ArmorHelper]
+type = Helper
+trigger1 = !NumHelper(44304)
+trigger1 = Alive
+name = "Armor"
+ID = 44304
+StateNo = 44304
+KeyCtrl = 1
+PauseMoveTime = 2147483647
+SuperMoveTime = 2147483647
+
+[State -3, Ow]
+type = LifeAdd
+trigger1 = var(20) && StateNo != [120,155]
+value = -var(20)
+
+[State -3, Reset]
+type = VarSet
+trigger1 = 1
+var(20) = 0
+;-----------------------------------
+
+

@@ -1,0 +1,550 @@
+
+;---------------------------------------------------------------------------
+; AI Walk
+[Statedef 6020]
+type    = S
+physics = S
+sprpriority = 0
+
+[State 620, 1]
+type = VelSet
+trigger1 = 1
+x = const(velocity.walk.fwd.x)
+
+[State 6020, 2]
+type = VelSet
+trigger1 = command = "holdback"
+x = const(velocity.walk.back.x)
+
+[State 6020, 3]
+type = ChangeAnim
+triggerall = vel x > 0
+trigger1 = Anim != 20 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0
+value = 20
+
+[State 6020, 4]
+type = ChangeAnim
+triggerall = vel x < 0
+trigger1 = Anim != 21 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0
+value = 21
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = time = 10
+value = 6200
+ctrl = 0
+
+;---------------------------------------------------------------------------
+; AI Standing Light Punch
+[Statedef 6200]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 200
+poweradd = 20
+sprpriority = 2
+
+[State 6200, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S1,0
+
+[State 6200, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,0
+
+[State 6200, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 25, 0
+animtype = Light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = S6000
+sparkxy = -5, -35
+hitsound = S20,0
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 16
+ground.velocity = -2
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 16
+
+[State 6200, 5]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+[State 6200, 5]
+type = ChangeState
+trigger1 = movecontact
+value = 6230
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;AI Standing Light Kick
+[Statedef 6230]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+poweradd= 20
+ctrl = 0
+velset = 0,0
+anim = 230
+
+[State 6230, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S2,0
+
+[State 6230, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = S36,3
+
+[State 6230, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 25, 0
+animtype = Light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 10
+sparkno = S6000
+sparkxy = -5, -25
+hitsound = S21,0
+guardsound = S6003, 0
+guard.sparkno = S6008
+ground.type = Low
+ground.slidetime = 5
+ground.hittime = 16
+ground.velocity = -2
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -1.4,-3
+air.hittime = 16
+
+[State 6200, 5]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+[State 6200, 5]
+type = ChangeState
+trigger1 = movecontact
+value = 430
+ctrl = 0
+
+;---------------------------------------------------------------------------
+;AI Run
+[Statedef 6100]
+type    = S
+physics = S
+anim = 100
+sprpriority = 1
+ctrl = 0
+
+[State 100, Helper]
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+name = "Dash Ring"
+stateno = 61
+pos = 20, -38
+postype = p1
+keyctrl = 0
+ownpal = 1
+size.xscale = 1
+size.yscale = 1
+supermovetime = 99999999999
+pausemovetime = 99999999999
+
+[State 100, Helper]
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+name = "Dash Effect"
+stateno = 62
+pos = -50, -38
+postype = p1
+keyctrl = 0
+size.xscale = 1
+size.yscale = 1
+supermovetime = 99999999999
+pausemovetime = 99999999999
+
+[State 100, Helper]
+type = Helper
+trigger1 = !Time
+trigger2 = Time%3 = 0
+helpertype = normal
+name = "Dash Line"
+stateno = 63
+pos = -20+random%20,-70+random%70
+postype = p1
+keyctrl = 0
+size.xscale = 1
+size.yscale = 1
+supermovetime = 99999999999
+pausemovetime = 99999999999
+
+[State 6100, 1]
+type = VelSet
+trigger1 = 1
+x = const(velocity.run.fwd.x)
+
+[State 6100, 4]
+type = ChangeState
+trigger1 = p2bodydist X <= 50
+value = 6900
+
+[State 6100, 4]
+type = ChangeState
+trigger1 = time = 50
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;AI Risky's Boots
+[Statedef 6900]
+type    = S
+movetype= A
+physics = N
+juggle  = 4
+ctrl = 0
+velset = 0,0
+poweradd = 65
+anim = 900
+
+[State 6900, 1]
+type = Explod
+trigger1 = AnimElem = 1
+trigger2 = AnimElem = 18
+anim = 901
+postype = p1
+sprpriority = 2
+pos = 0, -24
+ownpal = 1
+scale = 3,3
+
+[State 6900, PalFX]
+type = PalFX
+trigger1 = AnimElem = 1
+trigger2 = AnimElem = 18
+time = 5
+add = 255,255,255
+mul = 255,255,255
+invertall = 0
+color = 256
+
+[State 6900, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+time = 25
+timegap = 1
+framegap = 5
+length = 20
+palcontrast = 220,220,220
+paladd = 10,10,10
+palmul = .65,.65,.65
+trans = add1
+
+[State 6900, VelSet]
+type = VelSet
+trigger1 = animelem = 1
+x = 0
+y = 0
+
+[State 6900, VelSet]
+type = VelSet
+trigger1 = animelem = 2
+x = 10
+y = 0
+
+[State 6900, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+trigger2 = AnimElem = 18
+value = S900,0
+
+[State 6900, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S37,0
+
+[State 6900, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S1603,0
+
+[State 6900, 1]
+type = HitDef
+trigger1 = !Time
+trigger2 = Time%5 = 0
+attr = S, SA
+damage = 15,0
+animtype = hard
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 5, 5
+sparkno = s6002
+guard.sparkno = S6008
+sparkxy = -12, -35
+hitsound  = S22,1
+guardsound = S6003, 0
+ground.type = Low
+ground.slidetime = 5
+ground.hittime  = 24
+ground.velocity = -7
+ground.cornerpush.veloff = -10
+airguard.velocity = -1.9,-.8
+air.type = Low
+air.velocity = -7,-1.5
+air.hittime = 24
+
+[State 6900, 1]
+type = ChangeState
+triggerall = winko
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+[State 6900, 1]
+type = ChangeState
+trigger1 = animtime = 0
+value = 200
+
+;---------------------------------------------------------------------------
+;AI Storm Puff
+[StateDef 61100]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 1100
+poweradd = 45
+
+[State 61100, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 2
+value = S37,3
+
+[State 61100, Helper]
+type = Helper
+trigger1 = animelem = 1
+id = 1101
+pos = -50,0
+postype = p1
+stateno = 1101
+helpertype = normal
+name = "Storm Puff"
+keyctrl = 0
+ownpal = 1
+supermovetime = 1
+
+[State 61100, Helper]
+type = Helper
+trigger1 = animelem = 1
+id = 1102
+pos = 50,0
+postype = p1
+stateno = 1101
+helpertype = normal
+name = "Storm Puff"
+keyctrl = 0
+ownpal = 1
+supermovetime = 1
+
+[State 61100, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 6020
+
+;---------------------------------------------------------------------------
+; AI Stand to Crouch
+[Statedef 61101]
+type    = C
+physics = C
+anim = 10
+
+[State 61101, 1]
+type = VelMul
+trigger1 = Time = 0
+x = .75
+
+[State 61101, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S10,0
+
+[State 61101, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 61102
+
+;---------------------------------------------------------------------------
+; AI Crouching
+[Statedef 61102]
+type    = C
+physics = C
+anim = 11
+sprpriority = 0
+
+[State 61102, 1] ;Change from turning animation
+type = ChangeState
+trigger1 = time = 2
+value = 400
+
+;---------------------------------------------------------------------------
+;AI Scimitar Thrust
+[Statedef 61410]
+type    = A
+movetype= A
+physics = A
+juggle  = 5
+poweradd= 45
+ctrl = 0
+velset = 0,-5
+anim = 1410
+
+[State 61410, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = S1410,0
+
+[State 1410, end]
+type = ChangeState
+trigger1 = animtime = 0
+value = 61411
+
+;---------------------------------------------------------------------------
+[Statedef 61411]
+type    = A
+movetype= A
+physics = N
+ctrl = 0
+velset = 0,20
+
+[State 61411, AfterImage]
+type = AfterImage
+trigger1 = Time = 0
+time = 20
+timegap = 1
+framegap = 3
+length = 15
+palcontrast = 220,220,220
+paladd = 10,10,10
+palmul = .65,.65,.65
+trans = add1
+
+[State 61411, 1]
+type = HitDef
+trigger1 = time = 0
+attr = A, NA
+damage = 45, 0
+animtype = Medium
+Guardflag = HA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 5, 5
+sparkno = s6004
+guard.sparkno = S6008
+sparkxy = -20, 25
+hitsound = S22,1
+guardsound = S6003, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 20
+ground.velocity = 0,10
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = 0,10
+air.hittime = 20
+fall = 1
+fall.recover = 0
+
+[State 61411, TargetState]
+type = TargetState
+trigger1 = animelem = 1, >= 1
+trigger1 = movehit = 1
+value = 1413
+ignorehitpause = 1
+
+[State 61411, 1]
+type = ChangeState
+trigger1 = pos y >= 0 && vel y >= 0
+value = 61412
+
+;---------------------------------------------------------------------------
+;AI
+[StateDef 61412]
+type = A
+movetype= A
+physics = N
+juggle  = 1
+ctrl = 0
+anim = 47
+velset = 0,20
+
+[State 61412, VelSet]
+type = VelSet
+trigger1 = pos y >= 0 && vel y >= 0
+x = 0
+y = 0
+
+[State 61412, PosSet]
+type = PosSet
+trigger1 = pos y >= 0 && vel y >= 0
+y = 0
+
+[State -1, Artificial Intelligence]
+type = ChangeState
+trigger1 = (animtime = 0) && (power > 2000) && (random = [0,500])
+value = 3200
+
+[State -1, Artificial Intelligence]
+type = ChangeState
+trigger1 = (animtime = 0) && (power > 2000) && (random = [0,500])
+value = 3500
+
+[State -1, Artificial Intelligence]
+type = ChangeState
+trigger1 = (animtime = 0) && (power > 1000) && (random = [0,500])
+value = 3100
+
+[State -1, Artificial Intelligence]
+type = ChangeState
+trigger1 = (animtime = 0) && (power > 1000) && (random = [0,500])
+value = 3300
+
+[State -1, Artificial Intelligence]
+type = ChangeState
+trigger1 = (animtime = 0) && (power > 1000) && (random = [0,500])
+value = 3400
+
+[State 6100, 4]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1

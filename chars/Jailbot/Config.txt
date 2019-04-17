@@ -1,0 +1,116 @@
+; Jailbot by altoiddealer
+;---------------------------------------------------------------------------
+;CONFIGURATION
+;---------------------------------------------------------------------------
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;ROUND START
+[Statedef 5900]		;DO NOT EDIT
+type = S			;DO NOT EDIT
+[State 5900, Reset Int Vars]	;DO NOT EDIT
+type = VarRangeSet 		;DO NOT EDIT
+trigger1 = roundsexisted = 0	;DO NOT EDIT
+value = 0			;DO NOT EDIT
+[State 5900, Reset Fvars]	;DO NOT EDIT
+type = VarRangeSet		;DO NOT EDIT
+trigger1 = roundsexisted = 0	;DO NOT EDIT
+fvalue = 0		;DO NOT EDIT
+
+
+;===========================================================================
+[State 5900, Dynamic Face]
+type = VarSet
+trigger1 = 1
+;---------------------------------------------------------------------------
+; 0 = DISABLE ALL dynamic faces & low health glitching
+; 1 = ENABLE ALL dynamic faces & low health glitching (**DEFAULT**)
+; 2 = ENABLE dynamic faces / DISABLE low health glitching
+;---------------------------------------------------------------------------
+; INSTRUCTIONS: CHANGE THE VALUE BELOW (VALID OPTIONS: 0-2)
+;---------------------------------------------------------------------------
+var(5) = 1 ;<- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+
+
+;===========================================================================
+[State 5900, Palette Selection Behavior]
+type = VarSet
+trigger1 = 1
+;---------------------------------------------------------------------------
+; 0 = Human Players = DEFAULT / AI Players = DEFAULT
+; 1 = Human Players = DEFAULT / AI Players = RANDOM
+; 2 = Human Players = CHOOSE / AI Players = DEFAULT
+; 3 = Human Players = CHOOSE / AI Players = RANDOM (**DEFAULT**)
+; 4 = Human Players = RANDOM / AI Players = DEFAULT
+; 5 = Human Players = RANDOM / AI Players = RANDOM
+;---------------------------------------------------------------------------
+; INSTRUCTIONS: CHANGE THE VALUE BELOW (VALID OPTIONS: 0-5)
+;---------------------------------------------------------------------------
+var(10) = 3 ;<- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+
+
+;===========================================================================
+[State 5900, Censor Blood]
+type = Null
+trigger1 = 1
+;---------------------------------------------------------------------------
+; INSTRUCTIONS: REMOVE THE SEMI-COLON BELOW TO DISABLE BLOOD
+;---------------------------------------------------------------------------
+;trigger1 = var(2) := 11 ;<- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+
+
+;===========================================================================
+[State 5900, Pong Setting for Arcade Hyper]
+type = VarSet
+trigger1 = 1
+;---------------------------------------------------------------------------
+; 0 = AUTOMATIC PONG SEQUENCE
+;     ENEMY ALWAYS LOSES. ALWAYS SAME DAMAGE.
+;
+; 1 = CONTROLLABLE PONG GAME (**DEFAULT**)
+;     VARIABLE DAMAGE. ENEMY TAKES MINOR DAMAGE FOR EVERY VOLLEY.
+;     ENEMY CAN AVOID BIG DAMAGE BY WINNING THE GAME.
+;---------------------------------------------------------------------------
+; INSTRUCTIONS: CHANGE THE VALUE BELOW (VALID OPTIONS: 0-1)
+;---------------------------------------------------------------------------
+var(13) = 1 ;<- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+
+
+[State 5900, Log Default Pal]	;DO NOT EDIT
+type = VarSet		;DO NOT EDIT
+trigger1 = roundsexisted = 0	;DO NOT EDIT
+var(57) = PalNo		;DO NOT EDIT
+[State 5900, Apply Pal]	;DO NOT EDIT
+type = RemapPal		;DO NOT EDIT
+trigger1 = var(57)		;DO NOT EDIT
+source = 1,1		;DO NOT EDIT
+dest = 1,var(57)		;DO NOT EDIT
+[State 5900, Set Effects Pal]	;DO NOT EDIT
+type = RemapPal		;DO NOT EDIT
+trigger1 = var(57)		;DO NOT EDIT
+source = 3303,1		;DO NOT EDIT
+dest = 3303,var(57)		;DO NOT EDIT
+[State 5900, Glitch Reset]	;DO NOT EDIT
+type = varset		;DO NOT EDIT
+trigger1 = 1		;DO NOT EDIT
+var(9) = 0		;DO NOT EDIT
+[State 5900, Choose Win pose]	;DO NOT EDIT
+type = Null		;DO NOT EDIT
+triggerall = var(59) != [6,7] ;Don't randomize during Jailbarber sequence
+trigger1 = TeamMode = Simul ;If team game
+trigger1 = var(59) := Cond(random%2 = 1,1,3) ;Exclude ice cream
+trigger2 = TeamMode != Simul ;Not team game
+trigger2 = var(59) := random%3 +1 ;Arcade/Jailbarber Win poses are NOT in this range and are set on special conditions
+
+[State 5900, Change to Intro]	;DO NOT EDIT
+type = ChangeState		;DO NOT EDIT
+trigger1 = roundno = 1	;DO NOT EDIT
+value = 190		;DO NOT EDIT
+[State 5900, Change to Stand]	;DO NOT EDIT
+type = ChangeState		;DO NOT EDIT
+trigger1 = var(59) != 7	;DO NOT EDIT
+value = 0			;DO NOT EDIT
+[State 5900, Sweep Up Mess]	;DO NOT EDIT
+type = ChangeState		;DO NOT EDIT
+trigger1 = var(59) = 7	;DO NOT EDIT
+trigger1 = var(59) := random%3 +1 ;Randomize next pose
+value = 1837

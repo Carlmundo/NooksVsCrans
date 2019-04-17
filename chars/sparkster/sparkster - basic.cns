@@ -1,0 +1,1740 @@
+; 5A - Slash
+[Statedef 1000]
+type    = S                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = S                      ;Physics: S-stand, C-crouch, A-air
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1000                       ;Change animation (Def: no change)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1000]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,4
+
+
+[State 1000]
+type = HitDef
+trigger1 = !movecontact
+attr = S, NA
+priority = 3, hit
+animtype  = Light
+damage    = 14,0
+guardflag = MA
+pausetime = 1,10
+sparkno = 0
+sparkxy = -0,-30
+hitsound   = S5,2
+guardsound = S40,5
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 10
+ground.velocity = -4
+air.velocity = -2.2,-3.0
+
+[State 1000]
+type = Explod
+trigger1 = movecontact = 1
+anim = 8001
+pos = -0,-30
+postype = p2  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = 12
+pausemovetime = 0
+scale = 1,1
+random = 30,30
+sprpriority = 5
+
+
+
+[State 1000]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;2A - Low Slash
+[Statedef 1005]
+type    = C                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = S                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 2                    ;Number of air juggle points move takes
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1005                       ;Change animation (Def: no change)
+poweradd = 80                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1005]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,12
+
+
+[State 1005]
+type = HitDef
+trigger1 = !movecontact
+hitflag = MAFD
+attr = S, NA
+animtype  = Light
+priority = 3, hit
+damage    = 17,0
+guardflag = L
+pausetime = 1,10
+sparkno = 2
+sparkxy = 0,-30
+hitsound   = S5,3
+guardsound = S40,5
+ground.type = Low
+ground.slidetime = 12
+ground.hittime  = 16
+ground.velocity = -4
+air.velocity = -2.2,-3.2
+
+[State 1005]
+type = Explod
+trigger1 = animelem = 1
+anim = 8000
+pos = -10,-70
+postype = p1  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = 12
+pausemovetime = 0
+scale = 1.5,1.5
+random = 20,20
+sprpriority = 3
+
+[State 1005]
+type = CtrlSet
+trigger1 = movecontact >= 1
+value = 1
+ignorehitpause = 1
+
+
+[State 1005]
+type = Explod
+trigger1 = movecontact = 1
+anim = 8001
+pos = -0,-30
+postype = p2  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = 12
+pausemovetime = 0
+scale = 1,1
+random = 30,30
+sprpriority = 5
+
+
+
+[State 1005]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;5B - Fire Slash
+[Statedef 1010]
+type    = S                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = S                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 3                      ;Number of air juggle points move takes
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1010                       ;Change animation (Def: no change)
+poweradd = 80                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1010]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,5
+
+[State 1010]; The swing
+type = HitDef
+trigger1 = hitcount < 5
+;trigger1 = time >= 30
+attr = S, NA
+animtype  = Medium
+damage    = 20,4
+priority = 4, hit
+guardflag = MA
+pausetime = 2,15
+guard.pausetime = 1,15
+sparkno = 3
+sparkxy = -20+random%20,-40+random%20
+hitsound   = S40,6
+guardsound = S40,7
+ground.type = High
+guard.kill = 0
+ground.slidetime = 12
+palfx.time = 15
+palfx.add = 200,90,0
+palfx.color = 0
+palfx.invertall = 1
+palfx.sinadd = 70,80,100,5
+ground.hittime  = 17
+ground.velocity = -2
+air.velocity = -2.2,-3.2
+
+;[State 1010];From above
+;type = HitDef
+;trigger1 = hitcount < 5
+;trigger1 = time < 30
+;attr = S, NA
+;animtype  = Hard
+;damage    = 25,4
+;priority = 5, hit
+;guardflag = HA
+;pausetime = 1,15
+;sparkno = 3
+;sparkxy = -20+random%20,-40+random%20
+;hitsound   = S40,6
+;guardsound = S40,7
+;ground.type = High
+;guard.kill = 0
+;ground.slidetime = 12
+;palfx.time = 15
+;palfx.add = 200,90,0
+;palfx.color = 0
+;palfx.invertall = 1
+;palfx.sinadd = 70,80,100,5
+;ground.hittime  = 20
+;ground.velocity = -2
+;air.velocity = -0,-3.2
+
+[State 1010]
+type = CtrlSet
+trigger1 = hitcount = 5
+trigger1 = animelemtime(2) = 2
+value = 1
+ignorehitpause = 1
+
+[State 1010]
+type = Explod
+trigger1 = movecontact
+anim = 8005
+pos = -0,-30
+postype = p2  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = 16
+vel = 0, -3
+pausemovetime = 0
+scale = 1,1
+random = 50,50
+sprpriority = 5
+
+
+[State 1010]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+
+;---------------------------------------------------------------------------
+;2B - Heavy Slash
+[Statedef 1015]
+type    = S                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = S                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1015                       ;Change animation (Def: no change)
+poweradd = 80                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1015]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,6
+
+[State 1015]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = 0,11
+
+
+[State 1015]
+type = PalFX
+triggerall = Time >= 0
+trigger1 = TimeMod = 4,0
+trigger1 = Time > 0
+trigger1 = Time < 25
+time = 1
+add = 100,100,100
+
+[State 1015]
+type = PalFX
+trigger1 = AnimElem = 3
+trigger1 = Time > 0
+time = 10
+color = 0
+add = 255,0,0
+
+[State 1015]
+type = HitDef
+trigger1 = !movecontact
+attr = A, NA
+animtype  = Hard
+priority = 6, hit
+damage    = 120,20
+guardflag = HA
+pausetime = 30,30
+guard.pausetime = 10,10
+sparkno = 3
+sparkxy = -10,-0
+hitsound   = 5,2
+guardsound = S40,5
+ground.type = Heavy
+guard.kill = 0
+fall = 1
+fall.recover = 0
+fall.yvelocity = -9
+fall.xvelocity = -5
+ground.slidetime = 12
+ground.hittime  = 17
+ground.velocity = -0.5,80
+air.velocity = -0.5,80
+envshake.time = 10
+
+[State 1015]
+type = Explod
+trigger1 = movecontact = 1
+anim = 8000
+pos = -0,-30
+postype = p2
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = 12
+pausemovetime = 0
+scale = 2,2
+random = 30,30
+sprpriority = 5
+
+[State 1015]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;jA - Air
+[Statedef 1050]
+type    = A                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = A                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 0                      ;Number of air juggle points move takes
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1050                       ;Change animation (Def: no change)
+poweradd = 80                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1050]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,4
+
+[State 1050]
+type = HitDef
+trigger1 = !movecontact
+attr = A, NA
+priority = 3, hit
+animtype  = Medium
+damage    = 23,9
+guardflag = HA
+pausetime = 0,13
+sparkno = 2
+sparkxy = -10,0
+hitsound   = S5,2
+guardsound = S40,5
+ground.type = High
+guard.kill = 0
+ground.slidetime = 12
+ground.hittime  = 13
+ground.velocity = -6
+air.velocity = -2.2,-3.2
+
+[State 1050]
+type = Explod
+trigger1 = movecontact = 1
+anim = 8001
+pos = -0,-30
+postype = p2
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = 12
+pausemovetime = 0
+scale = 1,1
+random = 30,30
+sprpriority = 5
+
+[State 1050]
+type = CtrlSet
+trigger1 = Time = 15
+value = 1
+
+;---------------------------------------------------------------------------
+;2jAB - Heavy Air
+[Statedef 1055]
+type    = A                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = A                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 5                     ;Number of air juggle points move takes
+ctrl = 0                       ;Set ctrl (Def: no change)
+anim = 1055                       ;Change animation (Def: no change)
+poweradd = 80                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1055]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,6
+
+[State 1055]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = 0,11
+
+[State 1055]
+type = VelSet
+trigger1 = time = 1
+y = -4
+
+
+[State 1055]
+type = PalFX
+triggerall = Time >= 0
+trigger1 = TimeMod = 4,0
+trigger1 = Time > 0
+trigger1 = Time < 24
+time = 1
+add = 100,100,100
+
+[State 1055]
+type = PalFX
+trigger1 = AnimElem = 2
+trigger1 = Time > 0
+time = 10
+color = 0
+add = 255,0,0
+
+[State 1055]
+type = HitDef
+trigger1 = !movecontact
+hitflag = MAFD
+attr = A, NA
+animtype  = Hard
+damage    = ifelse(Enemy,gethitvar(hitcount) >= 5,50,80),18
+priority = 6, hit
+guardflag = HA
+pausetime = 25,25
+sparkno = 3
+sparkxy = -10,-0
+hitsound   = S56500,1
+guardsound = S5,1
+ground.type = Heavy
+fall = 1
+down.velocity = -20, 20
+fall.yvelocity = -9
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = -0.5,20
+air.velocity = -0.5,20
+airguard.velocity = 0,0
+envshake.time = 10
+
+
+
+[State 1055]
+type = CtrlSet
+trigger1 = Time = 100
+value = 1
+
+;---------------------------------------------------------------------------
+;jB - Fire Air
+[Statedef 1060]
+type    = A                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = A                      ;Physics: S-stand, C-crouch, A-air
+;juggle  = 1                      ;Number of air juggle points move takes
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1060                       ;Change animation (Def: no change)
+poweradd = 80                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1060]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,5
+
+[State 1060]
+type = HitDef
+trigger1 = hitcount < 5
+attr = A, NA
+animtype  = Medium
+priority = 4, Hit
+damage    = 20,2
+guardflag = HA
+pausetime = 2,18
+guard.pausetime = 1,18
+sparkno = 3
+guard.kill = 0
+sparkxy = -10+random%20,0-random%20
+hitsound   = S40,6
+guardsound = S40,7
+ground.type = High
+palfx.time = 17
+palfx.add = 200,90,0
+palfx.color = 0
+palfx.invertall = 1
+palfx.sinadd = 70,80,100,5
+ground.slidetime = 14
+ground.hittime  = 20
+ground.velocity = -9
+air.velocity = -2.2,-3.2
+
+[State 1060]
+type = Explod
+trigger1 = movecontact
+anim = 8005
+pos = -0,-30
+postype = p2
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = 16
+vel = 0, -3
+pausemovetime = 0
+scale = 1,1
+random = 50,50
+sprpriority = 5
+
+[State 1060]
+type = CtrlSet
+trigger1 = Time = 30
+value = 1
+
+;---------------------------------------------------------------------------
+;jC - Fire Spin
+[Statedef 1070]
+type    = A                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = A                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 0                      ;Number of air juggle points move takes
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1230                       ;Change animation (Def: no change)
+poweradd = 80                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1070]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,3
+
+[State 1070]
+type = HitDef
+trigger1 = time%4 = 0
+id = 1230
+attr = A, NA
+animtype  = Medium
+damage    = ifelse(Enemy,gethitvar(hitcount) - hitcount > 5,3,21),ifelse(Enemy,gethitvar(hitcount) - hitcount > 7,1,10)
+guardflag = HA
+priority = 3, Hit
+pausetime = 3,10
+sparkno = 3
+sparkxy = -10+random%25,-20-random%25
+hitsound   = S40,6
+guardsound = S40,7
+guard.kill = 0
+ground.type = High
+ground.slidetime = 12
+palfx.time = 10
+palfx.add = 200,90,0
+palfx.color = 0
+palfx.sinadd = 70,80,100,5
+palfx.invertall = 1
+ground.hittime  = 13
+ground.velocity = -9
+air.velocity = -1,-4.2
+
+[State 1070]
+type = Explod
+trigger1 = movecontact
+anim = 8005
+pos = -0,-30
+postype = p2  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = 16
+vel = 0, -3
+pausemovetime = 0
+scale = 1,1
+random = 50,50
+sprpriority = 5
+
+[State 1070]
+type = CtrlSet
+trigger1 = Time = 15
+value = 1
+
+
+;---------------------------------------------------------------------------
+; ROCKET: Diag Up
+[Statedef 1100]
+type    = A                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = N                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1160                       ;Change animation (Def: no change)
+poweradd = -1000                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = time = 5
+value = 1100
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = time < 5
+value = SCA
+time = 5
+
+
+
+[State 1100]
+type = PlaySnd
+trigger1 = time = 5
+value = 0,1
+
+
+[State 1100]
+type = HitDef
+trigger1 = !movecontact
+attr = S, NA
+animtype  = Medium
+damage    = 75,15
+priority = 4, hit
+guardflag = HA
+guard.kill = 0
+pausetime = 10,20
+sparkno = 1
+sparkxy = -10,-20
+hitsound   = S5,4
+guardsound = S5,1
+ground.type = High
+ground.slidetime = 12
+getpower = 0, 0
+ground.hittime  = 17
+ground.velocity = -1,-10
+air.velocity = -1,-10
+p1facing = -1
+
+[State 1100]
+type = Explod
+trigger1 = movecontact = 1
+anim = 8000
+pos = -0,-30
+postype = p2
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = 12
+pausemovetime = 0
+scale = 1,1
+random = 30,30
+sprpriority = 5
+
+[State 1100]
+type = VelSet
+trigger1 = time < 16
+trigger1 = time > 5
+y = -10
+x = 10
+
+[State 1100]
+type = VelSet
+trigger1 = time = 16
+trigger1 = time > 5
+x = 2
+
+[State 1100]
+type = Turn
+triggerall = Time = 16
+trigger1 = Facing = Enemy, Facing
+trigger2 = P2Dist X < 0
+
+[State 1100]
+type = CtrlSet
+trigger1 = Time = 16
+value = 1
+
+[State 1100]
+type = ChangeState
+trigger1 = time = 16
+value = 50
+
+;Gem on Hit---------
+[State 1100]
+type = Varadd
+trigger1 = movehit = 1
+fv = 39
+value = 1
+
+[State 1100]
+type = PlaySnd
+trigger1 = movehit = 1
+value = 0,7
+
+[State 1100]
+type = Explod
+trigger1 = movehit = 1
+anim = 8015
+ID = 1
+pos = 0,-20
+postype = p1
+facing = 1
+bindtime = 1
+vel = 0,-5
+accel = 0,0.2
+ownpal = 1
+random = random%75,0
+removetime = 30
+scale = 1.4,1.4
+sprpriority = -1
+ontop = 0
+
+
+;---------------------------------------------------------------------------
+;ROCKET: Forward
+[Statedef 1110]
+type    = S                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = N                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+velset = 10,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1170                       ;Change animation (Def: no change)
+poweradd = -1000                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1110]
+type = ChangeAnim
+trigger1 = time = 5
+value = 1110
+
+[State 1110]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,1
+
+
+[State 1110]
+type = HitDef
+trigger1 = !movecontact
+attr = S, NA
+animtype  = Medium
+damage    = 75,15
+priority = 4, hit
+guardflag = MA
+pausetime = 10,20
+sparkno = 1
+guard.kill = 0
+sparkxy = -10,-20
+hitsound   = S5,4
+guardsound = S5,1
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 17
+ground.velocity = -1,-10
+air.velocity = -1,-10
+getpower =  0, 0
+p1facing = -1
+
+[State 1110]
+type = Explod
+trigger1 = movecontact = 1
+anim = 8000
+pos = -0,-30
+postype = p2
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = 12
+pausemovetime = 0
+scale = 1,1
+random = 30,30
+sprpriority = 5
+
+[State 1110]
+type = VelSet
+trigger1 = time < 30
+y = 0
+x = 10
+
+[State 1110]
+type = ChangeAnim
+trigger1 = time = 30
+value = 1150
+
+[State 1110]
+type = VelSet
+trigger1 = time = 30
+x = 2
+
+[State 1110]
+type = Makedust
+trigger1 = time >= 30
+pos = 20,0
+spacing = 3
+
+[State 1110]
+type = ChangeState
+trigger1 = time = 40
+value = 0
+ctrl = 1
+
+;Gem on Hit---------
+[State 1110]
+type = Varadd
+trigger1 = movehit = 1
+fv = 39
+value = 1
+
+[State 1110]
+type = PlaySnd
+trigger1 = movehit = 1
+value = 0,7
+
+[State 1110]
+type = Explod
+trigger1 = movehit = 1
+anim = 8015
+ID = 1
+pos = 0,-20
+postype = p1
+facing = 1
+bindtime = 1
+vel = 0,-5
+accel = 0,0.2
+ownpal = 1
+random = random%75,0
+removetime = 30
+scale = 1.4,1.4
+sprpriority = -1
+ontop = 0
+
+;---------------------------------------------------------------------------
+; ROCKET: Air Forward
+[Statedef 1310]
+type    = A                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = A                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1170                       ;Change animation (Def: no change)
+poweradd = -1000                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1000, 1]
+type = ChangeAnim
+trigger1 = time = 5
+value = 1110
+
+
+[State 1000, 1]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,1
+
+[State 1000, 1]
+type = HitDef
+trigger1 = !movecontact
+attr = A, NA
+animtype  = Medium
+damage    = 75,15
+priority = 4, hit
+guardflag = HA
+pausetime = 10,20
+sparkno = 1
+sparkxy = -10,-20
+hitsound   = S5,4
+guardsound = S5,1
+guard.kill = 0
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 17
+getpower =  0, 0
+ground.velocity = -1,-10
+air.velocity = -1,-10
+p1facing = -1
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time <= 40
+y = 0
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time < 30
+x = 10
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time = 30
+x = 2
+
+[State 1110, 2]
+type = ChangeAnim
+trigger1 = time = 30
+value = 42
+
+[State 600, 3]
+type = CtrlSet
+trigger1 = Time = 30
+value = 1
+
+[State 1310, turn]
+type = Turn
+triggerall = Time = 40
+trigger1 = Facing = Enemy, Facing
+trigger2 = P2Dist X < 0
+
+;Gem on Hit---------
+[State 0, VarAdd]
+type = Varadd
+trigger1 = movehit = 1
+fv = 39
+value = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = movehit = 1
+value = 0,7
+
+[State 0, Explod]
+type = Explod
+trigger1 = movehit = 1
+anim = 8015
+ID = 1
+pos = 0,-20
+postype = p1  ;p2,front,back,left,right
+facing = 1
+bindtime = 1
+vel = 0,-5
+accel = 0,0.2
+ownpal = 1
+random = random%75,0
+removetime = 30
+scale = 1.4,1.4
+sprpriority = -1
+ontop = 0
+
+;---------------------------------------------------------------------------
+; ROCKET: Down
+[Statedef 1315]
+type    = A                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = A                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1240                       ;Change animation (Def: no change)
+poweradd = -1000                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1000, 1]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,3
+
+
+[State 1000, 1]
+type = ChangeAnim
+trigger1 = time = 15
+value = 1105
+
+[State 0, AngleDraw]
+type = AngleDraw
+trigger1 = time >= 15
+value = 15
+ignorehitpause = 1
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time < 15
+y = -3
+
+
+[State 1000, 1]
+type = PlaySnd
+trigger1 = time = 15
+value = 0,1
+
+;[State 0, PowerAdd]
+;type = PowerAdd
+;trigger1 = time%5 = 0
+;trigger1 = anim = 1110
+;value = -65
+
+[State 1000, 1]
+type = HitDef
+trigger1 = !movecontact
+trigger1 = anim = 1105
+attr = A, NA
+animtype  = Medium
+damage    = 75,15
+priority = 4, hit
+guardflag = HA
+pausetime = 10,20
+sparkno = 1
+sparkxy = -10,20
+hitsound   = S5,4
+guardsound = S5,1
+guard.kill = 0
+guardsound = S40,5
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 17
+getpower =  0, 0
+ground.velocity = -1,-8
+air.velocity = -1,-8
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time >= 15
+y = 10
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time > 15
+x = 12
+
+;[State 1110, 2]
+;type = VelSet
+;trigger1 = time = 30
+;x = 2
+
+;[State 1110, 2]
+;type = ChangeAnim
+;trigger1 = time = 30
+;value = 42
+
+[State 600, 3]
+type = CtrlSet
+trigger1 = Time = 60
+value = 1
+
+;Gem on Hit---------
+[State 0, VarAdd]
+type = Varadd
+trigger1 = movehit = 1
+fv = 39
+value = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = movehit = 1
+value = 0,7
+
+[State 1000]
+type = Explod
+trigger1 = movecontact = 1
+anim = 8001
+pos = -0,-30
+postype = p2  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = 12
+pausemovetime = 0
+scale = 1,1
+random = 30,30
+sprpriority = 5
+
+;---------------------------------------------------------------------------
+;ROCKET: Up
+[Statedef 1180]
+type    = C                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = N                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+;Commonly-used controllers:
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1180                       ;Change animation (Def: no change)
+poweradd = -1000                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 0, PowerAdd]
+type = PowerAdd
+trigger1 = time%5 = 0
+value = -65
+
+
+[State 1000, 1]
+type = ChangeState
+trigger1 = time = 10
+value = 1181
+ctrl = 0
+
+[State 1900, 4]
+type = GameMakeAnim
+trigger1 = AnimElem = 2
+value = 61
+pos = -5,0
+postype = p1
+under = 1
+
+;---------------------------------------------------------------------------
+
+[Statedef 1181]
+type    = A                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = A                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+;Commonly-used controllers:
+velset = 0,-5                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1120                       ;Change animation (Def: no change)
+poweradd = 65
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1000, 1]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,1
+
+[State 1000, 1]
+type = HitDef
+trigger1 = !movecontact
+attr = S, NA
+animtype  = Up
+damage    = 75,15
+guardflag = MA
+guard.kill = 0
+pausetime = 10,20
+sparkno = 1
+sparkxy = -10,-20
+hitsound   = S5,4
+guardsound = S5,1
+guardsound = 6,0
+ground.type = High
+ground.slidetime = 12
+getpower =  750, 0
+ground.hittime  = 20
+air.hittime = 35
+ground.velocity = 0.3,-10
+air.velocity = 0.3,-9
+
+[State 0, Explod]
+type = Explod
+trigger1 = movecontact = 1
+anim = 8000
+pos = -0,-30
+postype = p2  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = 12
+pausemovetime = 0
+scale = 1,1
+random = 30,30
+sprpriority = 5
+
+
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time < 30
+y = -5
+
+
+[State 1110, 2]
+type = ChangeAnim
+trigger1 = time = 30
+value = 42
+
+[State 600, 3]
+type = CtrlSet
+trigger1 = Time = 25
+value = 1
+
+;Gem on Hit---------
+[State 0, VarAdd]
+type = Varadd
+trigger1 = movehit = 1
+fv = 39
+value = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = movehit = 1
+value = 0,7
+
+[State 0, Explod]
+type = Explod
+trigger1 = movehit = 1
+anim = 8015
+ID = 1
+pos = 0,-20
+postype = p1  ;p2,front,back,left,right
+facing = 1
+bindtime = 1
+vel = 0,-5
+accel = 0,0.2
+ownpal = 1
+random = random%75,0
+removetime = 30
+scale = 1.4,1.4
+sprpriority = -1
+ontop = 0
+
+;---------------------------------------------------------------------------
+;H ROCKET: Diag Up
+[Statedef 1200]
+type    = A                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = A                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+;Commonly-used controllers:
+velset = 7,-7                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1200                       ;Change animation (Def: no change)
+poweradd = -2000                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1000, 1]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,2
+
+[State 1000, 1]
+type = HitDef
+trigger1 = hitcount < 5
+attr = S, NA
+hitflag = MAFD
+animtype  = Medium
+damage    = 27,2
+guardflag = MA
+pausetime = 1,15
+sparkno = 2
+guard.kill = 0
+sparkxy = random%50,-random%50
+hitsound   = S5,2
+guardsound = S40,5
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 17
+ground.velocity = -1,-10
+air.velocity = -1,-10
+
+[State 0, AfterImage]
+type = AfterImage
+trigger1 = time = 0
+length = 10
+framegap = 4
+time = 50
+trans = add1 ;"none","add1","sub"
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time < 30
+y = -7
+x = 7
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time = 30
+x = 1
+
+[State 1110, 2]
+type = ChangeAnim
+trigger1 = time = 30
+value = 42
+
+[State 600, 3]
+type = CtrlSet
+trigger1 = Time = 1000
+value = 1
+
+[State 1310, turn]
+type = Turn
+triggerall = Time = 40
+trigger1 = Facing = Enemy, Facing
+trigger2 = P2Dist X < 0
+
+
+;---------------------------------------------------------------------------
+;H ROCKET: Forward
+[Statedef 1210]
+type    = S                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = N                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+;Commonly-used controllers:
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1160                       ;Change animation (Def: no change)
+poweradd = -2000                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1000, 1]
+type = ChangeAnim
+trigger1 = time = 10
+value = 1210
+
+[State 0, AfterImage]
+type = AfterImage
+trigger1 = time = 10
+length = 10
+framegap = 4
+time = 45
+trans = add1 ;"none","add1","sub"
+
+[State 0, 1]
+type = VelSet
+trigger1 = time = 10
+x = 7
+
+[State 1000, 2]
+type = PlaySnd
+trigger1 = time = 10
+value = 0,2
+
+[State 1000, 2]
+type = HitDef
+trigger1 = hitcount < 5
+attr = S, NA
+animtype  = Medium
+damage    = 27,2
+guardflag = MA
+pausetime = 1,15
+sparkno = 2
+sparkxy = random%50,-random%50
+hitsound   = S5,2
+guard.kill = 0
+guardsound = S40,5
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 17
+ground.velocity = -1,-10
+air.velocity = -1,-10
+
+[State 1110, 2]
+type = ChangeAnim
+trigger1 = time = 55
+value = 1150
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time = 55
+x = 2
+
+[State 100, 2]
+type = Makedust
+trigger1 = time >= 55
+pos = 20,0
+spacing = 3
+
+
+[State 1000, 3]
+type = ChangeState
+trigger1 = time = 90
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;H ROCKET: Air Forward
+[Statedef 1410]
+type    = A                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = A                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+;Commonly-used controllers:
+velset = -0.5,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1170                       ;Change animation (Def: no change)
+poweradd = -2000                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1000, 1]
+type = ChangeAnim
+trigger1 = time = 15
+value = 1210
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time = 15
+x = 7
+
+[State 0, AfterImage]
+type = AfterImage
+trigger1 = time = 15
+length = 10
+framegap = 4
+time = 50
+trans = add1 ;"none","add1","sub"
+
+[State 1000, 1]
+type = PlaySnd
+trigger1 = time = 15
+value = 0,2
+
+[State 1000, 1]
+type = HitDef
+trigger1 = hitcount < 5
+attr = A, NA
+animtype  = Medium
+damage    = 27,2
+guardflag = HA
+pausetime = 1,15
+sparkno = 2
+sparkxy = random%50,-random%50
+hitsound   = S5,2
+guardsound = S40,5
+guard.kill = 0
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 17
+ground.velocity = -1,-10
+air.velocity = -1,-10
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time <= 70
+y = 0
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time = 60
+x = 2
+
+[State 1110, 2]
+type = ChangeAnim
+trigger1 = time = 60
+value = 42
+
+[State 600, 3]
+type = CtrlSet
+trigger1 = Time = 60
+value = 1
+
+[State 1310, turn]
+type = Turn
+trigger1 = Time = 90
+trigger1 = P2Dist X < 0
+
+;---------------------------------------------------------------------------
+;H ROCKET: Down
+[Statedef 1415]
+type    = A                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = N                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+;Commonly-used controllers:
+velset = 0,-7                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1240                       ;Change animation (Def: no change)
+poweradd = -2000                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+
+[State 1000, 1]
+type = ChangeAnim
+trigger1 = time = 10
+value = 1205
+
+[State 0, AngleDraw]
+type = AngleDraw
+trigger1 = time >= 10
+value = 8
+ignorehitpause = 1
+
+[State 1000, 1]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,3
+
+
+[State 1000, 1]
+type = PlaySnd
+trigger1 = time = 10
+value = 0,2
+
+[State 0, AfterImage]
+type = AfterImage
+trigger1 = time = 10
+length = 10
+framegap = 4
+time = 50
+trans = add1 ;"none","add1","sub"
+ignorehitpause = 1
+
+;[State 0, PowerAdd]
+;type = PowerAdd
+;trigger1 = time%5 = 0
+;trigger1 = anim = 1110
+;value = -65
+
+[State 1000, 1]
+type = HitDef
+trigger1 = hitcount < 9
+trigger1 = anim = 1205
+attr = S, NA
+hitflag = MAFD
+animtype  = Heavy
+damage   = 17, 2
+guardflag = HA
+pausetime = 5,20
+guard.pausetime = 5,0
+sparkno = 2
+guard.kill = 0
+sparkxy = -random%50,random%50
+hitsound   = S5,2
+guardsound = S40,5
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 20
+ground.velocity = 0 ,0
+air.velocity = 0,0
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time >= 10
+y = 6
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time > 10
+x = 7
+
+;[State 1110, 2]
+;type = VelSet
+;trigger1 = time = 30
+;x = 2
+
+;[State 1110, 2]
+;type = ChangeAnim
+;trigger1 = time = 30
+;value = 42
+
+[State 600, 3]
+type = CtrlSet
+trigger1 = Time = 80
+value = 1
+
+[State 7004, 2]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 1416 ;Downed get-hit (hit ground from fall)
+
+;---------------------------------------------------------------------------
+
+[Statedef 1416]
+type    = S                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = C                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+;Commonly-used controllers:
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1206                       ;Change animation (Def: no change)
+;poweradd = -1000                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = time = 0
+y = 0
+
+[State 0, AfterImageTime]
+type = AfterImageTime
+trigger1 = time = 0
+value = 0
+
+
+
+
+[State 1900, 4]
+type = GameMakeAnim
+trigger1 = time = 0
+value = 61
+pos = -5,0
+postype = p1
+under = 1
+
+[State 5220, 3]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 0, EnvShake]
+type = EnvShake
+trigger1 = time = 0
+time = 5
+freq = 60
+ampl = 8
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S40,3
+
+
+[State 1000, 1]
+type = HitDef
+trigger1 = !movecontact
+attr = S, NA
+animtype  = Heavy
+damage   = 20, 5
+guardflag = MA
+pausetime = 0,10
+guard.pausetime = 10,0
+sparkno = 3
+guard.kill = 0
+sparkxy = 0,-50
+hitsound   = 5,2
+guardsound = S40,11
+fall = 1
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 20
+ground.velocity = 0 ,-5
+air.velocity = 0,0
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;H ROCKET: Up
+[Statedef 1190]
+type    = C                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = N                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                      ;Number of air juggle points move takes
+;Commonly-used controllers:
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1190                       ;Change animation (Def: no change)
+poweradd = -2000                    ;Power to add (Def: 0)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1000, 1]
+type = HitDef
+trigger1 = !movecontact
+attr = S, NA
+animtype  = Medium
+damage    = 1, 25
+guardflag = H
+pausetime = 15,1
+sparkno = 3
+sparkxy = -10,-60
+hitsound   = 5,2
+guardsound = S40,11
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 1000
+ground.velocity = 4,-5.5
+air.velocity = 2,-6
+
+[State 1000, 1]
+type = ChangeState
+trigger1 = time = 12
+value = 1220
+ctrl = 0
+
+[State 1900, 4]
+type = GameMakeAnim
+trigger1 = AnimElem = 2
+value = 62
+pos = -5,0
+postype = p1
+under = 0
+
+;---------------------------------------------------------------------------
+
+[Statedef 1220]
+type    = A                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= A                      ;Move-type: A-attack, I-idle, H-gethit
+physics = A                      ;Physics: S-stand, C-crouch, A-air
+juggle  = 1                     ;Number of air juggle points move takes
+;Commonly-used controllers:
+velset = 0,-7                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 1220                       ;Change animation (Def: no change)
+sprpriority = 2                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State 1000, 1]
+type = PlaySnd
+trigger1 = time = 0
+value = 0,2
+
+[State 0, AfterImage]
+type = AfterImage
+trigger1 = time = 0
+length = 10
+framegap = 4
+time = 50
+trans = add1 ;"none","add1","sub"
+
+[State 1000, 1]
+type = HitDef
+trigger1 = hitcount < 9
+attr = S, NA
+animtype  = Heavy
+damage   = 16
+hitflag = MAFD
+guardflag = HA
+pausetime = 5,5
+sparkno = 2
+guard.kill = 0
+sparkxy = -random%50,-60+-random%50
+hitsound   = S5,2
+guardsound = S40,5
+fall = 1
+fall.recover = 0
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 50
+ground.velocity = 0,-8.5
+air.velocity = -0.5,-8.5
+
+[State 1110, 2]
+type = VelSet
+trigger1 = time < 30
+y = -7
+x = 0
+
+[State 1110, 2]
+type = ChangeAnim
+trigger1 = time = 25
+value = 42
+
+[State 600, 3]
+type = CtrlSet
+trigger1 = Time = 1000
+value = 1
+

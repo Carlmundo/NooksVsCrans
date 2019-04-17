@@ -1,0 +1,303 @@
+; Boss' constants and state file.
+; There are comments scattered through this file, so you may like to
+; take a look if would like to learn more about the cns.
+
+[Data]
+;Amount of life to start with
+;体力ゲージの初期値
+life = 1000
+;attack power (more is stronger)
+;攻撃ダメージ
+attack = 100
+;defensive power (more is stronger)
+;体力パワー
+defence = 100
+;Percentage to increase defense everytime player is knocked down
+fall.defence_up = 50
+;Time which player lies down for, before getting up
+liedown.time = 60
+;Number of points for juggling
+airjuggle = 15
+;Default hit spark number for HitDefs
+sparkno = 2
+;Default guard spark number
+guard.sparkno = 40
+;1 to enable echo on KO
+KO.echo = 0
+;Volume offset (negative for softer)
+volume = 0
+IntPersistIndex = 60
+FloatPersistIndex = 40
+
+[Size]
+xscale = 1           ;Horizontal scaling factor.
+yscale = 1           ;Vertical scaling factor.
+ground.back = 5    ;Player width (back, ground)
+ground.front = 5   ;Player width (front, ground)
+air.back = 1        ;Player width (back, air)
+air.front = 1       ;Player width (front, air)
+height = 1          ;Height of player (for opponent to jump over)
+attack.dist = 160    ;Default attack distance
+proj.attack.dist = 90 ;Default attack distance for projectiles
+proj.doscale = 0     ;Set to 1 to scale projectiles too
+head.pos = 1, 1   ;Approximate position of head
+mid.pos = 1, 1    ;Approximate position of midsection
+shadowoffset = 0     ;Number of pixels to vertically offset the shadow
+draw.offset = 0,0    ;Player drawing offset in pixels (x, y)
+
+[Velocity]
+walk.fwd  = 2.4      ;Walk forward
+walk.back = -2.2     ;Walk backward
+run.fwd  = 4.6, 0    ;Run forward (x, y)
+run.back = -4.5,-3.8 ;Hop backward (x, y)
+jump.neu = 0,-8.4    ;Neutral jumping velocity (x, y)
+jump.back = -2.55    ;Jump back Speed (x, y)
+jump.fwd = 2.5       ;Jump forward Speed (x, y)
+runjump.back = -2.55,-8.1 ;Running jump speeds (opt)
+runjump.fwd = 4,-8.1      ;.
+airjump.neu = 0,-8.1      ;.
+airjump.back = -2.55      ;Air jump speeds (opt)
+airjump.fwd = 2.5         ;.
+
+[Movement]
+airjump.num = 1      ;Number of air jumps allowed (opt)
+airjump.height = 35  ;Minimum distance from ground before you can air jump (opt)
+yaccel = .44         ;Vertical acceleration
+stand.friction = .85  ;Friction coefficient when standing
+crouch.friction = .82 ;Friction coefficient when crouching
+
+;---------------------------------------------------------------------------
+; Variable usage:
+; This is a record of the variables that Boss uses.
+
+; parent's var(57) - Parent's GameTime var, for pause and custom state check.
+
+; var(25) - Score System/Total Score
+; var(26) - Score System timer was started
+; var(27) - How many robots were mashed
+; helper,var(28): y position randomized
+; var(33) - time
+; var(34) - timer has started
+
+
+;---------------------------------------------------------------------------
+; Lose by Time Over
+; CNS difficulty: basic
+; CNS レベル: 基本
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win state decider
+; CNS difficulty: basic
+; CNS レベル: 基本
+[Statedef 180]
+type = S
+
+[State 180, 1]
+type = ChangeState
+trigger1 = Time = 0
+value = 181
+
+;---------------------------------------------------------------------------
+; Win pose 1 - Bow
+; CNS difficulty: basic
+; CNS レベル: 基本
+[Statedef 181]
+type = S
+ctrl = 0
+anim = 195
+velset = 0,0
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = time = [0,500]
+flag = roundnotover
+;---------------------------------------------------------------------------
+; Introduction
+; CNS difficulty: basic
+; CNS レベル: 基本
+[Statedef 191]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 191, 2] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = time <= 100
+flag = Intro
+
+;------------------------
+
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+
+[StateDef -2]
+
+[State -2, DTC]
+type = DisplayToClipboard
+trigger1 = 1
+text = "score = %d, time = %d, by supermystery"
+params = var(25),var(33)
+IgnoreHitPause = 1
+
+[State -2, HandsOff]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = -1
+IgnoreHitPause = 1
+
+;-----------------------------------------------------------
+;Taunt and Hit
+;-----------------------------------------------------------
+
+[State -2, Escape]
+type = SelfState
+trigger1 = var(57) != GameTime
+value = PrevStateNo ;0
+IgnoreHitPause = 1
+
+[State -2, 1]
+type = varrandom
+trigger1 = 1
+v = 28
+range = -80,0
+
+[State -2, 1]
+type = varrandom
+trigger1 = 1
+v = 29
+range = -50,200
+
+
+[State -2, Counter Position]
+type = varset
+trigger1 = NumPartner > 0
+trigger1= partner,name="BPS1 by supermystery"
+trigger1= ID < partner,ID
+v = 36
+value = 1
+
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------
+
+[StateDef -3]
+
+[State -3, va] 
+type = varset
+trigger1 = var(34) != 1
+trigger1 = roundstate = 2
+v = 33
+value = 300
+
+[State -3, va] 
+type = varset
+trigger1 = var(33) >= 299
+trigger1 = roundstate = 2
+v = 34
+value = 1
+
+[State -3, va] 
+type = varadd
+trigger1 = var(33) >= 0
+trigger1 = roundstate = 2
+trigger1 = gametime%45 = 0
+v = 33
+value = -1
+
+[State -3, Ow]
+type = LifeAdd
+trigger1 = var(27) > 15
+value = -9999
+
+[State -2, Set]
+type = VarSet
+trigger1 = Var(25) >= 9999
+var(25) = 9999
+ignorehitpause = 1
+
+[State -3, va] 
+type = varset
+trigger1 = win
+v = 33
+value = 0
+
+[State 5150, Score System] ; In losing state
+type = Helper
+triggerall = var(36) != 1
+triggerall = win || lose
+trigger1 = numhelper(3500) = 0 && stateno = 5150
+trigger2 = numhelper(3500) = 0 && stateno = 181
+ID = 3500
+pos = 0, 0 ; you will have to adjust this so it shows correctly on both sides
+sprpriority = 3
+postype = p1
+stateno = 3500
+helpertype = normal
+name = "scoresystemS1"
+keyctrl = 0
+ownpal = 1
+
+[State -1,Teamside]
+type = varset
+trigger1 = 1
+v = 26
+value = ifelse(teamside = 1,1,0)
+
+[State -2, Start timer minus value]
+type = varadd
+triggerall = P2name != "Metal Sonic MK3 by supermystery"
+triggerall = P4name != "Metal Sonic MK3 by supermystery"
+triggerall = P2name != "Sonic The Hedgehog by supermystery"
+triggerall = P4name != "Sonic The Hedgehog by supermystery"
+triggerall = P2name != "Knuckles by supermystery"
+triggerall = P4name != "Knuckles by supermystery"
+triggerall = P2name != "Tails by supermystery"
+triggerall = P4name != "Tails by supermystery"
+trigger1 = gametime%20 = 0 && !lose && stateno != 5150 && roundstate = 2
+trigger1 = enemynear,movetype = H
+v = 25
+value = -10
+ignorehitpause = 1
+
+[State -2, Start timer minus value]
+type = varadd
+triggerall = gametime%20 = 0 && !lose && stateno != 5150 && roundstate = 2
+triggerall = enemynear,stateno = 500 || enemynear,stateno = 501 || enemynear,stateno = 3500
+trigger1 = P2name = "Metal Sonic MK3 by supermystery" || P4name = "Metal Sonic MK3 by supermystery"
+trigger2 = P2name = "Sonic The Hedgehog by supermystery" || P4name = "Sonic The Hedgehog by supermystery"
+trigger3 = P2name = "Knuckles by supermystery" || P4name = "Knuckles by supermystery"
+trigger4 = P2name = "Tails by supermystery" || P4name = "Tails by supermystery"
+v = 25
+value = -50
+ignorehitpause = 1
+
+
+; It is very important that this controller NOT be moved 
+[State -3, GameTimeVar]
+type = VarSet
+trigger1 = !IsHelper
+var(57) = GameTime
+IgnoreHitPause = 1
+
+;-----------------------------------
+

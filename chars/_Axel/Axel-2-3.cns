@@ -1,0 +1,258 @@
+;===============================================================================
+; System variables usage
+; ----------------------
+; Var name    Type   Purpose
+; --------    ----   -------
+; sysvar(0)   Temp   Set by state 5081 (HITL_SLIDE) to 1 to prevent
+;                    showing ground hit frame in state 5110 (HIT_LIEDOWN).
+;                    Used by guarding states.
+; sysvar(1)   Temp   Used by state 40 (Jump Start) amd 45 (Air Jump Start)
+;                    to keep track of which way to jump.
+;                    Used by state 5100 and 5110 to remember downward
+;                    velocity of player just before hitting the ground.
+;                    Used in state 5080 for storing the anim # to display.
+;var(01) - unuse atm - Stun Break
+;var(02) - Player Config
+;var(03) - [2100] number of bomb
+;var(04) - [1300]Number of grenade
+;var(05) - [1200][1201] number of bullet
+;var(06) - [1200][1201] used in Shooting to determine bullet speed
+;          [1400] throwing Speed
+;var(07) -
+;var(08) - [960][970] Power kicks
+;var(09) - Config fixed A.I.   <===to be implemented
+;var(10) - [8xx] used by SLams and Throws
+;var(11) - [1460] to [1466] Bonus Type use by Helper not the Root character
+;var(12) - [1300][1400] - Grenade / Throwing Knife
+;var(12) - [1500] to [1503] Melee weapon control
+;-------------------------------------------------------------------------------
+;===============================================================================
+[Statedef -2];; States that are always executed (use statedef -2)
+;===============================================================================
+[State -2, DisplayToClipboard]
+type = displayToClipboard
+text = "Var(59)=%d,Var(58)=%d,X=%d,Y=%d"
+params = var(59),var(58),floor(P2BodyDist X),floor(P2BodyDist Y)
+trigger1 = 1
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+[state -2, set_Config]	;This variable is use to config Axel
+type = varset		;During Taunt Effect :
+trigger1 = roundstate = 0	;0 = Basic, 1 = Bonus Drop  
+var(2) = 3 ; 1; 2;		;2 = Life+Energy UP + Bonus Drop,         
+			        ;3 =Energy carried over to next Match
+
+[state -2, set_bomb]
+type = varset              ;0: Pre-intro - screen fades in, 1: Intro, 2: Fight - during battle
+trigger1 = roundstate = 0  ;3: Pre-over - just a round is won or lost 4: Over - win poses
+var(3) = 3                 ;no. of bomb     Max = 3 gfx [more will not show up]
+
+[state -2, set_grenade]
+type = varset
+trigger1 = roundstate = 0
+var(4) = 5                 ;no. of bullets  Max = 5 gfx [more will not show up]
+
+[state -2, set_bullet]
+type = varset
+trigger1 = roundstate = 0
+var(5) = 6                 ;no. of bullets  Max = 6 gfx [more will not show up]
+
+[State -2, Var(57)Set to Power] ;Enable Power to be carried over to
+type = VarSet		  ; next Match, not next round	
+triggerall= var(2) >= 1
+trigger1 = roundno=2
+var(57) = Power    ;fv = 10
+;===============================================================================
+;Version 1
+;===============================================================================
+[State -2, Helper-Arsenal Display]
+type = Helper ; null;
+triggerall = Roundstate>=1 ;&& teamside=1
+trigger1 = 1
+name = "Arsenal-P1"
+ID = 7000
+stateno = 7000+1*(TeamMode=Simul)
+pos = 0,0
+postype = Left    ;p2,front,back,left,right
+facing = 1
+keyctrl = 0
+;===============================================================================
+[State -2, Destroy 357-bullet helper] ;Remove bullet helper when they dont behave
+type=DestroySelf                     ;1200 bullet id, 1203 = bullet state
+triggerall = numhelper(1200)!=0
+triggerall = ishelper(1200)
+trigger1 = Helper(1200), stateno!= 1203 || Helper(1200), stateno!= 1202
+trigger2 = Helper(1200), anim!=4000
+trigger3 = Helper(1200), Movetype=H
+trigger4 = Helper(1200), Vel X=0
+
+[State -2, Destroy shotgun-bullet helper] ;Remove bullet helper when they dont behave
+type=DestroySelf                     ;1200 bullet id, 1203 = bullet state
+triggerall = numhelper(1601)!=0
+triggerall = ishelper(1601)
+trigger1 = Helper(1601), stateno!= 1603 || Helper(1601), stateno!= 1604
+trigger2 = Helper(1601), anim!=4000
+trigger3 = Helper(1601), Movetype=H
+trigger4 = Helper(1601), Vel X=0
+;---------------------------------------------------------------------------
+[State -2, Destroy grenade helper] ;Remove helper when they dont behave
+type=DestroySelf                     ;grenade 1400 or throwing knife 11400
+triggerall = numhelper(1300)!=0
+triggerall = ishelper(1300)
+trigger1 = (Helper(1300), stateno!= 1400) || (Helper(1300), stateno!= 11400)
+trigger3 = Helper(1300), Movetype=H
+trigger4 = Helper(1300), Vel X=0
+;---------------------------------------------------------------------------
+[State -2, Destroy Gift Helper] ;Remove helper when they dont behave
+type=DestroySelf                     ;grenade 1400 or throwing knife 11400
+triggerall = numhelper(1460)!=0
+triggerall = ishelper(1460)
+trigger1 = (Helper(11460), stateno!= 1461) || (Helper(1300), stateno!= 11462)
+trigger2 = (Helper(11460), stateno!= 1463) || (Helper(1300), stateno!= 11464)
+trigger3 = (Helper(11460), stateno!= 1465) || (Helper(1300), stateno!= 11466)
+trigger4 = (Helper(11460), stateno!= 1467) ;|| (Helper(1300), stateno!= 11468)
+trigger5 = Helper(11460), Movetype=H
+;---------------------------------------------------------------------------
+[State -2, Break Slam]	;Stun counter works with -3 Stun Timer
+Type = null; Selfstate ;
+triggerall= var(2) >= 1
+Triggerall = var(1)!=Gametime
+Trigger1 = command = "recovery"  ;&& stateType!=S ;=L
+Value = 80
+;===============================================================================
+[Statedef -3];; States that are always executed (use statedef -2)
+;===============================================================================
+[State -3, Destroy 357-bullet helper] ;Remove bullet helper when they dont behave
+type=DestroySelf                     ;1200 bullet id, 1203 = bullet state
+triggerall = numhelper(1200)!=0
+triggerall = ishelper(1200)
+trigger1 = Helper(1200), stateno!= 1203 || Helper(1200), stateno!= 1202
+trigger2 = Helper(1200), anim!=4000
+trigger3 = Helper(1200), Movetype=H
+trigger4 = Helper(1200), Vel X=0
+
+[State -3, Destroy shotgun-bullet helper] ;Remove bullet helper when they dont behave
+type=DestroySelf                     ;1200 bullet id, 1203 = bullet state
+triggerall = numhelper(1601)!=0
+triggerall = ishelper(1601)
+trigger1 = Helper(1601), stateno!= 1603 || Helper(1601), stateno!= 1604
+trigger2 = Helper(1601), anim!=4000
+trigger3 = Helper(1601), Movetype=H
+trigger4 = Helper(1601), Vel X=0
+;---------------------------------------------------------------------------
+[State -3, Destroy grenade helper] ;Remove helper when they dont behave
+type=DestroySelf                     ;grenade 1400 or throwing knife 11400
+triggerall = numhelper(1300)!=0
+triggerall = ishelper(1300)
+trigger1 = (Helper(1300), stateno!= 1400) || (Helper(1300), stateno!= 11400)
+trigger3 = Helper(1300), Movetype=H
+trigger4 = Helper(1300), Vel X=0
+;---------------------------------------------------------------------------
+[State -3, Destroy Gift Helper] ;Remove helper when they dont behave
+type=DestroySelf                     ;grenade 1400 or throwing knife 11400
+triggerall = numhelper(1460)!=0
+triggerall = ishelper(1460)
+trigger1 = (Helper(11460), stateno!= 1461) || (Helper(1300), stateno!= 11462)
+trigger2 = (Helper(11460), stateno!= 1463) || (Helper(1300), stateno!= 11464)
+trigger3 = (Helper(11460), stateno!= 1465) || (Helper(1300), stateno!= 11466)
+trigger4 = (Helper(11460), stateno!= 1467) ;|| (Helper(1300), stateno!= 11468)
+trigger5 = Helper(11460), Movetype=H
+;---------------------------------------------------------------------------
+[State -3, Var1_CounterStun Timer]	;Use For TargetBind Break
+Type = Null ; Varset		;use by [State -2, Stun Break] above
+Trigger1=1
+var(1)=Gametime                      ;
+ignorehitpause=1
+;-------------------------------------------------------------------------------
+;[State -3, Landing Sound]
+;type = PlaySnd
+;triggerall = Time = 1
+;trigger1 = stateno = 52 ;Jump land
+;value = s5,2
+;volume = 200
+
+[State -3, AttackMulSet]  ;var(2) = 3 ; 1; 2;
+type = AttackMulSet       ;0 = Basic, 1 = Bonus Drop
+trigger1 = Roundstate=2   ;2 = Life+Energy UP + Bonus Drop,
+value = 0.7+(var(2)*0.1)  ;3 =Energy carried over to next Match
+ignorehitpause = 1
+persistent = 1
+
+[State -3, DefenceMulSet]
+Type = DefenceMulSet            ;Smaller the Value, the higher the defence
+triggerall = Roundstate=2
+Trigger1 = GetHitVar(hitcount)>2
+Value = (GetHitVar(hitcount)-1)/(GetHitVar(hitcount))
+
+[State -3, Team-DefenceMulSet]  ;var(2) = 3 ; 1; 2;
+type = DefenceMulSet         
+triggerall=NumPartner>0
+trigger1 = Roundstate=2   
+value = 0.25  
+ignorehitpause = 1
+persistent = 1
+;-------------------------------------------------------------------------------
+;Positioning Correction
+[State -3, Wrong StateType Prevention-Correction]
+Type = ChangeState
+triggerall = stateno!=[800,899]
+Trigger1= pos y!=0 && stateType!=A && stateType!=L
+Value = 50
+ctrl = 1
+
+[State -3, PosSet]
+type = PosSet
+triggerall = stateno!=[800,899]
+trigger1 = pos y>0 && stateType!=A && stateType!=L
+y = -10
+;-------------------------------------------------------------------------------
+[State -3, 1461-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1461) && Anim!=1461
+value = 1461
+
+[State -3, 1462-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1462) && Anim!=1462
+value = 1462
+
+[State -3, 1463-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1463) && Anim!=1463
+value = 1463
+
+[State -3, 1464-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1464) && Anim!=1464
+value = 1464
+
+[State -3, 1465-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1465) && Anim!=1465
+value = 1465
+
+[State -3, 1466-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1466) && Anim!=1466
+value = 1466
+
+[State -3, 1467-CS MaxFood]
+type = ChangeState
+trigger1 = ishelper(1467) && Anim!=1467
+value = 1467
+;-------------------------------------------------------------------------------
+; Section H. - Debugger to be remove when character goes final
+;-------------------------------------------------------------------------------
+[State -3, Wrong StateType]
+type= null;superpause;
+Triggerall = statetype!=A && statetype!=L
+trigger1= pos y!=0
+time= 99999
+ignorehitpause= 1
+
+
+;-------------------------------------------------------------------------------
+; Section I. - A,I.
+;-------------------------------------------------------------------------------

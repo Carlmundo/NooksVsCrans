@@ -1,0 +1,160 @@
+﻿;---------------------------------------------------------------------------
+;===========================================================================
+;Definition of the Titan Hand-Arm 巨人手臂的定義
+;===========================================================================
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+;Titan Right Hand-Arm
+;巨人右手臂
+[Statedef 32]
+type = S
+physics = S
+sprpriority = 4
+anim = 32
+
+[State 32, 1]
+type = Width
+trigger1 = 1
+value = -24*const(size.xscale),-24*const(size.yscale)
+
+[State 32, 2]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0,0
+
+[State 32, 3]
+type = ChangeAnim
+trigger1 = Parent,StateNo = 0
+trigger1 = Anim != 32
+value = 32
+
+[State 32, 4]
+type = VarSet
+trigger1 = Time = 30
+v = 39
+value = 0
+
+[State 32, 5]
+type = VarSet
+trigger1 = Time = 0
+v = 40
+value = 0
+
+[State 32, 6]
+type = Turn
+trigger1 = Facing != Parent,Facing
+
+[State 32, 7]
+type = BindToParent
+trigger1 = 1
+time = 2
+pos = 0,0
+
+[State 32, 8]
+type = HitBy
+trigger1 = 1
+value =
+time = 1
+
+[State 32, 9]
+type = NotHitBy
+trigger1 = 1
+value = SCA, NA, SA, HA, NP, SP, HP, NT, ST, HT
+value2 = SCA, NA, SA, HA, NP, SP, HP, NT, ST, HT
+time = 1
+
+[State 32, 10]
+type = ChangeState
+trigger1 = Parent,StateNo = [310,339]
+trigger2 = Parent,StateNo = [2000,2099]
+trigger3 = Parent,StateNo = [2500,2599]
+trigger4 = Parent,StateNo = [3000,3099]
+value = Parent,StateNo+1
+
+[State 32, 11 (Helper End)]
+type = DestroySelf
+trigger1 = Parent,StateNo = 5150
+trigger2 = Parent,Alive = 0
+
+;---------------------------------------------------------------------------
+;===========================================================================
+;===========================================================================
+;---------------------------------------------------------------------------
+;Titan Right Hand-Arm (Damage)
+;巨人右手臂 (受擊)
+[Statedef 35]
+type = S
+movetype = H
+physics = S
+sprpriority = 4
+
+[State 35, 1]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0,0
+
+[State 35, 2]
+type = Width
+trigger1 = Time >= 0
+value = -24*const(size.xscale),-24*const(size.yscale)
+
+[State 35, 3]
+type = Turn
+trigger1 = Facing != Parent,Facing
+
+[State 35, 4]
+type = BindToParent
+trigger1 = 1
+time = 2
+pos = 0,0
+
+[state 35, 5]
+type = VarSet
+trigger1 = Time = 0
+v = 39
+value = var(39)+1
+
+[state 35, 6]
+type = ParentVarSet
+trigger1 = Time = 0
+v = 42
+value = 1
+
+[state 35, 7]
+type = VarSet
+trigger1 = Time = 0
+v = 40
+value = IfElse(GetHitVar(Damage) > 300,300,GetHitVar(Damage))
+
+[State 35, 8]
+type = HitBy
+trigger1 = 1
+value =
+time = 1
+
+[State 35, 9]
+type = NotHitBy
+trigger1 = 1
+value = SCA, NA, SA, HA, NP, SP, HP, NT ,ST ,HT
+value2 = SCA, NA, SA, HA, NP, SP, HP, NT, ST, HT
+time = 1
+
+[State 35, 10]
+type = HitOverride
+trigger1 = 1
+attr = SCA, NA, SA, HA, NP, SP, HP
+stateno = 35
+time = 2
+
+[state 35, 11]
+type = ChangeState
+trigger1 = Time = 1
+value = 32
+
+[state 35, 12 (Helper End)]
+type = DestroySelf
+trigger1 = Parent,StateNo = 5150
+trigger2 = Parent,Alive = 0

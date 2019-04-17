@@ -1,0 +1,656 @@
+
+;===========================================================================
+; 必殺技
+;===========================================================================
+
+;---------------------------------------------------------------------------
+; 破晄撃
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+; 破晄撃 弱
+;---------------------------------------------------------------------------
+[Statedef 1200]
+type     = S
+movetype = A ;ここをIにしてはダメ！ 相手AIがガード不能になります
+physics  = S
+poweradd = 50
+velset   = 0,0
+anim     = 1200
+ctrl     = 0
+sprpriority = 2
+
+[State 1200,01]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = 3000, 17
+
+[State 1200,02]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = 30, 8
+
+[State 1200,03]
+type = PlaySnd
+trigger1 = AnimElem = 6
+value = 20, 9
+
+[State 1200,04]
+type = Width
+trigger1 = ((AnimElemTime(2) >= 0) && (AnimElemTime(10) < 0))
+edge = 30,0
+player = 16,0
+
+[State 1200,05]
+type = Explod
+trigger1 = time = 5
+anim = 10200
+pos = 60,-20
+postype = P1
+scale = .5,.5
+sprpriority = 3
+ownpal = 1
+ID = 10200
+
+[State 1200,06]
+type = Helper
+trigger1 = AnimElem = 4
+name = "Beam"            ;ヘルパーの名前
+stateno = 1201           ;ヘルパーが最初に行くステート
+ID = 1200                ;ヘルパーのＩＤナンバー
+helpertype = normal      ;ヘルパーの属性：画面スクロールの影響を受けるか否かを決める
+                         ;（Player=影響有り・画面外に出られない　Normal=影響無し・画面外に出られる）
+pos = 30,0               ;ヘルパーの出現位置
+postype = p1             ;ヘルパーの最初に出る軸位置の属性（Explodのpostypeと書き方は同じだが効果が少し違う）
+keyctrl = 0              ;ヘルパーがコントロール可能かどうか（0=操作不可・1=操作可能）
+ownpal = 1               ;ヘルパーが(PalFXなどで)本体の色が変わった時に一緒に変わるかどうか（Explodのownpalと一緒）
+persistent = 0
+
+[State 1200,07]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; 破晄撃 斬撃 (弱）
+;---------------------------------------------------------------------------
+[Statedef 1201]
+type    = S
+movetype = A
+physics = N
+ctrl = 0
+velset = 0,0
+anim = 1201
+sprpriority = 4
+
+[State 1201,01]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[State 1201,02]
+type = VelSet
+trigger1 = time = 0
+x = 3
+
+[State 1201,03]
+type = Projectile
+trigger1 = time = 1
+attr = S, SP               ;Standing, Special Projectile（立ち必殺技の飛び道具）
+damage = 50,5
+getpower = 30,10
+animtype = Hard
+pausetime = 0,12
+offset = 0,0               ;飛び道具の出現位置
+velocity = 3,0             ;飛び道具の移動初速度
+accel = 0,0                ;飛び道具の加速度
+projID = 1200              ;飛び道具のＩＤナンバー
+projanim = 1210            ;飛び道具のアニメ
+projhitanim = -1;1211      ;飛び道具がヒットした時のアニメ
+projremanim = -1;1211      ;飛び道具が消える時のアニメ
+projcancelanim = -1;1211   ;飛び道具相殺時のアニメ（未記入時はprojremanimと同じ）
+projscale = .5,.5          ;飛び道具の大きさ（今は２倍）
+projshadow = 0,0,0         ;飛び道具の影（現在は0,0,0なので影無し）
+projhits = 1               ;飛び道具のヒット数
+projmisstime = 1           ;飛び道具がヒットしない間隔（２ヒット以上のみ作用する）
+projpriority = 1           ;飛び道具の攻撃優先度
+projsprpriority = 4        ;飛び道具の描画優先度。DEF=2
+projremove = 1             ;0にするとヒット後に飛び道具が消えない。
+projremovetime = -1        ;飛び道具が消えるまでの時間（-1なので画面外に出るか当たるまで消えない）
+projedgebound = 40         ;飛び道具が画面の外に進める距離。DEF=40
+projstagebound = 40        ;飛び道具がステージの外に進める距離。DEF=40
+projheightbound = -240,1   ;飛び道具が画面の上下に進める距離。DEF=-240,1
+hitflag = MAF
+guardflag = MA
+priority = 3
+sparkno = 2
+sparkxy = 0,0
+guard.sparkno = -1
+hitsound = S20,0
+guardsound = S10,0
+ground.type = High
+ground.slidetime = 14
+ground.hittime = 16
+ground.velocity = -6,0
+air.velocity = -3,-4
+air.juggle = 1              ;飛び道具の場合はここでジャグルポイントを設定する必要がある
+envshake.time = 8
+envshake.ampl = 6
+envshake.freq = 100
+
+[State 1201,04]
+type = Explod
+trigger1 = anim = 1200
+trigger1 = AnimElem = 5
+anim = 10200
+pos = 20,-10
+postype = p1
+ownpal = 1
+bindtime = -1
+pausemovetime = -1
+supermove = 1
+ID = 10200
+sprpriority = 3
+
+[State 1201,05]
+type = DestroySelf
+triggerall = time > 1
+trigger1 = FrontEdgeDist <= -40
+
+
+[State 1201,06]
+type = ChangeState
+triggerall = time > 1
+trigger1 = root,NumProjID(1200) = 0
+value = 1202
+
+;---------------------------------------------------------------------------
+; 破晄撃 強
+;---------------------------------------------------------------------------
+[Statedef 1250]
+type     = S
+movetype = A 
+physics  = S
+poweradd = 50
+velset   = 0,0
+anim     = 1200
+ctrl     = 0
+sprpriority = 2
+
+[State 1250,01]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = 3000, 0
+
+[State 1250,02]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = 30, 8
+
+[State 1250,03]
+type = PlaySnd
+trigger1 = AnimElem = 6
+value = 20, 9
+
+[State 1250,04]
+type = Width
+trigger1 = ((AnimElemTime(2) >= 0) && (AnimElemTime(10) < 0))
+edge = 30,0
+player = 16,0
+
+[State 1250,05]
+type = Explod
+trigger1 = time = 5
+anim = 10200
+pos = 60,-20
+postype = P1
+scale = .5,.5
+sprpriority = 5
+ownpal = 1
+
+[State 1250,06]
+type = Helper
+trigger1 = AnimElem = 4
+name = "Beam2"
+stateno = 1251
+ID = 1250
+helpertype = normal
+pos = 30,0
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .5
+size.yscale = .5
+
+[State 1250,07]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; 破晄撃 斬撃 (強)
+;---------------------------------------------------------------------------
+[Statedef 1251]
+type    = S
+movetype = A
+physics = N
+ctrl = 0
+velset = 0,0
+anim = 1201
+sprpriority = 4
+
+[State 1251,01]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[State 1251,02]
+type = VelSet
+trigger1 = time = 0
+x = 5
+
+[State 1251,03]
+type = Projectile
+trigger1 = time = 1
+attr = S, SP
+damage = 50,5
+getpower = 30,10
+animtype = Hard
+pausetime = 0,12
+offset = 0,0
+velocity = 5,0
+accel = 0,0
+projID = 1250
+projanim = 1212
+projhitanim = -1
+projremanim = -1
+projcancelanim = -1
+projscale = .5,.5
+projshadow = 0,0,0
+projhits = 1
+projmisstime = 1
+projpriority = 1
+projremovetime = -1
+hitflag = MAF
+guardflag = MA
+priority = 3
+sparkno = 2
+sparkxy = 0,0
+guard.sparkno = 40
+hitsound = S20,2
+guardsound = S10,0
+ground.type = High
+ground.slidetime = 14
+ground.hittime = 16
+ground.velocity = -6,0
+air.velocity = -3,-4
+air.juggle = 1
+envshake.time = 8
+envshake.ampl = 6
+envshake.freq = 100
+
+[State 1251,04]
+type = Explod
+trigger1 = anim = 1200
+trigger1 = AnimElem = 5
+anim = 10200
+pos = 20,-10
+postype = p1
+ownpal = 1
+bindtime = -1
+pausemovetime = -1
+supermove = 1
+ID = 10200
+sprpriority = 3
+
+[State 1251,05]
+type = DestroySelf
+triggerall = time > 1
+trigger1 = FrontEdgeDist <= -40
+
+
+[State 1251,06]
+type = ChangeState
+triggerall = time > 1
+trigger1 = root,NumProjID(1250) = 0
+value = 1202
+
+;---------------------------------------------------------------------------
+; 破晄撃 消滅
+;---------------------------------------------------------------------------
+[Statedef 1202]
+type     = S
+movetype = I
+physics  = N
+ctrl     = 0
+anim     = 1203
+
+[State 1202,01]
+type = Explod
+trigger1 = time = 1
+Anim = 1211
+id = 1211
+pos = 0, 0
+scale = .5,.5
+postype = p1
+ownpal = 1
+bindtime = 1
+sprpriority = 3
+
+[State 1201,02]
+type = AssertSpecial
+trigger1 = 1
+flag = NoShadow
+
+[State 1201,03]
+type = DestroySelf
+trigger1 = time = 1
+
+;---------------------------------------------------------------------------
+; ブレイバー
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+; ブレイバー 弱
+;---------------------------------------------------------------------------
+[Statedef 1400]
+type    = S
+movetype= A
+physics = S
+juggle  = 8
+poweradd= 110
+velset = 0,0
+anim = 1400
+ctrl = 0
+sprpriority = 2
+
+[State 1400,01]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = 3000, 19
+channel = 0
+
+[State 1400,08]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = 50, 0
+
+[State 1400,02]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = 40, 1
+
+[State 1400,02]
+type = PlaySnd
+trigger1 = AnimElem = 6
+value = 30, 8
+
+[State 1400,03]
+type = VelSet
+trigger1 = AnimElem = 1
+x = 1
+
+[State 1400,04]
+type = HitDef
+trigger1 = time = 0
+attr = A, SA
+animtype  = Medium
+damage    = 60, 5
+priority  = 5
+guardflag = M
+hitflag = MAF
+pausetime = 12,12
+sparkno = S7700 + (Random % 3)
+guard.sparkno = S7600 
+sparkxy = -10,-70
+hitsound   = S20,6
+guardsound = S10,0
+ground.type = Low
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = -2,-5
+guard.velocity = -7
+air.velocity = -2,-5
+fall = 1
+
+[State 1400,05]
+type = Explod
+trigger1 = AnimElem = 2
+anim = 7001
+pos = 0,0
+postype = P1
+scale = .5,.5
+sprpriority = 5
+ownpal = 1
+
+[State 1400,06]
+type = Explod
+trigger1 = AnimElem = 7
+anim = 10230
+pos = 80,-35
+postype = P1
+scale = .5,.5
+sprpriority = 5
+ownpal = 1
+
+[state 1400,07]
+type = StatetypeSet
+trigger1 = Animelem = 2
+value = A
+
+[State 1400,08]
+type = PosAdd
+trigger1 = AnimElem = 3
+x = 1
+
+[State 1400,09]
+type = VelSet
+trigger1 = AnimElem = 2
+x = 2
+y = -4
+
+[State 1400,10]
+type = VelAdd
+trigger1 = AnimElemTime(7) >= 1
+x = .5
+y = 1
+
+[State 1400,11]
+type = VelSet
+trigger1 = AnimElem = 5
+x = 3
+
+[State 1400,12]
+type = ChangeState
+trigger1 = Vel Y > 0 && Pos Y >= -10
+value = 1420
+
+;---------------------------------------------------------------------------
+; ブレイバー 強
+;---------------------------------------------------------------------------
+[Statedef 1410]
+type    = S
+movetype= A
+physics = S
+juggle  = 8
+poweradd= 110
+velset = 0,0
+anim = 1400
+ctrl = 0
+sprpriority = 2
+
+[State 1410,01]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = 3000, 19
+channel = 0
+
+[State 1401,02]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = 50, 0
+
+[State 1401,03]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = 40, 1
+
+[State 1400,02]
+type = PlaySnd
+trigger1 = AnimElem = 6
+value = 30, 8
+
+[State 1401,04]
+type = VelSet
+trigger1 = AnimElem = 1
+x = 1
+
+[State 1401,05]
+type = HitDef
+trigger1 = time = 0
+attr = A, SA
+animtype  = Medium
+damage    = 60, 5
+priority  = 5
+guardflag = M
+hitflag = MAF
+pausetime = 12,12
+sparkno = S7700 + (Random % 3)
+guard.sparkno = S7600 
+sparkxy = -10,-70
+hitsound   = S20,6
+guardsound = S10,0
+ground.type = Low
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = -2,-5
+guard.velocity = -7
+air.velocity = -2,-5
+fall = 1
+
+[State 1401,06]
+type = Explod
+trigger1 = AnimElem = 3
+anim = 7001
+pos = 0,0
+postype = P1
+scale = .5,.5
+sprpriority = 5
+ownpal = 1
+
+[State 1401,07]
+type = Explod
+trigger1 = AnimElem = 7
+anim = 10230
+pos = 90,-30
+postype = P1
+scale = .5,.5
+sprpriority = 5
+ownpal = 1
+
+[state 1401,08]
+type = StatetypeSet
+trigger1 = Animelem = 2
+value = A
+
+[State 1401,09]
+type = PosAdd
+trigger1 = AnimElem = 3
+x = 2
+
+[State 1401,10]
+type = VelSet
+trigger1 = AnimElem = 2
+x = 6
+y = -6
+
+[State 1401,10]
+type = VelSet
+trigger1 = AnimElem = 6
+x = 6
+
+
+[State 1400,11]
+type = VelAdd
+trigger1 = AnimElemTime(7) >= 1
+x = .5
+y = 1.5
+
+[State 1400,12]
+type = VelSet
+trigger1 = AnimElem = 5
+x = 3
+
+[State 1400,13]
+type = ChangeState
+trigger1 = Vel Y > 0 && Pos Y >= -10
+value = 1420
+
+;---------------------------------------------------------------------------
+; ブレイバー 着地
+;---------------------------------------------------------------------------
+[Statedef 1420]
+type    = C
+movetype= A
+physics = C
+juggle  = 7
+poweradd= 10
+velset = 0,0
+anim = 1410
+ctrl = 0
+sprpriority = 2
+
+[State 1420,01]
+type = PosSet
+trigger1 = time = 0
+y = 0
+
+[State 1420,02]
+type = Explod
+trigger1 = time = 0
+anim = 7010
+pos = 0,0
+postype = P1
+scale = .5,.5
+sprpriority = 5
+ownpal = 1
+
+[State 1420,03]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = 40,0
+
+[State 1420,04]
+type = HitDef
+trigger1 = time = 0
+attr = C, NA
+;animtype  = Medium
+damage    = 30
+priority  = 5
+guardflag = L
+hitflag = FD
+pausetime = 12,12
+sparkno = S7700 + (Random % 3)
+guard.sparkno = S7600 
+sparkxy = -10,-70
+hitsound   = S20,6
+guardsound = S10,0
+ground.type = Low
+ground.slidetime = 12
+ground.hittime  = 12
+ground.velocity = -2,-5
+guard.velocity = -7
+air.velocity = -2,-5
+fall = 1
+
+[State 1420,05]
+type = Changestate
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+

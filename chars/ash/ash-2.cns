@@ -1,0 +1,969 @@
+;---------------------------------------------------------------------------
+[Statedef -2]
+;----------------
+[State -2,]
+type = DisplayToClipboard
+trigger1 = 1
+text = "Var(49) =%d,Var(8) =%d,Distance X=%d,Y=%d"
+params = Var(49) ,var(8) ,floor(FrontEdgeBodyDist) , floor(P2BodyDist Y)
+
+[State -2];交代攻撃ヒットフラグ
+Type = VarSet
+Trigger1 = P2MoveType != H
+IgnoreHitPause = 1
+V = 19
+Value = 0
+
+[State -2,]
+type = Explod
+trigger1 = NumHelper(2602) = 0
+trigger1 = NumExplod(2999) = 0
+trigger1 = NumExplod(2798) = 0
+trigger1 = TeamSide = 1
+anim = 2999
+id = 2999
+Persistent = 0
+IgnoreHitPause = 1
+sprpriority = 100
+postype = left
+pos = 15,225
+facing = 1
+bindtime = -1
+supermove = 1
+ownpal = 1
+ontop = 1
+
+[State -2,]
+type = Explod
+trigger1 = NumHelper(2602) = 0
+trigger1 = NumExplod(2999) = 0
+trigger1 = NumExplod(2799) = 0
+trigger1 = TeamSide = 2
+anim = 2999
+id = 2999
+Persistent = 0
+IgnoreHitPause = 1
+sprpriority = 100
+postype = left
+pos = 270,225
+bindtime = -1
+supermove = 1
+ownpal = 1
+ontop = 1
+
+[State -2,]
+Type = VarSet
+trigger1 = statetype = A
+trigger1 = alive = 1
+V = 17
+Value = 0
+
+[State -2,]
+Type = VarSet
+trigger1 = statetype != A
+trigger1 = alive = 1
+V = 17
+Value = 1
+
+[State -2]
+Type = VarSet
+trigger1 = alive = 0
+trigger1 = prevstateno = [130,139]
+V = 18
+Value = 1
+
+[State -2]
+type = ChangeState
+triggerall = Var(17)= 1
+triggerall = Var(18)= 1
+triggerall = alive = 0
+trigger1 = stateno != 5950
+trigger1 = prevstateno = [130,139]
+ignorehitpause = 1
+value = 5950
+
+[State -2]
+type = PlaySnd
+trigger1 = Var(14)= 0
+trigger1 = Life = 0
+trigger1 = StateNo != 5950
+trigger1 = anim != 5950
+value =  11,1
+channel = 5
+
+[State -2,]
+Type = VarSet
+trigger1 = Life = 0
+trigger1 = Var(14)= 0
+trigger1 = StateNo != 5950
+V = 14
+Value = 1
+
+;----------------
+[State -2,];サンキュロット点滅
+type = PalFX
+triggerall = NumHelper(3301) = 1
+trigger1 = (GameTime%2) = 0
+time = 1
+IgnoreHitPause = 1
+add = 100,100,0
+
+[State -2,];ヴァントーズ連射フラグ
+type = Helper
+triggerall = NumHelper(1090) = 0
+Trigger1 = ProjContact1000 = 1, 1
+Trigger2 = ProjContact1010 = 1, 1
+Trigger3 = ProjContact1011 = 1, 1
+Trigger4 = ProjContact1012 = 1, 1
+ID = 1090
+pos = 0,0
+postype = p1
+stateno = 1090
+name = "VTR1"
+helpertype = normal
+
+[State -2,]
+Type = VarSet
+triggerall = NumHelper(1090) = 0
+trigger1 = StateNo != [1000,1099]
+trigger1 = numproj = 0
+V = 7
+Value = 0
+
+[State -2,]
+type = AfterImageTime
+trigger1 = movetype = H
+trigger2 = stateno = 52
+trigger4 = stateno = [5000,5999]
+Time = 0
+
+[State -2, ]
+type = StopSnd
+trigger1 = stateno != 100
+trigger1 = stateno != [180,195]
+channel = 0
+
+;----------------
+;テルミドール関連
+[State -2];ヒット数
+Type = VarAdd
+Trigger1 = ProjHit3003 = 1, 1
+Persistent = 0
+IgnoreHitPause = 1
+V = 6
+Value =1
+
+[State -2];ヒット数2
+Type = VarAdd
+Trigger1 = ProjHit3013 = 1, 1
+Persistent = 0
+IgnoreHitPause = 1
+V = 16
+Value =1
+
+[State -2];補正
+Type = VarSet
+Trigger1 = ProjHit3003 = 1, 1
+trigger1 = Var(6) <= 1
+Persistent = 0
+IgnoreHitPause = 1
+V = 5
+Value = floor(Var(5)*0.5)
+
+[State -2];補正2
+Type = VarSet
+Trigger1 = ProjHit3013 = 1, 1
+trigger1 = Var(16) <= 1
+Persistent = 0
+IgnoreHitPause = 1
+V = 15
+Value = floor(Var(15)*0.5)
+
+[State -2]
+Type = PlaySnd
+Trigger1 = ProjHit3003 = 1, 1
+Trigger2 = ProjHit3013 = 1, 1
+Persistent = 0
+IgnoreHitPause = 1
+value = 1010,2
+channel = 1
+
+[State -2]
+Type = PlaySnd
+Trigger1 = ProjGuarded3003 = 1, 1
+Trigger2 = ProjGuarded3013 = 1, 1
+Persistent = 0
+IgnoreHitPause = 1
+value = 6,1
+channel = 1
+
+;----------------
+;コンボ補正
+[State -2];ヒット数
+Type = VarSet
+Trigger1 = ProjHit3003 = 1, 1
+trigger1 = Var(6) <= 1
+Trigger2 = ProjHit3013 = 1, 1
+trigger2 = Var(16) <= 1
+Persistent = 0
+IgnoreHitPause = 1
+V = 7
+Value = 1
+
+[State -2,];ヒット数
+Type = VarAdd
+Trigger1 = ProjHit1000 = 1, 0
+Trigger2 = ProjHit1010 = 1, 0
+Trigger3 = ProjHit1011 = 1, 0
+Trigger4 = ProjHIt1012 = 1, 0
+Trigger5 = ProjHit3003 = 1, 0
+Trigger6 = ProjHit3013 = 1, 0
+Persistent = 0
+IgnoreHitPause = 1
+V = 8
+Value = 1
+
+[State -2]
+Type = VarSet
+Trigger1 = P2MoveType != H
+Trigger2 = P2StateNo = 5100
+Trigger3 = P2StateNo = 5110
+IgnoreHitPause = 1
+V = 8
+Value = 0
+
+[State -2]
+Type = AttackMulSet
+Trigger1 = Var(8) = 0
+IgnoreHitPause = 1
+Value = 1
+
+[State -2]
+Type = AttackMulSet
+Trigger1 = Var(8) >= 2
+IgnoreHitPause = 1
+Value = .5
+
+[State -2]
+Type = VarSet
+Trigger1 = P2MoveType != H
+IgnoreHitPause = 1
+V = 9
+Value = 1000
+
+[State -2]
+Type = VarSet
+trigger1 = Var(8) >= 2
+IgnoreHitPause = 1
+V = 9
+Value = 500
+
+;----------------
+[State -2,]
+type = PowerSet
+trigger1 = NumHelper(3301) = 1
+IgnoreHitPause = 1
+value = Var(10)
+
+[State -2]
+Type = VarSet
+Trigger1 = P2MoveType != H
+trigger1 = NumHelper(3001) = 0
+IgnoreHitPause = 1
+V = 6
+Value = 0
+
+;----------------
+[State -2]
+type = varset
+Trigger1 = P2MoveType = A
+IgnoreHitPause = 1
+V = 12
+Value = 1
+
+[State -2]
+Type = VarSet
+Trigger1 = P2MoveType != A
+Trigger1 = Var(8) != 1
+Trigger2 = P2StateNo = 5100
+Trigger3 = P2StateNo = 5110
+V = 12
+Value = 0
+
+[State 3000, SC]
+type = Explod
+Trigger1 = Var(12) != 0
+Trigger1 = Var(8) = 1
+trigger1 = NumExplod(2000) = 0
+trigger1 = TeamSide = 1
+anim = 2000
+ID = 2000
+pos = -125,70
+postype = left
+removetime = 60
+supermove = 1
+bindtime = -1
+vel=0,0
+ownpal = 1
+ontop=1
+
+[State 3000, SC]
+type = Explod
+Trigger1 = Var(12) != 0
+Trigger1 = Var(8) = 1
+trigger1 = NumExplod(2000) = 0
+trigger1 = TeamSide = 2
+anim = 2010
+ID = 2000
+facing = -1
+pos = 75,70
+postype = left
+removetime = 60
+supermove = 1
+bindtime = -1
+vel=0,0
+ownpal = 1
+ontop=1
+
+[State -2,];飛び道具カウンター
+type = TargetLifeAdd
+Triggerall = Var(12) != 0
+Trigger1 = ProjHit1000 = 1, 0
+Trigger2 = ProjHit1010 = 1, 0
+Trigger3 = ProjHit1011 = 1, 0
+Trigger4 = ProjHIt1012 = 1, 0
+IgnoreHitPause = 1
+Value = -10
+
+
+;-----------------------------------------------------------------------------------------------------------------------------
+; コンピューターアルゴリズム
+;-----------------------------------------------------------------------------------------------------------------------------
+[State 205, 3]
+type = VarRandom
+trigger1 = 1
+v = 48
+range = 0,100
+
+[State 205, 3];挑発後の行動禁止
+type = ctrlset
+triggerall = var(49) = 1
+trigger1 = stateno = 195
+value = 0
+;---------------------------------------------------------------------------
+; ＣＰＵの完全対応　挑発されたら挑発し返す＆敵がダウンしたらたま～に「てんで話にならないね」
+[State -1, Taunt]
+type = ChangeState
+value = 195
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = statetype != A
+triggerall = p2bodydist X > 90
+triggerall = stateno != 195
+triggerall = ctrl
+trigger1 = P2stateno = 195
+trigger1 = var(48) = [0,20]
+trigger2 = p2statetype = L
+trigger2 = var(48) = 77
+;---------------------------------------------------------------------------
+; ＣＰＵの特殊対応　遠距離で起き上がりに何らかの攻撃をされている場合B　緊急回避 60%
+[State -1, Taunt]
+type = ChangeState
+value = 300
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = statetype != A
+triggerall = p2MoveType = A
+triggerall = p2bodydist X > 100
+trigger1 = var(48) = [30,90]
+trigger1 = PrevStateNo = 5120
+trigger1 = stateno = 0
+trigger1 = ctrl
+;---------------------------------------------------------------------------
+; ＣＰＵの特殊対応　遠距離で起き上がりに何らかの攻撃をされている場合A　ニヴォース（弱）　20%
+[State -1, Taunt]
+type = ChangeState
+value = 1100
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = statetype != A
+triggerall = p2MoveType = A
+triggerall = p2bodydist X > 100
+trigger1 = var(48) = [0,20]
+trigger1 = PrevStateNo = 5120
+trigger1 = stateno = 0
+trigger1 = ctrl
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　 交代攻撃がヒットしてパワーゲージが無い場合 低確率でバックステップ
+[State -1, Taunt]
+type = ChangeState
+value = 105
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = var(19) = 1
+triggerall = power < 1000
+triggerall = statetype != A
+triggerall = p2MoveType = H
+trigger1 = StateNo = 2710
+trigger1 = time = 4
+trigger1 = var(48) = [75,100]
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　 交代攻撃がヒットしてパワーゲージが無い場合 低確率でヴァンデミエール
+[State -1, Taunt]
+type = ChangeState
+value = 1200
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = var(19) = 1
+triggerall = power < 1000
+triggerall = statetype != A
+triggerall = p2MoveType = H
+trigger1 = StateNo = 2710
+trigger1 = time = 4
+trigger1 = var(48) = [50,75]
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　 交代攻撃がヒットしてパワーゲージが無い場合 高確率でニヴォース（強）
+[State -1, Taunt]
+type = ChangeState
+value = 1110
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = var(19) = 1
+triggerall = power < 1000
+triggerall = statetype != A
+triggerall = p2MoveType = H
+trigger1 = StateNo = 2710
+trigger1 = time = 4
+trigger1 = var(48) = [0,50]
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　 交代攻撃がヒットしてパワーゲージがある場合ブリュヴィオーズ
+[State -1, Taunt]
+type = ChangeState
+value = 3100
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = var(19) = 1
+triggerall = power >= 1000
+triggerall = statetype != A
+triggerall = p2MoveType = H
+trigger1 = StateNo = 2710
+trigger1 = time = 4
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　 通常交代封印　緊急回避に化ける
+[State -1, Taunt]
+type = ChangeState
+value = 310
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = statetype != A
+trigger1 = StateNo = 2600
+;--------------------------------------------------------------------------
+;近距離でのカウンター攻撃 ＆　起き上がりに何かされた場合
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　近距離戦でパワーが多くあり尚且つ敵がうかつに攻撃を仕掛けてきたらテルミドール 10%
+[State -1, Taunt]
+type = ChangeState
+value = 3000
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = power >= 2000
+triggerall = NumHelper(3001) = 0
+triggerall = statetype != A
+triggerall = p2bodydist X < 42
+triggerall = p2statetype != L
+triggerall = p2MoveType = A
+triggerall = var(48) = [80,90]
+trigger1 = ctrl
+trigger2 = PrevStateNo = 5120
+trigger2 = stateno = 0
+trigger2 = ctrl
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　近距離戦でパワーがあり尚且つ敵がうかつに攻撃を仕掛けてきたらブリュヴィオーズ 30%
+[State -1, Taunt]
+type = ChangeState
+value = 3100
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = power >= 1000
+triggerall = statetype != A
+triggerall = p2bodydist X < 35
+triggerall = p2statetype != A
+triggerall = p2MoveType = A
+triggerall = var(48) = [20,50]
+trigger1 = ctrl
+trigger2 = PrevStateNo = 5120
+trigger2 = stateno = 0
+trigger2 = ctrl
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　近距離戦で敵がうかつに攻撃を仕掛けてきたらニヴォース（弱） 10%
+[State -1, Taunt]
+type = ChangeState
+value = 1100
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = statetype != A
+triggerall = p2bodydist X < 35
+triggerall = p2statetype = A
+triggerall = p2MoveType != H
+triggerall = var(48) = [55,65]
+trigger1 = ctrl
+trigger2 = PrevStateNo = 5120
+trigger2 = stateno = 0
+trigger2 = ctrl
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　近距離戦で敵がうかつに攻撃を仕掛けてきたらニヴォース（強） 12%
+[State -1, Taunt]
+type = ChangeState
+value = 1110
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = statetype != A
+triggerall = p2bodydist X < 35
+triggerall = p2statetype != L
+triggerall = p2MoveType = A
+triggerall = var(48) = [3,15]
+trigger1 = ctrl
+trigger2 = PrevStateNo = 5120
+trigger2 = stateno = 0
+trigger2 = ctrl
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　近距離戦でガードを固めているチキン野郎は投げ 60%
+[State -1, Taunt]
+type = ChangeState
+value = 800
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = Var(19) = 0
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2bodydist X < 24
+triggerall = p2statetype != A
+triggerall = p2MoveType != H
+trigger1 = P2stateno = [120,150]
+trigger1 = var(48) = [40,100]
+;---------------------------------------------------------------------------
+;距離ごとの適当な対応
+;--------------------------------------------------------------------------
+;近距離
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　近距離でニヴォース（強）にコンボを繋ぐ確率　12% (＊ただし敵がピンチの場合は控える
+[State -1, Taunt]
+type = ChangeState
+value = 1110
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = p2life >= 250
+triggerall = statetype != A
+triggerall = p2MoveType = H
+triggerall = P2bodydist X < 38
+triggerall = var(48) = [70,82]
+trigger1 = stateno = 200 && movecontact
+trigger2 = stateno = 210 && movecontact
+trigger3 = stateno = 230 && movecontact
+trigger4 = stateno = 240 && movecontact
+trigger5 = stateno = 251 && movecontact
+trigger6 = stateno = [400,430]
+trigger6 = movecontact
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　近距離でヴァントーズ（強）にコンボを繋ぐ確率　12% (＊ただし敵がピンチの場合は控える
+[State -1, Taunt]
+type = ChangeState
+value = 1010
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = p2life >= 200
+triggerall = statetype != A
+triggerall = p2MoveType = H
+triggerall = P2bodydist X < 35
+triggerall = var(48) = [88,100]
+trigger1 = stateno = 200 && movecontact
+trigger2 = stateno = 210 && movecontact
+trigger3 = stateno = 230 && movecontact
+trigger4 = stateno = 240 && movecontact
+trigger5 = stateno = 251 && movecontact
+trigger6 = stateno = [400,430]
+trigger6 = movecontact
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　近距離戦でパワーがあり尚且つ敵がうかつに攻撃＆ヒット中　交代攻撃　(＊ただし敵がピンチの場合は控える
+[State -1, Taunt]
+type = ChangeState
+value = 2700
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = NumExplod(2999) = 1
+triggerall = power >= 1300
+triggerall = p2life >= 400
+triggerall = statetype != A
+triggerall = p2bodydist X < 35
+triggerall = p2statetype != A
+triggerall = var(48) = [30,50]
+triggerall = ctrl
+trigger1 = p2MoveType = A
+trigger2 = p2MoveType = H
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　近距離戦のフロレアール 5%
+[State -1,]
+type = ChangeState
+value = 270
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2MoveType != A
+triggerall = p2MoveType != H
+triggerall = p2statetype != L
+triggerall = P2bodydist X < 35
+triggerall = var(48) = [0,5]
+trigger1 = stateno = 200 && movecontact
+trigger2 = stateno = 210 && movecontact
+trigger3 = stateno = 230 && movecontact
+trigger4 = stateno = 240 && movecontact
+trigger5 = stateno = 251 && movecontact
+trigger6 = stateno = [400,430]
+trigger6 = movecontact
+;--------------------------------------------
+; ＣＰＵの対応　フロレアール ヒット後にパワーがあればブリュヴィオーズで追撃 (＊ただし敵がピンチの場合は控える
+[State -1, Taunt]
+type = ChangeState
+value = 3100
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = power >= 1200
+triggerall = p2life >= 400
+triggerall = statetype != A
+triggerall = p2MoveType = H
+;triggerall = P2bodydist X < 32
+trigger1 = stateno = 272
+;--------------------------------------------
+; ＣＰＵの対応　フロレアール ヒット後にニヴォース（強）で追撃
+[State -1, Taunt]
+type = ChangeState
+value = 1110
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = p2life >= 180
+triggerall = statetype != A
+triggerall = p2MoveType = H
+;triggerall = P2bodydist X < 32
+trigger1 = stateno = 272
+;--------------------------------------------
+; ＣＰＵの対応　フロレアール ヒット後に敵の体力が少ない場合バックステップで逃げる
+[State -1, Taunt]
+type = ChangeState
+value = 1110
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = p2life < 180
+triggerall = statetype != A
+triggerall = p2MoveType = H
+;triggerall = P2bodydist X < 32
+trigger1 = stateno = 272
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　近距離戦のヴァンデミエール 5%
+[State -1, Taunt]
+type = ChangeState
+value = 1200
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = statetype != A
+triggerall = p2statetype != A
+triggerall = p2statetype != L
+triggerall = ctrl
+triggerall = p2MoveType != A
+triggerall = p2MoveType != H
+triggerall = P2bodydist X < 25
+triggerall = P2stateno != [120,150]
+trigger1 = var(48) = [15,20]
+;--------------------------------------------
+; ＣＰＵの対応　ヴァンデミエール ヒット後にはニヴォース（強）で追撃
+[State -1, Taunt]
+type = ChangeState
+value = 1110
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = power <= 1200
+triggerall = statetype != A
+triggerall = ctrl
+trigger1 = PrevStateNo = 1200
+trigger1 = stateno = 0
+;--------------------------------------------
+; ＣＰＵの対応　ヴァンデミエール ヒット後にパワーがあればテルミドールで追撃 (＊ただし敵がピンチの場合は控える
+[State -1, Taunt]
+type = ChangeState
+value = 3000
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = NumHelper(3001) = 0
+triggerall = p2life >= 500
+triggerall = power >= 1200
+triggerall = statetype != A
+triggerall = ctrl
+trigger1 = PrevStateNo = 1200
+trigger1 = stateno = 0
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　近距離戦からバックステップで逃げる 12%
+[State -1, Taunt]
+type = ChangeState
+value = 105
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2MoveType = A
+triggerall = P2bodydist X < 30
+trigger1 = var(48) = [0,12]
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　近距離戦からブレリアールで逃げる 15%
+[State -1, Taunt]
+type = ChangeState
+value = 280
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2statetype != A
+triggerall = p2MoveType != A
+triggerall = P2bodydist X < 25
+trigger1 = var(48) = [5,20]
+;---------------------------------------------------------------------------
+;中距離
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　中距離戦で稀にサン・キュロット 10% (＊ただし敵がピンチの場合は控える
+[State -1, Taunt]
+type = ChangeState
+value = 3300
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = NumHelper(3301) = 0
+triggerall = p2life >= 300
+triggerall = power >= 2500
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2bodydist X > 50
+triggerall = p2bodydist X < 100
+trigger1 = var(48) = [55,65]
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　サン・キュロット装備時にはバックステップで逃げる 30%
+[State -1, Taunt]
+type = ChangeState
+value = 105
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = NumHelper(3301) = 1
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2bodydist X > 50
+triggerall = p2bodydist X < 100
+trigger1 = var(48) = [0,30]
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　サン・キュロット装備時にはヴァントーズ（強） 25%
+[State -1, Taunt]
+type = ChangeState
+value = 1010
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = NumHelper(3301) = 1
+triggerall = NumHelper(3001) < 2
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2bodydist X > 50
+triggerall = p2bodydist X < 100
+trigger1 = var(48) = [50,75]
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　中距離戦で迂闊にヴァントーズ（強） 5%
+[State -1, Taunt]
+type = ChangeState
+value = 1010
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = NumHelper(3001) = 0
+triggerall = numproj = 0
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2statetype != L
+triggerall = p2bodydist X > 35
+triggerall = p2bodydist X < 70
+trigger1 = var(48) = [40,45]
+;--------------------------------------------------------------------------
+; ＣＰＵの対応　中距離戦で何となくフロレアール  5%
+[State -1, Taunt]
+type = ChangeState
+value = 270
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = numproj = 0
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2statetype != L
+triggerall = p2bodydist X > 35
+triggerall = p2bodydist X < 70
+trigger1 = var(48) = [20,25]
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　中距離戦で緊急回避  10%
+[State -1, Taunt]
+type = ChangeState
+value = 300
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2statetype != L
+triggerall = p2bodydist X > 70
+triggerall = p2bodydist X < 120
+trigger1 = var(48) = [70,80]
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　中距離戦でヴァントーズ（強）  10%
+[State -1, Taunt]
+type = ChangeState
+value = 1010
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = NumHelper(3001) = 0
+triggerall = numproj = 0
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2statetype != L
+triggerall = p2bodydist X > 70
+triggerall = p2bodydist X < 120
+trigger1 = var(48) = [30,40]
+;---------------------------------------------------------------------------
+;遠距離
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　遠距離戦のテルミドール  5%
+[State -1, Taunt]
+type = ChangeState
+value = 3000
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = power >= 1700
+triggerall = statetype != A
+triggerall = NumHelper(3301) = 0
+triggerall = NumHelper(3001) = 0
+triggerall = ctrl
+triggerall = p2MoveType != H
+triggerall = p2statetype != L
+triggerall = p2bodydist X > 140
+triggerall = P2stateno != [120,150]
+trigger1 = var(48) = [80,85]
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　遠距離戦のヴァントーズ（弱）  5%
+[State -1, Taunt]
+type = ChangeState
+value = 1000
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = NumHelper(3301) = 0
+triggerall = NumHelper(3001) = 0
+triggerall = numproj = 0
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2statetype != L
+triggerall = p2bodydist X > 140
+triggerall = StateNo != 100
+trigger1 = var(48) = [70,75]
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　遠距離戦のヴァントーズ（強）  10%
+[State -1, Taunt]
+type = ChangeState
+value = 1010
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = NumHelper(3301) = 0
+triggerall = NumHelper(3001) = 0
+triggerall = numproj = 0
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2statetype != L
+triggerall = p2bodydist X > 140
+trigger1 = var(48) = [50,60]
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　遠距離戦で緊急回避　 10%
+[State -1, Taunt]
+type = ChangeState
+value = 300
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2statetype != L
+triggerall = p2bodydist X > 140
+trigger1 = var(48) = [20,30]
+trigger2 = NumHelper(3001) = 1
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　遠距離戦のヴァントーズ連射（サン・キュロット装備）  30%
+[State -1, Taunt]
+type = ChangeState
+value = 1000
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = NumHelper(3301) = 1
+triggerall = NumHelper(3001) < 2
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2bodydist X > 140
+trigger1 = var(48) = [40,70]
+;---------------------------------------------------------------------------
+; ＣＰＵの対応　遠距離戦のヴァントーズ連射（サン・キュロット装備）  30%
+[State -1, Taunt]
+type = ChangeState
+value = 1010
+triggerall = roundstate = 2
+triggerall = var(49) = 1
+triggerall = NumHelper(3301) = 1
+triggerall = NumHelper(3001) < 2
+triggerall = statetype != A
+triggerall = ctrl
+triggerall = p2bodydist X > 140
+trigger1 = var(48) = [70,100]
+;-----------------------------------------------------------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+;[Statedef -3]
+
+[State -3]
+type = VarRandom
+trigger1 = time = 0
+trigger1 = stateno = 5000|stateno = 5010|stateno = 5020|stateno = 5070
+v = 13
+range = 0,4
+
+[State -3]
+type = PlaySnd
+triggerall = time = 1
+triggerall = stateno = 5000|stateno = 5010|stateno = 5020
+trigger1 = anim = 5000
+trigger2 = anim = 5010
+trigger3 = anim = 5020
+persistent = 0
+channel = 5
+value = S2, var(13)
+
+[State -3]
+type = PlaySnd
+triggerall = time = 1
+triggerall = stateno = 5000|stateno = 5010|stateno = 5020|stateno = 5070
+trigger1 = anim = 5002|anim = 5001
+trigger2 = anim = 5012|anim = 5011
+trigger3 = anim = 5022|anim = 5021
+trigger4 = anim = 5030|anim = 5051|anim = 5052
+trigger5 = anim = 5070
+persistent = 0
+channel = 5
+value = S20, var(13)
+
+[State -3]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 5100
+trigger2 = stateno = 5110
+trigger3 = stateno = 5105
+value =  5100,0
+
+[STate 5250,1]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 5200
+trigger2 = stateno = 5210
+value = 5250,0
+persistent = 0
+channel = 5

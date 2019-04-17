@@ -1,0 +1,1995 @@
+;Scorpion
+;Created by: Gary Fisher ("ermac" on mugenguild.com, mugen-fantry.net)
+
+;-----------------------------------------------------------------------------------------
+;explode reminders
+;-----------------------------------------------------------------------------------------
+;NumExplod(779)     =   place holder for hell mode
+;NumExplod(780)     =   place holder for spectre mode
+;NumExplod(781)     =   place holder 2 for hell mode
+;NumExplod(784)     =   place holder for no block after parry
+;NumExplod(1780)    =   place holder for fatality logo
+;NumExplod(10034)    =   place holder for double harakiri
+;NumExplod(10035)    =   placeholder for harakiri
+;
+;
+;
+;-----------------------------------------------------------------------------------------
+
+
+
+;-----------------------------------------------------------------------------------------
+;-states bitch
+;-----------------------------------------------------------------------------------------
+
+
+[Statedef -2]
+
+
+
+
+
+[state -2 ]
+type = poweradd
+trigger1=movehit=1
+value=200
+
+[state -2];no block 
+type = assertspecial
+trigger1 = 1
+flag = nostandguard
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+[state -2 ]
+type = ctrlset
+trigger1 = stateno =190
+triggerall = stateno = 191
+triggerall = stateno = 192
+triggerall = stateno = 193
+triggerall = stateno = 5900
+value = 0
+
+[state -2];no block after parry
+type = assertspecial
+trigger1 = numexplod(1349)=1
+flag = nostandguard
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+[state -2, reverse];reverse/counter set
+type = varset
+trigger1 = stateno = 5900
+var (51) = 0
+
+[state -2, bb];breaker buster set
+type = varset
+trigger1 = stateno = 5900
+var (55) = 1
+
+[state -2, bb];healer set
+type = varset
+trigger1 = stateno = 5900
+var (53) = 0
+
+[state -2, bb];res set
+type = varset
+trigger1 = stateno = 5900
+var (49) = 0
+
+
+
+;---------------------
+;side step crap
+;---------------------
+
+[state -2];sidestep sound ground
+type = playsnd
+trigger1 = var(46) = 2
+trigger1 = p2movetype = A
+trigger1 = p2statetype =S
+trigger1 = movetype !=H
+trigger1 = p2bodydist x = [0,101]
+trigger1 = stateno = 10 || stateno = 11 || stateno = 12 || stateno = 105 || stateno = 6168 || anim = 21 && stateno = 20
+trigger1 = p2stateno !=120
+trigger1 = p2stateno !=130
+trigger1 = p2stateno !=131
+trigger1 = p2stateno !=132
+trigger1 = p2stateno !=140
+trigger1 = p2stateno !=150
+trigger1 = p2stateno !=151
+trigger1 = stateno !=120
+trigger1 = stateno !=130
+trigger1 = stateno !=131
+trigger1 = stateno !=132
+trigger1 = stateno !=140
+trigger1 = stateno !=150
+trigger1 = stateno !=151
+value = S32, 21
+persistent = 0
+channel = 4
+
+[state -2];sidestep sound crouch
+type = playsnd
+trigger1 = var(46) = 2
+trigger1 = p2movetype = A
+trigger1 = p2statetype =C
+trigger1 = movetype !=H
+trigger1 = p2bodydist x = [0,101]
+trigger1 = stateno = 40|| stateno = 50 || stateno = 105
+trigger1 = p2stateno !=120
+trigger1 = p2stateno !=130
+trigger1 = p2stateno !=131
+trigger1 = p2stateno !=132
+trigger1 = p2stateno !=140
+trigger1 = p2stateno !=150
+trigger1 = p2stateno !=151
+trigger1 = stateno !=120
+trigger1 = stateno !=130
+trigger1 = stateno !=131
+trigger1 = stateno !=132
+trigger1 = stateno !=140
+trigger1 = stateno !=150
+trigger1 = stateno !=151
+value = S32, 21
+persistent = 0
+channel = 4
+
+[state -2];fucking stop it
+type = stopsnd
+trigger1 = movetype = H
+trigger1 = var(46) = 1
+trigger1 = p2stateno !=120
+trigger1 = p2stateno !=130
+trigger1 = p2stateno !=131
+trigger1 = p2stateno !=132
+trigger1 = p2stateno !=140
+trigger1 = p2stateno !=150
+trigger1 = p2stateno !=151
+trigger1 = stateno !=120
+trigger1 = stateno !=130
+trigger1 = stateno !=131
+trigger1 = stateno !=132
+trigger1 = stateno !=140
+trigger1 = stateno !=150
+trigger1 = stateno !=151
+channel = 4
+
+
+
+
+;--------------------------
+;counter hit crap
+;--------------------------
+
+[state -2]
+type = varset
+trigger1 = p2movetype != A
+var(46) = 2
+
+[state -2]
+type = varset
+trigger1 = p2movetype = A
+var(46) = 1
+
+[State -2]
+type = AttackMulSet
+trigger1 = var(46) = 1; && movehit = 1
+value = 1.4
+
+[State -2]
+type = AttackMulSet
+trigger1 = var(46) = 2; && movehit = 1
+value = 1
+
+[State -2]
+type = EnvColor
+trigger1 = var(46) = 1 && movehit = 1
+value = 223,0,0
+persistent = 0
+time = 1
+ignorehitpause = 1
+under = 1
+
+
+
+;------------------------
+;breaker limit
+;------------------------
+
+[state -2, b];breaker1
+type = varset
+trigger1 = stateno = 5900
+var (43) = 0
+
+[state -2, b];breaker2
+type = varset
+trigger1 = stateno = 5900
+var (44) = 0
+
+[state -2, b];breaker3
+type = varset
+trigger1 = stateno = 5900
+var (45) = 0
+
+
+
+;----------------------
+;blocking related
+;----------------------
+
+[State -2, no block]
+type = AssertSpecial
+trigger1 = p2stateno = 6172 ;subs wakeup ice
+trigger2 = p2stateno = 6202 ;subs ice shaker
+trigger3 = p2stateno = 99446 ;subs harakiri / scorpions harakiri
+trigger4 = p2stateno = 99440 ;subs double harakiri
+trigger5 = p2stateno = 99441 ;scorpions double harakiri
+trigger6 = p2stateno = 336644 ;players die state off screen
+trigger7 = stateno = 7005 ;parry
+trigger8 = p2stateno = 1944 ;sub zeros polarblast super
+trigger9 = p2stateno = 45469 ;scorpions ground fire super
+trigger10 = p2stateno = 1943 ;scorpions spectre mode
+flag = nostandguard
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;----------------------
+;monk super
+;----------------------
+[State -2, BGPalFX];background for monk
+type = BGPalFX
+trigger1 = Numhelper(9438) = 1
+trigger1 = stateno = 9439
+trigger1 = roundstate !=3
+time = 1000
+;add = -256,-256,-256
+;mul = -150,224,-256
+;sinadd = -10,-10,-10,50
+add = -40,-10,-10
+mul = 222,222,222
+sinadd = 0,0,0,0
+invertall = 0
+color = 0
+ignorehitpause =1
+persistent =1
+
+
+
+[State -2, life monk]
+type = LifeAdd
+trigger1 = Numhelper(9438) = 1
+;trigger1 = NumExplod(10124) = 1
+value = 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;----------------------
+;double harakiri
+;----------------------
+[State -2 ]
+type = AssertSpecial
+trigger1 = NumExplod(10034) = 1
+trigger1 = Time < 350
+flag = roundnotover
+
+
+[State -2, snd]
+type = PlaySnd
+trigger1 = time = 130 && stateno = 5150
+trigger1 = p2stateno != 5150
+trigger1 = NumExplod(10034) = 1
+value = s28, 5;14
+
+[State -2, snd]
+type = PlaySnd
+trigger1 = time = 50 && stateno = 5150
+trigger1 = p2stateno != 5150
+trigger1 = NumExplod(10034) = 1
+value = s2, 5;14
+
+
+[State -2, snd]
+type = PlaySnd
+trigger1 = time = 88 && stateno = 5150
+trigger1 = p2stateno != 5150
+trigger1 = NumExplod(10034) = 1
+value = s27, 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;-------------------------------
+;harakiri        
+;-------------------------------
+[State -2 ]
+type = Explod
+trigger1 = time = 410 && NumExplod(10035) = 1
+triggerall = stateno = 5150
+anim = 6162
+name = "hara"
+id = 6162
+pos = 70, 77
+postype = left
+facing = 1
+sprpriority = 99
+removetime = 500
+
+[State -2 ]
+type = PlaySnd
+trigger1 = time = 450 && NumExplod(10035) = 1
+triggerall = stateno = 5150
+value = s2, 14
+
+[State -2 ]
+type = PlaySnd
+trigger1 = time = 410 && NumExplod(10035) = 1
+triggerall = stateno = 5150
+value = s12, 1
+
+
+[state -2 ]
+type = assertspecial
+trigger1 = numhelper(10133) = 1
+triggerall = time < 575
+flag = roundnotover
+
+
+
+
+
+
+
+
+
+;-------------------------------
+;hell mode stuff----------------
+;-------------------------------
+
+[State -2, hell defense]
+type = DefenceMulSet
+trigger1 = NumExplod(779) = 1
+value = .8
+
+[State -2, hell defense]
+type = DefenceMulSet
+trigger1 = NumExplod(779) = 0
+value = 1
+
+
+[State -2, 0]
+type = AssertSpecial
+trigger1 = NumExplod(779) = 1
+trigger1 = Time < 7235
+flag = nomusic
+flag2 = noshadow
+persistent = 1
+ignorehitpause = 1
+
+[State -2, 0]
+type = AssertSpecial
+trigger1 = NumExplod(779) = 1
+trigger1 = Time < 7235
+flag = nobg
+flag2 = nofg
+persistent = 1
+ignorehitpause = 1
+
+[State -2, 0]
+type = AssertSpecial
+trigger1 = NumExplod(781) = 1
+trigger1 = Time < 7200;7235
+flag = nobg
+persistent = 1
+ignorehitpause = 1
+
+
+
+
+
+[State -2 ]
+type = PalFX
+trigger1 = numexplod(9005)=1
+time =  1
+add = 40,-70,-200
+mul = 256,256,256
+sinadd = 40,30,0,40
+invertall = 0
+color = 0
+ignorehitpause = 1
+persistent = 1
+
+
+;set res when hell is active
+[state -2, bb];res set
+type = varset
+trigger1 = numexplod(9005)!=1
+var (47) = 0
+
+[state -2, bb];res set
+type = varset
+trigger1 = numexplod(9005)=1
+var (47) = 1
+
+;----------------------
+;spectre mode stuff----
+;----------------------
+
+[State -2, 0]
+type = AssertSpecial
+trigger1 = NumExplod(780) = 1
+trigger1 = Time < 1000
+flag = invisible
+removeongethit = 0
+persistent = 1
+ignorehitpause = 1
+
+[State -2, 0]
+type = AssertSpecial
+trigger1 = NumExplod(780) = 1
+trigger1 = Time < 1000
+flag = nostandguard
+flag2 = nocrouchguard
+flag3 = noairguard
+persistent = 1
+ignorehitpause = 1
+
+
+[State -2, 0]
+type = NotHitBy
+trigger1 = NumExplod(780) = 1
+;time = 1000
+value = ,AP
+
+
+
+
+;----------------------
+;fatality related
+;----------------------
+[State -2, fat]
+type = Explod
+trigger1 = time = 300 && NumExplod(1780) = 1
+;trigger1 = life = 1000
+anim = 10029
+name = "Fatality"
+id = 10029
+pos = 90, 90
+postype = left
+facing = 1
+removetime = 9999
+sprpriority = 999999999
+
+
+[state -2 ];no bg music for finishers
+type = assertspecial
+trigger1 = numexplod(1780) = 1
+trigger2 = numexplod(10035) =1
+trigger3 = numexplod(10034) =1
+flag = nomusic
+
+
+
+
+
+;----------------------
+;life in danger    ----
+;----------------------
+
+
+[State -2, die]
+type = varadd
+triggerall = Life <= 200
+triggerall = NumExplod(10035) != 1
+trigger1 = Var(10) <= 2 
+v = 10
+value = 1
+
+
+;Die
+[State -2, Danger]
+type = PlaySnd
+triggerall = Var(10) = 1
+triggerall = NumExplod(10035) != 1
+;triggerall = (Teamside =1 && IsHomeTeam) || (Teamside =2 && !IsHomeTeam) || (TeamSide=1 && !IsHomeTeam)
+trigger1 = Life <= 200
+channel = 2
+value = s43,43
+
+
+
+
+
+
+
+;----------------------
+;fatality stunner  ----
+;----------------------
+[State -2, stun]
+type = varadd
+triggerall = Var(13) <= 2
+trigger1 = p2stateno = 5396
+trigger2 = p2stateno = 6396
+v = 13
+value = 1
+
+
+
+;stun
+[State -2, stun]
+type = PlaySnd
+trigger1 = Var(13) = 1
+triggerall = roundstate = 2
+;triggerall = p2stateno = 5396
+;triggerall = p2stateno = 6396
+channel = 2
+value = s28,3
+
+
+
+
+
+[State -2 ]
+type = assertspecial
+trigger1 = movetype != H
+ignorehitpause = 1
+flag = nokoslow
+
+
+
+
+;--------------------------
+;fall down to knees death
+;---------------------------
+
+[state ]
+type = EnvShake
+trigger1 = NumExplod(531) = 1
+trigger1 = stateno = 5150
+triggerall = time = 20
+triggerall = time = 55
+time = 4
+freq = 60
+ampl = 4
+phase = 90
+ignorehitpause =1
+persistent =0
+
+[State ]
+type = Playsnd
+triggerall = time =20
+trigger1 = NumExplod(531) = 1
+trigger1 = stateno = 5150
+value = s0,2
+
+[State ]
+type = Playsnd
+triggerall = time =55
+trigger1 = NumExplod(531) = 1
+trigger1 = stateno = 5150
+value = s0,1
+
+;[state ]
+;type = posset
+;trigger1 = NumExplod(531) = 1
+;y=9999
+
+
+
+
+;------------------------------------------------------------------------------
+;-3 states
+;------------------------------------------------------------------------------
+[Statedef -3]
+
+[State -3,jump]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 50 ;Jump land
+value = s11, 18
+
+
+
+
+;[State -3,spear breaker]
+;type = changestate
+;triggerall = movetype = H
+;triggerall = statetype != A
+;triggerall = p2bodydist x <= 30
+;triggerall = p2bodydist y <= 0
+;triggerall = Var(32)>2
+;triggerall = p2stateno !=6200
+;triggerall = p2stateno !=6201
+;trigger1 = command = "x"
+;triggerall = p2stateno !=666
+;triggerall = p2stateno !=667
+;trigger1 = statetype = S
+;triggerall = var(54) !=1
+;value = 1121
+
+
+;[State -3,air flip (kano) breaker]
+;type = changestate
+;triggerall = movetype = H
+;trigger1 = command = "y"
+;trigger1 = statetype = A
+;trigger1 = stateno != 5071
+;trigger1 = stateno != 5030
+;trigger1 = stateno != 5035
+;trigger1 = stateno != 5000
+;triggerall = p2stateno !=6200
+;triggerall = p2stateno !=6201
+;triggerall = p2bodydist x <= 30
+;value = 1122
+
+;[State -3,fire breaker]
+;type = changestate
+;triggerall = movetype = H
+;trigger1 = command = "y"
+;trigger1 = statetype = C
+;triggerall = p2stateno !=6200
+;triggerall = p2stateno !=6201
+;triggerall = p2stateno !=666
+;triggerall = p2stateno !=667
+;triggerall = p2bodydist x <= 30
+;triggerall = p2bodydist y <= 0
+;triggerall = var(54) !=1
+;value = 11543
+
+[State -3,wakeup]
+type = changestate
+triggerall = movetype = H
+triggerall = life !=0
+trigger1 = command = "holddown"
+trigger1 = stateno = 5110
+;trigger2 = stateno = 5120
+triggerall = anim !=5070
+triggerall = anim !=5071
+triggerall = anim !=5072
+triggerall = p2stateno !=5120
+triggerall = p2stateno !=8810
+value = 6169
+
+[State -3, rollback]
+type = ChangeState
+triggerall = movetype = H
+triggerall = life !=0
+trigger2 = stateno = 5100 && command = "holdback"
+trigger1 = Command = "holdback"  ;roll left
+trigger1 = stateno = 5110
+;trigger2 = stateno = 5120
+triggerall = p2stateno !=5120
+triggerall = p2stateno !=8810
+value = 6170
+
+[State -3, rollforward]
+type = ChangeState
+triggerall = movetype = H
+triggerall = life !=0
+trigger2 = stateno = 5100 && command = "holdfwd"
+trigger1 = Command = "holdfwd"  ;roll right
+triggerall = p2stateno != 9146
+triggerall = p2stateno != 1334
+triggerall = p2stateno != 1335
+trigger1 = stateno = 5110
+;trigger2 = stateno = 5120
+triggerall = p2stateno !=6171
+triggerall = p2stateno !=5120
+triggerall = p2stateno !=8810
+value = 5220
+
+
+[State ]
+type = Playsnd
+triggerall = !time && random >= 450 && alive
+trigger1 = stateno = 5000 || stateno = 5010 || stateno = 5020 || stateno = 5080
+value = s11,1
+;channel = 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;[State -3]
+;type = ChangeState
+;trigger1 = stateno = 9010 || stateno = 7015 || stateno = 7022 || stateno = 7031
+;value = 11234
+
+
+;----------------------
+;uppercut fatality ----
+;----------------------
+
+[state -3]
+type = playsnd
+trigger1 = anim = 9875
+trigger1 = time = 66
+value = s23,0
+
+[state -3]
+type = playsnd
+trigger1 = anim = 9875
+trigger1 = time = 70
+value = s23,0
+
+[state -3]
+type = playsnd
+trigger1 = anim = 9875
+trigger1 = time = 78
+value = s23,0
+
+[state -3]
+type = playsnd
+trigger1 = anim = 9875
+trigger1 = time = 79
+value = s23,0
+
+[state -3]
+type = playsnd
+trigger1 = anim = 9875
+trigger1 = time = 86
+value = s23,0
+
+[state -3]
+type = playsnd
+trigger1 = anim = 9875
+trigger1 = time = 87
+value = s23,0
+
+[state -3]
+type = playsnd
+trigger1 = anim = 9875
+trigger1 = time = 94
+value = s23,0
+
+[state -3]
+type = playsnd
+trigger1 = anim = 9875
+trigger1 = time = 95
+value = s23,0
+
+
+
+
+
+[state -3]
+type = varset
+trigger1 = var(54) != 1
+;trigger2 = stateno = 3016 || stateno = 3052
+;trigger3 = stateno = 4121
+;trigger4 = stateno = 1998 && animtime = 0
+var(54) = 2
+
+
+
+;-------------------Resurrection HELL MODE----------------;
+[state -3, Resurrection]
+type = changestate
+;trigger1 = power = 10000
+;trigger1 = Numhelper(9438) = 1
+;trigger1 = stateno = 9439
+triggerall = gethitvar(damage) >= life
+;triggerall = statetype = S
+;triggerall = statetype !=A
+;trigger1 = var(48) !=1
+trigger1 = var(49) = 0
+trigger1 = var(47) = 1
+trigger1 = var(53) != 1
+;triggerall = facing = 1
+value = 5394
+
+
+
+;-------------------Resurrection----------------;
+[state -3, bb];loss var to enable res
+type = varset
+trigger1 = stateno = 5150 && time = 50
+var (40) = 1
+
+[state -3, bb];enables res after loosing
+type = varset
+trigger1 = Var(40) = 1
+triggerall = stateno !=5099
+triggerall = roundstate = 2
+var (48) = 1
+
+[state -3 ];disables for round 1
+type = varset
+;trigger1 = time = 0
+trigger1 = roundno = 1
+trigger1 = stateno = 5900
+var(40) = 0
+
+[state -3 ];disables for round 1
+type = varset
+;trigger1 = time = 0
+trigger1 = roundno = 1
+trigger1 = stateno = 5900
+var(48) = 0
+
+[state -3 ];disables for hellmode
+type = varset
+;trigger1 = time = 0
+trigger1 = roundno = 1
+trigger1 = var(48)=1
+var(47) = 0
+
+[state -3 ];remove spectre mode when fatal is active
+type = RemoveExplod
+trigger1 = stateno = 6396
+id = 780
+
+[state -3 ];removes after image for spectre mode when fatal is active
+type = AfterImageTime
+trigger1 = stateno = 6396
+time = 1
+
+[state -3, Resurrection]
+type = changestate
+triggerall = gethitvar(damage) >= life
+trigger1 = var(48) = 1
+;trigger1 = var(49) != 0
+trigger1 = var(47)!=1
+;trigger1 = var(40) = 1
+;trigger1 = Var(40) <= 3
+;trigger1 =  roundno > 1
+triggerall = stateno !=6398
+triggerall = stateno !=5398
+triggerall = stateno !=5150
+value = 6394
+
+;-------------------Resurrection----------------;
+
+
+
+
+
+
+;------------------------------------------------------------------------------
+;Combo Count
+-------------------------------------------------------------------------------
+[State ]
+type = VarAdd
+trigger1 = HitCount-Var(34) > 0
+ignorehitpause = 1
+var(35) = 1
+
+[State ]
+type = VarSet
+trigger1 = 1
+ignorehitpause = 1
+var(34) = HitCount
+
+[State ]
+type = varset
+trigger1 = P2life <= 0
+trigger1 = var(50) = 0
+var(50) = 1
+
+;IMPRESSIVE
+[State ]
+type = PlaySnd
+trigger1 = P2MoveType != H
+triggerall = var(35) = [14,17]
+trigger2 = var(50)=1
+value = s2,13
+
+;ULTIMATE
+[State ]
+type = PlaySnd
+trigger1 = P2MoveType != H
+triggerall = var(35) = [18,100]
+trigger2 = var(50)=1
+value = s2,2
+
+[State ]
+type = VarSet
+trigger1 = var(50) = 1
+var(50) = 2
+
+[State ]
+type = VarSet
+trigger1 = P2MoveType != H
+ignorehitpause = 1
+var(35) = 0
+
+;------------------------------------------------------------------------------
+;get hit count
+;------------------------------------------------------------------------------
+[State ]
+type = Varadd
+triggerall = Time = 1
+trigger1 = StateNo = 5000
+trigger2 = StateNo = 5010
+trigger3 = StateNo = 5020
+trigger4 = StateNo = 5070
+trigger5 = StateNo = 5080
+ignorehitpause = 1
+var(32) = 1
+
+[State ]
+type = VarSet
+trigger1 = MoveType != H
+var(32) = 0
+
+[State ]
+type = VarAdd
+trigger1 = 1
+var(1) = -IfElse(Var(1)>=1,1,Var(1))
+
+
+;------------------------------------------------------------------------------
+;various displays
+;------------------------------------------------------------------------------
+[State ]
+type = DisplayToClipBoard
+trigger1 = 1
+ignorehitpause = 1
+text = "P2BodyDist X %f, P2BodyDist Y %f, code enabled:%d, ai:%d, GE:%d"
+params = P2bodydist x, p2bodydist y, var(54), var(21), var(57)
+
+
+[State ]
+type = DisplayToClipBoard
+trigger1 = 1
+trigger1 = var(54) = 1
+ignorehitpause = 1
+text = "smoke enabled:%d, code enabled:%d, invisible:%d"
+params = var(54), var(58), var(0)
+
+
+
+
+
+;-----------------------
+;breaker at top of screen, etc
+;------------------------
+[State -3]
+type = Helper
+trigger1 = numhelper(7799) != 1
+triggerall = roundstate!=3
+triggerall = roundstate!=4
+helpertype = Normal
+ID = 7799
+name = "breakers etc"
+postype = p1
+pos = 0,0
+stateno = 7799
+keyctrl = 0
+ownpal = 1
+
+
+
+
+
+
+
+
+
+
+;---------------------------------------------------
+;style shit
+;---------------------------------------------------
+
+
+[State -3]
+type = Helper
+trigger1 = numhelper(3099) != 1
+;trigger1= roundstate=2
+triggerall = roundstate!=3
+triggerall = roundstate!=4
+;triggerall = facing = 1
+;trigger2 = var(54) = 1
+;trigger1 = p2stateno != 33555
+;trigger1 = var(54) !=2
+helpertype = Normal
+ID = 3099
+name = "style changer"
+postype = p1
+pos = 0,0
+stateno = 3099
+keyctrl = 0
+ownpal = 1
+
+
+
+
+
+
+
+
+
+;classic start
+[Statedef 3099]
+type = S
+movetype = I
+physics = S
+anim = 38457
+ctrl = 0
+sprpriority = 1
+
+[state ]
+type = playsnd
+trigger1=time=0
+value= s1,22
+
+;[State ]
+;type = BindToParent
+;trigger1 = time = 0
+;Pos = 0,0
+;facing = 1
+;time = -1
+;value = 0
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = time=0
+id = 63731
+;ignorehitpause =
+;persistent =
+
+
+[State 0, Explod] ;player1
+type = Explod
+trigger1 = time =0
+;triggerall = roundstate !=4
+trigger1 = facing = 1 ;facing right
+anim = 61731
+id = 61731
+pos = 0,220;-90,-220
+scale =1,1
+postype   = left;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+;removetime = -2
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 9999999999999999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+[State 0, Explod];player2
+type = Explod
+trigger1 = time =0
+;triggerall = roundstate !=4
+trigger1 = facing = -1;facing right
+anim = 990;61731
+id = 61731
+pos = -100,220;-90,-220
+scale =1,1
+postype   = right;p1
+facing = 1;1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+;removetime = -2
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 9999999999999999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+
+[state ]
+type = destroyself
+trigger1 = time = 9999999999999999
+;trigger1 = roundstate= 3
+;trigger2 = roundstate= 4
+
+[state ]
+type = changestate
+trigger1 = parent,var(54)=1
+value = 14467
+ctrl = 1
+
+[state ]
+type = changestate
+trigger1 =roundstate=4
+value = 14460
+ctrl = 1
+
+
+
+
+
+
+
+;changes from classic to hapkido
+[Statedef 14467]
+type = S
+movetype = I
+physics = S
+anim = 38457
+ctrl = 0
+sprpriority = 1
+
+[state ]
+type = playsnd
+trigger1=time=0
+value= s1,22
+
+;[State ]
+;type = BindToParent
+;trigger1 = time = 0
+;Pos = 0,0
+;facing = 1
+;time = -1
+;value = 0
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = time=0
+id = 61731
+;ignorehitpause =
+;persistent =
+
+
+
+
+
+[State 0, Explod];PLAYER1
+type = Explod
+trigger1 = time =0
+trigger1 = facing = 1 ;facing right
+anim = 61732
+id = 61732
+pos = 0,220;-90,-220
+scale =1,1
+postype   = left;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = 16
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 9999999999999999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+[State 0, Explod];PLAYER2
+type = Explod
+trigger1 = time =0
+trigger1 = facing = -1 ;facing right
+anim = 991
+id = 61732
+pos = -100,220;-90,-220
+scale =1,1
+postype   = right;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = 16
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 9999999999999999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+
+
+
+
+
+
+
+
+[State 0, Explod];player1
+type = Explod
+trigger1 = time =0
+trigger1 = facing = 1 ;facing right
+anim = 62731
+id = 62731
+pos = 0,220;-90,-220
+scale =1,1
+postype   = left;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+;removetime = 16
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 9999999999999999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+[State 0, Explod];player2
+type = Explod
+trigger1 = time =0
+trigger1 = facing = -1 ;facing right
+anim = 992
+id = 62731
+pos = -100,220;-90,-220
+scale =1,1
+postype   = right;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+;removetime = 16
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 9999999999999999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+[state ]
+type = destroyself
+trigger1 = time = 9999999999999999
+;trigger1 = roundstate= 3
+;trigger2 = roundstate= 4
+
+[state ]
+type = changestate
+trigger1 = parent,var(54)=2
+value = 14468
+ctrl = 1
+
+[state ]
+type = changestate
+trigger1 =roundstate=4
+value = 14461
+ctrl = 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;changes from hapkido back to classic
+[Statedef 14468]
+type = S
+movetype = I
+physics = S
+anim = 38457
+ctrl = 0
+sprpriority = 1
+
+;[State ]
+;type = BindToParent
+;trigger1 = time = 0
+;Pos = 0,0
+;facing = 1
+;time = -1
+;value = 0
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = time=0
+id = 62731
+;ignorehitpause =
+;persistent =
+
+
+
+[State 0, Explod];player1
+type = Explod
+trigger1 = time =0
+trigger1 = facing = 1 ;facing right
+anim =63731
+id = 63731
+pos = 0,220;-90,-220
+scale =1,1
+postype   = left;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = 16
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 9999999999999999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+
+[State 0, Explod];player2
+type = Explod
+trigger1 = time =0
+trigger1 = facing = -1 ;facing right
+anim =993
+id = 63731
+pos = -100,220;-90,-220
+scale =1,1
+postype   = right;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = 16
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 9999999999999999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+[state ]
+type = destroyself
+trigger1 = time = 9999999999999999
+;trigger1 = roundstate= 3
+;trigger2 = roundstate= 4
+
+
+[state ]
+type = changestate
+trigger1 = time = 6
+value = 3099
+ctrl = 1
+
+
+
+
+
+
+
+
+
+
+
+;changes from classic to end of round
+[Statedef 14460]
+type = S
+movetype = I
+physics = S
+anim = 38457
+ctrl = 0
+sprpriority = 1
+
+[state ]
+type = playsnd
+trigger1=time=0
+value= s1,22
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = time=0
+id = 61731
+;ignorehitpause =
+;persistent =
+
+[State 0, Explod];p1
+type = Explod
+trigger1 = time =0
+trigger1 = facing = 1 ;facing right
+anim = 61732
+id = 61732
+pos = 0,220;-90,-220
+scale =1,1
+postype   = left;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = 16
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 9999999999999999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+[State 0, Explod];p2
+type = Explod
+trigger1 = time =0
+trigger1 = facing = -1 ;facing right
+anim = 991
+id = 61732
+pos = -100,220;-90,-220
+scale =1,1
+postype   = right;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = 16
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 9999999999999999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+[state ]
+type = destroyself
+trigger1 = time = 15
+
+
+
+
+
+
+
+
+;changes from hapkido to end of round
+[Statedef 14461]
+type = S
+movetype = I
+physics = S
+anim = 38457
+ctrl = 0
+sprpriority = 1
+
+[state ]
+type = playsnd
+trigger1=time=0
+value= s1,22
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = time=0
+id = 62731
+;ignorehitpause =
+;persistent =
+
+[State 0, Explod];p1
+type = Explod
+trigger1 = time =0
+trigger1 = facing = 1 ;facing right
+anim = 63731
+id = 63731
+pos = 0,220;-90,-220
+scale =1,1
+postype   = left;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = 16
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 9999999999999999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+[State 0, Explod];p2
+type = Explod
+trigger1 = time =0
+trigger1 = facing = -1 ;facing right
+anim = 993
+id = 63731
+pos = -100,220;-90,-220
+scale =1,1
+postype   = right;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = 16
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 9999999999999999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+[state ]
+type = destroyself
+trigger1 = time = 15
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+;breaker lightning bolts, guard scapes, etc
+[Statedef 7799]
+type = S
+movetype = I
+physics = S
+anim = 38457
+ctrl = 0
+sprpriority = 1
+
+
+
+
+[State 0, RemoveExplod];breaker 1
+type = RemoveExplod
+trigger1 = parent, var(43) = 1
+id = 111
+
+[State 0, RemoveExplod];breaker 2
+type = RemoveExplod
+trigger1 = parent, var(44) = 1
+id = 222
+
+[State 0, RemoveExplod];breaker 3
+type = RemoveExplod
+trigger1 = parent, var(45) = 1
+id = 333
+
+
+
+
+
+
+
+
+
+
+
+[State 0, Explod] ;player1 - breaker 1
+type = Explod
+trigger1 = time =0
+;triggerall = roundstate !=4
+trigger1 = facing = 1 ;facing right
+anim = 7799
+id = 111
+pos = 100,38
+scale =1,1
+postype   = left;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+;removetime = -2
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 999
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+
+[State 0, Explod] ;player1 - breaker 2
+type = Explod
+trigger1 = time =0
+;triggerall = roundstate !=4
+trigger1 = facing = 1 ;facing right
+anim = 7799
+id = 222
+pos = 115,38
+scale =1,1
+postype   = left;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+;removetime = -2
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 999
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+[State 0, Explod] ;player1 - breaker 3
+type = Explod
+trigger1 = time =0
+;triggerall = roundstate !=4
+trigger1 = facing = 1 ;facing right
+anim = 7799
+id = 333
+pos = 130,38
+scale =1,1
+postype   = left;p1
+facing = 1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+;removetime = -2
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 999
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+[State 0, Explod] ;player2 - breaker 1
+type = Explod
+trigger1 = time =0
+;triggerall = roundstate !=4
+trigger1 = facing = -1 ;facing right
+anim = 7799
+id = 111
+pos = -100,38
+scale =1,1
+postype   = right;p1
+facing = -1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+;removetime = -2
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 999
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+
+[State 0, Explod] ;player2 - breaker 2
+type = Explod
+trigger1 = time =0
+;triggerall = roundstate !=4
+trigger1 = facing = -1 ;facing right
+anim = 7799
+id = 222
+pos = -115,38
+scale =1,1
+postype   = right;p1
+facing = -1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+;removetime = -2
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 999
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+
+
+
+
+
+
+[State 0, Explod] ;player2 - breaker 3
+type = Explod
+trigger1 = time =0
+;triggerall = roundstate !=4
+trigger1 = facing = -1 ;
+anim = 7799
+id = 333
+pos = -130,38
+scale =1,1
+postype   = right;p2
+facing = -1;1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+;removetime = -2
+supermove = 0
+supermovetime = 0
+pausemovetime = 12
+sprpriority = 999
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+
+[State 0, Helper]
+type = Helper
+trigger1 = parent, Var(13) = 1
+triggerall = roundstate = 2
+helpertype = normal ;player
+name = "bloodonscreen"
+ID = 20157
+stateno = 20150
+Postype = left
+pos = 0,00
+velocity = 0,0
+ownpal = 1
+keyctrl = 0
+ontop = 1
+size.xscale = .4
+size.yscale = .4
+
+
+
+
+
+[state ]
+type = destroyself
+trigger1 = time = 9999999999999999
+
+;[state ] ; transision for bolts to disapear during fatals
+;type = changestate
+;trigger1 =parent, stateno = 
+;value = 8799
+;ctrl = 1
+
+
+
+
+
+
+
+[StateDef 20150]
+type = S
+movetype= I
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 110
+sprpriority = 999999
+
+
+
+[State ]
+type = Explod
+trigger1 = time  = 0
+;trigger1 = time >= 0 && !(time%3)
+anim = 900071
+id = 900071
+Postype = left
+pos = 50,15
+bindtime = 100
+removetime=100
+random = 40,20
+ontop = 1
+sprpriority = 2
+velocity = 0,0
+ownpal = 1
+
+
+
+[State ]
+type = Explod
+trigger1 = time  = 5
+;trigger1 = time >= 0 && !(time%3)
+anim = 900073
+id = 900071
+Postype = left
+removetime=100
+pos = 150,150
+bindtime = 100
+random = 5,5
+ontop = 1
+sprpriority = 2
+velocity = 0,0
+ownpal = 1
+
+
+[State ]
+type = Explod
+trigger1 = time  = 2
+;trigger1 = time >= 0 && !(time%3)
+anim = 900072
+id = 900071
+Postype = left
+pos = 255,90
+bindtime = 100
+removetime=100
+random = 5,15
+ontop = 1
+sprpriority = 2
+velocity = 0,0
+;scale = .60,.60
+ownpal = 1
+
+[state ]
+type = playsnd
+trigger1 = time = 1
+value = s63,0
+
+[state ]
+type = playsnd
+trigger1 = time = 5
+value = s63,1
+[state ]
+type = playsnd
+trigger1 = time = 2
+value = s63,2
+
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+
+
+[State 0, end]
+type = destroyself
+trigger1 = time = 100
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,3251 @@
+
+
+;殴り・引っかき
+
+
+;■殴る01_1■
+
+[Statedef 1000]
+type    = S
+movetype= A
+physics = S
+juggle  = 2
+velset = 0,0
+ctrl = 0
+anim = 1000 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<7, 1, 2)) ))
+poweradd = 60
+sprpriority = 1
+facep2 = 1
+
+
+[State 1000, アーマー時のダメージ蓄積 初期化]
+type = VarSet
+trigger1 = time = 0
+trigger2 = AnimElemTime(14) > 0
+trigger3 = movecontact
+var(3) = 0
+
+[State 1000, アーマーフラグ]
+type = VarSet
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(14) < 0
+var(2) = 1
+
+[State 1000, アーマーフラグ初期化]
+type = VarSet
+trigger1 = AnimElemTime(14) >= 0
+var(2) = 0
+
+[state 1000, 本体攻撃無効(ダメージはヘルパー経由で本体へ還元)]
+type = NotHitBy
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(14) < 0
+value = SCA, AA, AT, AP
+
+[state 1000, アーマー用ヘルパー]
+type = Helper
+trigger1 = var(2) = 1
+id = 8050
+name = "8050"
+postype = p1
+facing = 1
+pos =  0, 0
+stateno = 8050
+helpertype = normal
+keyctrl = 0 
+ownpal = 0
+size.xscale = 0.5
+size.yscale = 0.5
+supermovetime = 9999
+pausemovetime = 9999
+persistent = 0
+
+[state 1000]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = invisible ;透明
+flag2 = noshadow ;影非表示
+
+[state 1000]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = nostandguard ;ガードしない
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+[State 1000, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(10)=0
+value = S2, 0
+
+[State 1000, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(10)=0
+value = S3, ifelse(random>500, 3, 5)
+
+[State 1000, 軸位置移動]
+type = velset
+trigger1 = FrontEdgeDist > 20
+trigger1 = animelemtime(10)>0 &&  animelemtime(14)<0
+x = 10
+
+[State 1000, エフェクト・打撃斜め下] 
+type = Helper
+trigger1 = animelemtime(11)=0
+id = 10035
+name = "10035"
+pos = 110, -100
+postype = p1
+stateno = 10035
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+[State 1000, ヒット定義]
+type = HitDef
+trigger1 = animelemtime(11)>=0 && animelemtime(14)<0 ;アーマー蓄積ダメージ反映のため時間を限定
+attr = S, NA
+damage = (120+var(3)), (12+var(3)*0.1)
+animtype = hard
+guardflag = MA
+hitflag = MAFD
+priority = 4, Hit
+pausetime = 1, 5
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S0,0
+guardsound = f7, 2
+ground.type = low
+ground.slidetime = 13
+ground.hittime  = 25
+ground.velocity = -7
+air.type = low
+air.velocity = -5, 4
+air.hittime = 10
+persistent = 0
+fall = ifelse(P2StateType = A, 1, 0)
+fall.recover = 0
+
+[State 1000, エフェクト・ヒット03] 
+type = Helper
+trigger1 = movehit
+id = 10015
+name = "10015"
+pos = 1+(random*0.01), -50+(random*0.02)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10015
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.4
+size.yscale = 0.4
+persistent = 0
+
+
+[State 1000, 画面の振動]
+type = EnvShake
+trigger1 = animelemtime(14) >= 0
+time = 4
+freq = 60
+ampl = -4
+phase = 0
+persistent = 0
+
+[State 1000, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(14) >= 0
+trigger2 = movehit
+value = S1, 0
+persistent = 0
+
+[State 1000, エフェクト・土煙02] 
+type = Helper
+trigger1 = animelemtime(14) >= 0
+id = 10025
+name = "10025"
+pos = 160+(random*0.01), 0
+postype = p1
+facing = ifelse(random>500, 1, -1)
+stateno = 10025
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.4
+size.yscale = 0.4
+persistent = 0
+
+[State 1000, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(22) = 0
+x = 20
+
+
+[State 1000, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 2
+persistent = 0
+
+
+[State 1000, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+;■アーマー用ヘルパー■
+[statedef 8050]
+type    = S
+movetype= I
+physics = N
+poweradd = 0
+
+[state 8050]
+type = NotHitBy
+trigger1 = 1
+value = , AT ;投げ無効
+
+[State 8050]
+type = HitOverride
+trigger1 = 1
+time = -1
+attr = SCA, AA, AP
+stateno = 8055
+pausemovetime = 9999
+supermovetime = 9999
+ignorehitpause = 1
+
+[State 8050]
+type = ChangeAnim
+trigger1 = 1
+value = parent, Anim
+elem = parent, AnimElemNo(0)
+pausemovetime = 9999
+supermovetime = 9999
+ignorehitpause = 1
+
+[State 8050]
+type = BindToRoot
+trigger1 = 1
+pausemovetime = 9999
+supermovetime = 9999
+ignorehitpause = 1
+
+[State 8050]
+type = Turn
+trigger1 = Facing != parent,Facing
+pausemovetime = 9999
+supermovetime = 9999
+ignorehitpause = 1
+
+[state 8050,ヘルパー消去]
+type = Destroyself
+trigger1 = parent, var(2) = 0
+trigger2 =! parent, alive
+
+
+;■アーマー用ヘルパー2■
+[statedef 8055]
+type = S
+movetype= H
+physics = N
+poweradd = 0
+
+[state 8055, 攻撃無効]
+type = NotHitBy
+trigger1 = 1
+value = SCA, AA, AT, AP
+
+[state 8055]
+type = Selfstate
+trigger1 = time = 0
+value = 8050
+
+[state 8055,ヘルパー消去]
+type = Destroyself
+trigger1 = time > 100 ; エラー予防
+
+
+
+
+;■殴る(連携)02_1■
+
+[Statedef 1050]
+type    = S
+movetype= A
+physics = S
+juggle  = 2
+velset = 0,0
+ctrl = 0
+anim = 1050 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<8, 1, 2)) ))
+poweradd = 55
+sprpriority = 2
+;facep2 = 1
+
+
+[State 1050, アーマー時のダメージ蓄積 初期化]
+type = VarSet
+trigger1 = time = 0
+trigger2 = AnimElemTime(15) > 0
+trigger3 = movecontact
+var(3) = 0
+
+[State 1050, アーマーフラグ]
+type = VarSet
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(15) < 0
+var(2) = 1
+
+[State 1050, アーマーフラグ初期化]
+type = VarSet
+trigger1 = AnimElemTime(15) >= 0
+var(2) = 0
+
+[state 1050, 攻撃無効]
+type = NotHitBy
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(15) < 0
+value = SCA, AA, AT, AP
+
+[state 1050, アーマー用ヘルパー]
+type = Helper
+trigger1 = var(2) = 1
+id = 8050
+name = "8050"
+postype = p1
+facing = 1
+pos =  0, 0
+stateno = 8050
+helpertype = normal
+keyctrl = 0 
+ownpal = 0
+size.xscale = 0.5
+size.yscale = 0.5
+supermovetime = 9999
+pausemovetime = 9999
+persistent = 0
+
+[state 1050]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = invisible ;透明
+flag2 = noshadow ;影非表示
+
+[state 1050]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = nostandguard ;ガードしない
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+[State 1050, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(10)=0
+value = S2, 0
+
+[State 1050, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(9)=0
+value = S3, ifelse(random>500, 3, 5)
+
+[State 1050, 軸位置移動]
+type = velset
+trigger1 = FrontEdgeDist > 20
+trigger1 = animelemtime(12)>0 &&  animelemtime(16)<0
+x = 15
+
+
+[State 1050, エフェクト・打撃斜め下] 
+type = Helper
+trigger1 = animelemtime(11)=0
+id = 10035
+name = "10035"
+pos = 80, -100
+postype = p1
+stateno = 10035
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+
+[State 1050, ヒット定義]
+type = HitDef
+trigger1 =  animelemtime(11)>=0 && animelemtime(15)<0 ;アーマー蓄積ダメージ反映のため時間を限定
+attr = S, NA
+damage = (110+var(3)), (11+var(3)*0.1)
+animtype = hard
+guardflag = MA
+hitflag = MAFD
+priority = 4, Hit
+pausetime = 1, 5
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S0,0
+guardsound = f7, 2
+ground.type = high
+ground.slidetime = 13
+ground.hittime  = 20
+ground.velocity = -7
+air.type = low
+air.velocity = -8, 4
+air.hittime = 10
+persistent = 0
+fall = ifelse(P2StateType = A, 1, 0)
+fall.recover = 0
+
+
+[State 1050, エフェクト・ヒット03] 
+type = Helper
+trigger1 = movehit
+id = 10015
+name = "10015"
+pos = 1+(random*0.01), -50+(random*0.02)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10015
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.4
+size.yscale = 0.4
+persistent = 0
+
+
+[State 1050, 画面の振動]
+type = EnvShake
+trigger1 = animelemtime(15) >= 0
+time = 4
+freq = 60
+ampl = -4
+phase = 0
+persistent = 0
+
+[State 1050, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(15) >= 0
+trigger2 = movehit
+value = S1, 0
+persistent = 0
+
+[State 1050, エフェクト・土煙02] 
+type = Helper
+trigger1 = animelemtime(15) >= 0
+id = 10025
+name = "10025"
+pos = 140+(random*0.01), 0
+postype = p1
+facing = ifelse(random>500, 1, -1)
+stateno = 10025
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.4
+size.yscale = 0.4
+persistent = 0
+
+
+[State 1050, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 3
+persistent = 0
+
+
+[State 1050, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+;■殴る(連携)03_1■
+
+[Statedef 1200]
+type    = S
+movetype= A
+physics = S
+juggle  = 2
+velset = 0,0
+ctrl = 0
+anim = 1200 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<9, 1, 2)) ))
+poweradd = 50
+sprpriority = 1
+;facep2 = 1
+
+
+[State 1200, アーマー時のダメージ蓄積 初期化]
+type = VarSet
+trigger1 = time = 0
+trigger2 = AnimElemTime(10) > 0
+trigger3 = movecontact
+var(3) = 0
+
+[State 1200, アーマーフラグ]
+type = VarSet
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(10) < 0
+var(2) = 1
+
+[State 1200, アーマーフラグ初期化]
+type = VarSet
+trigger1 = AnimElemTime(10) >= 0
+var(2) = 0
+
+[state 1200, 攻撃無効]
+type = NotHitBy
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(10) < 0
+value = SCA, AA, AT, AP
+
+[state 1200, アーマー用ヘルパー]
+type = Helper
+trigger1 = var(2) = 1
+id = 8050
+name = "8050"
+postype = p1
+facing = 1
+pos =  0, 0
+stateno = 8050
+helpertype = normal
+keyctrl = 0 
+ownpal = 0
+size.xscale = 0.5
+size.yscale = 0.5
+supermovetime = 9999
+pausemovetime = 9999
+persistent = 0
+
+[state 1200]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = invisible ;透明
+flag2 = noshadow ;影非表示
+
+[state 1200]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = nostandguard ;ガードしない
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+[State 1200, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(5)=0
+value = S2, 0
+
+[State 1200, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(5)=0
+value = S3, ifelse(random>500, 3, 5)
+
+[State 1200, 軸位置移動]
+type = velset
+trigger1 = animelemtime(6)>0 &&  animelemtime(9)<0
+x = 7
+
+
+[State 1200, エフェクト・打撃斜め下] 
+type = Helper
+trigger1 = animelemtime(6)=0
+id = 10035
+name = "10035"
+pos = 50, -100
+postype = p1
+stateno = 10035
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+[State 1200, ヒット定義]
+type = HitDef
+trigger1 =  animelemtime(7)>=0 && animelemtime(10)<0 ;アーマー蓄積ダメージ反映のため時間を限定
+attr = S, NA
+damage =  (100+var(3)), (10+var(3)*0.1)
+animtype = hard
+guardflag = MA
+hitflag = MAFD
+priority = 3, Hit
+pausetime = 1, 5
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S0,0
+guardsound = f7, 2
+ground.type = low
+ground.slidetime = 10
+ground.hittime  = 10
+ground.velocity = -1, 20
+air.type = low
+air.velocity = 0, 20
+air.hittime = 10
+persistent = 0
+fall = 1
+fall.recover = 0
+fall.yvelocity = -9
+
+
+[State 1200, エフェクト・ヒット03] 
+type = Helper
+trigger1 = movehit
+id = 10015
+name = "10015"
+pos = 1+(random*0.01), -40+(random*0.02)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10015
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.4
+size.yscale = 0.4
+persistent = 0
+
+
+[State 1200, 画面の振動]
+type = EnvShake
+trigger1 = animelemtime(9) >= 0
+time = 4
+freq = 60
+ampl = -4
+phase = 0
+persistent = 0
+
+[State 1200, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(9) >= 0
+trigger2 = movehit
+value = S1, 0
+persistent = 0
+
+[State 1200, エフェクト・土煙02] 
+type = Helper
+trigger1 = animelemtime(9) >= 0
+id = 10025
+name = "10025"
+pos = 140+(random*0.01), 0
+postype = p1
+facing = ifelse(random>500, 1, -1)
+stateno = 10025
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.4
+size.yscale = 0.4
+persistent = 0
+
+
+[State 1200, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 4
+persistent = 0
+
+
+[State 1200, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+
+
+;■殴る04(打ち上げる)_1■
+
+[Statedef 1250]
+type    = S
+movetype= A
+physics = S
+juggle  = 3
+velset = 0,0
+ctrl = 0
+anim = 1250 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<7, 1, 2)) ))
+poweradd = 60
+sprpriority = 2
+facep2 = 1
+
+
+[State 1250, アーマー時のダメージ蓄積 初期化]
+type = VarSet
+trigger1 = time = 0
+trigger2 = AnimElemTime(15) > 0
+trigger3 = movecontact
+var(3) = 0
+
+[State 1250, アーマーフラグ]
+type = VarSet
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(15) < 0
+var(2) = 1
+
+[State 1250, アーマーフラグ初期化]
+type = VarSet
+trigger1 = AnimElemTime(15) >= 0
+var(2) = 0
+
+[state 1250, 攻撃無効]
+type = NotHitBy
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(15) < 0
+value = SCA, AA, AT, AP
+
+[state 1250, アーマー用ヘルパー]
+type = Helper
+trigger1 = var(2) = 1
+id = 8050
+name = "8050"
+postype = p1
+facing = 1
+pos =  0, 0
+stateno = 8050
+helpertype = normal
+keyctrl = 0 
+ownpal = 0
+size.xscale = 0.5
+size.yscale = 0.5
+supermovetime = 9999
+pausemovetime = 9999
+persistent = 0
+
+[state 1250]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = invisible ;透明
+flag2 = noshadow ;影非表示
+
+[state 1250]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = nostandguard ;ガードしない
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+[State 1250, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(8)=0
+value = S2, 2
+
+[State 1250, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(7)=0
+value = S3, ifelse(random>500, 3, 5)
+
+[State 1250, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(3) =  0
+x = 10
+persistent = 0
+
+[State 1250, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(5) =  0
+trigger2 = animelemtime(6) =  0
+trigger3 = animelemtime(7) =  0
+trigger4 = animelemtime(8) =  0
+x = 1
+
+[State 1250, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(9) =  0
+x = 20
+persistent = 0
+
+
+[State 1250, エフェクト・打撃斜め上] 
+type = Helper
+trigger1 = animelemtime(11)=0
+id = 10040
+name = "10040"
+pos = 30, -50
+postype = p1
+stateno = 10040
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+[State 1250, ヒット定義]
+type = HitDef
+trigger1 =  animelemtime(11)>=0 && animelemtime(15)<0 ;アーマー蓄積ダメージ反映のため時間を限定
+attr = S, NA
+damage = (180+var(3)), (18+var(3)*0.1)
+animtype = back
+guardflag = HA
+hitflag = MAF
+priority = 4, Hit
+pausetime = 1, 1
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S01,0
+guardsound = f7, 2
+ground.type = high
+ground.slidetime = 13
+ground.hittime  = 25
+ground.velocity = -5, -10
+air.type = low
+air.velocity = -7, -8
+air.hittime = 10
+persistent = 0
+fall = 1
+fall.recover = 0
+
+
+[State 1250, エフェクト・ヒット03] 
+type = Helper
+trigger1 = movehit
+id = 10015
+name = "10015"
+pos = 1+(random*0.01), -70+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10015
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+
+[State 1250, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(20) =  0
+x = 10
+
+[State 1250, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(24) =  0
+x = 5
+
+
+
+[State 1250, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 3
+persistent = 0
+
+
+[State 1250, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+;■殴る05(殴る04 近距離)_1■
+
+[Statedef 1255]
+type    = S
+movetype= A
+physics = S
+juggle  = 3
+velset = 0,0
+ctrl = 0
+anim = 1255 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<7, 1, 2)) ))
+poweradd = 50
+sprpriority = 1
+facep2 = 1
+
+
+[State 1255, アーマー時のダメージ蓄積 初期化]
+type = VarSet
+trigger1 = time = 0
+trigger2 = AnimElemTime(11) > 0
+trigger3 = movecontact
+var(3) = 0
+
+[State 1255, アーマーフラグ]
+type = VarSet
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(11) < 0
+var(2) = 1
+
+[State 1255, アーマーフラグ初期化]
+type = VarSet
+trigger1 = AnimElemTime(11) >= 0
+var(2) = 0
+
+[state 1255, 攻撃無効]
+type = NotHitBy
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(11) < 0
+value = SCA, AA, AT, AP
+
+[state 1255, アーマー用ヘルパー]
+type = Helper
+trigger1 = var(2) = 1
+id = 8050
+name = "8050"
+postype = p1
+facing = 1
+pos =  0, 0
+stateno = 8050
+helpertype = normal
+keyctrl = 0 
+ownpal = 0
+size.xscale = 0.5
+size.yscale = 0.5
+supermovetime = 9999
+pausemovetime = 9999
+persistent = 0
+
+[state 1255]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = invisible ;透明
+flag2 = noshadow ;影非表示
+
+[state 1255]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = nostandguard ;ガードしない
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+[State 1255, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(5)=0
+value = S2, 2
+
+[State 1255, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(4)=0
+value = S3, ifelse(random>500, 3, 5)
+
+
+[State 1255, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(3) =  0
+x = 10
+persistent = 0
+
+[State 1255, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(4) =  0
+x = 2
+
+[State 1255, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(5) =  0
+x = 20
+persistent = 0
+
+[State 1255, エフェクト・打撃斜め上] 
+type = Helper
+trigger1 = animelemtime(7)=0
+id = 10040
+name = "10040"
+pos = 30, -50
+postype = p1
+stateno = 10040
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+[State 1255, ヒット定義]
+type = HitDef
+trigger1 =  animelemtime(7)>=0 && animelemtime(11)<0 ;アーマー蓄積ダメージ反映のため時間を限定
+attr = S, NA
+damage = (130+var(3)), (13+var(3)*0.1)
+animtype = back
+guardflag = HA
+hitflag = MAF
+priority = 4, Hit
+pausetime = 1, 1
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S01,0
+guardsound = f7, 2
+ground.type = high
+ground.slidetime = 13
+ground.hittime  = 25
+ground.velocity = -5, -10
+air.type = low
+air.velocity = -7, -8
+air.hittime = 10
+persistent = 0
+fall = 1
+fall.recover = 0
+
+
+[State 1255, エフェクト・ヒット03] 
+type = Helper
+trigger1 = movehit
+id = 10015
+name = "10015"
+pos = 1+(random*0.01), -70+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10015
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+
+[State 1255, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(16) =  0
+x = 10
+
+[State 1255, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(20) =  0
+x = 5
+
+
+[State 1255, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 3
+persistent = 0
+
+
+[State 1255, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+;■殴る05(打ち上げる2)_1■
+
+[Statedef 1300]
+type    = S
+movetype= A
+physics = S
+juggle  = 3
+velset = 0,0
+ctrl = 0
+anim = 1300 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<9, 1, 2)) ))
+poweradd = 70
+sprpriority = 1
+;facep2 = 1
+
+
+[State 1300, アーマー時のダメージ蓄積 初期化]
+type = VarSet
+trigger1 = time = 0
+trigger2 = AnimElemTime(18) > 0
+trigger3 = movecontact
+var(3) = 0
+
+[State 1300, アーマーフラグ]
+type = VarSet
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(18) < 0
+var(2) = 1
+
+[State 1300, アーマーフラグ初期化]
+type = VarSet
+trigger1 = AnimElemTime(18) >= 0
+var(2) = 0
+
+[state 1300, 攻撃無効]
+type = NotHitBy
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(18) < 0
+value = SCA, AA, AT, AP
+
+[state 1300, アーマー用ヘルパー]
+type = Helper
+trigger1 = var(2) = 1
+id = 8050
+name = "8050"
+postype = p1
+facing = 1
+pos =  0, 0
+stateno = 8050
+helpertype = normal
+keyctrl = 0 
+ownpal = 0
+size.xscale = 0.5
+size.yscale = 0.5
+supermovetime = 9999
+pausemovetime = 9999
+persistent = 0
+
+[state 1300]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = invisible ;透明
+flag2 = noshadow ;影非表示
+
+[state 1300]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = nostandguard ;ガードしない
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+[State 1300, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(8)=0
+value = S2, 2
+
+[State 1300, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(7)=0
+value = S3, ifelse(random>500, 3, 5)
+
+[State 1300, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(2) =  0
+trigger2 = animelemtime(3) =  0
+trigger3 = animelemtime(4) =  0
+trigger4 = animelemtime(5) =  0
+trigger5 = animelemtime(6) =  0
+trigger6 = animelemtime(7) =  0
+x = 23
+
+[State 1300, 軸位置移動]
+type = velset
+trigger1 = FrontEdgeDist > 10
+trigger1 = animelemtime(9)>0 &&  animelemtime(14)<0
+x = 1
+
+[State 1300, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(14) =  0
+x = 30
+
+[State 1300, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(15) =  0
+x = 20
+
+[State 1300, エフェクト・土煙] 
+type = Helper
+trigger1 =  animelemtime(6) =  0
+trigger2 =  animelemtime(8) =  0
+id = 10015
+name = "10015"
+pos = 40, 0
+postype = p1
+facing = 1
+stateno = 10015
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.2
+size.yscale = 0.2
+;persistent = 0
+
+[State 1300, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(6)=0
+value = S0, 7
+
+[State 1300, エフェクト・打撃水平] 
+type = Helper
+trigger1 = animelemtime(13)=0
+id = 10030
+name = "10030"
+pos = 100, -150
+postype = p1
+facing = 1
+stateno = 10030
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+[State 1300, ヒット定義]
+type = HitDef
+trigger1 =  animelemtime(13)>=0 && animelemtime(18)<0 ;アーマー蓄積ダメージ反映のため時間を限定
+attr = S, NA
+damage = (180+var(3)), (18+var(3)*0.1)
+animtype = back
+guardflag = HA
+hitflag = MAF
+priority = 4, Hit
+pausetime = 1, 1
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S01,0
+guardsound = f7, 2
+ground.type = high
+ground.slidetime = 13
+ground.hittime  = 25
+ground.velocity = -15, -3
+air.type = low
+air.velocity = -20, 20
+air.hittime = 10
+persistent = 0
+fall = 1
+fall.recover = 0
+fall.xvelocity = -7
+fall.yvelocity = -7
+
+
+[State 1300, エフェクト・ヒット03] 
+type = Helper
+trigger1 = movehit
+id = 10015
+name = "10015"
+pos = -10+(random*0.01), -40+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10015
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+
+
+[State 1300, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(27) =  0
+x = 20
+
+[State 1300, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(28) =  0
+trigger2 = animelemtime(29) =  0
+x = 10
+
+[State 1300, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 4
+persistent = 0
+
+
+[State 1300, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+
+
+;■殴る06(水平)_1■
+
+[Statedef 1700]
+type    = S
+movetype= A
+physics = S
+juggle  = 3
+velset = 0,0
+ctrl = 0
+anim = 1700 + (ifelse(var(0)+var(59)<6, 0, (ifelse(var(0)+var(59)<9, 1, 2)) ))
+poweradd = 80
+sprpriority = 1
+;facep2 = 1
+
+
+[State 1700, アーマー時のダメージ蓄積 初期化]
+type = VarSet
+trigger1 = time = 0
+trigger2 = AnimElemTime(16) > 0
+trigger3 = movecontact
+var(3) = 0
+
+[State 1700, アーマーフラグ]
+type = VarSet
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(16) < 0
+var(2) = 1
+
+[State 1700, アーマーフラグ初期化]
+type = VarSet
+trigger1 = AnimElemTime(16) >= 0
+var(2) = 0
+
+[state 1700, 攻撃無効]
+type = NotHitBy
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(16) < 0
+value = SCA, AA, AT, AP
+
+[state 1700, アーマー用ヘルパー]
+type = Helper
+trigger1 = var(2) = 1
+id = 8050
+name = "8050"
+postype = p1
+facing = 1
+pos =  0, 0
+stateno = 8050
+helpertype = normal
+keyctrl = 0 
+ownpal = 0
+size.xscale = 0.5
+size.yscale = 0.5
+supermovetime = 9999
+pausemovetime = 9999
+persistent = 0
+
+[state 1700]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = invisible ;透明
+flag2 = noshadow ;影非表示
+
+[state 1700]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = nostandguard ;ガードしない
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+[State 1700, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(11)=0
+value = S2, 2
+
+[State 1700, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(10)=0
+value = S3, ifelse(random>500, 3, 5)
+
+[State 1700, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(3) =  0
+x = -20
+
+[State 1700, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(5) =  0
+x = -25
+
+[State 1700, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(10) =  0
+x = 10
+
+[State 1700, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(11) =  0
+x = 20
+
+[State 1700, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(12) =  0
+x = 10
+
+
+[State 1700, 軸位置移動]
+type = posadd
+trigger1 = FrontEdgeDist > 10
+trigger1 = animelemtime(11)>0 &&  animelemtime(16)<0
+x = 10
+
+
+
+[State 1700, エフェクト・打撃水平] 
+type = Helper
+trigger1 = animelemtime(14)=0
+id = 10030
+name = "10030"
+pos = 50, -110
+postype = p1
+facing = 1
+stateno = 10030
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+[State 1700, エフェクト・土煙03] 
+type = Helper
+trigger1 =  animelemtime(16) = 0
+id = 10047
+name = "10047"
+pos = 70, -5
+postype = p1
+facing = -1
+stateno = 10047
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.3
+size.yscale = 0.3
+persistent = 0
+
+[State 1700, ヒット定義]
+type = HitDef
+trigger1 =  animelemtime(11)>=0 && animelemtime(16)<0 ;アーマー蓄積ダメージ反映のため時間を限定
+attr = S, NA
+damage = (300+var(3)), (30+var(3)*0.1)
+animtype = back
+guardflag = M
+hitflag = MAF
+priority = 4, Hit
+pausetime = 1, 1
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S01,0
+guardsound = f7, 2
+ground.type = high
+ground.slidetime = 13
+ground.hittime  = 25
+ground.velocity = -15, -3
+air.type = low
+air.velocity = -20, 20
+air.hittime = 10
+persistent = 0
+fall = 1
+fall.recover = 0
+fall.xvelocity = -7
+fall.yvelocity = -7
+
+
+[State 1700, エフェクト・ヒット03] 
+type = Helper
+trigger1 = movehit
+id = 10015
+name = "10015"
+pos = (150 + (random*0.01)), (-100+(random*0.01))
+postype = p1
+facing = ifelse(random>500, 1, -1)
+stateno = 10015
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+[State 1700, エフェクト・ヒット02] 
+type = Helper
+trigger1 = movehit
+id = 10010
+name = "10010"
+pos = (150 + (random*0.01)), (-100+(random*0.01))
+postype = p1
+facing = 1
+stateno = 10010
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.4
+size.yscale = 0.4
+persistent = 0
+
+[State 1700, 画面の振動]
+type = EnvShake
+trigger1 = movehit
+time = 6
+freq = 60
+ampl = -4
+phase = 0
+persistent = 0
+
+[State 1700, 音を鳴らす]
+type = PlaySnd
+trigger1 = movehit
+value = S1, 1
+persistent = 0
+
+
+[State 1700, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 4
+persistent = 0
+
+
+[State 1700, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+;■殴る06(水平)引っかく03から_1■
+
+[Statedef 1705]
+type    = S
+movetype= A
+physics = S
+juggle  = 3
+velset = 0,0
+ctrl = 0
+anim = 1705 ;+ (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<9, 1, 2)) ))
+poweradd = 70
+sprpriority = 1
+;facep2 = 1
+
+
+[State 1705, アーマー時のダメージ蓄積 初期化]
+type = VarSet
+trigger1 = time = 0
+trigger2 = AnimElemTime(14) > 0
+trigger3 = movecontact
+var(3) = 0
+
+[State 1705, アーマーフラグ]
+type = VarSet
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(14) < 0
+var(2) = 1
+
+[State 1705, アーマーフラグ初期化]
+type = VarSet
+trigger1 = AnimElemTime(114) >= 0
+var(2) = 0
+
+[state 1705, 攻撃無効]
+type = NotHitBy
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(14) < 0
+value = SCA, AA, AT, AP
+
+[state 1705, アーマー用ヘルパー]
+type = Helper
+trigger1 = var(2) = 1
+id = 8050
+name = "8050"
+postype = p1
+facing = 1
+pos =  0, 0
+stateno = 8050
+helpertype = normal
+keyctrl = 0 
+ownpal = 0
+size.xscale = 0.5
+size.yscale = 0.5
+supermovetime = 9999
+pausemovetime = 9999
+persistent = 0
+
+[state 1705]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = invisible ;透明
+flag2 = noshadow ;影非表示
+
+[state 1705]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = nostandguard ;ガードしない
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+[State 1705, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(6)=0
+value = S2, 2
+
+[State 1705, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(5)=0
+value = S3, ifelse(random>500, 3, 5)
+
+
+[State 1705, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(7) =  0
+x = -5
+
+[State 17050, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(8) =  0
+x = 20
+
+[State 1705, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(9) =  0
+x = 10
+
+
+[State 1705, エフェクト・打撃水平] 
+type = Helper
+trigger1 = animelemtime(9)=0
+id = 10030
+name = "10030"
+pos = 50, -110
+postype = p1
+facing = 1
+stateno = 10030
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+
+[State 1705, ヒット定義]
+type = HitDef
+trigger1 =  animelemtime(10)>=0 && animelemtime(14)<0 ;アーマー蓄積ダメージ反映のため時間を限定
+attr = S, NA
+damage = (190+var(3)), (19+var(3)*0.1)
+animtype = back
+guardflag = M
+hitflag = MAF
+priority = 4, Hit
+pausetime = 1, 1
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S01,0
+guardsound = f7, 2
+ground.type = high
+ground.slidetime = 13
+ground.hittime  = 25
+ground.velocity = -15, -3
+air.type = low
+air.velocity = -20, 20
+air.hittime = 10
+persistent = 0
+fall = 1
+fall.recover = 0
+fall.xvelocity = -7
+fall.yvelocity = -7
+
+
+[State 1705, エフェクト・ヒット03] 
+type = Helper
+trigger1 = movehit
+id = 10015
+name = "10015"
+pos = -10+(random*0.01), -40+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10015
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+[State 1705, エフェクト・ヒット02] 
+type = Helper
+trigger1 = movehit
+id = 10010
+name = "10010"
+pos = (150 + (random*0.01)), (-100+(random*0.01))
+postype = p1
+facing = 1
+stateno = 10010
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.4
+size.yscale = 0.4
+persistent = 0
+
+[State 1705, 画面の振動]
+type = EnvShake
+trigger1 = movehit
+time = 6
+freq = 60
+ampl = -4
+phase = 0
+persistent = 0
+
+[State 1705, 音を鳴らす]
+type = PlaySnd
+trigger1 = movehit
+value = S1, 1
+persistent = 0
+
+
+[State 1705, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 4
+persistent = 0
+
+
+[State 1705, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+;■殴る07(引っかく03連携)_1■
+
+[Statedef 1850]
+type    = S
+movetype= A
+physics = S
+juggle  = 3
+velset = 0,0
+ctrl = 0
+anim = 1850 ;+ (ifelse(var(0)+var(59)<6, 0, (ifelse(var(0)+var(59)<9, 1, 2)) ))
+poweradd = 60
+sprpriority = 1
+;facep2 = 1
+
+
+[State 1850, アーマー時のダメージ蓄積 初期化]
+type = VarSet
+trigger1 = time = 0
+trigger2 = AnimElemTime(9) > 0
+trigger3 = movecontact
+var(3) = 0
+
+[State 1850, アーマーフラグ]
+type = VarSet
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(9) < 0
+var(2) = 1
+
+[State 1850, アーマーフラグ初期化]
+type = VarSet
+trigger1 = AnimElemTime(9) >= 0
+var(2) = 0
+
+[state 1850, 攻撃無効]
+type = NotHitBy
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(9) < 0
+value = SCA, AA, AT, AP
+
+[state 1850, アーマー用ヘルパー]
+type = Helper
+trigger1 = var(2) = 1
+id = 8050
+name = "8050"
+postype = p1
+facing = 1
+pos =  0, 0
+stateno = 8050
+helpertype = normal
+keyctrl = 0 
+ownpal = 0
+size.xscale = 0.5
+size.yscale = 0.5
+supermovetime = 9999
+pausemovetime = 9999
+persistent = 0
+
+[state 1850]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = invisible ;透明
+flag2 = noshadow ;影非表示
+
+[state 1850]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = nostandguard ;ガードしない
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+[State 1850, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(3)=0
+value = S2, 2
+
+[State 1850, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(3)=0
+value = S3, ifelse(random>500, 3, 5)
+
+[State 1850, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(2) =  0
+trigger2 = animelemtime(3) =  0
+x = 10
+
+[State 1850, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(5) =  0
+x = 15
+
+[State 1850, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(13) =  0
+x = -5
+
+[State 1850, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(14) =  0
+x = -15
+
+
+[State 1850, エフェクト・打撃斜め下] 
+type = Helper
+trigger1 = animelemtime(5)=0
+id = 10035
+name = "10035"
+pos = 0, -120
+postype = p1
+stateno = 10035
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+[State 1850, ヒット定義]
+type = HitDef
+trigger1 =  animelemtime(5)>=0 && animelemtime(9)<0 ;アーマー蓄積ダメージ反映のため時間を限定
+attr = S, NA
+damage = (150+var(3)), (15+var(3)*0.1)
+animtype = back
+guardflag = MA
+hitflag = MAF
+priority = 4, Hit
+pausetime = 1, 1
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S01,0
+guardsound = f7, 2
+ground.type = high
+ground.slidetime = 13
+ground.hittime  = 25
+ground.velocity = -15, -3
+air.type = low
+air.velocity = -20, 20
+air.hittime = 10
+persistent = 0
+fall = 1
+fall.recover = 0
+fall.xvelocity = -7
+fall.yvelocity = -7
+
+
+[State 1850, エフェクト・ヒット03] 
+type = Helper
+trigger1 = movehit
+id = 10015
+name = "10015"
+pos = (150 + (random*0.01)), (-100+(random*0.01))
+postype = p1
+facing = ifelse(random>500, 1, -1)
+stateno = 10015
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+[State 1850, 画面の振動]
+type = EnvShake
+trigger1 = movehit
+time = 6
+freq = 60
+ampl = -4
+phase = 0
+persistent = 0
+
+[State 1850, 音を鳴らす]
+type = PlaySnd
+trigger1 = movehit
+value = S1, 1
+persistent = 0
+
+
+[State 1850, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 3
+persistent = 0
+
+
+[State 1850, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+
+
+
+
+
+;■引っかく01_1■
+
+[Statedef 1100]
+type    = S
+movetype= A
+physics = S
+juggle  = 2
+velset = 0,0
+ctrl = 0
+anim = 1100 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<7, 1, 2)) ))
+poweradd = 40
+sprpriority = 1
+facep2 = 1
+
+[State 1100, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(4)=0
+value = S2, 4
+
+[State 1100, 軸位置移動]
+type = velset
+trigger1 = animelemtime(4)>0 &&  animelemtime(6)<0
+x = 7
+
+
+[State 1100, ヒット定義]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 80, 8
+animtype = mid
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 2, 5
+sparkno = -1; S10000+ifelse(random>500, 5, 0)
+sparkxy = -20, -40
+hitsound = S1, 3
+guardsound = f7, 2
+ground.type = low
+ground.slidetime = 5
+ground.hittime  = 10
+ground.velocity = -4
+air.type = low
+air.velocity = -5, 0
+air.hittime = 10
+persistent = 0
+fall = ifelse(P2StateType = A, 1, 0)
+fall.recover = 0
+
+[State 1100, エフェクト・ヒット01] 
+type = Helper
+trigger1 = movehit
+id = 10000
+name = "10000"
+pos = 10+(random*0.01), -50+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10000
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.6
+size.yscale = 0.6
+persistent = 0
+
+
+[State 1100, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 1
+persistent = 0
+
+
+[State 1100, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+;■引っかく(連携)02_1■
+
+[Statedef 1150]
+type    = S
+movetype= A
+physics = S
+juggle  = 2
+velset = 0,0
+ctrl = 0
+anim = 1150 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<8, 1, 2)) ))
+poweradd = 40
+sprpriority = 1
+facep2 = 1
+
+[State 1150, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(7)=0
+value = S2, 4
+
+[State 1150, 軸位置移動]
+type = velset
+trigger1 = animelemtime(7)>0 &&  animelemtime(10)<0
+x = 10
+
+[State 1150, ヒット定義]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 80, 8
+animtype = mid
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 1, 8
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S1, 6
+guardsound = f7, 2
+ground.type = low
+ground.slidetime = 10
+ground.hittime  = 15
+ground.velocity = -5
+air.type = low
+air.velocity = -5, 0
+air.hittime = 10
+persistent = 0
+fall = ifelse(P2StateType = A, 1, 0)
+fall.recover = 0
+
+[State 1150, エフェクト・ヒット01] 
+type = Helper
+trigger1 = movehit
+id = 10000
+name = "10000"
+pos = 10+(random*0.01), -40+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10000
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.7
+size.yscale = 0.7
+persistent = 0
+
+
+[State 1150, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 2
+persistent = 0
+
+
+[State 1150, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+
+;■引っかく03_1■
+
+[Statedef 1750]
+type    = S
+movetype= A
+physics = S
+juggle  = 2
+velset = 0,0
+ctrl = 0
+anim = 1750 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<9, 1, 2)) ))
+poweradd = 40
+sprpriority = 1
+facep2 = 1
+
+[State 1750, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(8)=0
+value = S2, 2
+
+[State 1750, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(3)=0
+trigger2 = animelemtime(4)=0
+trigger3 = animelemtime(7)=0
+x = 5
+
+[State 1750, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(8)=0
+x = -10
+
+[State 1750, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(13)=0
+x = -10
+
+[State 1750, ヒット定義]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 80, 8
+animtype = back
+guardflag = MA
+hitflag = MAF
+priority = 4, Hit
+pausetime = 1, 1
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S1,7
+guardsound = f7, 2
+ground.type = high
+ground.slidetime = 13
+ground.hittime  = 10
+ground.velocity = -1, -9
+air.type = low
+air.velocity = -1, -7
+air.hittime = 10
+persistent = 0
+fall = 1
+fall.recover = 0
+
+[State 1750, エフェクト・ヒット01] 
+type = Helper
+trigger1 = movehit
+id = 10000
+name = "10000"
+pos = 10+(random*0.01), -50+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10000
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.6
+size.yscale = 0.6
+persistent = 0
+
+[State 1750, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(25)=0
+trigger2 = animelemtime(26)=0
+x = 10
+
+[State 1750, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 1
+persistent = 0
+
+
+[State 1750, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+;■引っかく03（殴る03から）_1■
+
+[Statedef 1755]
+type    = S
+movetype= A
+physics = S
+juggle  = 2
+velset = 0,0
+ctrl = 0
+anim = 1755 ;+ (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<8, 1, 2)) ))
+poweradd = 30
+sprpriority = 1
+facep2 = 1
+
+[State 1755, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(10)=0
+value = S2, 4
+
+[State 1755, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(4)=0
+x = 5
+
+[State 1755, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(9)=0
+x = -10
+
+[State 1755, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(14)=0
+x = -10
+
+[State 1755, ヒット定義]
+type = HitDef
+trigger1 = time = 0
+;trigger1 = enemynear, pos y < 0
+attr = S, NA
+damage = 40, 4
+animtype = back
+guardflag = MA
+hitflag = MAFD
+priority = 4, Hit
+pausetime = 1, 1
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S01,0
+guardsound = f7, 2
+ground.type = high
+ground.slidetime = 13
+ground.hittime  = 10
+ground.velocity = -1, -9
+air.type = low
+air.velocity = -1, -7
+air.hittime = 10
+persistent = 0
+fall = 1
+fall.recover = 0
+
+[State 1755, エフェクト・ヒット01] 
+type = Helper
+trigger1 = movehit
+id = 10000
+name = "10000"
+pos = 10+(random*0.01), -50+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10000
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.6
+size.yscale = 0.6
+persistent = 0
+
+
+[State 1755, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(26)=0
+trigger2 = animelemtime(27)=0
+x = 10
+
+[State 1755, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 1
+persistent = 0
+
+
+[State 1755, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+;■抜き手01_1■
+
+[Statedef 1800]
+type    = S
+movetype= A
+physics = S
+juggle  = 2
+velset = 0,0
+ctrl = 0
+anim = 1800 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<9, 1, 2)) ))
+poweradd = 60
+sprpriority = 1
+facep2 = 1
+
+[State 1800]
+type = SprPriority
+trigger1 = P2BodyDist X = [-10, 10]
+value = -1
+
+[State 1800, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(9)=0
+value = S2, 2
+
+[State 1800, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(3)=0 
+x = 15
+
+[State 1800, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(10)=0 
+x = 80
+
+[State 1800, ヒット定義]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 100, 10
+animtype = mid
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 2, 10
+sparkno = -1; S10000+ifelse(random>500, 5, 0)
+sparkxy = -20, -40
+hitsound = S1, 3
+guardsound = f7, 2
+ground.type = low
+ground.slidetime = 15
+ground.hittime  = 15
+ground.velocity = -6
+air.type = low
+air.velocity = -6, 1
+air.hittime = 10
+persistent = 0
+;fall = ifelse(P2StateType = A, 1, 0)
+;fall.recover = 0
+
+[State 1800, エフェクト・ヒット01] 
+type = Helper
+trigger1 = movehit
+id = 10000
+name = "10000"
+pos = 10+(random*0.01), -50+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10000
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.6
+size.yscale = 0.6
+persistent = 0
+
+
+[State 1800, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 1
+persistent = 0
+
+
+[State 1800, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+
+;■しゃがみ引っかき03(引っかく連携)_1■
+
+[Statedef 1650]
+type    = C
+movetype= A
+physics = C
+juggle  = 2
+velset = 0,0
+ctrl = 0
+anim = 1650 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<9, 1, 2)) ))
+poweradd = 40
+sprpriority = 1
+facep2 = 1
+
+[State 1650, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(4)=0
+value = S2, 4
+
+[State 1650, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(8)=0
+x = 10
+
+[State 1650, ヒット定義]
+type = HitDef
+trigger1 = time = 0
+attr = C, NA
+damage = 80, 8
+animtype = hard
+guardflag = L
+hitflag = MAF
+priority = 3, Hit
+pausetime = 2, 3
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S1, 3
+guardsound = f7, 2
+ground.type = trip
+ground.slidetime = 10
+ground.hittime  = 10
+ground.velocity = -3, -3
+air.type = low
+air.velocity = -7, 0
+air.hittime = 6
+persistent = 0
+;fall = ifelse(P2StateType = A, 1, 0)
+;fall.recover = 0
+
+[State 1650, エフェクト・ヒット01] 
+type = Helper
+trigger1 = movehit
+id = 10000
+name = "10000"
+pos = 10+(random*0.01), -30+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10000
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.8
+size.yscale = 0.8
+persistent = 0
+
+
+[State 1650, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(16)=0
+x = 10
+
+
+[State 1650, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 3
+persistent = 0
+
+
+[State 1650, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+
+
+;■踏む01(引っかく連携)_1■
+
+[Statedef 1600]
+type    = S
+movetype= A
+physics = S
+juggle  = 2
+velset = 0,0
+ctrl = 0
+anim = 1600
+poweradd = 50
+sprpriority = 1
+;facep2 = 1
+
+
+[State 1600, 軸位置移動]
+type = velset
+trigger1 = animelemtime(8)>0 &&  animelemtime(10)<0
+x = 2
+
+[State 1600, ヒット定義]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA
+damage = 100, 10
+animtype = hard
+guardflag = HA
+hitflag = MAF
+priority = 4, Hit
+pausetime = 1, 5
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S1, 2
+guardsound = f7, 2
+ground.type = high
+ground.slidetime = 10
+ground.hittime  = 10
+ground.velocity = 0, 20
+air.type = low
+air.velocity = -3, 20
+air.hittime = 10
+persistent = 0
+fall = 1
+fall.recover = 0
+p2stateno = 1605
+
+
+[State 1600, 画面の振動]
+type = EnvShake
+trigger1 = animelemtime(11) >= 0
+time = 6
+freq = 60
+ampl = -4
+phase = 0
+persistent = 0
+
+[State 1600, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(11) >= 0
+trigger2 = movehit
+value = S1, 0
+persistent = 0
+
+[State 1600, エフェクト・土煙02] 
+type = Helper
+trigger1 = animelemtime(11) >= 0
+id = 10025
+name = "10025"
+pos = 90+(random*0.01), 0
+postype = p1
+facing = ifelse(random>500, 1, -1)
+stateno = 10025
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.6
+size.yscale = 0.6
+persistent = 0
+
+[State 1600, エフェクト・土煙03] 
+type = Helper
+trigger1 = animelemtime(11) = 0
+id = 10045
+name = "100245"
+pos = 90+(random*0.01), 0
+postype = p1
+facing = 1
+stateno = 10045
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+[State 1600, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 3
+persistent = 0
+
+
+[State 1600, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+
+;■踏む01　相手側1■
+[Statedef 1605]
+type    = L
+movetype= H
+physics = N
+;velset = 0,0
+sprpriority = 0
+
+[State 1605, NotHitby]
+type = NotHitBy
+trigger1 = 1
+value = SCA, AA, AT, AP
+
+[State 1605]
+type = playerpush
+trigger1 = 1
+value=0
+
+[State 1605]
+type = ChangeAnim2
+trigger1 = time =0
+value = 1605
+
+[State 1605, 軸位置移動]
+type = velset
+trigger1 = time = 1
+x = -3
+y = 10
+
+[State 1605, 軸位置移動]
+type = veladd
+trigger1 = time > 3
+trigger1 = pos y < 0
+y = .45
+
+[State 1605, 音を鳴らす]
+type = PlaySnd
+trigger1 = pos y >= 0
+value = f7, 2
+persistent = 0
+
+[State 1605, 音を鳴らす]
+type = PlaySnd
+trigger1 = pos y >= 0
+value = f7, 2
+persistent = 0
+
+[State 1605, 画面の振動]
+type = EnvShake
+trigger1 = pos y >= 0
+time = 4
+freq = 60
+ampl = -4
+phase = 0
+persistent = 0
+
+[State 1605]
+type = LifeAdd
+trigger1 = pos y >= 0
+value = -10
+persistent = 0
+
+[State 1605]
+type = GameMakeAnim
+trigger1 = pos y >= 0
+value = 61
+pos = 0, 10
+under = 1
+persistent = 0
+
+
+[State 1605, 軸位置移動]
+type = velset
+trigger1 = time > 2
+trigger1 = pos y >= 0
+x = 0
+y = 0
+
+[State 1605, 軸位置移動]
+type = posset
+trigger1 = time > 2
+trigger1 = pos y >= 0
+y = 0
+
+[State 1605, ステート変更 地面]
+type = ChangeState
+trigger1 = time > 3
+trigger1 = pos y >= 0
+value = 2105
+
+[State 1605]
+type = SelfState
+trigger1 = Time > 100  ;バグ防止・一定時間経過後に相手ステートに戻す
+value = 5100
+ctrl = 0
+
+
+
+
+
+;■しゃがみ引っかき01_1■
+
+[Statedef 1350]
+type    = C
+movetype= A
+physics = C
+juggle  = 3
+velset = 0,0
+ctrl = 0
+anim = 1350 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<6, 1, 2)) ))
+poweradd = 35
+sprpriority = 1
+facep2 = 1
+
+[State 1350, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(4)=0
+value = S2, 4
+
+[State 1350, ヒット定義]
+type = HitDef
+trigger1 = time = 0
+attr = C, NA
+damage = 70, 7
+animtype = mid
+guardflag = L
+hitflag = MAF
+priority = 3, Hit
+pausetime = 2, 5
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S1, 3
+guardsound = f7, 2
+ground.type = low
+ground.slidetime = 10
+ground.hittime  = 10
+ground.velocity = -2
+air.type = low
+air.velocity = -2, 0
+air.hittime = 6
+persistent = 0
+;fall = ifelse(P2StateType = A, 1, 0)
+;fall.recover = 0
+
+[State 1350, エフェクト・ヒット01] 
+type = Helper
+trigger1 = movehit
+id = 10000
+name = "10000"
+pos = 10+(random*0.01), -30+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10000
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.6
+size.yscale = 0.6
+persistent = 0
+
+[State 1350, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(9)=0 ||  animelemtime(10)=0
+x = 2
+
+
+[State 1350, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 1
+persistent = 0
+
+
+[State 1350, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 11
+ctrl = 1
+
+
+
+;■しゃがみ引っかき(連携)02_1■
+
+[Statedef 1400]
+type    = C
+movetype= A
+physics = C
+juggle  = 3
+velset = 0,0
+ctrl = 0
+anim = 1400 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<8, 1, 2)) ))
+poweradd = 40
+sprpriority = 1
+facep2 = 1
+
+[State 1400, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(4)=0
+value = S2, 4
+
+[State 1400, ヒット定義]
+type = HitDef
+trigger1 = time = 0
+attr = C, NA
+damage = 80, 8
+animtype = hard
+guardflag = L
+hitflag = MAF
+priority = 3, Hit
+pausetime = 1, 5
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S1, 3
+guardsound = f7, 2
+ground.type = trip
+ground.slidetime = 10
+ground.hittime  = 10
+ground.velocity = -3, -3
+air.type = low
+air.velocity = -7, 0
+air.hittime = 6
+persistent = 0
+;fall = ifelse(P2StateType = A, 1, 0)
+;fall.recover = 0
+
+[State 1400, エフェクト・ヒット01] 
+type = Helper
+trigger1 = movehit
+id = 10000
+name = "10000"
+pos = 10+(random*0.01), -30+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10000
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.8
+size.yscale = 0.8
+persistent = 0
+
+[State 1400, 軸位置移動]
+type = velset
+trigger1 = animelemtime(4)>=0  &&  animelemtime(7)<0
+x = 3
+
+
+[State 1400, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 3
+persistent = 0
+
+
+[State 1400, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 11
+ctrl = 1
+
+
+
+
+;■しゃがみ殴り01_1■
+
+[Statedef 1450]
+type    = C
+movetype= A
+physics = C
+juggle  = 3
+velset = 0,0
+ctrl = 0
+anim = 1450 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<8, 1, 2)) ))
+poweradd = 70
+sprpriority = 1
+facep2 = 1
+
+[State 1450, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(1)=0
+value = S3, 5
+
+[State 1450, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(4)=0
+value = S2, 1
+
+[State 1450, 軸位置移動]
+type = posadd
+trigger1 = animelemtime(7)=0
+x = 20
+
+[State 1450, 軸位置移動]
+type = velset
+trigger1 = animelemtime(7)>=0  &&  animelemtime(11)<0
+x = 5
+
+[State 1450, エフェクト・打撃水平] 
+type = Helper
+trigger1 = animelemtime(9)=0
+id = 10030
+name = "10030"
+pos = 70, -20
+postype = p1
+stateno = 10030
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.4
+size.yscale = 0.4
+persistent = 0
+
+[State 1450, ヒット定義]
+type = HitDef
+trigger1 = animelemtime(9)=0
+trigger2 = animelemtime(10)=0
+trigger3 = animelemtime(11)=0
+trigger4 = animelemtime(12)=0
+trigger5 = animelemtime(13)=0
+attr = C, NA
+damage = 35, 3
+animtype = hard
+guardflag = L
+hitflag = MAF
+priority = 4, Hit
+pausetime = 5, 5
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S1, 4
+guardsound = f7, 2
+ground.type = low
+ground.slidetime = 25
+ground.hittime  = 20
+ground.velocity = -10
+air.type = low
+air.velocity = -15, 0
+air.hittime = 15
+;persistent = 0
+;fall = ifelse(P2StateType = A, 1, 0)
+;fall.recover = 0
+
+
+[State 1450, エフェクト・ヒット03] 
+type = Helper
+trigger1 = movehit
+id = 10015
+name = "10015"
+pos = 1+(random*0.01), -20+(random*0.01)
+postype = p2
+facing = ifelse(random>500, 1, -1)
+stateno = 10015
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.4
+size.yscale = 0.4
+persistent = 0
+
+
+[State 1450, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 4
+persistent = 0
+
+
+[State 1450, ステート変更]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 11
+ctrl = 1
+
+
+
+
+;■空中殴り01_1■
+
+[Statedef 1500]
+type    = A
+movetype= A
+physics = A
+juggle  = 3
+;velset = 0,0
+ctrl = 0
+anim = 1500 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<7, 1, 2)) ))
+poweradd = 70
+sprpriority = 1
+;facep2 = 1
+
+
+[State 1500, アーマー時のダメージ蓄積 初期化]
+type = VarSet
+trigger1 = time = 0
+trigger2 = AnimElemTime(13) > 0
+trigger3 = movecontact
+var(3) = 0
+
+[State 1500, アーマーフラグ]
+type = VarSet
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(13) < 0
+var(2) = 1
+
+[State 1500, アーマーフラグ初期化]
+type = VarSet
+trigger1 = AnimElemTime(13) >= 0
+var(2) = 0
+
+[state 1500, 攻撃無効]
+type = NotHitBy
+trigger1 = AnimElemTime(1) >= 0 && AnimElemTime(13) < 0
+value = SCA, AA, AT, AP
+
+[state 1500, アーマー用ヘルパー]
+type = Helper
+trigger1 = var(2) = 1
+id = 8050
+name = "8050"
+postype = p1
+facing = 1
+pos =  0, 0
+stateno = 8050
+helpertype = normal
+keyctrl = 0 
+ownpal = 0
+size.xscale = 0.5
+size.yscale = 0.5
+supermovetime = 9999
+pausemovetime = 9999
+persistent = 0
+
+[state 1500]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = invisible ;透明
+flag2 = noshadow ;影非表示
+
+[state 1500]
+type = AssertSpecial
+trigger1 = var(2) = 1
+flag = nostandguard ;ガードしない
+flag2 = nocrouchguard
+flag3 = noairguard
+
+
+[State 1500, 軸位置移動]
+type = veladd
+trigger1 = animelemtime(2)>=0 && animelemtime(15)<0
+trigger1 = vel y > 0
+y = -.7
+
+[State 1500, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(7)=0
+value = S2, 0
+
+[State 1500, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(8)=0
+value = S3, ifelse(random>500, 3, 5)
+
+
+[State 1500, エフェクト・打撃水平] 
+type = Helper
+trigger1 = animelemtime(10)=0
+id = 10030
+name = "10030"
+pos = 100, -100
+postype = p1
+facing = -1
+stateno = 10030
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+[State 1500, ヒット定義]
+type = HitDef
+trigger1 = animelemtime(8)>=0 && animelemtime(13)<0 ;アーマー蓄積ダメージ反映のため時間を限定
+attr = A, NA
+damage = (140+var(3)), (14+var(3)*0.1)
+animtype = hard
+guardflag = HA
+hitflag = MAF
+priority = 4, Hit
+pausetime = 1, 5
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S0,0
+guardsound = f7, 2
+ground.type = low
+ground.slidetime = 13
+ground.hittime  = 25
+ground.velocity = -10
+air.type = low
+air.velocity = -15, 0
+air.hittime = 10
+persistent = 0
+fall = ifelse(P2StateType = A, 1, 0)
+fall.recover = 0
+
+[State 1500, エフェクト・ヒット03] 
+type = Helper
+trigger1 = movehit
+id = 10015
+name = "10015"
+pos = 100+(random*0.01), -90+(random*0.01)
+postype = p1
+facing = ifelse(random>500, 1, -1)
+stateno = 10015
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+
+
+[State 1500, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 5
+persistent = 0
+
+
+
+;■空中引っかき01_1■
+
+[Statedef 1550]
+type    = A
+movetype= A
+physics = A
+juggle  = 3
+;velset = 0,0
+ctrl = 0
+anim = 1550 + (ifelse(var(0)+var(59)<4, 0, (ifelse(var(0)+var(59)<6, 1, 2)) ))
+poweradd = 35
+sprpriority = 1
+;facep2 = 1
+
+[State 1550, 音を鳴らす]
+type = PlaySnd
+trigger1 = animelemtime(3)=0
+value = S2, 4
+
+[State 1550, ヒット定義]
+type = HitDef
+trigger1 = time = 0
+attr = A, NA
+damage = 70, 7
+animtype = mid
+guardflag = HA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 1, 8
+sparkno = -1
+sparkxy = -20, -60
+hitsound = S1, 3
+guardsound = f7, 2
+ground.type = high
+ground.slidetime = 10
+ground.hittime  = 15
+ground.velocity = -3
+air.type = low
+air.velocity = -5, 0
+air.hittime = 10
+persistent = 0
+;fall = ifelse(P2StateType = A, 1, 0)
+;fall.recover = 0
+
+
+[State 1550, エフェクト・ヒット01] 
+type = Helper
+trigger1 = movehit
+id = 10000
+name = "10000"
+pos = 100+(random*0.01), -30+(random*0.01)
+postype = p1
+facing = ifelse(random>500, 1, -1)
+stateno = 10000
+helpertype = normal
+keyctrl = 0 
+ownpal = 1
+supermovetime = 99
+pausemovetime = 99
+size.xscale = 0.6
+size.yscale = 0.6
+persistent = 0
+
+
+[State 1550, プレイヤーリミット　カウンタ]
+type = VarAdd
+triggerall = !Var(0) ;ＡＩ判定
+trigger1 = var(59) < 10
+trigger1 = movehit
+var(58) = 4
+persistent = 0
+
+
+
+
+
+

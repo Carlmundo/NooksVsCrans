@@ -1,0 +1,2600 @@
+; Jailbot by altoiddealer
+;---------------------------------------------------------------------------
+;INTRO/WIN POSES
+;---------------------------------------------------------------------------
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;LOSE TIME OVER
+[Statedef 170]
+type = S
+physics = S
+ctrl = 0
+anim = 170
+sprpriority = 0
+velset = 0,0
+
+[State 170, Round Not Over]
+type = AssertSpecial  
+trigger1 = Time < 240
+flag = roundnotover
+
+[State 170, NotHitBy]
+type = NotHitBy 
+trigger1 = 1
+value = SCA
+
+[State 170, Crazy Face]
+type = Explod
+trigger1 = !Time
+anim = 9
+removetime = 30
+bindtime = -1
+sprpriority = 1
+
+[State 170, Sound]
+type = PlaySnd
+trigger1 = !Time
+value = 3300,12
+
+[State 170, Electricity]
+type = Explod
+trigger1 = !Time
+sprpriority = 2
+anim = 8109
+removeTime = 90
+bindTime = -1
+
+[State 170, Flash]
+type = BgPalFX
+trigger1 = !Time
+Time = 90
+add = 20,20,0
+sinadd = 50,50,0,4
+
+[State 170, Wirr Sound]
+type = PlaySnd
+trigger1 = animelem = 2
+trigger2 = animelem = 19
+value = 2,1
+
+[State 170, Wirr Sound]
+type = PlaySnd
+trigger1 = animelem = 9
+value = 2,2
+
+[State 170, Transform Sound]
+type = PlaySnd
+trigger1 = Animelem = 26
+value = 170,0
+
+[State 170, Hit Ground Sound]
+type = PlaySnd
+trigger1 = animelem = 38
+value = F7, (sysvar(1) > Const720p(20)) + (sysvar(1) > Const720p(56))
+
+[State 170, Static Sound]
+type = PlaySnd
+trigger1 = Animelem = 43
+value = 2000,0
+loop = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;DRAW TIME OVER
+[Statedef 175]
+type = S
+physics = S
+ctrl = 0
+anim = 175
+sprpriority = 0
+velset = 0,0
+
+[State 175, NotHitBy]
+type = NotHitBy 
+trigger1 = 1
+value = SCA
+
+[State 175, Round Not Over]
+type = AssertSpecial  
+trigger1 = Time < 210
+flag = roundnotover
+
+[State 175, Transform Sound]
+type = PlaySnd
+trigger1 = !Time
+value = 3300,9
+
+[State 175, Draw Gun]
+type = Explod
+trigger1 = Time = 41
+anim = 176
+removetime = -1
+bindtime = -1
+sprpriority = 1
+scale = 0.14,0.14
+pos = -43,-30
+
+[State 175, Draw Text Sound 1]
+type = PlaySnd
+trigger1 = Time = 41
+trigger2 = Time = 61
+value = 250,2
+
+[State 175, Draw Text Sound 1]
+type = PlaySnd
+trigger1 = Time = 51
+trigger2 = Time = 71
+value = 250,1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;WIN POSES
+[Statedef 180] ;Win poses are predetermined at round start. See Config.txt (State 5900).
+type = S
+
+[State 180, Reset Face Glitches]
+type = varset
+trigger1 = 1
+var(9) = 0
+
+[State 180, Arcade] ;Custom win from Arcade hyper
+type = ChangeState
+trigger1 = var(59) = 5
+value = 3313
+
+[State 180, Jailbarber Conclusion]
+type = ChangeState
+triggerall = WinKO
+trigger1 = var(59) = 6
+value = 183
+
+[State 180, Win By Default]
+type = ChangeState
+trigger1 = !WinKO
+value = 185
+
+[State 180, Perfect Win]
+type = ChangeState
+trigger1 = WinPerfect
+value = 186
+
+[State 180, F**k The Police] ;I respect the law! Just capitalizing on the irony.
+type = ChangeState
+triggerall = WinKO
+triggerall = var(59) != 2 ;Does not override Ice Cream win pose
+triggerall = TeamMode != Simul ;Let's make sure the irony is kept personal
+trigger1 = enemy,name = "Robocop"
+trigger2 = enemy,name = "Captain America"
+trigger3 = enemy,name = "Batman"
+trigger4 = enemy,name = "Superman"
+trigger5 = enemy,name = "Heidern"
+trigger6 = enemy,name = "Isaiah Bradley"
+trigger7 = enemy,name = "Gordon Bowman"
+trigger8 = enemy,name = "Chun-Li"
+trigger9 = enemy,name = "Chris Redfield"
+trigger10 = enemy,name = "Jill Valentine"
+value = 186
+
+[State 180, Jukebox]
+type = ChangeState
+triggerall = WinKO
+trigger1 = var(59) = 1
+trigger2 = var(59) = 3 ;If the Jacknife pose was selected...
+trigger2 = Cond(PlayerIDExist(var(58)),(Abs(PlayerID(var(58)),pos X - pos X) < 150),(Abs(Enemy,pos X - pos X) < 150)) ;...but the Enemy's body is too close to play nicely.
+trigger3 = var(59) = 2
+trigger3 = !(PlayerIDExist(var(58)) && PlayerID(var(58)),StateNo = 5151) ;If ice cream pose unexpectedly fails
+trigger3 = Time > 2 ;short wait, just to be sure
+value = 181
+
+[State 180, Ice Cream]
+type = ChangeState
+triggerall = WinKO
+triggerall = var(59) = 2
+trigger1 = PlayerIDExist(var(58)) && PlayerID(var(58)),StateNo = 5151 ;Enemy is ready for ice cream
+value = 182
+
+[State 180, Jacknife]
+type = ChangeState
+triggerall = WinKO
+trigger1 = var(59) = 3
+trigger1 = Cond(PlayerIDExist(var(58)),(Abs(PlayerID(var(58)),pos X - pos X) >= 100),(Abs(Enemy,pos X - pos X) >= 100)) ;Enemy's body is distant enough. Otherwise, play Jukebox.
+value = 184
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;WIN1: JUKEBOX
+[Statedef 181]
+type = S
+physics = S
+ctrl = 0
+anim = 181
+velset = 0,0
+sprpriority = -4
+
+[State 181, No hits]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 181,1]
+type = AssertSpecial  
+trigger1 = var(4) < 2000
+flag = roundnotover
+
+[State 181, Turn if necessary] ;at start
+type = Turn
+trigger1 = !time
+trigger1 = FrontEdgeDist < (GameWidth/2)
+
+[State 181, Walk no arms]
+type = Changeanim
+trigger1 = Time = 1
+trigger1 = FrontEdgeDist > (GameWidth/2)
+value = 181
+persistent = 0
+
+[State 181, Walk speed]
+type = VelSet
+trigger1 = Time >= 1
+trigger1 = anim = 181
+trigger1 = FrontEdgeDist > (GameWidth/2)
+x = const(velocity.walk.fwd.x)
+
+[State 181, Centralize]
+type = posSet
+trigger1 = Time >= 1
+trigger1 = FrontEdgeDist <= (GameWidth/2)
+x = Abs(Floor((GameWidth/2)-FrontEdgeDist))
+persistent = 0
+
+[State 181, Log time 1] ;Time after Jailbot arrives at center
+type = varSet
+trigger1 = Time >= 1
+trigger1 = FrontEdgeDist <= (GameWidth/2)
+var(4) = 0
+persistent = 0
+
+[State 181, Log time 2] ;Time after Jailbot arrives at center
+type = varSet
+trigger1 = NumHelper(1811)
+trigger1 = Helper(1811),anim = 1813
+var(4) = 1330 ;2000 - 1330 = 670   There are about 670 ticks left from this point until Nova's electronic music ends.
+persistent = 0
+
+[State 181, Log time 3] ;Time after Jailbot arrives at center
+type = varAdd
+trigger1 = anim = 1811
+trigger2 = NumHelper(1811)
+var(4) = 1
+
+[State 181, Record player]
+type = Changeanim
+trigger1 = Time >= 1
+trigger1 = FrontEdgeDist <= (GameWidth/2)
+value = 1811
+persistent = 0
+
+[State 181, Stop walking]
+type = VelSet
+trigger1 = Time >= 1
+trigger1 = FrontEdgeDist <= (GameWidth/2)
+x = 0
+
+[State 181, Play classical music]
+type = PlaySnd
+trigger1 = anim = 1811 && AnimElem = 4
+value = 181,1+random%6 ;randomly selected from 6 choices
+channel = 1
+
+[State 181, Rioting Sounds] ;for Superjail! prison stage
+type = PlaySnd
+trigger1 = anim = 1811 && AnimElem = 4
+trigger1 = StageVar(info.name) = "Superjail! Prison Riot"
+value = 8000,0
+channel = 2
+loop = 1
+
+[State 181, No BG music]
+type = AssertSpecial
+trigger1 = anim = 1811 && AnimElem = 4, >= 0
+trigger2 = NumHelper(1811)
+flag = Nomusic
+
+[State 181, Stop classical music]
+type = StopSnd
+trigger1 = NumHelper(1811)
+trigger1 = Helper(1811),anim = 1813 && Helper(1811),AnimElem = 22
+persistent = 0
+channel = 1
+
+[State 181, Spawn Nova]
+type = Helper
+trigger1 = var(4) = 200 ;120 ticks elapsed since arriving at the center of the screen
+name = "Nova"
+id = 1811
+StateNo = 1811
+size.ground.back = 45
+size.ground.front = 45
+size.height = 145
+facing = -1
+pos = FrontEdgeDist + 60,0 ;40px off-screen
+persistent = 0
+
+[State 181, Walk offscreen]
+type = Screenbound
+trigger1 = var(4) > 1425
+
+[State 181, Jailbot exit] ;un-happily
+type = Changeanim
+trigger1 = var(4) > 1425
+value = 1817
+persistent = 0
+
+[State 181, Glide away] ;un-happily
+type = VelSet
+trigger1 = anim = 1817 && AnimElem = 3, >= 0
+x = 1.25 ;glide away (slower than walk)
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;NOVA (WIN1)
+[StateDef 1811]
+type = S
+physics = S
+anim = 1812
+ctrl = 0
+sprpriority = -3
+
+[State 1811, Walk to Jailbot]
+type = VelSet
+trigger1 = anim = 1812
+trigger1 = Abs(ParentDist X) > 3
+x = 3
+
+[State 1811, Stop at Jailbot]
+type = VelSet
+trigger1 = Abs(ParentDist X) <= 3
+x = 0
+
+[State 1811, Centralize]
+type = posAdd
+trigger1 = Abs(ParentDist X) <= 3
+x = Abs(ParentDist X)
+persistent = 0
+
+[State 1811, Transform sound effect]
+type = PlaySnd
+trigger1 = Abs(ParentDist X) <= 3
+persistent = 0
+value = 181,0
+
+[State 1811, Transform into sound system]
+type = Changeanim
+trigger1 = Abs(ParentDist X) <= 3
+value = 1813
+persistent = 0
+
+[State 1811, Play electronic music]
+type = PlaySnd
+trigger1 = anim = 1813 && AnimElem = 22
+persistent = 0
+value = 181,7+random%6 ;randomly selected from 6 choices
+
+[State 1811, Rainbow]
+type = AllPalFX
+trigger1 = anim = 1813 && AnimElem = 22, >= 0
+time = 1
+add = Floor(sin(GameTime/8)*64),Floor(sin((GameTime-85)/8)*64),Floor(sin((GameTime-170)/8)*64)
+
+[State 1811, Light 1]
+type = Explod
+trigger1 = anim = 1813 && AnimElem = 22
+removeTime = -1
+ontop = 1
+persistent = 0
+bindTime = -1
+anim = 1814
+pos = -97,-145
+
+[State 1811, Light 2]
+type = Explod
+trigger1 = anim = 1813 && AnimElem = 22
+removeTime = -1
+ontop = 1
+persistent = 0
+bindTime = -1
+anim = 1815
+pos = -61,-153
+
+[State 1811, Light 3]
+type = Explod
+trigger1 = anim = 1813 && AnimElem = 22
+removeTime = -1
+ontop = 1
+persistent = 0
+bindTime = -1
+facing = -1
+anim = 1815
+pos = 62,-153
+
+[State 1811, Light 4]
+type = Explod
+trigger1 = anim = 1813 && AnimElem = 22
+removeTime = -1
+ontop = 1
+persistent = 0
+bindTime = -1
+facing = -1
+anim = 1814
+pos = 98,-145
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;WIN2: ICE CREAM
+[Statedef 182]
+type = S
+physics = S
+ctrl = 0
+anim = 182
+velset = 0,0
+
+[State 182, 2]
+type = ScreenBound
+trigger1 = 1
+movecamera = 1,0
+
+[State 182, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 182, 3]
+type = AssertSpecial
+trigger1 = Time < 800
+flag = RoundNotOver
+flag2 = NoAutoTurn
+
+[State 182, Turn]
+type = Turn
+triggerall = !time
+trigger1 = Cond(facing = 1,Pos x > 0,Pos X <= 0)
+
+[State 182, Chopper Open Sound]
+type = PlaySnd
+trigger1 = !time
+value = 182,0
+
+[State 182, Fly away]
+type = VelSet
+trigger1 = Time = 80
+x = .2
+y = -.02
+
+[State 182, Fly away]
+type = VelAdd
+trigger1 = Time = [80,200]
+x = 1.5
+y = -.15
+
+[State 182, Stop flying] ;don't have to fly to the moon.
+type = VelSet
+trigger1 = Time >= 199
+x = 0
+y = 0
+
+[State 182, Turn] ;Make sure Jailbot is facing the right way
+type = Turn
+triggerall = Time = 199
+trigger1 = Cond(facing = 1,PlayerID(var(58)),Pos X <= 0,PlayerID(var(58)),Pos X > 0)
+
+[State 182, No FG, Stop Music]
+type = AssertSpecial
+trigger1 = Time = [200,319]
+trigger2 = Time = [419,641]
+flag = NoFg
+flag2 = NoMusic
+
+[State 182, No lifebars]
+type = AssertSpecial
+trigger1 = Time >= 200
+Flag = nobardisplay
+flag2 = Invisible
+
+[State 182, Fullscreen anim]
+type = Explod
+trigger1 = Time = 200
+anim = 1821
+removeTime = Cond(facing = 1,-2,314) ;Stop anim early if facing left
+ontop = 1
+postype = back
+pos = Floor(GameWidth/2),0
+scale = GameWidth/320,GameHeight/240
+;scale = Cond(GameWidth/GameHeight >= 1.5,GameWidth/320,GameHeight/240),Cond(GameWidth/GameHeight >= 1.5,GameWidth/320,GameHeight/240) ;Proportionate, dynamic scaling!
+
+[State 182, Chopper Sound]
+type = PlaySnd
+trigger1 = Time = 200
+value = 182,1
+
+[State 182, PosSet] ;PlayerID match
+type = posset
+trigger1 = Time = 240
+trigger1 = PlayerIDExist(var(58)) ;If the Enemy's PlayerID WAS logged properly
+x = Cond((PlayerID(var(58)),facing = -1),(PlayerID(var(58)),pos X - PlayerID(var(58)),Const(size.head.pos.x) - 96),(PlayerID(var(58)),pos X + PlayerID(var(58)),Const(size.head.pos.x) + 96))
+y = PlayerID(var(58)),pos Y + PlayerID(var(58)),Const(size.head.pos.y)
+
+[State 182, PosSet] ;Fallback code
+type = posset
+trigger1 = Time = 240
+trigger1 = !PlayerIDExist(var(58)) ;If the Enemy's PlayerID WAS NOT logged properly
+x = Cond(Enemy,facing = -1,(Enemy,pos X - Enemy,Const(size.head.pos.x) - 96),(Enemy,pos X + Enemy,Const(size.head.pos.x) + 96))
+y = Enemy,pos Y + Enemy,Const(size.head.pos.y)
+
+[State 182, Sad/Shoot Sound]
+type = PlaySnd
+trigger1 = Time = 419
+value = 182,2
+
+[State 182, Fullscreen anim facing left]
+type = Explod
+trigger1 = Time = 514
+trigger1 = facing = -1
+anim = 1822
+ontop = 1
+postype = back
+pos = Floor(GameWidth/2),0
+scale = GameWidth/320,GameHeight/240
+;scale = Cond(GameWidth/GameHeight >= 1.5,GameWidth/320,GameHeight/240),Cond(GameWidth/GameHeight >= 1.5,GameWidth/320,GameHeight/240) ;Proportionate, dynamic scaling!
+
+[State 182, Ice Cream Cone Flies]
+type = Explod
+trigger1 = Time = 680
+anim = 1823
+removeTime = 19
+pos = -115,-115
+sprpriority = 5
+persistent = 0
+vel = 6,6
+
+[State 182, Cone Splat]
+type = Explod
+trigger1 = Time = 699
+anim = 1824
+sprpriority = 5
+persistent = 0
+vel = 1,0
+
+[State 182, Splat Sound]
+type = PlaySnd
+trigger1 = Time = 699
+value = 182,3
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;WIN3: JAILBARBER CONCLUSION
+[Statedef 183]
+type = S
+physics = S
+ctrl = 0
+anim = 1
+sprpriority = 0
+velset = 0,0
+
+[State 183, NotHitBy]
+type = NotHitBy 
+trigger1 = 1
+value = SCA
+
+[State 183, 2]
+type = AssertSpecial
+trigger1 = var(2) < 10
+trigger1 = Time < 320
+trigger2 = var(2) = 11 ;censored mode
+trigger2 = Time < 160
+flag = RoundNotOver
+
+[State 183, 3] ;Sync special intro
+type = varSet
+trigger1 = 1
+var(59) = 7
+
+[State 183, 4] ;Audio
+type = PlaySnd
+trigger1 = !time
+value = 183,0
+
+[State 0, 5] ;Face overlay
+type = Explod
+trigger1 = Time < 40
+sprpriority = 1
+anim = 10000
+
+[State 183, 5] ;Turn anim (dynamic)
+type = Changeanim
+triggerall = Time = 30
+trigger1 = Cond(facing = 1,pos x >= 0, pos x < 0)
+value = 4
+
+[State 183, 6] ;Turn
+type = Turn
+triggerall = Time = 30
+trigger1 = Cond(facing = 1,pos x >= 0, pos x < 0)
+
+[State 183, 7] ;Stand after turn
+type = Changeanim
+trigger1 = anim = 4 && !animtime
+value = 1
+
+[State 183, 8] ;Look up, down, up
+type = Explod
+trigger1 = Time = 40
+anim = 1835
+bindTime = -1
+sprpriority = 1
+
+[State 183, 9] ;What goes up, must come down
+type = Explod
+trigger1 = Time = 80
+removeTime = 42
+anim = 183
+sprpriority = 4
+shadow = -1
+pos = 50,-340
+vel = 0,6
+
+[State 183, 10] ;Rocket trail
+type = Explod
+trigger1 = Time = 80
+removeTime = 42
+anim = 1831
+shadow = -1
+sprpriority = 3
+pos = 121,-340
+vel = 0,6
+
+[State 183, 11] ;Explosion
+type = Explod
+trigger1 = Time = 120
+anim = 7510
+sprpriority = 5
+bindTime = -1
+shadow = -1
+pos = 121,0
+scale = 1.25,1.25
+
+[State 183, 12] ;Debris
+type = Explod
+trigger1 = Time = 120
+anim = 1834
+sprpriority = 4
+bindTime = -1
+pos = 50,0
+
+[State 183, 13] ;Burning Corpse
+type = Explod
+trigger1 = Time = 120
+trigger1 = var(2) < 11 ;check for censored mode
+anim = 1833
+sprpriority = 3
+bindTime = -1
+pos = 121,0
+
+[State 183, 14] ;Explosion
+type = Explod
+trigger1 = Time = 120
+anim = 1832
+sprpriority = 2
+bindTime = -1
+shadow = -1
+pos = 121,0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;POST-WIN3 INTRO
+[Statedef 1837]
+type = S
+physics = S
+ctrl = 0
+anim = 1836
+velset = 0,0
+sprpriority = 0
+
+[State 1837, 1] ;Special Intro
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 1837, 2] ;Offset from normal start position
+type = posAdd
+trigger1 = !time
+x = -21
+
+[State 1837, 3] ;Audio
+type = PlaySnd
+trigger1 = Time = 4
+trigger2 = Time = 54
+value = 183,1
+
+[State 1837, 3] ;Scooch forward
+type = VelSet
+trigger1 = Time = [4,24]
+trigger2 = Time = [54,74]
+x = 0.5
+
+[State 1837, 4] ;Broomhead Move (separate for shadow issue)
+type = Explod
+trigger1 = Time = 4 || Time = 54
+removeTime = 20
+sprpriority = 1
+anim = 1837
+bindTime = -1
+
+[State 1837, 5] ;Broomhead Stop (separate for shadow issue)
+type = Explod
+trigger1 = Time = 24 || Time = 74
+removeTime = 30
+sprpriority = 1
+anim = 1838
+bindTime = -1
+
+[State 1837, 6] ;Dust
+type = Explod
+trigger1 = Time = 24 || Time = 74
+pos = 86,8
+sprpriority = -1
+anim = 1839
+bindTime = -1
+
+[State 1837, 7] ;End Intro
+type = ChangeState
+trigger1 = !animtime
+value = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;WIN4: JACKNIFE
+[Statedef 184] ;Credit for the "take Enemy's wallet" concept, as well as the wallet/money animation, goes to Warner.
+type = S
+physics = S
+ctrl = 0
+anim = 1
+sprpriority = -4
+velset = 0,0
+
+[State 184, 23]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 184, 2]
+type = AssertSpecial
+trigger1 = Abs(pos X) < (GameWidth/2) + 50 ;After Jailbot runs off-screen
+trigger1 = NumHelper(1841) ;if Jacknife somehow vanishes
+flag = RoundNotOver
+
+[State 184, Hover]
+type = Offset
+trigger1 = Time < 60
+y = 1*cos(GameTime/6.0)
+
+[State 186, Stop Hover Sound]
+type = StopSnd
+trigger1 = Time >= 60
+channel = 0
+
+[State 184, 4] ;Spawn Jacknife
+type = Helper
+trigger1 = !time
+name = "Jacknife"
+id = 1841
+StateNo = 1841
+size.ground.back = 15
+size.ground.front = 30
+size.height = 108
+facing = -1
+pos = frontedgedist + 100 ;100px off-screen
+
+[State 184, 5] ;Eyes watching Jacknife
+type = Explod
+trigger1 = anim = 1
+trigger1 = Abs(Helper(1841),ParentDist X) > 200
+anim = 18401
+
+[State 184, 5] ;Eyes watching Jacknife
+type = Explod
+trigger1 = anim = 1
+trigger1 = Abs(Helper(1841),ParentDist X) = [120, 200]
+anim = 18402
+
+[State 184, 5] ;Eyes watching Jacknife
+type = Explod
+trigger1 = anim = 1
+trigger1 = Abs(Helper(1841),ParentDist X) < 120
+anim = 18403
+
+[State 184, 5] ;Mouth anim
+type = Explod
+trigger1 = Time < 50
+anim = 18404
+
+[State 184, 5] ;Mouth anim
+type = Explod
+trigger1 = Time = [50,60]
+anim = 18405
+
+[State 184, 5] ;Mouth anim
+type = Explod
+trigger1 = anim = 1
+trigger1 = Time > 60
+anim = 18406
+
+[State 184, 7] ;Brandish MiniGun
+type = Changeanim
+trigger1 = Helper(1841),anim = 1841
+trigger1 = Helper(1841),AnimElem = 5
+persistent = 0
+value = 1840
+
+[State 184, 8] ;Minigun anim
+type = Explod
+trigger1 = anim = 1840
+removeTime = -1
+sprpriority = 4
+persistent = 0
+bindTime = -1
+id = 1846
+anim = 1846
+
+[state 184, 8] ;Gun Out Sound
+type = Playsnd
+trigger1 = anim = 1840
+value = 1000,0
+persistent = 0
+
+[State 184, 5] ;Bottle smashed
+type = Explod
+trigger1 = Helper(1841),anim = 1841
+trigger1 = Helper(1841),AnimElem = 6 >= 0
+trigger1 = !NumHelper(1842)
+sprpriority = 6
+persistent = 0
+bindTime = -1
+id = 1843
+anim = 1843
+pos = 0,-110
+
+[State 184, 6] ;Bottle impact
+type = EnvShake
+trigger1 = numexplod(1843) = 1
+Time = 12
+ampl = 4
+freq = 80
+persistent = 0
+
+[State 184, 6] ;Zap sound
+type = PlaySnd
+trigger1 = NumExplod(1843) = 1
+value = 184,3
+persistent = 0
+
+[State 184, 10] ;Static face
+type = Explod
+trigger1 = numexplod(1843) = 1
+removeTime = -1
+sprpriority = 4
+persistent = 0
+bindTime = -1
+id = 1847
+anim = 1847
+
+[State 184, 11] ;Static sound
+type = PlaySnd
+trigger1 = NumExplod(1843) = 1
+value = 2000,0
+loop = 1
+channel = 8
+persistent = 0
+
+[State 184, 12] ;Jacknife bumps into Jailbot impact
+type = EnvShake
+trigger1 = Abs(Helper(1841),ParentDist X) <= 35
+trigger1 = anim = 1840
+Time = 8
+ampl = 2
+freq = 120
+persistent = 0
+
+[State 184, 12] ;Stop static sound
+type = StopSnd
+trigger1 = Abs(Helper(1841),ParentDist X) <= 35
+trigger1 = anim = 1840
+channel = 8
+
+[State 184, 13] ;Remove static anim
+type = RemoveExplod
+trigger1 = Abs(Helper(1841),ParentDist X) <= 35
+trigger1 = anim = 1840
+id = 1847
+
+[State 184, 14] ;Remove downed minigun
+type = RemoveExplod
+triggerall = Helper(1841),anim = 1849
+trigger1 = Abs(Helper(1841),ParentDist X) >= 200
+id = 1846
+
+[State 184, 15] ;Reboot face
+type = Explod
+trigger1 = anim = 1840
+trigger1 = Abs(Helper(1841),ParentDist X) <= 35
+sprpriority = 4
+persistent = 0
+bindTime = -1
+id = 1848
+anim = 1848
+
+[State 184, 16] ;Reboot/pissed off sound
+type = PlaySnd
+trigger1 = numExplod(1848) = 1
+value = 184,6
+persistent = 0
+
+[State 184, 16] ;Remove Reboot face
+type = RemoveExplod
+triggerall = Helper(1841),anim = 1849
+trigger1 = Abs(Helper(1841),ParentDist X) >= 200
+id = 1848
+
+[State 184, 17] ;Chase Jacknife
+type = Changeanim
+trigger1 = Helper(1841),anim = 1849
+trigger1 = Abs(Helper(1841),ParentDist X) >= 200
+value = 1845
+persistent = 0
+
+[State 184, 1]
+type = ScreenBound
+trigger1 = anim = 1845
+
+[State 184, 18] ;Chase Jacknife
+type = VelSet
+trigger1 = anim = 1845
+x = 4.2
+
+[state 184, 19] ;Gun Loop Sound
+type = Playsnd
+trigger1 = anim = 1845
+value = 1000,1
+loop = 1
+persistent = 0
+
+[State 184, 20] ;Bursts
+type = Explod
+trigger1 = anim = 1845
+anim = 1004
+sprpriority = 2
+persistent = 0
+removeTime = -1
+bindTime = -1
+vel = 4,0
+
+[State 184, 21] ;Shells
+type = Explod
+trigger1 = anim = 1845
+trigger1 = Time%3 = 0
+anim = 1005+random%2
+pos = 15,-50
+vel = -3+(random%2/1.5),-4+(random%2/1.5)
+accel = 0,.125
+sprpriority = -3
+removeTime = 70
+
+[State 184, 22]
+type = EnvShake
+trigger1 = anim = 1845
+trigger1 = AnimElem = 1 || AnimElem = 3
+Time = 16
+ampl = 2
+freq = 100
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;JACKNIFE (WIN4)
+[StateDef 1841]
+type = S
+physics = S
+anim = 184
+ctrl = 0
+sprpriority = -3
+
+[State 1841, 1] ;Walk towards Enemy's body
+type = VelSet
+triggerall = anim != 1849
+trigger1 = PlayerIdExist(parent,var(58))
+trigger1 = Cond(PlayerId(parent,var(58)),pos X > parent,pos X,pos X > (PlayerId(parent,var(58)),pos X - 50),pos X < (PlayerId(parent,var(58)),pos X + 50)) ;Allows Jacknife to walk 50px past the opponent's body
+trigger2 = !PlayerIdExist(parent,var(58)) ;fallback code
+trigger2 = Cond(Enemy,pos X > parent,pos X,pos X > (Enemy,pos X - 50),pos X < (Enemy,pos X + 50))
+x = 1.5
+
+[State 1841, 2] ;Footstep sounds
+type = PlaySnd
+trigger1 = anim = 184
+trigger1 = AnimElem = 1 || AnimElem = 7
+trigger2 = anim = 1849
+trigger2 = AnimElem = 13 || AnimElem = 18
+value = 184,0
+
+[State 1841, 3] ;Gulp sounds
+type = PlaySnd
+trigger1 = anim = 184 && AnimElem = 4
+value = 184,1
+
+[State 1841, 4] ;Turn at Enemy's body
+type = Turn
+triggerall = anim != 1849
+trigger1 = PlayerIdExist(parent,var(58))
+trigger1 = Cond(PlayerId(parent,var(58)),pos X > parent,pos X,pos X <= (PlayerId(parent,var(58)),pos X - 50),pos X >= (PlayerId(parent,var(58)),pos X + 50)) ;Allows Jacknife to walk 50px past the opponent's body
+trigger2 = !PlayerIdExist(parent,var(58)) ;fallback code
+trigger2 = Cond(Enemy,pos X > parent,pos X,pos X <= (Enemy,pos X - 50),pos X >= (Enemy,pos X + 50)) ;fallback code
+persistent = 0
+
+[State 1841, 5] ;Toss bottle, take wallet, walk off counting the money
+type = Changeanim
+triggerall = anim != 1849
+trigger1 = PlayerIdExist(parent,var(58))
+trigger1 = Cond(PlayerId(parent,var(58)),pos X > parent,pos X,pos X <= (PlayerId(parent,var(58)),pos X - 50),pos X >= (PlayerId(parent,var(58)),pos X + 50)) ;Allows Jacknife to walk 50px past the opponent's body
+trigger2 = !PlayerIdExist(parent,var(58)) ;fallback code
+trigger2 = Cond(Enemy,pos X > parent,pos X,pos X <= (Enemy,pos X - 50),pos X >= (Enemy,pos X + 50)) ;fallback code
+value = 1841
+persistent = 0
+
+[State 1841, 6] ;Spawn bottle
+type = Helper
+trigger1 = anim = 1841 && AnimElem = 5
+name = "Bottle"
+id = 1842
+StateNo = 1842
+size.ground.back = 10
+size.ground.front = 10
+size.air.back = 10
+size.air.front = 10
+size.height = 20
+pos = 50,-108
+
+[State 1841, 7] ;Toss bottle sound
+type = PlaySnd
+trigger1 = anim = 1841 && AnimElem = 4
+value = 184,2
+
+[State 1841, 8] ;nYah! sound
+type = PlaySnd
+trigger1 = anim = 1841 && AnimElem = 18
+value = 184,4
+persistent = 0
+
+[State 1841, 9] ;Turn towards Jailbot
+type = Turn
+trigger1 = anim = 1841 && AnimElem = 11
+trigger1 = facing = parent,facing
+persistent = 0
+
+[State 1841, 10] ;Walk towards Jailbot
+type = VelSet
+trigger1 = anim = 1841
+trigger1 = AnimElem = 11 >= 0
+trigger1 = Abs(ParentDist x) >= 35
+x = 1
+
+[State 1841, 11] ;Hands counting cash. Credit for the cash-counting animation goes to Warner.
+type = Explod
+trigger1 = anim = 1841 && AnimElem = 11
+sprpriority = -2
+removeTime = -1
+shadow = -1
+bindTime = -1
+id = 1844
+anim = 1844
+
+[State 1841, 12]
+type = Changeanim ;Bumps into Jailbot, gets scared and runs away
+triggerall = anim = 1841
+trigger1 = Abs(ParentDist X) <= 35
+value = 1849
+persistent = 0
+
+[State 1841, 13] ;Stop counting money
+type = RemoveExplod
+trigger1 = anim = 1849
+id = 1844
+
+[State 1841, 14] ;Scared sound
+type = PlaySnd
+trigger1 = anim = 1849
+value = 184,5
+persistent = 0
+
+[State 1841, 15] ;Turn to run away
+type = Turn
+trigger1 = anim = 1849 && AnimElem = 7, > 0
+persistent = 0
+
+[State 1841, 16] ;Run away!
+type = VelSet
+trigger1 = anim = 1849 && AnimElem = 7, > 0
+x = 4.2
+
+[State 1841, 17] ;Dropping cash
+type = Explod
+trigger1 = anim = 1849
+trigger1 = Time%10 = 0
+sprpriority = 4
+removeTime = 300
+random = 0,10
+pos = 0,-75
+vel = -.5,.5
+anim = 18440+random%2
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;BOTTLE (WIN4)
+[Statedef 1842]
+type = A
+physics = N
+ctrl = 0
+velset = ((RootDist X) / 60), (((0.5*Const(movement.yaccel)*60*61)-((-110)-(pos Y)+(Root,pos Y))) / -60) ;Credits to DEMAN for this wonderful code! http://tinyurl.com/pdjpebm
+anim = 1842
+sprpriority = 5
+ 
+[State 1842, Gravity]
+type = VelAdd
+trigger1 = 1
+y = Const(movement.yaccel)
+ 
+[State 1842, 2]
+type = DestroySelf
+trigger1 = Time >= 60
+ignorehitpause = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;WIN5: WIN BY DEFAULT
+[Statedef 185]
+type = S
+physics = S
+ctrl = 0
+anim = 185
+sprpriority = 2
+velset = 0,0
+
+[State 185, No hits]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 185, 2]
+type = AssertSpecial
+trigger1 = Time < 200
+flag = RoundNotOver
+
+[state 185, Cork Pop Sound]
+type = Playsnd
+trigger1 = anim = 185 && AnimElem = 8
+value = 185,0
+persistent = 0
+
+[State 185, Spawn Cork]
+type = Helper
+trigger1 = anim = 185 && AnimElem = 8
+name = "Cork"
+id = 1851
+StateNo = 1851
+size.ground.back = 2
+size.ground.front = 2
+size.height = 2
+pos = -56,-120
+persistent = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;CORK (WIN6)
+[Statedef 1851]
+type = A
+physics = N
+ctrl = 0
+anim = 1851
+sprpriority = 5
+
+[State 1851, Cork fly with lock on target]
+type = VelSet ;Credits to DEMAN for this wonderful code! http://tinyurl.com/pdjpebm
+trigger1 = !time
+trigger1 = PlayerIDExist(var(58))
+x = (Abs(PlayerID(parent,var(58)),pos X - pos X)) / 75
+y = (((0.5*Const(movement.yaccel)*75*76)-((PlayerID(parent,var(58)),Const(Size.Head.pos.y))-(pos Y)+(PlayerID(parent,var(58)),pos Y))) / -75)
+
+[State 1851, Cork fly fallback code]
+type = VelSet
+trigger1 = !time
+trigger1 = !PlayerIDExist(var(58))
+x = (Abs(Enemy,pos X - pos X)) / 75 ;Fallback code
+y = (((0.5*Const(movement.yaccel)*75*76)-((Enemy,Const(Size.Head.pos.y))-(pos Y)+(Enemy,pos Y))) / -75) ;Fallback code
+ 
+[State 1851, Gravity]
+type = VelAdd
+trigger1 = 1
+y = Const(movement.yaccel)
+
+[State 1851, 1]
+type = AngleDraw
+trigger1 = 1
+
+[State 1851, Cork spin]
+type = AngleAdd
+trigger1 = Time < 100
+value = 5
+
+[State 1851, Cork bounces off Enemy]
+type = VelSet
+triggerall = Time >= 75
+trigger1 = PlayerIDExist(var(58))
+trigger1 = Abs(PlayerID(parent,var(58)),pos X - pos X) < 5 ;See if Enemy hasn't moved
+trigger2 = !PlayerIDExist(var(58)) ;Fallback code
+trigger2 = Abs(Enemy,pos X - pos X) < 5 ;Fallback code
+x = -(Vel X) ;deflect
+persistent = 0
+
+[State 1851, Cork bounces off ground]
+type = VelSet
+trigger1 = pos Y >= 0
+y = -(Vel Y / 4)
+persistent = 0
+
+[State 1851, Reduce X vel]
+type = VelMul
+trigger1 = pos Y >= 0
+x = 0.75
+persistent = 0
+
+[State 1851, Cork lays down]
+type = AngleSet
+trigger1 = Time > 100
+trigger1 = pos Y >= -4
+value = 90
+
+[State 1851, Cork stop]
+type = posFreeze
+trigger1 = Time > 100
+trigger1 = pos Y >= -4
+y = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;WIN6: DEAL WITH IT
+[Statedef 186]
+type = S
+physics = N
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 186, NotHitBy]
+type = NotHitBy 
+trigger1 = 1
+value = SCA
+
+[State 186, Reset Var]
+type = VarSet
+trigger1 = !Time
+var(4) = 0
+
+[State 185, Round Not Over]
+type = AssertSpecial
+trigger1 = var(4) < Cond(WinPerfect,600,351)
+flag = RoundNotOver
+
+[State 185, No shadow]
+type = AssertSpecial
+trigger1 = 1
+flag = NoShadow
+
+[State 186, Camera Helper 1]
+type = Helper
+trigger1 = !Time
+postype = left
+pos = 46,0
+stateno = 1862
+id = 1862
+
+[State 186, Camera Helper 2]
+type = Helper
+trigger1 = !Time
+postype = right
+pos = -46,0
+stateno = 1862
+id = 1863
+
+[State 186, Deal with it]
+type = Helper
+trigger1 = !Time
+pos = 0,Floor(-Screenpos Y+105)
+stateno = 1861
+
+[State 186, Hover Override]
+type = OffSet
+trigger1 = var(4)
+y = 0
+
+[State 186, Stop Hover Sound]
+type = StopSnd
+trigger1 = var(4)
+channel = 0
+
+[State 185, 2]
+type = Screenbound
+trigger1 = var(4)
+
+[State 185, No Music]
+type = AssertSpecial
+trigger1 = var(4)
+flag = NoMusic
+
+[State 186, Rioting Sounds] ;for Superjail! prison stage
+type = PlaySnd
+trigger1 = var(4)
+trigger1 = StageVar(info.name) = "Superjail! Prison Riot"
+value = 8000,0
+persistent = 0
+
+[state 186, Choose Song]
+type = Playsnd
+trigger1 = var(4)
+value = 186,Cond(WinPerfect,0,1)
+persistent = 0
+
+[State 186, BG Fade]
+type = BGPalFX
+trigger1 = var(4)
+time = 1
+color = Floor(200-(Cond(var(4) < 180,var(4),200)))
+
+[State 186, Zoom]
+type = VelSet
+trigger1 = var(4)
+x = ((-facing*1.00)*(Pos X*1.00))/600.00
+y = 0.2
+persistent = 0
+
+[State 186, Zoom]
+type = AngleDraw
+trigger1 = var(4)
+scale = 1.00+((var(4)*1.00)/500.00),1.00+((var(4)*1.00)/500.00)
+
+[State 186, Text]
+type = Explod
+trigger1 = var(4) > 180
+postype = right
+pos = 0,Floor(GameHeight)
+bindtime = -1
+anim = Cond(WinPerfect,1861,1862)
+scale = 0.5,0.5
+ontop = 1
+persistent = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;WIN6: GLASSES
+[Statedef 1861]
+type = S
+physics = N
+anim = 186
+sprpriority = 1
+velset = 0,0.5
+
+[State 1861, Stop Falling]
+type = ParentVarAdd
+trigger1 = Pos Y >= 0
+var(4) = 1
+
+[State 1861, Stop Falling]
+type = VelSet
+trigger1 = Pos Y >= 0
+y = 0
+persistent = 0
+
+[State 186, Zoom]
+type = VelSet
+trigger1 = parent,var(4)
+x = ((-facing*1.00)*(Pos X*1.00))/600.00
+y = 0.2
+persistent = 0
+
+[State 186, Zoom]
+type = AngleDraw
+trigger1 = parent,var(4)
+scale = 1.00+((parent,var(4)*1.00)/500.00),1.00+((parent,var(4)*1.00)/500.00)
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;WIN6: CAMERA HELPER
+[Statedef 1862]
+type = S
+physics = N
+anim = 9999
+
+[State 1862,0]
+type = Screenbound
+trigger1 = 1
+value = 1
+movecamera = 1,0
+
+[State 1862, Move Camera]
+type = VelSet
+trigger1 = parent,var(4)
+x = Cond(parent,Pos X <= 0,-0.07,0.07)
+persistent = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;CUSTOM KO
+[Statedef 5150]
+type = L
+movetype = H
+physics = U
+sprpriority = -3
+ctrl = 0
+
+[State 3306, CUSTOM Lose to Arcade]
+type = Screenbound
+trigger1 = PlayerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = gethitvar(fall.envshake.freq) != Teamside
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),var(59) = 5
+ignorehitpause = 1
+
+[State 5150, CUSTOM Lose to Arcade]
+type = lifeSet
+trigger1 = !Time
+trigger1 = PlayerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = gethitvar(fall.envshake.freq) != Teamside
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+[State 3306, CUSTOM Lose to Arcade]
+type = VelSet
+triggerall = !Time
+trigger1 = PlayerIDExist(gethitvar(fall.envshake.ampl))
+trigger1 = gethitvar(fall.envshake.freq) != Teamside
+trigger1 = PlayerID(gethitvar(fall.envshake.ampl)),var(59) = 5
+x = 0
+y = 0
+ignorehitpause = 1
+
+[State 5150, DEFAULT] ;Normal anim
+type = Changeanim
+triggerall = !time
+triggerall = SelfanimExist(5140)
+trigger1 = (anim != [5111,5119]) && (anim != [5171,5179])
+trigger2 = !SelfanimExist(5140 + (anim % 10))
+value = 5140
+
+[State 5150, DEFAULT] ;Hit up type anim
+type = Changeanim
+trigger1 = !time
+trigger1 = (anim = [5111,5119]) || (anim = [5171,5179])
+trigger1 = SelfanimExist(5140 + (anim % 10))
+value = 5140 + (anim % 10)
+
+[State 5150, DEFAULT] ;Match over anim
+type = Changeanim
+persistent = 0
+trigger1 = MatchOver = 1
+trigger1 = anim = [5140,5149]
+trigger1 = SelfanimExist(anim+10)
+value = anim+10
+
+[State 5150, DEFAULT] ;Switch to 5110 if liedead anim does not exist
+type = Changeanim
+trigger1 = !time
+trigger1 = anim != [5140,5159]
+trigger1 = anim != [5110,5119]
+value = 5110
+
+[State 5150, DEFAULT] ;Friction
+type = VelMul
+trigger1 = 1
+x = 0.85
+
+[State 5150, DEFAULT] ;Friction
+type = VelSet
+trigger1 = Abs(Vel x) < Const(movement.down.friction.threshold)
+persistent = 0
+x = 0
+
+[State 5150, DEFAULT]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5150, CUSTOM] ;Enemy Is Going to Get Creamed
+type = ChangeState
+triggerall = Roundstate = 4
+triggerall = PlayerIDExist(gethitvar(fall.envshake.ampl)) ;Check that this is not self
+triggerall = gethitvar(fall.envshake.freq) != Teamside ;Check that this is not self
+triggerall = !PlayerID(gethitvar(fall.envshake.ampl)),WinPerfect ;lay dead against perfect win
+trigger1 = gethitvar(fall.envshake.phase) = 2 ;var(59) = 2 (The enemy is going to get creamed)
+value = 5151
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;ENEMY CREAMED (WIN2)
+[Statedef 5151]
+type = S
+physics = S
+ctrl = 0
+velset = 0,0
+
+[State 5151, NoAutoTurn]
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 5151, Turn] ;if facing the wrong way
+type = Turn
+triggerall = Time = 280
+trigger1 = FrontEdgeDist < Floor(GameWidth/2)
+;trigger2 = facing = 1 && FrontEdgeDist = Floor(GameWidth/2) ;if exactly in the center, and facing to the right.
+
+[State 5151, Enemy starts getting up]
+type = Changeanim
+trigger1 = Time = 380
+value = 5120
+
+[State 5151, Enemy dizzy] ;must have higher priority than the following "slow stand up" controllers
+type = Changeanim
+trigger1 = anim = 5120
+trigger1 = !animtime ;when anim over
+value = Cond(selfanimexist(5300),5300,11) ;Use dizzy anim, or just crouch
+
+[State 5151, Enemy gets up 1] ;manual control of animation
+type = Changeanim
+trigger1 = Time = [381,385]
+trigger1 = anim != 5300 && anim != 11 ;if end of get-up anim has not been reached yet
+value = 5120
+elem = 1 ;frame 1 of animation
+
+[State 5151, Enemy gets up 2] ;manual control of animation
+type = Changeanim
+trigger1 = Time = [386,390]
+trigger1 = anim != 5300 && anim != 11 ;if end of get-up anim has not been reached yet
+value = 5120 
+elem = 2 ;frame 2 of animation
+
+[State 5151, Enemy gets up 3] ;manual control of animation
+type = Changeanim
+trigger1 = Time = [391,395]
+trigger1 = anim != 5300 && anim != 11 ;if end of get-up anim has not been reached yet
+value = 5120
+elem = 3 ;frame 3 of animation
+
+[State 5151, Enemy walking]
+type = Changeanim
+trigger1 = Time = 700
+value = 20
+
+[State 5151, Enemy walks]
+type = VelSet
+trigger1 = Time = [700,742]
+x = 2
+
+[State 5151, Enemy falls back]
+type = VelSet
+trigger1 = Time = [744,762]
+x = -2
+
+[State 5151, Enemy hit]
+type = Changeanim2
+trigger1 = Time = 744
+value = 1825
+
+;[State 5151, Offset Ground Level]
+;type = Offset
+;trigger1 = Time >= 767
+;y = Const(movement.air.gethit.groundrecover.groundlevel)
+
+[State 5151, Enemy dead]
+type = Changeanim
+trigger1 = selfanimexist(5150)
+trigger1 = anim = 1825
+trigger1 = !animtime ;when anim over
+value = 5150
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;INTRODUCTIONS
+[Statedef 190]
+type = S
+
+[State 190, To determine if Player1 or Player3]
+type = VarSet
+trigger1 = numpartner
+trigger1 = partner,name = "Jailbot" ;Jailbot is a partner
+var(3) = partner,ID
+;var(4) = Cond((ID < Partner,ID),1,3)
+
+[State 190, Palette Selector]
+type = Helper
+trigger1 = Cond(ailevel,(var(10) = 1 || var(10) = 3 || var(10) = 5),(var(10) = [2,5])) ;AI
+stateno = 199
+id = 199
+
+[State 190, 2 Jailbots] ;mirror match
+type = ChangeState
+trigger1 = numEnemy = 1 ;not for team games
+trigger1 = Enemy,name = "Jailbot"
+trigger1 = !time
+value = 193
+
+[State 190, Randomize]
+type = varSet
+trigger1 = 1
+var(1) = random%3 + 1
+
+[State 190, Warden intro]
+type = ChangeState
+trigger1 = var(1) = 1
+value = 191
+
+[State 190, Jailbarber intro]
+type = ChangeState
+trigger1 = var(1) = 2
+trigger1 = var(59) := 6 ;flag special win pose
+value = 192
+
+[State 190, Jail Destroyer intro]
+type = ChangeState
+trigger1 = var(1) = 3
+value = 194
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;INTRO1: WARDEN
+[Statedef 191]
+type = S
+physics = S
+anim = 9999 ;invisible
+ctrl = 0
+velset = 0,0
+
+[State 191, Change Jailbot Pal]
+type = RemapPal
+trigger1 = var(57)
+source = 1,1
+dest = 1,var(57)
+
+[State 191, Change face effects Pal]
+type = RemapPal
+trigger1 = var(57)
+source = 3303,1
+dest = 3303,var(57)
+
+[State 191, 1]
+type = AssertSpecial
+trigger1 = Time < 1074
+flag = Intro
+flag2 = nomusic
+
+[State 191, Rioting Sounds] ;for Superjail! prison stage
+type = PlaySnd
+trigger1 = !time
+trigger1 = StageVar(info.name) = "Superjail! Prison Riot"
+value = 8000,0
+channel = 2
+persistent = 0
+
+[State 191, Epic Intro Sound]
+type = PlaySnd
+trigger1 = !time
+value = 191,0
+channel = 30
+
+[State 191, Epic BG]
+type = Explod
+trigger1 = Time = 10
+anim = 1915
+postype = back
+sprpriority = -1
+scale = 0.5,0.5
+
+[State 191, Rainbow Appears]
+type = Explod
+trigger1 = Time = 50
+anim = 191
+removeTime = 156
+scale = 0.85,0.85
+shadow = -1
+
+[State 191, Warden Appears]
+type = Explod
+trigger1 = Time = 135
+anim = 1911
+sprpriority = 1
+scale = 0.85,0.85
+shadow = -1
+
+[State 191, Warden anim]
+type = Explod
+trigger1 = Time = 206
+anim = 1912
+sprpriority = 1
+scale = 0.85,0.85
+shadow = -1
+bindTime = -1
+
+[State 191, Warden Talk 1]
+type = PlaySnd
+trigger1 = Time = 260
+value = 191,1
+channel = 30
+
+[State 191, Warden Talk 2]
+type = PlaySnd
+trigger1 = Time = 331
+value = 191,2
+channel = 30
+
+[State 191, Cloud Poof]
+type = Explod
+trigger1 = Time = 210
+anim = 1913
+scale = 0.85,0.85
+shadow = -1
+
+[State 191, Warden Mouth]
+type = Explod
+trigger1 = Time = 260
+anim = 1914
+sprpriority = 2
+scale = 0.85,0.85
+bindTime = -1
+
+[State 191, Warden sit down / cane toss]
+type = PlaySnd
+trigger1 = Time = 507
+value = 191,3
+channel = 30
+
+[State 191, Warden talk 3]
+type = PlaySnd
+trigger1 = Time = 718
+value = 191,4
+channel = 30
+
+[State 191, Warden talk 4]
+type = PlaySnd
+trigger1 = Time = 828
+value = 191,5
+channel = 30
+
+[State 191, Screen Shake]
+type = EnvShake
+trigger1 = Time = 930
+Time = 80
+freq = 120
+ampl = -2
+
+[State 191, Drill over desk]
+type = Explod
+trigger1 = Time = 1014
+anim = 1916
+sprpriority = 3
+scale = 0.85,0.85
+shadow = -1
+bindTime = -1
+
+[State 191, Enter Jailbot]
+type = Explod
+trigger1 = Time = 1022
+anim = 1917
+sprpriority = -1
+shadow = -1
+
+[State 191, Change to Stand]
+type = ChangeState
+trigger1 = Time = 1074
+value = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;INTRO2: JAILBARBER
+[Statedef 192]
+type = S
+physics = S
+anim = 192
+ctrl = 0
+
+[State 192, Change Jailbot Pal]
+type = RemapPal
+trigger1 = var(57)
+source = 1,1
+dest = 1,var(57)
+
+[State 192, Change face effects Pal]
+type = RemapPal
+trigger1 = var(57)
+source = 3303,1
+dest = 3303,var(57)
+
+[State 192, 2]
+type = AssertSpecial
+trigger1 = Time < 472
+flag = Intro
+
+[State 192, Offset position at start]
+type = posAdd
+trigger1 = !time
+x = -30
+
+[State 192, Sound FX]
+type = PlaySnd
+trigger1 = !time
+value = 192,0
+channel = 30
+persistent = 0
+
+[State 192, Inmate]
+type = Explod
+trigger1 = !time
+anim = 1924
+sprpriority = 4
+shadow = -1
+bindTime = -1
+
+[State 192, Grabby arm 1]
+type = Explod
+trigger1 = Time = 10
+anim = 19210
+sprpriority = -1
+shadow = -1
+bindTime = -1
+
+[State 192, Blade arm]
+type = Explod
+trigger1 = Time = 100
+anim = 19200
+sprpriority = 1
+shadow = -1
+bindTime = -1
+
+[State 192, Blade blood 1]
+type = Explod
+triggerall = var(2) < 11
+trigger1 = Time = 128
+anim = 19202
+sprpriority = 2
+shadow = -1
+bindTime = -1
+
+[State 192, Blade blood 2]
+type = Explod
+triggerall = var(2) < 11
+trigger1 = Time = 154
+anim = 19203
+sprpriority = 5
+shadow = -1
+bindTime = -1
+
+[State 192, Blade slice]
+type = Explod
+trigger1 = Time = 154
+anim = 19201
+sprpriority = 4
+shadow = -1
+bindTime = -1
+
+[State 192, Mirror]
+type = Explod
+trigger1 = Time = 262
+anim = 19204
+sprpriority = 1
+shadow = -1
+bindTime = -1
+
+[State 192, Lather arms]
+type = Explod
+trigger1 = Time = 104
+anim = 19220
+sprpriority = 2
+shadow = -1
+bindTime = -1
+
+[State 192, Lather]
+type = Explod
+trigger1 = Time = 104
+anim = 19221
+sprpriority = 2
+shadow = -1
+bindTime = -1
+
+[State 192, Scissor arm]
+type = Explod
+trigger1 = Time = 114
+anim = 19230
+sprpriority = 6
+shadow = -1
+bindTime = -1
+
+[State 192, Scissor blood 1]
+type = Explod
+triggerall = var(2) < 11
+trigger1 = Time = 144
+anim = 19231
+sprpriority = 6
+shadow = -1
+bindTime = -1
+
+[State 192, Scissor blood 2]
+type = Explod
+triggerall = var(2) < 11
+trigger1 = Time = 192
+anim = 19232
+sprpriority = 6
+shadow = -1
+
+[State 192, Blood1]
+type = Explod
+triggerall = var(2) < 11
+trigger1 = Time = 128
+anim = 9100
+sprpriority = -1
+pos = 74,-82
+shadow = -1
+
+[State 192, Blood2]
+type = Explod
+triggerall = var(2) < 11
+trigger1 = Time = 166
+anim = 9101
+sprpriority = 5
+pos = 71,-80
+shadow = -1
+
+[State 192, Blood3]
+type = Explod
+triggerall = var(2) < 11
+trigger1 = Time = 210
+anim = 9100
+sprpriority = 5
+pos = 73,-88
+shadow = -1
+
+[State 192, Face action]
+type = Explod
+trigger1 = Time = 162
+anim = 1925
+sprpriority = 7
+shadow = -1
+
+[State 192, Grabby arm 2]
+type = Explod
+trigger1 = Time = 334
+anim = 19211
+sprpriority = 5
+shadow = -1
+bindTime = -1
+
+[State 192, Rocket sound]
+type = PlaySnd
+trigger1 = Time = 380
+value = 192,1
+channel = 30
+persistent = 0
+
+[State 192, Chair blasts off]
+type = Explod
+trigger1 = Time = 386
+removeTime = 100
+anim = 1927
+sprpriority = 4
+shadow = -1
+vel = 0,0
+accel = 0,-.3
+
+[State 192, Blast off]
+type = Explod
+trigger1 = Time = 386
+removeTime = 100
+anim = 1926
+sprpriority = 3
+pos = 71,4
+vel = 0,0
+accel = 0,-.3
+
+[State 192, Shockwave]
+type = Explod
+trigger1 = Time = 386
+anim = 8100
+sprpriority = -1
+pos = 71,0
+
+[State 192, Shockwave]
+type = Explod
+trigger1 = Time = 398
+anim = 7766
+sprpriority = -2
+pos = 71,0
+
+[State 192, Screen Shake]
+type = EnvShake
+trigger1 = Time = 386
+Time = 30
+freq = 80
+ampl = -2
+
+[State 192, Walk]
+type = Changeanim
+trigger1 = Time = 404
+value = 181
+
+[State 192, Move]
+type = VelSet
+trigger1 = Time = [404,412]
+x = 3
+
+[State 192, Change anim]
+type = ChangeAnim
+trigger1 = Time = 412
+value = 1
+
+[State 192, Look Up]
+type = Explod
+trigger1 = Time > 412
+sprpriority = 1
+anim = 10003
+
+[State 192, Change to Stand]
+type = ChangeState
+trigger1 = Time = 472
+value = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;INTRO3: 2 JAILBOTS?!
+[Statedef 193]
+type = S
+physics = S
+anim = 0
+ctrl = 0
+velset = 0,0
+
+[State 193, Change Jailbot Pal]
+type = RemapPal
+trigger1 = var(57)
+source = 1,1
+dest = 1,var(57)
+
+[State 193, Change face effects Pal]
+type = RemapPal
+trigger1 = var(57)
+source = 3303,1
+dest = 3303,var(57)
+
+[State 193, 1]
+type = ScreenBound
+trigger1 = 1
+
+[State 193, 2] ;BOTH JAILBOTS
+type = AssertSpecial
+trigger1 = Time < 1314
+flag = Intro
+flag2 = nobardisplay
+
+[State 193, 2] ;BOTH JAILBOTS
+type = AssertSpecial
+trigger1 = 1
+flag = noFG
+flag2 = noautoturn
+
+[State 193, No music] ;BOTH JAILBOTS
+type = AssertSpecial
+trigger1 = Time < 1250
+flag = nomusic
+
+[State 193, No hover sounds]
+type = StopSnd
+trigger1 = 1
+channel = 0
+
+[State 193, Cinematic anim] ;LEFT JAILBOT
+type = Explod
+trigger1 = Teamside = 1
+trigger1 = !time
+anim = 193
+postype = back
+pos = Floor(GameWidth/2),Floor(GameHeight/2)
+scale = Cond(GameWidth/GameHeight >= 1.5,GameWidth/480,GameHeight/320),Cond(GameWidth/GameHeight >= 1.5,GameWidth/480,GameHeight/320) ;Proportionate, dynamic scaling!
+ontop = 1
+
+[State 193, Default Run] ;LEFT JAILBOT
+type = Changeanim
+trigger1 = Teamside = 1
+trigger1 = !time
+value = 100
+
+[State 193, Stand] ;LEFT JAILBOT
+type = Changeanim
+triggerall = Teamside = 1
+trigger1 = Time >= 400
+value = Cond(NumExplod(193),1,0)
+
+[State 193, Confused face] ;LEFT JAILBOT
+type = Explod
+trigger1 = Teamside = 1
+trigger1 = Time = 420
+sprpriority = 1
+bindTime = -1
+shadow = -1
+anim = 9
+id = 193
+
+[State 193, Jacknife run] ;LEFT JAILBOT
+type = Helper
+trigger1 = Teamside = 1
+trigger1 = Time = 350
+pos = -60,0
+StateNo = 1931
+name = "Jacknife"
+sprpriority = 3
+
+[State 193, Offset] ;LEFT JAILBOT
+type = OffSet
+trigger1 = Teamside = 1
+trigger1 = Time < 400
+x = -1600+(Time*4)
+
+[State 193, Shocked] ;RIGHT JAILBOT
+type = Changeanim
+trigger1 = Teamside = 2
+trigger1 = Time = 360
+value = 1932
+
+[State 193, Looking eyes Stand] ;RIGHT JAILBOT
+type = Explod
+triggerall = Teamside = 2
+triggerall = anim = 1932
+trigger1 = AnimElemTime(2) >= 0 ;while turning
+trigger1 = AnimElemTime(4) < 0 ;while turning
+trigger2 = AnimElemTime(5) >= 0 ;while turning
+trigger2 = AnimElemTime(7) < 0 ;while turning
+anim = 10000 ;look normal
+sprpriority = 2
+
+[State 193, Looking eyes near] ;RIGHT JAILBOT
+type = Explod
+triggerall = Teamside = 2
+triggerall = anim = 1932
+trigger1 = AnimElemTime(1) >= 30
+trigger1 = AnimElemTime(2) < 0
+trigger2 = AnimElemTime(4) >= 0
+trigger2 = AnimElemTime(4) < 15
+facing = Cond((AnimElemTime(3) < 0 || AnimElemTime(5) >= 0),1,-1)
+anim = 10004 ;look near
+sprpriority = 2
+
+[State 193, Looking eyes far] ;RIGHT JAILBOT
+type = Explod
+triggerall = Teamside = 2
+triggerall = anim = 1932
+trigger1 = AnimElemTime(1) < 30
+trigger2 = AnimElemTime(4) >= 15
+trigger2 = AnimElemTime(5) < 0
+facing = Cond((AnimElemTime(3) < 0 || AnimElemTime(5) >= 0),1,-1)
+anim = 10008 ;look far
+sprpriority = 2
+
+[State 193, Jump back] ;RIGHT JAILBOT
+type = posAdd
+triggerall = Teamside = 2
+triggerall = anim = 1932
+trigger1 = AnimElem = 7
+trigger2 = AnimElem = 8
+x = -10
+
+[State 193, Confused face] ;RIGHT JAILBOT
+type = Explod
+triggerall = Teamside = 2
+triggerall = anim = 1932
+trigger1 = AnimElemTime(7) >= 0
+trigger1 = AnimElemTime(8) < 0
+trigger2 = AnimElemTime(18) >= 0
+anim = 1933
+sprpriority = 2
+
+[State 193, Add X] ;RIGHT JAILBOT
+type = posAdd
+trigger1 = Teamside = 2
+trigger1 = anim = 1932 && !animtime
+x = 20
+persistent = 0
+
+[State 193, Default stand] ;RIGHT JAILBOT
+type = Changeanim
+trigger1 = Teamside = 2
+trigger1 = anim = 1932 && !animtime
+value = 0
+persistent = 0
+
+[State 193, Static Sound] ;LEFT JAILBOT
+type = PlaySnd
+trigger1 = Teamside = 1
+trigger1 = Time = 335
+value = 2000,0
+
+[State 193, Screen static] ;LEFT JAILBOT
+type = Explod
+trigger1 = Teamside = 1
+trigger1 = Time = 350
+anim = 1931
+pos = Floor(GameWidth/2),0
+postype = back
+scale = GameWidth/720,GameHeight/480
+sprpriority = 5
+removeTime = 200
+
+[State 193, Sound] ;LEFT JAILBOT
+type = PlaySnd
+trigger1 = Teamside = 1
+trigger1 = !time
+value = 193,0
+channel = 30
+
+[State 192, Change to Stand] ;BOTH JAILBOTS
+type = ChangeState
+trigger1 = Time = 1314
+value = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;JACKNIFE (INTRO3)
+[StateDef 1931]
+type = S
+physics = S
+ctrl = 0
+sprpriority = 3
+
+[State 1931,0]
+type = Changeanim
+trigger1 = !time
+value = 1849
+elem = 8
+
+[State 1931,0]
+type = VelSet
+trigger1 = 1
+x = 4.3
+
+[State 1931,2]
+type = DestroySelf
+trigger1 = Time >= 600
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;INTRO4: JAIL DESTROYER
+[Statedef 194]
+type = A
+physics = N
+anim = 9999
+sprpriority = 4
+ctrl = 0
+velset = 0,0
+
+[State 194, Change Jailbot Pal]
+type = RemapPal
+trigger1 = var(57)
+source = 1,1
+dest = 1,var(57)
+
+[State 194, Change face effects Pal]
+type = RemapPal
+trigger1 = var(57)
+source = 3303,1
+dest = 3303,var(57)
+
+[State 194, 1]
+type = ScreenBound
+trigger1 = 1
+
+[State 194, 1]
+type = AssertSpecial
+trigger1 = Time < 820
+flag = Intro
+
+[State 194, 2]
+type = AssertSpecial
+trigger1 = 1
+flag = nomusic
+flag2 = noautoturn
+
+[State 194, 3]
+type = AssertSpecial
+trigger1 = Time < 780
+flag = nobardisplay
+
+[State 194, Rioting Sounds] ;for Superjail! prison stage
+type = PlaySnd
+trigger1 = !time
+trigger1 = StageVar(info.name) = "Superjail! Prison Riot"
+value = 8000,0
+channel = 2
+persistent = 0
+
+[State 194, Intro Audio] ;Credits: the polish AGH University of Science and Technology (youtu.be/yHJOz_y9rZE)
+type = PlaySnd
+trigger1 = !time
+value = 194,0
+channel = 30
+
+[State 194, Log start position]
+type = varSet
+trigger1 = Time = 1
+var(4) = Floor(pos X)
+
+[State 194, Offset to above the screen]
+type = posAdd
+trigger1 = Time = 50
+x = Floor(FrontEdgeDist)
+y = Floor(-Screenpos Y)
+
+[State 194, Massive Jail-Destroyer]
+type = Changeanim
+trigger1 = Time = 300
+value = 194
+
+[State 194, Scale down to normal player size]
+type = AngleDraw
+trigger1 = Time < 780
+Scale = 1-(((Time*1.0)-300.0)*.00185445),1-(((Time*1.0)-300.0)*.00185445) ;scale to normal size
+
+[State 194, Turn]
+type = Turn
+trigger1 = Time = 300
+
+[State 194, Thrusters Helper]
+type = Helper
+trigger1 = Time = 300
+StateNo = 1941
+name = "Thrusters"
+
+[State 194, Glide to start position]
+type = VelSet
+trigger1 = Time = 301
+x = Abs(var(4) - pos X) / 480
+y = Abs((pos Y + 40) / 480)
+
+[State 194, Flip over to Stand]
+type = Changeanim
+trigger1 = Time = 780
+value = 1942
+
+[State 194, Place at start]
+type = posAdd
+trigger1 = Time = 780
+x = Abs(var(4) - pos X)
+y = 40
+
+[State 194, Stop moving]
+type = VelSet
+trigger1 = Time = 780
+x = 0
+y = 0
+
+[State 194, Turn]
+type = Turn
+trigger1 = Time = 780
+
+[State 194, Change to Stand]
+type = ChangeState
+trigger1 = anim = 1942 && !animtime
+value = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;THRUSTERS (INTRO4)
+[StateDef 1941]
+type = A
+physics = N
+anim = 1941
+ctrl = 0
+sprpriority = 5
+velset = (Abs(parent,var(4) - pos X) / 480),(Abs((pos Y + 40) / 480))
+
+[State 1941, No shadow]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+
+[State 1941, Semitransparent]
+type = Trans
+trigger1 = 1
+trans = add
+
+[State 1941, Scale down over time]
+type = AngleDraw
+trigger1 = 1
+Scale = 1-((Time*1.0)*.00185445),1-((Time*1.0)*.00185445) ;shrink
+
+[State 1941, 1]
+type = DestroySelf
+trigger1 = parent,anim = 1942
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;PALETTE SELECTOR
+[StateDef 199]
+anim = 9999
+ctrl = Cond(parent,ailevel,0,parent,var(10) = [2,3])
+
+[State 199, Intro Cube]
+type = Explod
+trigger1 = !Time
+trigger1 = !parent,var(3) ;Jailbot IS NOT a partner
+anim = 190
+id = 190
+scale = 0.5,0.5
+removetime = -1
+postype = left
+pos = Cond(TeamSide = 1,Floor((GameWidth/4)-62),Floor((GameWidth*0.75)-62)),Floor(GameHeight-9)
+ontop = 1
+
+[State 199, Intro Cube]
+type = Explod
+trigger1 = !Time
+trigger1 = parent,var(3) ;Jailbot IS a partner
+anim = 190
+id = 190
+scale = 0.32,0.32
+removetime = -1
+postype = left
+pos = Cond(TeamSide = 1,Floor((GameWidth/4)-62),Floor((GameWidth*0.75)-62)),Cond(parent,var(3) > parent,ID,Floor(GameHeight-22),Floor(GameHeight-4))
+ontop = 1
+
+[State 199, Pal Icons]
+type = Explod
+triggerall = !Time
+trigger1 = !parent,var(3) ;Jailbot IS NOT a partner
+trigger2 = parent,var(3) && (parent,var(3) > parent,ID) ;Jailbot IS a partner and I am Player 1
+anim = 1900
+id = 190
+removetime = -1
+postype = left
+pos = Cond(TeamSide = 1,Floor((GameWidth/4)+16),Floor((GameWidth*0.75)+16)),Floor(GameHeight-4)
+ontop = 1
+persistent = 0
+
+[State 199, Pal Icons]
+type = Explod
+triggerall = parent,var(3) && (parent,var(3) < parent,ID) ;Jailbot IS a partner and I am Player 3
+trigger1 = PlayerID(parent,var(3)),StateNo = 0 ;Jailbot partner has finished his Intro.
+trigger2 = !PlayerID(parent,var(3)),numhelper(199)
+anim = 1900
+id = 190
+removetime = -1
+postype = left
+pos = Cond(TeamSide = 1,Floor((GameWidth/4)+16),Floor((GameWidth*0.75)+16)),Floor(GameHeight-4)
+ontop = 1
+persistent = 0
+
+[State 199, Blue Pal Selector]
+type = RemapPal
+trigger1 = parent,var(3) && (parent,var(3) < parent,ID)
+source = 0,1901
+dest = 2,3
+persistent = 0
+
+[State 199, Pal Selector]
+type = Explod
+trigger1 = !Time
+anim = 1901
+id = 1901
+removetime = -1
+postype = left
+pos = Cond(TeamSide = 1,Floor((GameWidth/4)-30),Floor((GameWidth*0.75)-30)),Floor(GameHeight-32)
+ontop = 1
+
+[State 199, Random Palette]
+type = ParentVarSet
+triggerall = !ctrl
+trigger1 = Time < 90 && Time%4 = 0
+var(57) = random%33+1
+
+[State 199, Pal Set Command = FWD]
+type = ParentVarAdd
+triggerall = !parent,var(3) ;No Jailbot partner
+trigger1 = Cond(parent,facing = 1,parent,command = "fwd",parent,command = "back")
+var(57) = Cond((parent,var(57) = 11 || parent,var(57) = 22 || parent,var(57) = 33),-10,1) ;forward one, or jump to other side
+
+[State 199, 2 Jailbots FWD]
+type = ParentVarAdd
+triggerall = parent,var(3) ;Jailbot partner
+triggerall = Cond(parent,facing = 1,parent,command = "fwd",parent,command = "back")
+trigger1 = parent,var(57) != 11 && parent,var(57) != 22 && parent,var(57) != 33
+trigger1 = PlayerID(parent,var(3)),var(57) != parent,var(57) + 1
+trigger2 = parent,var(57) = 11 || parent,var(57) = 22 || parent,var(57) = 33
+trigger2 = PlayerID(parent,var(3)),var(57) != parent,var(57) - 10
+var(57) = Cond((parent,var(57) = 11 || parent,var(57) = 22 || parent,var(57) = 33),-10,1) ;forward one, or jump to other side
+
+[State 199, Pal Set Command = BACK]
+type = ParentVarAdd
+triggerall = !parent,var(3) ;No Jailbot partner
+trigger1 = Cond(parent,facing = 1,parent,command = "back",parent,command = "fwd")
+var(57) = Cond((parent,var(57) = 1 || parent,var(57) = 12 || parent,var(57) = 23),10,-1) ;back one, or jump to other side
+
+[State 199, 2 Jailbots BACK]
+type = ParentVarAdd
+triggerall = parent,var(3) ;Jailbot partner
+triggerall = Cond(parent,facing = 1,parent,command = "back",parent,command = "fwd")
+trigger1 = parent,var(57) != 1 && parent,var(57) != 12 && parent,var(57) != 23
+trigger1 = PlayerID(parent,var(3)),var(57) != parent,var(57) - 1
+trigger2 = parent,var(57) = 1 || parent,var(57) = 12 || parent,var(57) = 23
+trigger2 = PlayerID(parent,var(3)),var(57) != parent,var(57) + 10
+var(57) = Cond((parent,var(57) = 1 || parent,var(57) = 12 || parent,var(57) = 23),10,-1) ;back one, or jump to other side
+
+[State 199, Pal Set Command = DOWN]
+type = ParentVarAdd
+triggerall = !parent,var(3) ;No Jailbot partner
+trigger1 = parent,command = "down"
+var(57) = Cond((parent,var(57) = [23,33]),-22,11) ;down one, or jump to other side
+
+[State 199, 2 Jailbots DOWN]
+type = ParentVarAdd
+triggerall = parent,var(3) ;Jailbot partner
+triggerall = parent,command = "down"
+trigger1 = (parent,var(57) != [23,33])
+trigger1 = PlayerID(parent,var(3)),var(57) != parent,var(57) + 11
+trigger2 = (parent,var(57) = [23,33])
+trigger2 = PlayerID(parent,var(3)),var(57) != parent,var(57) - 22
+var(57) = Cond((parent,var(57) = [23,33]),-22,11) ;down one, or jump to other side
+
+[State 199, Pal Set Command = UP]
+type = ParentVarAdd
+triggerall = !parent,var(3) ;No Jailbot partner
+trigger1 = parent,command = "up"
+var(57) = Cond((parent,var(57) = [1,11]),22,-11) ;up one, or jump to other side
+
+[State 199, 2 Jailbots UP]
+type = ParentVarAdd
+triggerall = parent,var(3) ;Jailbot partner
+triggerall = parent,command = "up"
+trigger1 = (parent,var(57) != [1,11])
+trigger1 = PlayerID(parent,var(3)),var(57) != parent,var(57) - 11
+trigger2 = (parent,var(57) = [1,11])
+trigger2 = PlayerID(parent,var(3)),var(57) != parent,var(57) + 22
+var(57) = Cond((parent,var(57) = [1,11]),22,-11) ;up one, or jump to other side
+
+[State 199, Pal Selector - Left Teamside]
+type = ModifyExplod
+trigger1 = TeamSide = 1
+anim = 1901
+id = 1901
+removetime = -1
+postype = left
+pos = Floor((GameWidth/4)+(Cond((parent,var(57)=[1,11]),(-50+(parent,var(57)*11)),(Cond((parent,var(57)=[12,22]),(-50+((parent,var(57)-11)*11)),(-50+((parent,var(57)-22)*11))))))),Floor(Cond((parent,var(57)=[1,11]),GameHeight-32,Cond((parent,var(57)=[12,22]),GameHeight-21,GameHeight-10)))
+;pos = Floor((GameWidth/4)-38),Floor(GameHeight-34)
+ontop = 1
+
+[State 199, Pal Selector - Right Teamside]
+type = ModifyExplod
+trigger1 = TeamSide = 2
+anim = 1901
+id = 1901
+removetime = -1
+postype = left
+pos = Floor((GameWidth*0.75)+(Cond((parent,var(57)=[1,11]),(-50+(parent,var(57)*11)),(Cond((parent,var(57)=[12,22]),(-50+((parent,var(57)-11)*11)),(-50+((parent,var(57)-22)*11))))))),Floor(Cond((parent,var(57)=[1,11]),GameHeight-32,Cond((parent,var(57)=[12,22]),GameHeight-21,GameHeight-10)))
+ontop = 1
+
+[State 199, Pal Selector - Right Teamside]
+type = CtrlSet
+triggerall = parent,var(3)
+trigger1 = parent,command = "s"
+trigger2 = !ctrl
+trigger2 = Time > 100
+value = 0
+
+[State 199, Remove Cube/Icons]
+type = RemoveExplod
+trigger1 = parent,StateNo = 0
+trigger2 = RoundState = 2
+trigger3 = parent,command = "s"
+trigger4 = !ctrl
+trigger4 = Time > 100
+id = 190
+
+[State 199, Remove Pal Selector]
+type = RemoveExplod
+trigger1 = parent,StateNo = 0
+trigger2 = RoundState = 2
+trigger3 = parent,command = "s"
+trigger4 = !ctrl
+trigger4 = Time > 100
+id = 1901
+
+[State 199, Destroy Self]
+type = DestroySelf
+trigger1 = parent,StateNo = 0
+trigger2 = RoundState = 2
+trigger3 = parent,command = "s"
+trigger4 = !ctrl
+trigger4 = Time > 100

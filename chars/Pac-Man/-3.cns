@@ -1,0 +1,131 @@
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------
+[Statedef -3]
+
+;This controller plays a sound everytime KFM lands from a jump, or
+;from his back-dash.
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52 ;Jump land
+trigger2 = stateno = 106 ;Run-back land
+value = 40, 0
+
+[State -3, VarSet]
+type = VarSet
+trigger1 = power < 1000
+v =  3
+value = 0
+
+[State -3, PlaySnd]
+type = PlaySnd
+trigger1 = stateno != 5900
+trigger1 = stateno != 190
+trigger1 = (power >= 1000) && (power < 2000) && (var(3) < 1) && (RoundState = 2)
+value = S30,0
+abspan = 1
+
+[State -3, VarSet]
+type = VarSet
+trigger1 = (power >= 1000) && (power < 2000)
+v =  3
+value = 1
+
+[State -3, PlaySnd]
+type = PlaySnd
+trigger1 = stateno != 5900
+trigger1 = stateno != 190
+trigger1 = (power >= 2000) && (power < 3000) && (var(3) < 2) && (RoundState = 2)
+value = S30,0
+abspan = 1
+
+[State -3, VarSet]
+type = VarSet
+trigger1 = (power >= 2000) && (power < 3000)
+v =  3
+value = 2
+
+[State -3, PlaySnd]
+type = PlaySnd
+trigger1 = stateno != 5900
+trigger1 = stateno != 190
+trigger1 = (power >= 3000) && (var(3) < 3) && (RoundState = 2)
+value = S30,0
+abspan = 1
+
+[State -3, PlaySnd]
+type = PlaySnd
+trigger1 = stateno != 5900
+trigger1 = stateno != 190
+trigger1 = (power >= 3000) && (var(3) < 3) && (RoundState = 2)
+value = S30,1
+abspan = 1
+
+[State -3, VarSet]
+type = VarSet
+trigger1 = (power >= 3000)
+v =  3
+value = 3
+
+[State -3, Super Jump]
+type = VarSet
+trigger1 = Stateno = 0
+v = 12
+value = 0
+
+[State -3, VarAdd]
+type = VarAdd
+trigger1 = (HitPauseTime = 1) && (P2MoveType = H) && (MoveHit = 1) && (StateNo < 3000)
+trigger2 = ProjHitTime(0) = 1
+v = 21
+value = 1
+ignorehitpause = 1
+
+[State -3, VarReset]
+type = VarSet
+trigger1 = P2MoveType != H
+v = 21
+value = 0
+
+[State -3, AttackMulSet]
+type = AttackMulSet
+trigger1 = StateNo >= 3000
+value = 1
+
+[State -3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) <= 1
+value = 1
+
+[State -3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) = 2
+value = 0.8
+
+[State -3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) = 3
+value = 0.6
+
+[State -3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) = 4
+value = 0.4
+
+[State -3, AttackMulSet]
+type = AttackMulSet
+triggerall = StateNo < 3000
+trigger1 = Var(21) >= 5
+value = .2
+
+[State -3, 1]
+type = VarSet
+trigger1 = (StateNo != 5050) && (StateNo != 5071)
+v = 30
+value = 0
+

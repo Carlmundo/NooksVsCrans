@@ -1,0 +1,269 @@
+;Colossal Titan (CT) Constants File.
+;人物「超大型巨人」常數檔案
+ 
+;---------------------------------------------------------------------------
+[Data]
+;Amount of life to start with
+life = 1000            ;生命值
+;Amount of power to start with
+power = 5000           ;力量值
+;attack power (more is stronger)
+attack = 100           ;攻擊力(單位百分比) 只提升HitDef的殺傷力，不會提升TargetLifeAdd的殺傷力。
+;defensive power (more is stronger)
+defence = 100          ;防禦力(單位百分比)
+;Percentage to increase defense everytime player is knocked down
+fall.defence_up = 50   ;被打倒時防禦力臨時上升的百分比
+;Time which player lies down for, before getting up
+liedown.time = 60      ;擊倒在地後躺在地上的時間
+;Number of points for juggling
+airjuggle = 15         ;空中juggle值 一般juggle點的設定都是15 視人物而定
+;Default hit spark number for HitDefs
+sparkno = 2            ;使用遊戲中擊中火花(血條包fight檔案)
+;Default guard spark number
+guard.sparkno = 40     ;使用遊戲中防禦火花(血條包fight檔案)
+;1 to enable echo on KO
+KO.echo = 0            ;被KO時有沒有回聲 0表示不執行 1表示執行
+;Volume offset (negative for softer)
+volume = 100           ;音量調整(數值為100表示音量為100% 有效值從0-100)
+
+;---------------------------------------------------------------------------
+;大於等於此索引號的變量在round或match之間將不會復位(初始化)到0.
+;有60個整型變量(索引號從0到59)和40個浮點型變量(索引號從0到39)供使用.
+;如果缺省,默認分別有60個整型變量和40個浮點型變量,意味著沒有一個變量被persist(指保留上一回合的數據),即所有變量都復位.
+;如果你想讓變量在回合結束時能保留上一回合的數據,你需要覆蓋common1.cns中的[statedef 5900](此狀態管理每回合結束時的變量初始化)
+IntPersistIndex = 60
+FloatPersistIndex = 40
+
+;---------------------------------------------------------------------------
+[Size]
+xscale = 1.10              ;Horizontal scaling factor. 橫向縮放值
+yscale = 1.10              ;Vertical scaling factor. 縱向縮放值
+ground.back = 100          ;Player width (back, ground) 人物寬度站立後點
+ground.front = 80          ;Player width (front, ground) 人物寬度站立前點
+air.back = 100             ;Player width (back, air) 人物寬度空中後點
+air.front = 60             ;Player width (front, air) 人物寬度空中前點
+height = 180               ;Height of player (for opponent to jump over) 人物身高(與對方跳躍過頂有關)
+attack.dist = 320          ;Default attack distance 攻擊效果距離(與對方擺防禦動作有關)
+proj.attack.dist = 180     ;Default attack distance for projectiles 飛行道具攻擊效果距離(與對方擺防禦動作有關)
+proj.doscale = 1           ;Set to 1 to scale projectiles too 飛行道具是否也受人物縮放比例影響
+head.pos = 0,-180          ;Approximate position of head 近似的頭部位置
+mid.pos = 0,-120           ;Approximate position of midsection 近似的中身部位置
+shadowoffset = 0           ;Number of pixels to vertically offset the shadow 影子的垂直偏離象素
+draw.offset = 0,0          ;Player drawing offset in pixels (x, y). Recommended 0,0 人物的偏離象素(xy軸)
+
+[Velocity]
+walk.fwd  = 4.0            ;Walk forward 步行前進速度
+walk.back = -3.4           ;Walk backward 步行後退速度
+run.fwd  = 12,0            ;Run forward (x, y) 跑步前進速度
+run.back = -12,0           ;Hop backward (x, y) 跑步後退速度
+jump.neu = 0,0             ;Neutral jumping velocity (x, y) 正上跳起速度
+jump.back = 0              ;Jump back speed (x, y) 向後跳起速度
+jump.fwd = 0               ;Jump forward speed (x, y) 向前跳起速度
+runjump.back = 0,0         ;Running jump back speed (opt) 向後跑跳起速度
+runjump.fwd = 0,0          ;Running jump forward speed (opt) 向前跑跳起速度
+airjump.neu = 0,0          ;Running jump neutral speed (opt) 正上空中連跳速度
+airjump.back = 0           ;Air jump back speed (opt) 向後空中連跳速度
+airjump.fwd = 0            ;Air jump forward speed (opt) 向前空中連跳速度
+
+[Movement]
+airjump.num = 0            ;Number of air jumps allowed (opt) 空中能連跳數 1表示空中可以跳1次
+airjump.height = 1         ;Minimum distance from ground before you can air jump (opt) 空中能啟動連跳的最低高度
+yaccel = 0.88              ;Vertical acceleration 下落加速度
+stand.friction = .85       ;Friction coefficient when standing 站立摩擦系數
+crouch.friction = .82      ;Friction coefficient when crouching 蹲下摩擦系數
+
+;---------------------------------------------------------------------------
+;人物的勝利台詞  **MUGEN 1.0 1.1以上版本專用**
+;會優先取代畫面包設定的winquote.text勝利台詞，默認語言必須為英語
+;每種語言最多可以有100個勝利台詞 (victory0 - victory99)
+[Quotes];勝利所說的話 (英文)
+victory1 = "We really did think of you as friends!"
+victory2 = "Humanity's\nGreatest enemy."
+victory3 = "Stupid Humanity......\nNo Hope!"
+victory4 = "Titan Win!"
+
+;---------------------------------------------------------------------------
+;Stand
+;站立
+[Statedef 0]
+type = S
+physics = S
+sprpriority = 1
+anim = 9999
+
+[State 0, 1]
+type = ChangeState
+triggerall = NumHelper(24) = 1
+trigger1 = IsHelper(24)
+value = 24
+
+[State 0, 2]
+type = ChangeState
+triggerall = NumHelper(32) = 1
+trigger1 = IsHelper(32)
+value = 32
+
+[State 0, 3]
+type = CtrlSet
+trigger1 = NumHelper(24) = 1
+trigger1 = NumHelper(32) = 1
+trigger1 = Helper(24),StateNo = 24
+trigger1 = Helper(32),StateNo = 32
+trigger2 = PrevStateNo = 35
+value = 1
+
+[State 0, 4]
+type = CtrlSet
+triggerall = NumHelper(24) = 1
+triggerall = NumHelper(32) = 1
+trigger1 = Helper(24),StateNo != 24
+trigger2 = Helper(32),StateNo != 32
+trigger3 = (RoundState = 0) || (RoundState = 1)
+value = 0
+
+[State 0, 5]
+type = Helper
+trigger1 = Numhelper(24) = 0
+helpertype = player
+name = "Titan Body";巨人身體
+postype = p1
+pos = 0,0
+id = 24
+stateno = 24
+ownpal = 0
+keyctrl = 0
+size.xscale = const(size.xscale)
+size.yscale = const(size.yscale)
+
+[State 0, 6]
+type = Helper
+trigger1 = Numhelper(32) = 0
+helpertype = normal
+name = "Titan Right Arm";巨人右臂
+postype = p1
+pos = 0,0
+id = 32
+stateno = 32
+ownpal = 0
+keyctrl = 0
+size.xscale = const(size.xscale)*0.910
+size.yscale = const(size.yscale)*0.910
+
+[State 0, 7]
+type = ChangeAnim
+trigger1 = Anim != 9999
+value = 9999
+
+[State 0, 8]
+type = HitBy ;*1
+trigger1 = 1
+value = 
+time = 1
+
+[State 0, 9]
+type = NotHitBy ;*1
+trigger1 = 1
+value = SCA, NA, SA, HA, NP, SP, HP, NT, ST, HT
+time = 1
+
+[State 0, 10 (End)]
+type = ChangeState
+trigger1 = !Alive
+value = 5150
+
+;*1 加上HitBy、NotHitBy Statedef 0就不會被改變
+;   可避免該Statedef受到對手帶有p2stateno效果的HitDef攻擊所影響。
+;   如果無效，就利用State脫離的方式跳回Statedef 0
+
+;---------------------------------------------------------------------------
+;Lose (Time Over)
+;時間到敗北動作
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 9999
+velset = 0,0
+
+[State 170, 1 (End)]
+type = ChangeState
+trigger1 = Time = 0
+value = 5150
+
+;---------------------------------------------------------------------------
+;Draw Game (Time Over)
+;時間到平手
+[Statedef 175]
+type = S
+ctrl = 0
+velset = 0,0
+anim = 9999
+
+[State 175, 1 (End)]
+type = ChangeState
+trigger1 = Time = 0
+value = 5150
+
+;---------------------------------------------------------------------------
+;Win State Decider
+;勝利動作
+[Statedef 180]
+type = S
+anim = 9999
+
+[State 180, 1 (End)]
+type = ChangeState
+trigger1 = Time = 0
+value = 181
+
+;---------------------------------------------------------------------------
+;Win Pose 1
+;勝利動作1
+[Statedef 181]
+type = S
+ctrl = 0
+anim = 9999
+velset = 0,0
+
+[State 181, 1]
+type = HitBy
+trigger1 = 1
+value =
+time = 1
+
+[State 181, 2]
+type = NotHitBy
+trigger1 = 1
+value = SCA, AA, AP, AT
+time = 1
+
+[State 181, 3 (End)]
+type = AssertSpecial
+trigger1 = Time = [0,130]
+flag = RoundNotOver
+
+;---------------------------------------------------------------------------
+;Introduction (Decision)
+;開頭動作 (選擇)
+[Statedef 190]
+type = S
+ctrl = 0
+velset = 0,0
+anim = 9999
+
+[State 190, 1 (End)]
+type = ChangeState
+trigger1 = Time = 0
+value = 191
+
+;---------------------------------------------------------------------------
+;Intro 1
+;開頭動作1
+[Statedef 191]
+type = S
+ctrl = 0
+anim = 9999
+
+[State 191, 1 (End)]
+type = ChangeState
+trigger1 = Time = 0
+value = 0

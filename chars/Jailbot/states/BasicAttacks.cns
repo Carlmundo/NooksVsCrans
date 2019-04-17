@@ -1,0 +1,1049 @@
+; Jailbot by altoiddealer
+;---------------------------------------------------------------------------
+;BASIC ATTACKS
+;---------------------------------------------------------------------------
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;LIGHT PUNCH
+[Statedef 200]
+type = S
+movetype = A
+physics = S
+juggle = 4
+ctrl = 0
+anim = 200
+velset = 0,0
+poweradd = 15
+sprpriority = 2
+
+[State 200, FWD VelAdd X]
+type = VelAdd
+triggerall = Vel X <= 1
+triggerall = frontedgebodydist > P2BodyDist X + 70
+trigger1 = command = "holdfwd"
+x = 0.25
+
+[State 200, Back VelAdd X]
+type = VelAdd
+triggerall = Vel X >= -0.5
+trigger1 = command = "holdback"
+x = -0.125
+
+[State 200, Arm out sound]
+type = PlaySnd
+trigger1 = !time
+value = 1,1
+
+[State 200, Arm in sound]
+type = PlaySnd
+trigger1 =  AnimElem = 4
+value = 1,2
+
+[State 200, HitDef]
+type = HitDef
+trigger1 = AnimElem = 2
+attr = S,NA
+damage = 20,1
+animtype = Light
+guardflag = MA
+hitflag = MAF
+priority = 4, Hit
+pauseTime = 7,5
+guard.pauseTime = 7,3
+sparkno = s8000
+;sparkno = 1;s8000
+sparkxy = -10, -92
+guard.sparkno = -1
+hitsound = S200,240 ;5,0
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 15
+ground.hitTime  = 15
+ground.velocity = Cond(frontedgebodydist > P2BodyDist X + 80,-4,-6)
+air.type = Low
+air.hitTime = 15
+air.velocity = -2,-3
+envshake.Time = 1
+envshake.ampl = 1
+id = 200
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 200, Change to Stand]
+type = ChangeState
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;MED PUNCH
+[Statedef 210]
+type = S
+movetype = A
+physics = S
+juggle = 4
+ctrl = 0
+anim = 210
+poweradd = 35
+sprpriority = 2
+
+[State 210, Slow down from Run]
+type = VelMul
+trigger1 = !time
+trigger1 = PrevStateNo = 100
+x = .8
+
+[State 210, Arm out sound]
+type = PlaySnd
+trigger1 = !time
+value = 2,0+random%3 ;add a little variety
+
+[State 210, Arm in sound]
+type = PlaySnd
+trigger1 = AnimElem = 8
+value = 1,2
+
+[State 210, HitDef]
+type = HitDef
+trigger1 = AnimElem = 6
+attr = S,NA
+damage = 35,1
+animtype = Medium
+guardflag = MA
+hitflag = MAF
+priority = 4, Hit
+pauseTime = 7,8
+guard.pauseTime = 8,6
+sparkno = s8001
+;sparkno = 2;s8001
+sparkxy = -10,-92
+guard.sparkno = -1
+hitsound = S200,250 ;5,1
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 15
+ground.hitTime  = 15
+ground.velocity = -5
+air.type = Low
+air.hitTime = 15
+air.velocity = -3,-4
+envshake.Time = 1
+envshake.ampl = 1
+id = 210
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 210, Change to Stand]
+type = ChangeState
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HARD PUNCH
+[Statedef 220]
+type = S
+movetype = A
+physics = S
+juggle = 4
+ctrl = 0
+anim = 220
+poweradd = 55
+sprpriority = 2
+
+[State 220, Slow down from Run]
+type = VelMul
+trigger1 = !time
+trigger1 = PrevStateNo = 100
+x = .8
+
+[State 220, Arm out sound]
+type = PlaySnd
+trigger1 = !time
+value = 1,0
+
+[State 220, Whack sound]
+type = PlaySnd
+trigger1 = AnimElem = 6
+value = 0,4
+
+[State 220, Hit Enemy in Air]
+type = HitDef
+trigger1 = animelem = 7
+attr = S,NA
+damage = 40,1
+animtype = Hard
+guardflag = MA
+hitflag = AF
+priority = 4, Hit
+pauseTime = 6,6
+guard.pauseTime = 6,6
+sparkno = s8002
+;sparkno = 3;s8002
+sparkxy = -10,-74
+guard.sparkno = -1
+hitsound = S200,260 ;5,4
+guardsound = S200,340 ;6,0
+air.type = Low
+air.hitTime = 10
+air.velocity = -8,-1
+airguard.velocity = -2,-1
+envshake.Time = 10          
+envshake.ampl = 5
+envshake.freq = 100
+id = 220
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 220, Hit Enemy on Ground]
+type = HitDef
+trigger1 = animelem = 8
+attr = S,NA
+damage = 40,1
+animtype = Hard
+guardflag = MA
+hitflag = M
+priority = 4, Hit
+pauseTime = 12,12
+guard.pauseTime = 12,8
+sparkno = s8002
+;sparkno = 3;s8002
+sparkxy = -10,-74
+guard.sparkno = -1
+hitsound = S200,260 ;5,4
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 18
+ground.hitTime  = 18
+ground.velocity = -6
+envshake.Time = 15           
+envshake.ampl = 7
+envshake.freq = 160
+id = 220
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 220, Change to Stand]
+type = ChangeState
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;CLOSE HP
+[Statedef 221]
+type = S
+movetype = A
+physics = S
+juggle = 4
+ctrl = 0
+anim = 221
+poweradd = 55
+sprpriority = 2
+
+[State 221, Neck steam]
+type = Explod
+trigger1 = !time
+persistent = 0
+anim = 2210
+sprpriority = 3
+bindTime = -1
+removeongethit = 1
+
+[State 221, Transform sound]
+type = PlaySnd
+trigger1 = !time
+value = 221,0
+
+[State 221, HitDef]
+type = HitDef
+trigger1 = AnimElem = 9
+attr = S,NA
+damage = 50,1
+animtype = Hard
+guardflag = MA
+hitflag = MAF
+priority = 4, Hit
+pauseTime = 8,10
+guard.pauseTime = 10,10
+sparkno = s8002
+;sparkno = 3;s8002
+sparkxy = -10, -94
+guard.sparkno = -1
+hitsound = S200,260 ;5,4
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 18
+ground.hitTime = 18
+ground.velocity = -6
+air.type = High
+air.hitTime = 18
+air.velocity = -4,-4
+envshake.Time = 2
+envshake.ampl = 2
+id = 221
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 221, Change to Stand]
+type = ChangeState
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;LIGHT KICK
+[Statedef 230]
+type = S
+movetype = A
+physics = S
+juggle = 4
+ctrl = 0
+anim = 230
+poweradd = 15
+sprpriority = 2
+
+[State 230, Swoosh sound]
+type = PlaySnd
+trigger1 = !time
+value = 230,0
+
+[State 230, HitDef]
+type = HitDef
+trigger1 = AnimElem = 3
+attr = S,NA
+damage = 20,1
+animtype = Light
+guardflag = MA
+hitflag = MAF
+priority = 4, Hit
+pauseTime = 7,8
+guard.pauseTime = 8,7
+sparkno = s8000
+;sparkno = 0;s8000
+sparkxy = 5, -30
+guard.sparkno = -1
+hitsound = S200,250 ;5,2
+guardsound = S200,340 ;6,0
+ground.type = Low
+ground.slideTime = 10
+ground.hitTime = 10
+ground.velocity = -3,0
+air.type = Low
+air.hitTime = 3
+air.velocity = -5,0
+id = 230
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 230, Change to Stand]
+type = ChangeState
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;MED KICK
+[Statedef 240]
+type = S
+movetype = A
+physics = S
+juggle = 4
+ctrl = 0
+anim = 240
+poweradd = 35
+sprpriority = 2
+
+[State 240, Swoosh sound 1]
+type = PlaySnd
+trigger1 = !time
+value = 230,0
+
+[State 240, Swoosh sound 2]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = 230,0
+
+[State 240, HitDef]
+type = HitDef
+trigger1 = AnimElem = 3
+attr = S,NA
+damage = 35,1
+animtype = Medium
+guardflag = MA
+hitflag = MAF
+priority = 4, Hit
+pauseTime = 8,8
+guard.pauseTime = 8,6
+sparkno = s8000
+;sparkno = 1;s8000
+sparkxy = -10,-54
+guard.sparkno = -1
+hitsound = S200,250 ;5,1
+guardsound = S200,340 ;6,0
+ground.type = Low
+ground.slideTime = 12
+ground.hitTime = 12
+ground.velocity = -5,0
+air.type = Low
+air.hitTime = 5
+air.velocity = -5,0
+id = 240
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 240, Change to Stand]
+type = ChangeState
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HARD KICK (CHARGE)
+[Statedef 250]
+type = S
+movetype = A
+physics = S
+juggle = 4
+ctrl = 0
+anim = 250
+poweradd = 0
+sprpriority = 2
+
+[State 250, FWD VelAdd X]
+type = VelAdd
+triggerall = Vel X <= 1
+trigger1 = !AILevel
+trigger1 = command = "holdfwd"
+trigger2 = AILevel
+trigger2 = Time%10 = 0
+trigger2 = Random < Cond(enemynear,command = "holdback",400+(var(56)*2),300)
+x = 0.25
+
+[State 250, Back VelAdd X]
+type = VelAdd
+triggerall = Vel X >= -1
+trigger1 = AILevel
+trigger1 = command = "holdback"
+trigger2 = !AILevel
+trigger2 = Time%10 = 0
+trigger2 = Random < Cond(enemynear,command = "holdfwd",400+(var(56)*2),300)
+x = -0.25
+
+[State 250, Cranking sound]
+type = PlaySnd
+trigger1 = !time
+value = 250,0
+channel = 0
+
+[State 250, Reset counter]
+type = varset
+trigger1 = !time
+var(4) = 0
+
+[State 250, Increment counter]
+type = varadd
+trigger1 = 1
+var(4) = 2
+
+[State 250, Increase Power]
+type = PowerAdd
+trigger1 = 1
+value = 1
+
+[State 250, Change to  Hard Kick]
+type = ChangeState
+trigger1 = !AILevel
+trigger1 = command != "holdc"
+trigger1 = AnimElem = 3,>= 0
+trigger2 = AILevel
+trigger2 = Time%10 = 0
+trigger2 = Random < Cond((enemynear,StateNo = [120,140]),333-(var(56)*2),333)
+trigger3 = !animtime
+value = 251
+ctrl = 0
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;HARD KICK (ATTACK)
+[Statedef 251]
+type = S
+movetype = A
+physics = S
+juggle = 4
+ctrl = 0
+anim = 251
+poweradd = 10+Floor(var(4)/2)
+sprpriority = 2
+
+[State 251, Stop cranking sound]
+type = StopSnd
+trigger1 = !time
+channel = 0
+
+[State 251, Attack sound]
+type = PlaySnd
+trigger1 = !time
+value = 250,1
+
+[State 251, Retract sound]
+type = PlaySnd
+trigger1 = AnimElem = 5
+value = 250,2
+
+[State 251, Unguardable]
+type = AssertSpecial
+trigger1 = var(4) >= 80
+flag = Unguardable
+
+[State 251, HitDef]
+type = HitDef
+trigger1 = AnimElem = 3
+attr = S,NA
+damage = 30+(var(4)/2),1
+animtype = Hard
+guardflag = MA
+hitflag = MAF
+priority = Cond(var(4) < 80,4,7),Hit
+pausetime = Cond(var(4) < 80,8,20),Cond(var(4) < 80,12,24)
+guard.pausetime = 10,10
+sparkno = s8000+floor(var(4)/40)
+;sparkno = Ceil(var(4)/27)
+sparkxy = -10, -84
+guard.sparkno = -1
+hitsound = S200,240+Ceil((var(4)/27)*10) ;5,3
+guardsound = S200,340 ;6,0
+ground.type = Low
+ground.slideTime = 13
+ground.hitTime = 13
+ground.velocity = Cond(var(4) < 80,-8,-2),Cond(var(4) < 80,0,-8)
+air.type = Low
+air.hitTime = 5
+air.velocity = Cond(var(4) < 80,-4,-2),Cond(var(4) < 80,0,-10)
+fall.recovertime = 12
+id = 250
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+fall = Cond(var(4) < 80,0,1)
+p2facing = Cond(var(4) < 80,0,1)
+
+[State 251, Change to Stand]
+type = ChangeState
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;SWEEP KICK
+[Statedef 430]
+type = C
+movetype = A
+physics = C
+juggle = 4
+ctrl = 0
+anim = 430
+poweradd = 15
+Sprpriority = 2
+
+[State 430, Attack sound]
+type = PlaySnd
+trigger1 = !time
+value = 430,0
+channel = 0
+
+[State 430, Start with low priority]
+type = Sprpriority
+trigger1 = AnimElem = 2
+value = -5
+
+[State 430, End with high priority]
+type = Sprpriority
+trigger1 = AnimElem = 5
+value = 5
+
+[State 430, HitDef]
+Type = HitDef
+Trigger1 = AnimElem = 5
+Attr = SC,NA
+HitFlag = MA
+GuardFlag = L
+Damage = 20,1
+PauseTime = 6,6
+guard.PauseTime = 8,6
+sparkno = s8000
+;sparkno = 1;s8000
+sparkxy = 0,-12
+Guard.SparkNo = -1
+;sparkxy = -9999,-8888
+hitsound = S200,260 ;5,3
+guardsound = S200,340 ;6,0
+animType = Hard
+Ground.Type = Trip
+Ground.SlideTime = 14
+Ground.HitTime = 14
+Guard.HitTime = 18
+Ground.Velocity = -1*Const(Size.XScale),-2
+Guard.Velocity = -1*Const(Size.XScale)
+Air.Velocity = -1*Const(Size.XScale),-2
+Ground.CornerPush.VelOff = -18*Const(Size.XScale)
+Fall = 1
+Fall.Recover = 0
+Fall.YVelocity = 0
+YAccel = .4
+P2Facing = 1
+id = 350
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 430, Change to Stand]
+type = ChangeState
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;AIR LIGHT PUNCH
+[Statedef 600]
+type = A
+movetype = A
+physics = A
+juggle = 2
+ctrl = 0
+anim = 600
+poweradd = 15
+sprpriority = 2
+
+[State 600, Arm out sound]
+type = PlaySnd
+trigger1 =  !time
+value = 1,1
+
+[State 600, Arm in sound]
+type = PlaySnd
+trigger1 =  AnimElem = 4
+value = 1,2
+
+[State 600, HitDef]
+type = HitDef
+trigger1 = AnimElem = 2
+attr = A,NA
+damage = 20,1
+animtype = Light
+guardflag = HA
+priority = 4, Hit
+pauseTime = 6,6
+guard.pauseTime = 8,6
+sparkno = s8000
+;sparkno = 1;s8000
+sparkxy = -10,-42
+guard.sparkno = -1
+hitsound = S200,240 ;5,0
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 10
+ground.hitTime = 16
+ground.velocity = -5
+air.fall = 0
+air.velocity = -2, -3
+airguard.velocity = -1,-1.5
+id = 600
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 600, Change to Safe Fall]
+type = ChangeState
+trigger1 = !animtime
+value = 948
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;AIR MED PUNCH
+[Statedef 610]
+type = A
+movetype = A
+physics = A
+juggle = 5
+ctrl = 0
+anim = 610 
+poweradd = 35
+sprpriority = 2
+
+[State 610, Start sound]
+type = PlaySnd
+trigger1 = !time
+trigger2 = animelem = 7
+value = 1,1
+channel = 0
+
+[State 610, Attack sound]
+type = PlaySnd
+trigger1 = animelem = 4
+value = 230,0
+channel = 0
+
+[State 610, HitDef]
+type = HitDef
+trigger1 = AnimElem = 5
+attr = A,NA
+damage = 35,1
+animtype = medium
+guardflag = HA
+priority = 4, Hit
+pauseTime = 8,8
+guard.pauseTime = 8,6
+sparkno = s8001
+;sparkno = 2;s8001
+sparkxy = -30,-20
+guard.sparkno = -1
+hitsound = S200,250 ;5,1
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 12
+ground.hitTime  = 16
+ground.velocity = -7
+air.fall = 0
+air.velocity = -5,-2
+airguard.velocity = -2.5,-1
+id = 610
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 610, Change to Safe Fall]
+type = ChangeState
+trigger1 = !animtime
+value = 948
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;AIR HARD PUNCH
+[Statedef 620]
+type = A
+movetype = A
+physics = A
+juggle = 4
+ctrl = 0
+anim = 620
+poweradd = 55
+sprpriority = 2
+
+[State 620, PlaySnd]
+type = PlaySnd
+trigger1 = !Time
+value = 620,0
+channel = 2
+
+[State 620, PlaySnd]
+type = SndPan
+trigger1 = 1
+channel = 2
+abspan = Floor(300-(Time*20))
+
+[State 620, Swoosh]
+type = Explod
+triggerall = !movehit
+trigger1 = anim = 620 && animelem = 7
+anim = 626
+bindtime = -1
+id = 621
+ignorehitpause = 1
+sprpriority = 4
+
+[State 620, AfterImage 1]
+type = Explod
+triggerall = !movehit
+trigger1 = anim = 620 && animelem = 7
+anim = 621
+bindtime = -1
+id = 621
+ignorehitpause = 1
+sprpriority = 3
+
+[State 620, AfterImage 2]
+type = Explod
+triggerall = !movehit
+trigger1 = anim = 620 && animelem = 8
+anim = 622
+bindtime = -1
+id = 621
+ignorehitpause = 1
+sprpriority = 3
+
+[State 620, AfterImage 3]
+type = Explod
+triggerall = !movehit
+trigger1 = anim = 620 && animelem = 9
+anim = 623
+bindtime = -1
+id = 621
+ignorehitpause = 1
+sprpriority = 3
+
+[State 620, AfterImage 4]
+type = Explod
+triggerall = !movehit
+trigger1 = anim = 620 && animelem = 10
+anim = 624
+bindtime = -1
+id = 621
+ignorehitpause = 1
+sprpriority = 3
+
+[State 620, AfterImage 5]
+type = Explod
+triggerall = !movehit
+trigger1 = anim = 620 && animelem = 11
+anim = 625
+bindtime = -1
+id = 621
+ignorehitpause = 1
+sprpriority = 3
+
+[State 620, Kill AfterImages]
+type = RemoveExplod
+trigger1 = movehit
+id = 621
+persistent = 0
+ignorehitpause = 1
+
+[State 620, HitDef]
+type = HitDef
+trigger1 = !movecontact
+trigger1 = AnimElem = 7 || AnimElem = 8 || AnimElem = 9 || AnimElem = 10
+attr = A,NA
+damage = 50,1
+animtype = Hard
+guardflag = HA
+priority = 4, Hit
+pauseTime = 8,8
+guard.pauseTime = 10,6
+sparkno = s8002
+;sparkno = 3;s8002
+sparkxy = -10,-20
+guard.sparkno = -1
+hitsound = S200,260 ;5,3
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 15
+ground.hitTime = 20
+ground.velocity = -8
+air.velocity = -8,4
+airguard.velocity = -4,2
+yaccel = 0.5
+air.hitTime = 25
+air.fall = 1
+id = 620
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 620, Fall neutral]
+type = Changeanim
+trigger1 = anim = 620 && !animtime
+value = 44
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;AIR LIGHT KICK
+[Statedef 630]
+type = A
+movetype = A
+physics = A
+juggle = 4
+ctrl = 0
+anim = 630
+poweradd = 15
+sprpriority = 2
+
+[State 630, Swoosh sound]
+type = PlaySnd
+trigger1 = !time
+value = 230,0
+
+[State 630, HitDef]
+type = HitDef
+trigger1 = AnimElem = 3
+attr = A,NA
+damage = 20,1
+animtype = Light
+guardflag = HA
+priority = 4, Hit
+pauseTime = 10,10
+guard.pauseTime = 8,8
+sparkno = s8000
+;sparkno = 0;s8000
+sparkxy = -10, -16
+guard.sparkno = -1
+hitsound = S200,260 ;5,3
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 12
+ground.hitTime = 15
+ground.velocity = -6
+air.fall = 0
+air.velocity = -2, -2
+air.hitTime = 25
+id = 630
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 630, Change to Safe Fall]
+type = ChangeState
+trigger1 = !animtime
+value = 948
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;AIR MED KICK
+[Statedef 640]
+type = A
+movetype = A
+physics = A
+juggle = 8
+ctrl = 0
+anim = 640
+poweradd = 35
+sprpriority = 2
+
+[State 640, Jumping straight up attack]
+type = Changeanim
+trigger1 = vel x = 0
+value = 641
+persistent = 0
+ignorehitpause = 1
+
+[State 640, Attack sound]
+type = PlaySnd
+trigger1 = !time
+value = 640,0
+
+[State 640, HitDef]
+type = HitDef
+triggerall = !moveguarded
+trigger1 = Cond(movehit,Time%5 = 0,1)
+trigger1 = animelem = 3 || animelem = 4 || animelem = 5 || animelem = 6 || animelem = 7 || animelem = 8 || animelem = 9
+;trigger1 = hitcount < 5
+attr = A,NA
+damage = 12,1
+animtype = Medium
+guardflag = HA
+priority = 4, Hit
+pauseTime = 4,4
+pauseTime = 2,2
+sparkno = s8001
+;sparkno = 2;s8001
+sparkxy = -10,-22
+guard.sparkno = -1
+hitsound = S200,250 ;5,1
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 2
+ground.hitTime = 15
+ground.velocity = -8
+air.fall = 0
+air.velocity = -3, -5
+airguard.velocity = -1.5,-2.5
+air.hitTime = 25
+id = 640
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 640, Change to Safe Fall]
+type = ChangeState
+trigger1 = !animtime
+value = 948
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;AIR HARD KICK
+[Statedef 650]
+type = A
+movetype = A
+physics = A
+juggle = 4
+ctrl = 0
+anim = 650
+poweradd = 55
+sprpriority = 2
+
+[State 650, Transform sound]
+type = PlaySnd
+trigger1 = !time
+value = 650,0
+
+[State 650, HitDef]
+type = HitDef
+trigger1 = AnimElem = 4
+attr = A,NA
+damage = 50,1
+animtype = back
+guardflag = HA
+priority = 4, Hit
+pauseTime = 12,14
+guard.pauseTime = 10,6
+sparkno = s8002
+;sparkno = 3;s8002
+sparkxy = -10, -50
+guard.sparkno = -1
+hitsound = S200,260 ;5,3
+guardsound = S200,340 ;6,0
+ground.type = High
+ground.slideTime = 18
+ground.hitTime  = 12
+ground.velocity = -6
+air.velocity = -7,-1
+airguard.velocity = -3,-0.5
+air.fall = 1
+air.hitTime = 20
+fall = 1
+fall.recoverTime = 40   
+yaccel = 0.5
+id = 650
+fall.envshake.freq = TeamSide ;provide Jailbot's Teamside
+fall.envshake.ampl = ID ;provide Jailbot's PlayerID
+fall.envshake.phase = var(59) ;provide Jailbot's Pre-Determined Winpose
+
+[State 650, Change to Safe Fall]
+type = ChangeState
+trigger1 = !animtime
+value = 948
+ctrl = 1
+
+;xxxx(¯(__)¯)xxxxxxxx/ [ ° ____ ° ] \xxxxxxxx(¯(__)¯)xxxx
+;SAFE FALL
+;(from superjump, or jumping attack)
+[StateDef 948]
+type = A
+movetype = I
+physics = A
+ctrl = 0
+
+[State 948, Fall neutral]
+type = Changeanim
+trigger1 = !time && Vel X = 0
+value = 44
+
+[State 948, Fall forwards]
+type = Changeanim
+trigger1 = !time && Vel X > 0
+value = 45
+
+[State 948, Fall backwards]
+type = Changeanim
+trigger1 = !time && Vel X < 0
+value = 46
+
+[State 948, Try Again?]
+type = CtrlSet
+trigger1 = Time >= 10
+value = 1

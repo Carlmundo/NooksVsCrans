@@ -1,0 +1,439 @@
+; The CMD file for Boss by supermystery.
+;
+; Two parts: 1. Command definition and  2. State entry
+; (state entry is after the commands def section)
+;
+;-| Default Values |-------------------------------------------------------
+[Defaults]
+; Default value for the "time" parameter of a Command. Minimum 1.
+command.time = 15
+
+; Default value for the "buffer.time" parameter of a Command. Minimum 1,
+; maximum 30.
+command.buffer.time = 1
+;
+;-| Single Button |---------------------------------------------------------
+[Command]
+name = "a"
+command = a
+time = 1
+
+[Command]
+name = "b"
+command = b
+time = 1
+
+[Command]
+name = "c"
+command = c
+time = 1
+
+[Command]
+name = "x"
+command = x
+time = 1
+
+[Command]
+name = "y"
+command = y
+time = 1
+
+[Command]
+name = "z"
+command = z
+time = 1
+
+[Command]
+name = "start"
+command = s
+time = 1
+
+;-| Hold Dir |--------------------------------------------------------------
+[Command]
+name = "holdfwd";Required (do not remove)
+command = /$F
+time = 1
+
+[Command]
+name = "holdback";Required (do not remove)
+command = /$B
+time = 1
+
+[Command]
+name = "holdup" ;Required (do not remove)
+command = /$U
+time = 1
+
+[Command]
+name = "holddown";Required (do not remove)
+command = /$D
+time = 1
+
+;-| Hold Button |----------------------------------------------------------
+
+[Command]
+name = "holda"
+command = /a
+time = 1
+
+[Command]
+name = "holdb"
+command = /b
+time = 1
+
+[Command]
+name = "holdc"
+command = /c
+time = 1
+
+[Command]
+name = "holdx"
+command = /x
+time = 1
+
+[Command]
+name = "holdy"
+command = /y
+time = 1
+
+[Command]
+name = "holdz"
+command = /z
+time = 1
+
+[Command]
+name = "holdstart"
+command = /s
+time = 1
+
+;--- None of your own command definitions should be above this line. ---
+
+;-| CPU |--------------------------------------------------------------
+
+[Command]
+name = "a2"
+command = a
+time = 1
+
+[Command]
+name = "b2"
+command = b
+time = 1
+
+[Command]
+name = "c2"
+command = c
+time = 1
+
+[Command]
+name = "x2"
+command = x
+time = 1
+
+[Command]
+name = "y2"
+command = y
+time = 1
+
+[Command]
+name = "z2"
+command = z
+time = 1
+
+[Command]
+name = "start2"
+command = s
+time = 1
+
+[Command]
+name = "holdfwd2"
+command = /$F
+time = 1
+
+[Command]
+name = "holdback2"
+command = /$B
+time = 1
+
+[Command]
+name = "holdup2"
+command = /$U
+time = 1
+
+[Command]
+name = "holddown2"
+command = /$D
+time = 1
+
+[Command]
+name = "holda2"
+command = /a
+time = 1
+
+[Command]
+name = "holdb2"
+command = /b
+time = 1
+
+[Command]
+name = "holdc2"
+command = /c
+time = 1
+
+[Command]
+name = "holdx2"
+command = /x
+time = 1
+
+[Command]
+name = "holdy2"
+command = /y
+time = 1
+
+[Command]
+name = "holdz2"
+command = /z
+time = 1
+
+[Command]
+name = "holdstart2"
+command = /s
+time = 1
+
+[Command]
+name = "recovery2"
+command = x+y
+time = 1
+
+;-| Super Motions |--------------------------------------------------------
+
+;-| Special Motions |------------------------------------------------------
+
+;-| Double Tap |-----------------------------------------------------------
+
+[Command]
+name = "FF"     ;Required (do not remove)
+command = F, F
+time = 10
+
+[Command]
+name = "BB"     ;Required (do not remove)
+command = B, B
+time = 10
+
+[Command]
+name = "DD"     ;Required (do not remove)
+command = D, D
+time = 10
+
+[Command]
+name = "UU"     ;Required (do not remove)
+command = U, U
+time = 10
+
+;-| 2/3 Button Combination |-----------------------------------------------
+[Command]
+name = "recovery";Required (do not remove)
+command = x+y
+time = 1
+
+;-| Dir + Button |---------------------------------------------------------
+[Command]
+name = "down_a"
+command = /$D,a
+time = 1
+
+[Command]
+name = "down_b"
+command = /$D,b
+time = 1
+
+;---------------------------------------------------------------------------
+; 2. State entry
+; --------------
+; This is where you define what commands bring you to what states.
+
+; Don't remove the following line. It's required by the CMD standard.
+[Statedef -1]
+
+[State -1, No time over]
+type = AssertSpecial
+trigger1 = 1
+flag = timerfreeze
+
+[State -1, WideOpen]
+type = AssertSpecial
+trigger1 = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State -1, WideOpen]
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+flag2 = noautoturn
+flag3 = nokoslow
+IgnoreHitPause = 1
+
+[State -1, GO]
+type = DestroySelf
+trigger1 = IsHelper
+trigger1 = movereversed = 1
+
+[State -1, PP]
+type = playerpush
+trigger1 = 1
+value = 0
+
+;===========================================================================
+; Human-only command-based ChangeStates 
+;---------------------------------------------------------------------------
+
+[State -1, Bomb]
+type = Helper
+trigger1 = numhelper(400) < 3 && random > 500 && var(27) >= 9
+trigger1 = gametime%90 = 0
+trigger1 = ctrl 
+trigger1 = roundstate = 2
+ID = 400
+pos = -250, 0
+sprpriority = 3
+postype = p1
+stateno = ifelse(random <= 400,400,431)
+helpertype = normal
+name = "BombS1"
+keyctrl = 0
+ownpal = 1
+
+[State -1, Cater K]
+type = Helper
+trigger1 = numhelper(380) < 1 && random >= 500 && var(27) = [3,8]
+trigger1 = gametime%90 = 0
+trigger1 = ctrl 
+trigger1 = roundstate = 2
+ID = 380
+pos = -250, 0
+sprpriority = 3
+postype = p1
+stateno = 380
+helpertype = normal
+name = "CaterkS1"
+keyctrl = 0
+ownpal = 1
+
+[State -1, Roll]
+type = Helper
+trigger1 = numhelper(320) < 3 && random < 500
+trigger1 = gametime%150 = 0
+trigger1 = ctrl 
+trigger1 = roundstate = 2
+ID = 320
+pos = -200, 0
+sprpriority = 3
+postype = p1
+stateno = 340
+helpertype = normal
+name = "Roller"
+keyctrl = 0
+ownpal = 1
+
+[State -1, Motobug]
+type = Helper
+trigger1 = numhelper(310) < 2 && random >= 500 && var(27) < 3
+trigger1 = gametime%80 = 0
+trigger1 = ctrl 
+trigger1 = roundstate = 2
+ID = 310
+pos = -250, 0
+sprpriority = 3
+postype = p1
+stateno = ifelse(random < 600,350,310)
+helpertype = normal
+name = "Moto Bug S1"
+keyctrl = 0
+ownpal = 1
+
+
+[State -1, BatS1]
+type = Helper
+trigger1 = numhelper(390) < 2 && var(27) >= 9
+trigger1 = gametime%200 = 0
+trigger1 = ctrl 
+trigger1 = roundstate = 2
+ID = 390
+pos = 0, -200
+sprpriority = 3
+postype = p1
+stateno = 390
+helpertype = normal
+name = "BatS1"
+keyctrl = 0
+ownpal = 1
+
+[State -1, Cham]
+type = Helper
+trigger1 = numhelper(320) < 2 && var(27) < 9
+trigger1 = gametime%100 = 0
+trigger1 = ctrl 
+trigger1 = roundstate = 2
+ID = 320
+pos = 0, 0
+sprpriority = 3
+postype = p1
+stateno = 320
+helpertype = normal
+name = "Cham S1"
+keyctrl = 0
+ownpal = 1
+
+[State -1, Buzz Bomber]
+type = Helper
+trigger1 = numhelper(300) <= 3 && random < 500
+trigger1 = gametime%80 = 0
+trigger1 = ctrl 
+trigger1 = roundstate = 2
+ID = 300
+pos = -200, -90
+sprpriority = 3
+postype = p1
+stateno = 300
+helpertype = normal
+name = "Buzz Bomber S1"
+keyctrl = 0
+ownpal = 1
+
+[State -1, Orbinaut]
+type = Helper
+trigger1 = numhelper(360) < 1 && random <= 800 && var(27) >= 2
+trigger1 = gametime%80 = 0
+trigger1 = ctrl 
+trigger1 = roundstate = 2
+ID = 360
+pos = -400, -90
+sprpriority = 3
+postype = p1
+stateno = ifelse(var(27) <= 8,420,360)
+helpertype = normal
+name = "OrbinautV1S1"
+keyctrl = 0
+ownpal = 1
+
+[State -1, Neut]
+type = Helper
+trigger1 = numhelper(300) < 4 && random >= 400
+trigger1 = gametime%100 = 0
+trigger1 = ctrl 
+trigger1 = roundstate = 2
+ID = 300
+pos = -200, -90
+sprpriority = 3
+postype = p1
+stateno = ifelse(random < 500,330,372)
+helpertype = normal
+name = "Neutron S1"
+keyctrl = 0
+ownpal = 1
+
+
+

@@ -1,0 +1,1007 @@
+;-------------------------------------------------------------------------------
+; Assist Rick
+[StateDef 6000]
+type = S
+movetype = A
+physics = S
+juggle = 0
+anim = 6000
+ctrl = 0
+
+[State 6000, Helper]
+type = Helper
+trigger1 = time = 15
+ID = 6001
+pos = -35,0
+postype = back
+stateno = 6001
+helpertype = normal
+name = "Rick"
+keyctrl = 0
+ownpal = 1
+supermovetime = 1
+size.xscale = 0.8
+size.yscale = 0.8
+
+[State 6000, VelSet]
+type = VelSet
+trigger1 = time >= 0
+x = 0
+y = 0
+
+[State 6000, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S6000,0
+
+[State 6000, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+[State 6000, End2]
+type = ChangeState
+trigger1 = AnimTime = 0
+trigger1 = P2BodyDist X > 100
+value = 0
+ctrl = 1
+
+;-------------------------------------------------------------------------------
+; Rick Walks In
+[Statedef 6001]
+type    = S
+movetype= A
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 6100
+
+[State 6001, PlaySnd2]
+type = PlaySnd
+trigger1 = Time = 0
+value = S6000,1
+volume = 200
+channel = 0
+
+[State 6001, 1]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA, AA, AP, AT
+stateno = 6003
+time = -1
+
+[State 6001, 3]
+type = SprPriority
+trigger1 = Time = 0
+value = 2
+
+[State 6001, 2]
+type = VelAdd
+trigger1 = time = 0
+x = 3
+
+[State 6001, Win]
+type = changestate
+triggerall = time >= 24
+trigger1 = Win
+trigger2 = RoundState = 4
+value = 6005
+ctrl = 0
+
+[State 6004, Lose]
+type = changestate
+triggerall = time >= 24
+trigger1 = Lose
+trigger2 = RoundState = 4
+value = 6006
+ctrl = 0
+
+[State 6001, 3]
+type = ChangeState
+Trigger1 = time = 70
+value = 6002
+ctrl = 0
+
+;-------------------------------------------------------------------------------
+; Rick's Attack
+[Statedef 6002]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+anim = 6101
+ctrl = 0
+
+[State 440, 2]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = 0, 2
+
+[State 6002, 1]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA, AA, AP, AT
+stateno = 6003
+time = -1
+
+[State 6002, 3]
+type = HitDef
+trigger1 = Time = 0
+attr = S, SA
+animtype  = Medium
+damage    = 25,10
+guardflag = MA
+pausetime = 8,8
+sparkno = S7020
+guard.sparkno = S7000 
+sparkxy = -10,-60
+hitsound   = S5,2
+guardsound = S6,0
+ground.type = Low
+ground.slidetime = 12
+ground.hittime  = 15
+ground.velocity = -1
+air.velocity = -1,-3
+
+[State 6002, Win]
+type = ChangeState
+triggerall = time >= 24
+trigger1 = Win
+trigger2 = RoundState = 4
+value = 6005
+ctrl = 0
+
+[State 6002, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 6004
+
+;-------------------------------------------------------------------------------
+; Rick Hit
+[Statedef 6003]
+type    = A
+movetype= I
+physics = N
+velset = -17,0
+anim = 6102
+
+[State 6003, 1]
+type = SprPriority
+trigger1 = Time = 0
+value = -1
+
+[State 6003, PlaySnd]
+type = PlaySnd
+trigger1 = time = 2
+value = S6000,2
+
+[State 6003, 2]
+type = DestroySelf
+trigger1 = time = 50
+
+;-------------------------------------------------------------------------------
+; Rick Leaves
+[Statedef 6004]
+type    = A
+movetype= I
+physics = N
+velset = 0,0
+anim = 6105
+
+[State 6004, 1]
+type = SprPriority
+trigger1 = Time = 0
+value = -1
+
+[State 6004, ScreenBound]
+type = ScreenBound
+trigger1 = time = 0
+value = 1
+movecamera = 0,0
+
+[State 6004, Win]
+type = changestate
+triggerall = time >= 24
+trigger1 = Win
+trigger2 = RoundState = 4
+value = 6005
+ctrl = 0
+
+[State 6004, Lose]
+type = changestate
+triggerall = time >= 24
+trigger1 = Lose
+trigger2 = RoundState = 4
+value = 6006
+ctrl = 0
+
+[State 6004, ScreenBound]
+type = ScreenBound
+trigger1 = time = 0
+value = 1
+movecamera = 0,0
+
+[State 6004, 2]
+type = VelSet
+trigger1 = time = 0
+x = -3
+
+[State 6004, 3]
+type = DestroySelf
+trigger1 = Time = 120
+
+;-------------------------------------------------------------------------------
+;Rick's Win pose
+[Statedef 6005]
+type = S
+anim = 6103
+velset = 0,0
+ctrl = 0
+
+[State 6005, PlaySnd]
+type = PlaySnd
+trigger1 = time = 2
+value = S6000,3
+
+[State 6005, 1]
+type = VelSet
+trigger1 = time >= 0
+x = 0
+y = 0
+
+;-------------------------------------------------------------------------------
+;Rick's Lose pose
+[Statedef 6006]
+type = S
+anim = 6104
+velset = 0,0
+ctrl = 0
+
+[State 6005, PlaySnd]
+type = PlaySnd
+trigger1 = time = 2
+value = S6000,4
+
+[State 6005, 1]
+type = VelSet
+trigger1 = time >= 0
+x = 0
+y = 0
+
+;-------------------------------------------------------------------------------
+; Assist Mike
+[StateDef 6100]
+type = S
+movetype = A
+physics = S
+juggle = 0
+anim = 6000
+ctrl = 0
+
+[State 6100, Helper]
+type = Helper
+trigger1 = time = 15
+ID = 6101
+pos = -15,0
+postype = back
+stateno = 6101
+helpertype = normal
+name = "Mike"
+keyctrl = 0
+ownpal = 1
+supermovetime = 1
+size.xscale = 0.8
+size.yscale = 0.8
+
+[State 6100, VelSet]
+type = VelSet
+trigger1 = time >= 0
+x = 0
+y = 0
+
+[State 6100, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S6100,0
+
+[State 6100, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+[State 6100, End2]
+type = ChangeState
+trigger1 = AnimTime = 0
+trigger1 = P2BodyDist X > 100
+value = 0
+ctrl = 1
+
+;-------------------------------------------------------------------------------
+; Mike Walks In
+[Statedef 6101]
+type    = S
+movetype= A
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 6200
+
+[State 6101, PlaySnd2]
+type = PlaySnd
+trigger1 = Time = 0
+value = S6100,1
+volume = 200
+channel = 0
+
+[State 6101, 1]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA, AA, AP, AT
+stateno = 6103
+time = -1
+
+[State 6101, 3]
+type = SprPriority
+trigger1 = Time = 0
+value = 2
+
+[State 6101, 2]
+type = VelAdd
+trigger1 = time = 0
+x = 4
+
+[State 6101, Win]
+type = changestate
+triggerall = time >= 24
+trigger1 = Win
+trigger2 = RoundState = 4
+value = 6105
+ctrl = 0
+
+[State 6104, Lose]
+type = changestate
+triggerall = time >= 24
+trigger1 = Lose
+trigger2 = RoundState = 4
+value = 6106
+ctrl = 0
+
+[State 6101, 3]
+type = ChangeState
+Trigger1 = time = 70
+value = 6102
+ctrl = 0
+
+;-------------------------------------------------------------------------------
+; Mike's Attack
+[Statedef 6102]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+anim = 6201
+ctrl = 0
+
+[State 440, 2]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = 0, 2
+
+[State 6102, 1]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA, AA, AP, AT
+stateno = 6103
+time = -1
+
+[State 6102, 3]
+type = HitDef
+trigger1 = Time = 0
+attr = S, SA
+animtype  = Medium
+damage    = 25,10
+guardflag = MA
+pausetime = 8,8
+sparkno = S7020
+guard.sparkno = S7000 
+sparkxy = -10,-61
+hitsound   = S5,2
+guardsound = S6,0
+ground.type = Low
+ground.slidetime = 12
+ground.hittime  = 15
+ground.velocity = -1
+air.velocity = -1,-3
+
+[State 6102, Win]
+type = ChangeState
+triggerall = time >= 24
+trigger1 = Win
+trigger2 = RoundState = 4
+value = 6105
+ctrl = 0
+
+[State 6102, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 6104
+
+;-------------------------------------------------------------------------------
+; Mike Hit
+[Statedef 6103]
+type    = A
+movetype= I
+physics = N
+velset = -17,0
+anim = 6202
+
+[State 6103, 1]
+type = SprPriority
+trigger1 = Time = 0
+value = -1
+
+[State 6103, PlaySnd]
+type = PlaySnd
+trigger1 = time = 2
+value = S6100,2
+
+[State 6103, 2]
+type = DestroySelf
+trigger1 = time = 50
+
+;-------------------------------------------------------------------------------
+; Mike Leaves
+[Statedef 6104]
+type    = A
+movetype= I
+physics = N
+velset = 0,0
+anim = 6205
+
+[State 6104, 1]
+type = SprPriority
+trigger1 = Time = 0
+value = -1
+
+[State 6104, ScreenBound]
+type = ScreenBound
+trigger1 = time = 0
+value = 1
+movecamera = 0,0
+
+[State 6104, Win]
+type = changestate
+triggerall = time >= 24
+trigger1 = Win
+trigger2 = RoundState = 4
+value = 6105
+ctrl = 0
+
+[State 6104, Lose]
+type = changestate
+triggerall = time >= 24
+trigger1 = Lose
+trigger2 = RoundState = 4
+value = 6106
+ctrl = 0
+
+[State 6104, ScreenBound]
+type = ScreenBound
+trigger1 = time = 0
+value = 1
+movecamera = 0,0
+
+[State 6104, 2]
+type = VelSet
+trigger1 = time = 0
+x = -4
+
+[State 6104, 3]
+type = DestroySelf
+trigger1 = Time = 120
+
+;-------------------------------------------------------------------------------
+;Mike's Win pose
+[Statedef 6105]
+type = S
+anim = 6203
+velset = 0,0
+ctrl = 0
+
+[State 6105, PlaySnd]
+type = PlaySnd
+trigger1 = time = 2
+value = S6100,3
+
+[State 6105, 1]
+type = VelSet
+trigger1 = time >= 0
+x = 0
+y = 0
+
+;-------------------------------------------------------------------------------
+;Mike's Lose pose
+[Statedef 6106]
+type = S
+anim = 6204
+velset = 0,0
+ctrl = 0
+
+[State 6105, PlaySnd]
+type = PlaySnd
+trigger1 = time = 2
+value = S6100,4
+
+[State 6105, 1]
+type = VelSet
+trigger1 = time >= 0
+x = 0
+y = 0
+
+;-------------------------------------------------------------------------------
+; Assist Neil
+[StateDef 6200]
+type = S
+movetype = A
+physics = S
+juggle = 0
+anim = 6000
+ctrl = 0
+
+[State 6200, Helper]
+type = Helper
+trigger1 = time = 15
+ID = 6201
+pos = -15,0
+postype = back
+stateno = 6201
+helpertype = normal
+name = "Neil"
+keyctrl = 0
+ownpal = 1
+supermovetime = 1
+size.xscale = 1
+size.yscale = 1.1
+
+[State 6200, VelSet]
+type = VelSet
+trigger1 = time >= 0
+x = 0
+y = 0
+
+[State 6200, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S6200,0
+
+[State 6200, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+[State 6200, End2]
+type = ChangeState
+trigger1 = AnimTime = 0
+trigger1 = P2BodyDist X > 100
+value = 0
+ctrl = 1
+
+;-------------------------------------------------------------------------------
+; Neil Walks In
+[Statedef 6201]
+type    = S
+movetype= A
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 6300
+
+[State 6201, PlaySnd2]
+type = PlaySnd
+trigger1 = Time = 0
+value = S6200,1
+volume = 200
+channel = 0
+
+[State 6201, 1]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA, AA, AP, AT
+stateno = 6203
+time = -1
+
+[State 6201, 3]
+type = SprPriority
+trigger1 = Time = 0
+value = 2
+
+[State 6201, 2]
+type = VelAdd
+trigger1 = time = 0
+x = 4
+
+[State 6201, Win]
+type = changestate
+triggerall = time >= 24
+trigger1 = Win
+trigger2 = RoundState = 4
+value = 6205
+ctrl = 0
+
+[State 6204, Lose]
+type = changestate
+triggerall = time >= 24
+trigger1 = Lose
+trigger2 = RoundState = 4
+value = 6206
+ctrl = 0
+
+[State 6201, 3]
+type = ChangeState
+Trigger1 = time = 70
+value = 6202
+ctrl = 0
+
+;-------------------------------------------------------------------------------
+; Neil's Attack
+[Statedef 6202]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+anim = 6301
+ctrl = 0
+
+[State 440, 2]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = 0, 2
+
+[State 6202, 1]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA, AA, AP, AT
+stateno = 6203
+time = -1
+
+[State 6202, 3]
+type = HitDef
+trigger1 = Time = 0
+attr = S, SA
+animtype  = Medium
+damage    = 25,10
+guardflag = MA
+pausetime = 8,8
+sparkno = S7020
+guard.sparkno = S7000 
+sparkxy = -10,-61
+hitsound   = S5,2
+guardsound = S6,0
+ground.type = Low
+ground.slidetime = 12
+ground.hittime  = 15
+ground.velocity = -1
+air.velocity = -1,-3
+
+[State 6202, Win]
+type = ChangeState
+triggerall = time >= 24
+trigger1 = Win
+trigger2 = RoundState = 4
+value = 6205
+ctrl = 0
+
+[State 6202, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 6204
+
+;-------------------------------------------------------------------------------
+; Neil Hit
+[Statedef 6203]
+type    = A
+movetype= I
+physics = N
+velset = -17,0
+anim = 6302
+
+[State 6203, 1]
+type = SprPriority
+trigger1 = Time = 0
+value = -1
+
+[State 6203, PlaySnd]
+type = PlaySnd
+trigger1 = time = 2
+value = S6200,2
+
+[State 6203, 2]
+type = DestroySelf
+trigger1 = time = 50
+
+;-------------------------------------------------------------------------------
+; Neil Leaves
+[Statedef 6204]
+type    = A
+movetype= I
+physics = N
+velset = 0,0
+anim = 6305
+
+[State 6204, 1]
+type = SprPriority
+trigger1 = Time = 0
+value = -1
+
+[State 6204, ScreenBound]
+type = ScreenBound
+trigger1 = time = 0
+value = 1
+movecamera = 0,0
+
+[State 6204, Win]
+type = changestate
+triggerall = time >= 24
+trigger1 = Win
+trigger2 = RoundState = 4
+value = 6205
+ctrl = 0
+
+[State 6204, Lose]
+type = changestate
+triggerall = time >= 24
+trigger1 = Lose
+trigger2 = RoundState = 4
+value = 6206
+ctrl = 0
+
+[State 6204, ScreenBound]
+type = ScreenBound
+trigger1 = time = 0
+value = 1
+movecamera = 0,0
+
+[State 6204, 2]
+type = VelSet
+trigger1 = time = 0
+x = -4
+
+[State 6204, 3]
+type = DestroySelf
+trigger1 = Time = 120
+
+;-------------------------------------------------------------------------------
+;Neil's Win pose
+[Statedef 6205]
+type = S
+anim = 6303
+velset = 0,0
+ctrl = 0
+
+[State 6205, PlaySnd]
+type = PlaySnd
+trigger1 = time = 2
+value = S6200,3
+
+[State 6205, 1]
+type = VelSet
+trigger1 = time >= 0
+x = 0
+y = 0
+
+;-------------------------------------------------------------------------------
+;Neil's Lose pose
+[Statedef 6206]
+type = S
+anim = 6304
+velset = 0,0
+ctrl = 0
+
+[State 6205, PlaySnd]
+type = PlaySnd
+trigger1 = time = 2
+value = S6200,4
+
+[State 6205, 1]
+type = VelSet
+trigger1 = time >= 0
+x = 0
+y = 0
+
+;-------------------------------------------------------------------------------
+; Assist Mr. Balowski
+[StateDef 6300]
+type = S
+movetype = A
+physics = S
+juggle = 0
+anim = 195
+ctrl = 0
+
+[State 6250, Helper]
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+name = "Mr. Balowski"
+id = 6301
+postype = back
+facing = 1
+pos = 0,0
+stateno = 6301
+keyctrl = 0
+ownpal = 1
+
+[State 6260, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S195,0
+
+[State 6250, End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+[State 6250, End2]
+type = ChangeState
+trigger1 = AnimTime = 0
+trigger1 = P2BodyDist X > 100
+value = 0
+ctrl = 1
+
+;-------------------------------------------------------------------------------
+; Mr. Balowski Walks In
+[Statedef 6301]
+type    = S
+movetype= A
+physics = N
+velset = 28,0
+ctrl = 0
+anim = 6350
+
+[State 6261, PlaySnd]
+type = PlaySnd
+trigger1 = time =0
+value = S6250,0
+volume = 200
+channel = 0
+
+[State 6261, 1]
+type = HitOverride
+trigger1 = Time = 0
+attr = SCA, AA, AP, AT
+stateno = 6303
+time = -1
+
+[State 6001, 3]
+type = ChangeState
+trigger1 = p2bodydist x < 150
+value = 6302
+ctrl = 0
+
+;-------------------------------------------------------------------------------
+; Mr. Balowski's Attack
+[Statedef 6302]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+anim = 6355
+ctrl = 0
+
+[State 6252, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = S6250,1
+
+[State 6252, EnvShake]
+type = EnvShake
+trigger1 = AnimElem = 3
+time = 8
+freq = 8
+ignorehitpause = 1
+
+[State 6252, Projectile]
+type = Projectile
+trigger1 = animelem = 3
+ProjID = 6353
+projanim = 6353
+projhitanim = 6354
+projpriority = 2
+projsprpriority = 2
+projheightbound = -240, 100
+projedgebound = 100
+projshadow = -1
+projscale = 1.5,1.5
+offset = 65,-68
+velocity = 25,0
+attr = S, SA
+damage = 89,11
+animtype = Heavy
+guardflag = MA
+hitflag = MAFDP
+pausetime = 8,8
+sparkno = S7010
+guard.sparkno = S7000 
+sparkxy = -10, -76
+hitsound = S5, 0
+guardsound = S6, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 12
+ground.velocity = -9,-1
+airguard.velocity = -5,-3
+air.type = High
+air.velocity = -5,-3
+air.hittime = 12
+fall = 1
+envshake.time = 15
+envshake.ampl = 7
+palfx.time = 30
+palfx.add = 32,16,50
+palfx.mul = 164,32,50
+palfx.color = 100
+
+[State 6252, VelAdd]
+type = VelSet
+trigger1 = AnimElem = 6
+x = -30
+
+[State 6252, 2]
+type = DestroySelf
+trigger1 = Time = 50
+
+;-------------------------------------------------------------------------------
+; Mr. Balowski Hit
+[Statedef 6303]
+type    = A
+movetype= I
+physics = N
+velset = -17,0
+anim = 6351
+
+[State 6253, Helper]
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+name = "Riffel"
+ID = 6304
+stateno = 6304
+pos = 20,-28
+postype = p1    ;p2,front,back,left,right
+facing = 1
+keyctrl = 0
+
+[State 6253, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S6250,2
+
+[State 6253, 1]
+type = SprPriority
+trigger1 = Time = 0
+value = -1
+
+[State 6253, 2]
+type = DestroySelf
+trigger1 = Time = 50
+
+;---------------------------------------------------------------------------
+; Mr. Balowski's Riffel
+[Statedef 6304]
+type = S
+ctrl = 0
+anim = 6352
+
+[State 6254, VelSet]
+type = VelSet
+trigger1 = time = 0
+x = 18
+y = -16
+
+[State 6254, 1]
+type = DestroySelf
+trigger1 = Time = 120
